@@ -52,17 +52,21 @@ export type RcaRow = {
 
 export type SummaryMetrics = {
   copowerFailures: number;
-  totalEvents: number;
+  /** Bitácora total; null si el informe no la reporta. */
+  totalEvents: number | null;
   mtbfHours: number;
   mttrHours: number;
-  actionsOverdue: number;
-  rcaPending: number;
+  /** null si el informe no reporta acciones vencidas. */
+  actionsOverdue: number | null;
+  /** null si el informe no reporta RCA pendientes. */
+  rcaPending: number | null;
   hoursOperated: number;
   hoursStandby: number;
   hoursPreventive: number;
   hoursCorrective: number;
   hoursFailureCopower: number;
   hoursFailureClient: number;
+  /** Gas Costayaco (kWh), alineado al desglose del informe. */
   energyGasKwh: number;
   energyDieselKwh: number;
 };
@@ -102,14 +106,17 @@ export type GenerationByEquipmentRow = {
 export type MachineIndicatorRow = {
   unidad: string;
   campo: string;
-  horasStandBy: number;
+  /** null cuando el informe no publica stand-by (p. ej. unidades en estabilizacion). */
+  horasStandBy: number | null;
   disponibilidadPct: number;
   confiabilidadPct: number;
   fallas: number;
   mtbfLabel: string;
   mttrHours: number;
   riesgoTecnico: "RIESGO BAJO" | "RIESGO MEDIO" | "RIESGO ALTO";
-  cumplimiento: "CUMPLE" | "NO CUMPLE";
+  cumplimiento: "CUMPLE" | "NO CUMPLE" | "N/A";
+  /** Nota del anexo / criterio de imputabilidad. */
+  detalle?: string;
 };
 
 export type EventRecord = {

@@ -2165,10 +2165,10 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
     "label": "Mayo",
     "sourceFile": "data/GTE/Mayo/Data Soporte Cálculo Copower PUTN Mayo 2026.xlsx",
     "summary": {
-      "copowerFailures": 10,
+      "copowerFailures": 7,
       "totalEvents": 12,
-      "mtbfHours": 614.17,
-      "mttrHours": 6.63,
+      "mtbfHours": 500.39,
+      "mttrHours": 5.32,
       "actionsOverdue": 0,
       "rcaPending": 0,
       "hoursOperated": 6141.75,
@@ -2692,8 +2692,8 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
       }
     ],
     "kpi": {
-      "availability": 0.9895,
-      "reliability": 0.993,
+      "availability": 0.9288,
+      "reliability": 0.9405,
       "maintainability": 0.9893,
       "generationMwh": 3955.107,
       "operationalLossesMwh": 64.558,
@@ -2704,19 +2704,19 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
     "label": "Junio",
     "sourceFile": "data/GTE/Junio/Data Soporte Cálculo Copower PUTN Junio 2026 (1).xlsx",
     "summary": {
-      "copowerFailures": 10,
+      "copowerFailures": 7,
       "totalEvents": 38,
-      "mtbfHours": 690.7,
-      "mttrHours": 2,
-      "actionsOverdue": 0,
-      "rcaPending": 0,
+      "mtbfHours": 711.57,
+      "mttrHours": 2.86,
+      "actionsOverdue": null,
+      "rcaPending": null,
       "hoursOperated": 6907,
       "hoursStandby": 3128,
       "hoursPreventive": 28,
       "hoursCorrective": 20,
       "hoursFailureCopower": 20,
       "hoursFailureClient": 189,
-      "energyGasKwh": 3990428.246,
+      "energyGasKwh": 3499840.246,
       "energyDieselKwh": 119716
     },
     "generationByAsset": [
@@ -2918,86 +2918,106 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
       {
         "unidad": "CPW01",
         "campo": "COSTAYACO",
-        "horasStandBy": 60,
-        "disponibilidadPct": 87.78,
+        "horasStandBy": 146,
+        "disponibilidadPct": 99.72,
         "confiabilidadPct": 99.72,
-        "fallas": 2,
-        "mtbfLabel": "286.00",
-        "mttrHours": 1,
-        "riesgoTecnico": "RIESGO ALTO",
-        "cumplimiento": "NO CUMPLE"
+        "fallas": 1,
+        "mtbfLabel": "572.00",
+        "mttrHours": 2,
+        "riesgoTecnico": "RIESGO BAJO",
+        "cumplimiento": "CUMPLE",
+        "detalle": "Tuvo 2 salidas en el Excel; 1 fue imputada al cliente (6/07) y no cuenta"
       },
       {
         "unidad": "CPW02",
         "campo": "COSTAYACO",
-        "horasStandBy": 43,
-        "disponibilidadPct": 96.53,
+        "horasStandBy": 68,
+        "disponibilidadPct": 100,
         "confiabilidadPct": 100,
         "fallas": 0,
         "mtbfLabel": "Sin Fallas",
         "mttrHours": 0,
-        "riesgoTecnico": "RIESGO MEDIO",
-        "cumplimiento": "NO CUMPLE"
+        "riesgoTecnico": "RIESGO BAJO",
+        "cumplimiento": "CUMPLE",
+        "detalle": "Sin eventos en el mes"
       },
       {
         "unidad": "CPW03",
         "campo": "COSTAYACO",
-        "horasStandBy": 83,
-        "disponibilidadPct": 95.83,
+        "horasStandBy": 104,
+        "disponibilidadPct": 98.75,
         "confiabilidadPct": 99.31,
         "fallas": 1,
         "mtbfLabel": "607.00",
         "mttrHours": 5,
-        "riesgoTecnico": "RIESGO MEDIO",
-        "cumplimiento": "NO CUMPLE"
+        "riesgoTecnico": "RIESGO BAJO",
+        "cumplimiento": "CUMPLE",
+        "detalle": "Evento único, mayor MTTR del grupo de un evento"
       },
       {
         "unidad": "CPW04",
         "campo": "COSTAYACO",
-        "horasStandBy": 7,
-        "disponibilidadPct": 99.31,
+        "horasStandBy": 12,
+        "disponibilidadPct": 100,
         "confiabilidadPct": 100,
-        "fallas": 1,
-        "mtbfLabel": "708.00",
+        "fallas": 0,
+        "mtbfLabel": "Sin Fallas",
         "mttrHours": 0,
         "riesgoTecnico": "RIESGO BAJO",
-        "cumplimiento": "CUMPLE"
+        "cumplimiento": "CUMPLE",
+        "detalle": "Tuvo 1 salida en el Excel (6/23) pero fue imputada al cliente, no cuenta"
       },
       {
         "unidad": "CPW05",
         "campo": "COSTAYACO",
-        "horasStandBy": 8,
-        "disponibilidadPct": 98.19,
+        "horasStandBy": 13,
+        "disponibilidadPct": 98.89,
         "confiabilidadPct": 99.86,
-        "fallas": 2,
-        "mtbfLabel": "349.50",
-        "mttrHours": 0.5,
-        "riesgoTecnico": "RIESGO MEDIO",
-        "cumplimiento": "CUMPLE"
+        "fallas": 1,
+        "mtbfLabel": "699.00",
+        "mttrHours": 1,
+        "riesgoTecnico": "RIESGO BAJO",
+        "cumplimiento": "CUMPLE",
+        "detalle": "Tuvo 2 salidas en el Excel; 1 fue imputada al cliente (6/23) y no cuenta"
       },
       {
         "unidad": "CPW06",
         "campo": "COSTAYACO",
-        "horasStandBy": 45,
-        "disponibilidadPct": 98.89,
+        "horasStandBy": 46,
+        "disponibilidadPct": 99.03,
         "confiabilidadPct": 99.03,
         "fallas": 3,
         "mtbfLabel": "222.33",
-        "mttrHours": 2.33,
+        "mttrHours": 2,
         "riesgoTecnico": "RIESGO MEDIO",
-        "cumplimiento": "CUMPLE"
+        "cumplimiento": "CUMPLE",
+        "detalle": "Activo dominante del mes: 3 fallas imputables (6/03, 6/27, 6/28), todas contractuales"
       },
       {
         "unidad": "CPW07",
         "campo": "COSTAYACO",
-        "horasStandBy": 90,
-        "disponibilidadPct": 96.53,
+        "horasStandBy": 110,
+        "disponibilidadPct": 99.31,
         "confiabilidadPct": 99.31,
         "fallas": 1,
         "mtbfLabel": "605.00",
         "mttrHours": 5,
-        "riesgoTecnico": "RIESGO MEDIO",
-        "cumplimiento": "NO CUMPLE"
+        "riesgoTecnico": "RIESGO BAJO",
+        "cumplimiento": "CUMPLE",
+        "detalle": "Evento del 6/27, mismo incidente de red que afectó a CPW06"
+      },
+      {
+        "unidad": "JIN-10",
+        "campo": "COSTAYACO",
+        "horasStandBy": 245,
+        "disponibilidadPct": 99.44,
+        "confiabilidadPct": 100,
+        "fallas": 0,
+        "mtbfLabel": "Sin Fallas",
+        "mttrHours": 0,
+        "riesgoTecnico": "RIESGO BAJO",
+        "cumplimiento": "CUMPLE",
+        "detalle": "Sin eventos correctivos"
       },
       {
         "unidad": "G101V",
@@ -3009,7 +3029,8 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "mtbfLabel": "Sin Fallas",
         "mttrHours": 0,
         "riesgoTecnico": "RIESGO BAJO",
-        "cumplimiento": "CUMPLE"
+        "cumplimiento": "CUMPLE",
+        "detalle": "Unidad diésel, sin eventos"
       },
       {
         "unidad": "G102J",
@@ -3021,7 +3042,8 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "mtbfLabel": "Sin Fallas",
         "mttrHours": 0,
         "riesgoTecnico": "RIESGO BAJO",
-        "cumplimiento": "CUMPLE"
+        "cumplimiento": "CUMPLE",
+        "detalle": "Unidad diésel, sin eventos"
       },
       {
         "unidad": "G102K",
@@ -3033,444 +3055,439 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "mtbfLabel": "Sin Fallas",
         "mttrHours": 0,
         "riesgoTecnico": "RIESGO BAJO",
-        "cumplimiento": "CUMPLE"
+        "cumplimiento": "CUMPLE",
+        "detalle": "Unidad diésel, sin eventos"
       },
       {
         "unidad": "JIN-01",
         "campo": "VONU",
-        "horasStandBy": 12,
+        "horasStandBy": 13,
+        "disponibilidadPct": 99.17,
+        "confiabilidadPct": 100,
+        "fallas": 0,
+        "mtbfLabel": "Sin Fallas",
+        "mttrHours": 0,
+        "riesgoTecnico": "RIESGO BAJO",
+        "cumplimiento": "CUMPLE",
+        "detalle": "Sin fallas; Vonu recupera 100%"
+      },
+      {
+        "unidad": "JIN-02",
+        "campo": "VONU",
+        "horasStandBy": 16,
         "disponibilidadPct": 99.03,
         "confiabilidadPct": 100,
         "fallas": 0,
         "mtbfLabel": "Sin Fallas",
         "mttrHours": 0,
         "riesgoTecnico": "RIESGO BAJO",
-        "cumplimiento": "CUMPLE"
-      },
-      {
-        "unidad": "JIN-02",
-        "campo": "VONU",
-        "horasStandBy": 6,
-        "disponibilidadPct": 97.64,
-        "confiabilidadPct": 100,
-        "fallas": 0,
-        "mtbfLabel": "Sin Fallas",
-        "mttrHours": 0,
-        "riesgoTecnico": "RIESGO BAJO",
-        "cumplimiento": "CUMPLE"
-      },
-      {
-        "unidad": "JIN-10",
-        "campo": "COSTAYACO",
-        "horasStandBy": 230,
-        "disponibilidadPct": 97.36,
-        "confiabilidadPct": 100,
-        "fallas": 0,
-        "mtbfLabel": "Sin Fallas",
-        "mttrHours": 0,
-        "riesgoTecnico": "RIESGO BAJO",
-        "cumplimiento": "CUMPLE"
+        "cumplimiento": "CUMPLE",
+        "detalle": "Sin fallas; Vonu recupera 100%"
       },
       {
         "unidad": "JIN-11",
-        "campo": "COSTAYACO",
-        "horasStandBy": 316,
+        "campo": "COSTAYACO (excluida del sistémico)",
+        "horasStandBy": null,
         "disponibilidadPct": 100,
         "confiabilidadPct": 100,
         "fallas": 0,
         "mtbfLabel": "Sin Fallas",
         "mttrHours": 0,
         "riesgoTecnico": "RIESGO BAJO",
-        "cumplimiento": "CUMPLE"
+        "cumplimiento": "N/A",
+        "detalle": "Evaluada individual, en estabilización (ventana ~19 días); no se suma al Sistema N"
       },
       {
         "unidad": "JIN-12",
-        "campo": "COSTAYACO",
-        "horasStandBy": 231,
+        "campo": "COSTAYACO (excluida del sistémico)",
+        "horasStandBy": null,
         "disponibilidadPct": 100,
         "confiabilidadPct": 100,
         "fallas": 0,
         "mtbfLabel": "Sin Fallas",
         "mttrHours": 0,
         "riesgoTecnico": "RIESGO BAJO",
-        "cumplimiento": "CUMPLE"
+        "cumplimiento": "N/A",
+        "detalle": "Evaluada individual, en estabilización (ventana ~19 días); no se suma al Sistema N"
       },
       {
         "unidad": "SISTEMA N",
         "campo": "COSTAYACO",
-        "horasStandBy": 3110,
-        "disponibilidadPct": 97.59,
-        "confiabilidadPct": 99.77,
-        "fallas": 10,
-        "mtbfLabel": "550.90",
-        "mttrHours": 2,
-        "riesgoTecnico": "RIESGO ALTO",
-        "cumplimiento": "CUMPLE"
+        "horasStandBy": 744,
+        "disponibilidadPct": 97.92,
+        "confiabilidadPct": 97.92,
+        "fallas": 7,
+        "mtbfLabel": "711.57",
+        "mttrHours": 2.86,
+        "riesgoTecnico": "RIESGO MEDIO",
+        "cumplimiento": "CUMPLE",
+        "detalle": "Mejora vs. mayo (+5.04pp Disp., +3.87pp Conf.), mismos 7 eventos que mayo pero menor severidad"
       },
       {
         "unidad": "SISTEMA N",
         "campo": "VONU",
-        "horasStandBy": 18,
-        "disponibilidadPct": 98.33,
+        "horasStandBy": 29,
+        "disponibilidadPct": 100,
         "confiabilidadPct": 100,
         "fallas": 0,
         "mtbfLabel": "Sin Fallas",
         "mttrHours": 0,
         "riesgoTecnico": "RIESGO BAJO",
-        "cumplimiento": "CUMPLE"
+        "cumplimiento": "CUMPLE",
+        "detalle": "Recuperación plena vs. mayo (95.97%/97.04%)"
       }
     ],
-    "eventLog": [
+        "eventLog": [
       {
         "date": "2026-06-28",
-        "equipment": "CPW01",
+        "equipment": "CPW07",
         "eventType": "Operativo",
-        "cause": "Evento reportado en soporte mensual",
+        "cause": "7:14hr sale de linea equipo cpw07 por salida MRU. 8:20 hr ingresa a linea modo reparto de carga",
         "downtimeHours": 1,
         "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 1 h | Falla_evento 0"
       },
       {
         "date": "2026-06-28",
-        "equipment": "CPW02",
-        "eventType": "Operativo",
-        "cause": "Evento reportado en soporte mensual",
+        "equipment": "CPW06",
+        "eventType": "Falla",
+        "cause": "7:31hr sale de linea equipo cpw06 sale de linea por sobrecarga. 7:46 hr ingresa a linea modo reparto de carga",
         "downtimeHours": 1,
-        "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
-      },
-      {
-        "date": "2026-06-28",
-        "equipment": "CPW03",
-        "eventType": "Operativo",
-        "cause": "Evento reportado en soporte mensual",
-        "downtimeHours": 1,
-        "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
+        "responsible": "COPOWER",
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 1 h | PF_cli 0 h | Falla_evento 1"
       },
       {
         "date": "2026-06-28",
         "equipment": "CPW05",
         "eventType": "Falla",
-        "cause": "Evento reportado en soporte mensual",
+        "cause": "7:33hr sale de linea equipo cpw05 por parada manual entra en portencia inversa y falla en la gobernación. 8:09 hr ingresa a linea modo reparto de carga",
         "downtimeHours": 1,
         "responsible": "COPOWER",
-        "notes": "PP 0 h | StandBy 0 h"
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 1 h | PF_cli 0 h | Falla_evento 1"
       },
       {
         "date": "2026-06-28",
-        "equipment": "CPW06",
-        "eventType": "Falla",
-        "cause": "Evento reportado en soporte mensual",
-        "downtimeHours": 1,
-        "responsible": "COPOWER",
-        "notes": "PP 0 h | StandBy 0 h"
-      },
-      {
-        "date": "2026-06-28",
-        "equipment": "CPW07",
+        "equipment": "CPW03",
         "eventType": "Operativo",
-        "cause": "Evento reportado en soporte mensual",
+        "cause": "7:14hr sale de linea equipo cpw03 por salida MRU. 8:23 hr ingresa a linea modo reparto de carga",
         "downtimeHours": 1,
         "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 1 h | Falla_evento 0"
       },
       {
-        "date": "2026-06-27",
-        "equipment": "CPW06",
-        "eventType": "Falla",
-        "cause": "Evento reportado en soporte mensual",
-        "downtimeHours": 2,
-        "responsible": "COPOWER",
-        "notes": "PP 0 h | StandBy 0 h"
+        "date": "2026-06-28",
+        "equipment": "CPW02",
+        "eventType": "Operativo",
+        "cause": "7:14hr sale de linea equipo cpw02 por salida MRU. 8:26 hr ingresa a linea modo reparto de carga",
+        "downtimeHours": 1,
+        "responsible": "Cliente",
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 1 h | Falla_evento 0"
+      },
+      {
+        "date": "2026-06-28",
+        "equipment": "CPW01",
+        "eventType": "Operativo",
+        "cause": "7:14hr sale de linea equipo cpw01 por salida MRU. 8:28 hr ingresa a linea modo reparto de carga",
+        "downtimeHours": 1,
+        "responsible": "Cliente",
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 1 h | Falla_evento 0"
       },
       {
         "date": "2026-06-27",
         "equipment": "CPW07",
         "eventType": "Falla",
-        "cause": "Evento reportado en soporte mensual",
+        "cause": "FDL equipos G56 & 57, se presenta perturbacion en la red generando elevacion del voltaje y potencia reactiva de los generadores CPW06 & 07, los cuales salen de linea, el voltaje...",
         "downtimeHours": 5,
         "responsible": "COPOWER",
-        "notes": "PP 0 h | StandBy 0 h"
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 5 h | PF_cli 0 h | Falla_evento 1"
       },
       {
-        "date": "2026-06-26",
-        "equipment": "CPW01",
-        "eventType": "Operativo",
-        "cause": "Evento reportado en soporte mensual",
+        "date": "2026-06-27",
+        "equipment": "CPW06",
+        "eventType": "Falla",
+        "cause": "FDL equipos G56 & 57, se presenta perturbacion en la red generando elevacion del voltaje y potencia reactiva de los generadores CPW06 & 07, los cuales salen de linea, el voltaje...",
         "downtimeHours": 2,
-        "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
-      },
-      {
-        "date": "2026-06-26",
-        "equipment": "CPW02",
-        "eventType": "Operativo",
-        "cause": "Evento reportado en soporte mensual",
-        "downtimeHours": 2,
-        "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
-      },
-      {
-        "date": "2026-06-26",
-        "equipment": "CPW03",
-        "eventType": "Operativo",
-        "cause": "Evento reportado en soporte mensual",
-        "downtimeHours": 2,
-        "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
-      },
-      {
-        "date": "2026-06-26",
-        "equipment": "CPW04",
-        "eventType": "Operativo",
-        "cause": "Evento reportado en soporte mensual",
-        "downtimeHours": 3,
-        "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
+        "responsible": "COPOWER",
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 2 h | PF_cli 0 h | Falla_evento 1"
       },
       {
         "date": "2026-06-26",
         "equipment": "CPW05",
         "eventType": "Operativo",
-        "cause": "Evento reportado en soporte mensual",
+        "cause": "01:00 FDL generación a gas CPW 01-02-03-04-05-06-07- Jinan 10 por disparo de C9 y reconectador RX por sobrecorriente. FDL. 13:26:00 p. m. se coordina con CCM se realiza el apaga...",
         "downtimeHours": 3,
         "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 3 h | Falla_evento 0"
       },
       {
-        "date": "2026-06-25",
-        "equipment": "CPW01",
+        "date": "2026-06-26",
+        "equipment": "CPW04",
         "eventType": "Operativo",
-        "cause": "Evento reportado en soporte mensual",
-        "downtimeHours": 12,
+        "cause": "01:00 FDL generación a gas CPW 01-02-03-04-05-06-07- Jinan 10 por disparo de C9 y reconectador RX por sobrecorriente. FDL. 13:26:00 p. m. se coordina con CCM se realiza el apaga...",
+        "downtimeHours": 3,
         "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 3 h | Falla_evento 0"
       },
       {
-        "date": "2026-06-25",
-        "equipment": "CPW02",
-        "eventType": "Operativo",
-        "cause": "Evento reportado en soporte mensual",
-        "downtimeHours": 11,
-        "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
-      },
-      {
-        "date": "2026-06-25",
+        "date": "2026-06-26",
         "equipment": "CPW03",
         "eventType": "Operativo",
-        "cause": "Evento reportado en soporte mensual",
-        "downtimeHours": 12,
+        "cause": "01:00 FDL generación a gas CPW 01-02-03-04-05-06-07- Jinan 10 por disparo de C9 y reconectador RX por sobrecorriente. FDL - Parada Externa - Coordinación por parte de GTE",
+        "downtimeHours": 2,
         "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 2 h | Falla_evento 0"
+      },
+      {
+        "date": "2026-06-26",
+        "equipment": "CPW02",
+        "eventType": "Operativo",
+        "cause": "01:00 FDL generación a gas CPW 01-02-03-04-05-06-07- Jinan 10 por disparo de C9 y reconectador RX por sobrecorriente. FDL - Parada Externa - Coordinación por parte de GTE",
+        "downtimeHours": 2,
+        "responsible": "Cliente",
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 2 h | Falla_evento 0"
+      },
+      {
+        "date": "2026-06-26",
+        "equipment": "CPW01",
+        "eventType": "Operativo",
+        "cause": "01:00 FDL generación a gas CPW 01-02-03-04-05-06-07- Jinan 10 por disparo de C9 y reconectador RX por sobrecorriente. FDL - Parada Externa - Coordinación por parte de GTE",
+        "downtimeHours": 2,
+        "responsible": "Cliente",
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 2 h | Falla_evento 0"
       },
       {
         "date": "2026-06-25",
         "equipment": "CPW07",
         "eventType": "Operativo",
-        "cause": "Evento reportado en soporte mensual",
+        "cause": "11:30:00 a. m. salen de lienas equipos CPW001,CPW002,CPW003,CPW007,CPW010 y CPW011, por protección parada MRU. Sale MRU de operación por activación de nivel alto en tanque de NG...",
         "downtimeHours": 12,
         "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 12 h | Falla_evento 0"
       },
       {
-        "date": "2026-06-24",
-        "equipment": "CPW01",
-        "eventType": "Operativo",
-        "cause": "Evento reportado en soporte mensual",
-        "downtimeHours": 6,
-        "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
-      },
-      {
-        "date": "2026-06-24",
-        "equipment": "CPW02",
-        "eventType": "Operativo",
-        "cause": "Evento reportado en soporte mensual",
-        "downtimeHours": 11,
-        "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
-      },
-      {
-        "date": "2026-06-24",
+        "date": "2026-06-25",
         "equipment": "CPW03",
         "eventType": "Operativo",
-        "cause": "Evento reportado en soporte mensual",
-        "downtimeHours": 6,
+        "cause": "11:30:00 a. m. salen de lienas equipos CPW001,CPW002,CPW003,CPW007,CPW010 y CPW011, por protección parada MRU. Sale MRU de operación por activación de nivel alto en tanque de NG...",
+        "downtimeHours": 12,
         "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 12 h | Falla_evento 0"
+      },
+      {
+        "date": "2026-06-25",
+        "equipment": "CPW02",
+        "eventType": "Operativo",
+        "cause": "11:30:00 a. m. salen de lienas equipos CPW001,CPW002,CPW003,CPW007,CPW010 y CPW011, por protección parada MRU. Sale MRU de operación por activación de nivel alto en tanque de NG...",
+        "downtimeHours": 11,
+        "responsible": "Cliente",
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 11 h | Falla_evento 0"
+      },
+      {
+        "date": "2026-06-25",
+        "equipment": "CPW01",
+        "eventType": "Operativo",
+        "cause": "11:30:00 a. m. salen de lienas equipos CPW001,CPW002,CPW003,CPW007,CPW010 y CPW011, por protección parada MRU. Sale MRU de operación por activación de nivel alto en tanque de NG...",
+        "downtimeHours": 12,
+        "responsible": "Cliente",
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 12 h | Falla_evento 0"
       },
       {
         "date": "2026-06-24",
-        "equipment": "CPW04",
+        "equipment": "JIN-02",
         "eventType": "Operativo",
-        "cause": "Evento reportado en soporte mensual",
-        "downtimeHours": 1,
+        "cause": "10:43 hrs equipo jinan 2 en coordinación con CCM sale de línea equipo Jinan 02 por mantenimiento cyc 19. 16:20 hr equipo ingresa a linea",
+        "downtimeHours": 6,
         "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 6 h | Falla_evento 0"
+      },
+      {
+        "date": "2026-06-24",
+        "equipment": "CPW07",
+        "eventType": "Operativo",
+        "cause": "8:19 hrs equipo cpw07 en coordinación con CCM , sale de línea equipos cpw alineados con gas MRU+CHILLER, causa corrección fuga de aceite en sistema QUINCY. 10:13 hrs ingresa a l...",
+        "downtimeHours": 6,
+        "responsible": "Cliente",
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 6 h | Falla_evento 0"
       },
       {
         "date": "2026-06-24",
         "equipment": "CPW06",
         "eventType": "Operativo",
-        "cause": "Evento reportado en soporte mensual",
+        "cause": "05:13 EEP reporta disparo de reconectador línea 34.5 Kv Jauno - Piamonte, FDL generación CPW. FDL manual sistema inyección para control de cargas",
         "downtimeHours": 1,
         "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 1 h | Falla_evento 0"
       },
       {
         "date": "2026-06-24",
-        "equipment": "CPW07",
+        "equipment": "CPW04",
         "eventType": "Operativo",
-        "cause": "Evento reportado en soporte mensual",
-        "downtimeHours": 6,
+        "cause": "05:13 EEP reporta disparo de reconectador línea 34.5 Kv Jauno - Piamonte, FDL generación CPW. FDL manual sistema inyección para control de cargas",
+        "downtimeHours": 1,
         "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 1 h | Falla_evento 0"
       },
       {
         "date": "2026-06-24",
-        "equipment": "JIN-02",
+        "equipment": "CPW03",
         "eventType": "Operativo",
-        "cause": "Evento reportado en soporte mensual",
+        "cause": "05:13 EEP reporta disparo de reconectador línea 34.5 Kv Jauno - Piamonte, FDL generación CPW. FDL manual sistema inyección para control de cargas, 8:16 hrs equipo cpw01 en coord...",
         "downtimeHours": 6,
         "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 6 h | Falla_evento 0"
+      },
+      {
+        "date": "2026-06-24",
+        "equipment": "CPW02",
+        "eventType": "Operativo",
+        "cause": "05:13 EEP reporta disparo de reconectador línea 34.5 Kv Jauno - Piamonte, FDL generación CPW. FDL manual sistema inyección para control de cargas, 8:11 hrs equipo cpw02 en coord...",
+        "downtimeHours": 11,
+        "responsible": "Cliente",
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 11 h | Falla_evento 0"
+      },
+      {
+        "date": "2026-06-24",
+        "equipment": "CPW01",
+        "eventType": "Operativo",
+        "cause": "05:13 EEP reporta disparo de reconectador línea 34.5 Kv Jauno - Piamonte, FDL generación CPW. FDL manual sistema inyección para control de cargas, 8:16 hrs equipo cpw01 en coord...",
+        "downtimeHours": 6,
+        "responsible": "Cliente",
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 6 h | Falla_evento 0"
       },
       {
         "date": "2026-06-23",
-        "equipment": "CPW04",
-        "eventType": "Falla",
-        "cause": "Evento reportado en soporte mensual",
-        "downtimeHours": 1,
+        "equipment": "JIN-02",
+        "eventType": "Operativo",
+        "cause": "8:10 pm 4 horas en stanby por daño en tuberia de cyc 19 inicia nuevamente a las 11:52 pm",
+        "downtimeHours": 4,
         "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 4 h | Falla_evento 0"
       },
       {
         "date": "2026-06-23",
         "equipment": "CPW05",
         "eventType": "Falla",
-        "cause": "Evento reportado en soporte mensual",
+        "cause": "se presentan dos salidas en las cuales se abre el totalizador principal de tablero de auxiliares 480V-Pendiente verificar reprote de configuración de protecciónes",
         "downtimeHours": 2,
         "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 2 h | Falla_evento 1"
       },
       {
         "date": "2026-06-23",
-        "equipment": "JIN-02",
-        "eventType": "Operativo",
-        "cause": "Evento reportado en soporte mensual",
-        "downtimeHours": 4,
+        "equipment": "CPW04",
+        "eventType": "Falla",
+        "cause": "se presentan dos salidas en las cuales se abre el totalizador principal de tablero de auxiliares 480V-Pendiente verificar reprote de configuración de protecciónes",
+        "downtimeHours": 1,
         "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 1 h | Falla_evento 1"
       },
       {
         "date": "2026-06-11",
         "equipment": "CPW03",
         "eventType": "Falla",
-        "cause": "Evento reportado en soporte mensual",
+        "cause": "Sale por detonación equipo 15/06 sin reporte de falla.",
         "downtimeHours": 5,
         "responsible": "COPOWER",
-        "notes": "PP 0 h | StandBy 0 h"
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 5 h | PF_cli 0 h | Falla_evento 1"
       },
       {
         "date": "2026-06-10",
         "equipment": "CPW07",
         "eventType": "Operativo",
-        "cause": "Evento reportado en soporte mensual",
+        "cause": "14:20 hrs Parada manual equipo CPW07 por protección presenta altas vivraciones y se nota alta oscilación de carga al pasar la turbina a diesel se informa a CCM. 14:50 hrs Ingres...",
         "downtimeHours": 1,
         "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 1 h | Falla_evento 0"
       },
       {
         "date": "2026-06-09",
         "equipment": "JIN-10",
         "eventType": "Operativo",
-        "cause": "Evento reportado en soporte mensual",
+        "cause": "Equipos entregado a GTE para inicio de arranque sobre las 15:00 se realiza verifiación y pruebas de magnetización de equipo.",
         "downtimeHours": 10,
         "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 9 h"
+        "notes": "PP 0 h | StandBy 9 h | PF_contr 0 h | PF_cli 10 h | Falla_evento 0"
       },
       {
         "date": "2026-06-08",
         "equipment": "JIN-10",
         "eventType": "Operativo",
-        "cause": "Evento reportado en soporte mensual",
+        "cause": "Sale de linea equipo CPW010, 18:30 Se informa equipo disponible para magnetizar transformador 5MVA. Se solicita por Copower realizar el arranque al dia siguiente debido a falta ...",
         "downtimeHours": 5,
         "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 19 h"
+        "notes": "PP 0 h | StandBy 19 h | PF_contr 0 h | PF_cli 5 h | Falla_evento 0"
       },
       {
         "date": "2026-06-07",
         "equipment": "CPW01",
         "eventType": "Falla",
-        "cause": "Evento reportado en soporte mensual",
+        "cause": "FDL por SD detonación. Se evidencia en las tendencias de operación del equipo caída de presión de gas.se realiza cambio de base y rele k4, alimentación válvula shutoff suministr...",
         "downtimeHours": 3,
         "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 3 h | Falla_evento 1"
       },
       {
         "date": "2026-06-06",
         "equipment": "JIN-01",
         "eventType": "Operativo",
-        "cause": "Evento reportado en soporte mensual",
+        "cause": "Sale de línea equipo JINAN-01 parada manual, se realizará cambio de válvula 3/4\" por parte de Confipetrol Tiempo estimado 1 hora.",
         "downtimeHours": 1,
         "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 1 h | Falla_evento 0"
       },
       {
         "date": "2026-06-05",
         "equipment": "CPW01",
         "eventType": "Falla",
-        "cause": "Evento reportado en soporte mensual",
+        "cause": "Sale para mantenimiento correctivo por exostacion del dia 2-06-2026, al momento de iniciar en linea el cual nos produjo daño en la integridad de el equipo, afectando el flexible...",
         "downtimeHours": 2,
         "responsible": "COPOWER",
-        "notes": "PP 0 h | StandBy 0 h"
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 2 h | PF_cli 0 h | Falla_evento 1"
       },
       {
         "date": "2026-06-04",
         "equipment": "CPW01",
         "eventType": "Operativo",
-        "cause": "Evento reportado en soporte mensual",
+        "cause": "Hora de operación posterior a el mantenimiento debido a daño en el tren de admision.",
         "downtimeHours": 23,
         "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
-      },
-      {
-        "date": "2026-06-03",
-        "equipment": "CPW01",
-        "eventType": "Operativo",
-        "cause": "Evento reportado en soporte mensual",
-        "downtimeHours": 24,
-        "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 23 h | Falla_evento 0"
       },
       {
         "date": "2026-06-03",
         "equipment": "CPW06",
         "eventType": "Falla",
-        "cause": "Evento reportado en soporte mensual",
+        "cause": "Cambio de intercooler por exceso de reciduo de secuestrante. Pendiente reporte de fallo.",
         "downtimeHours": 4,
         "responsible": "COPOWER",
-        "notes": "PP 0 h | StandBy 6 h"
+        "notes": "PP 0 h | StandBy 6 h | PF_contr 4 h | PF_cli 0 h | Falla_evento 1"
+      },
+      {
+        "date": "2026-06-03",
+        "equipment": "CPW01",
+        "eventType": "Operativo",
+        "cause": "Falla en el sistema de admision.",
+        "downtimeHours": 24,
+        "responsible": "Cliente",
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 24 h | Falla_evento 0"
       },
       {
         "date": "2026-06-02",
         "equipment": "CPW01",
         "eventType": "Operativo",
-        "cause": "Evento reportado en soporte mensual",
+        "cause": "Sale para mantenimiento semanal de MRU posteriormente presenta detonación al momento de iniciar en línea, el cual nos produjo daño en la integridad de el equipo. Pendiente proce...",
         "downtimeHours": 15,
         "responsible": "Cliente",
-        "notes": "PP 0 h | StandBy 0 h"
+        "notes": "PP 0 h | StandBy 0 h | PF_contr 0 h | PF_cli 15 h | Falla_evento 0"
       }
     ],
     "kpi": {
-      "availability": 0.9769,
-      "reliability": 0.9981,
-      "maintainability": 0.9971,
+      "availability": 0.9792,
+      "reliability": 0.9792,
+      "maintainability": 0.86,
       "generationMwh": 4110.144,
       "operationalLossesMwh": 141.031,
-      "contractualCompliance": 1.0275
+      "contractualCompliance": 1.0
     }
   }
 };

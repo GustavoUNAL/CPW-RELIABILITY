@@ -67,7 +67,7 @@ type SortConfig = {
 const NAV_ITEMS: NavItem[] = [
   { key: "resumen", label: "Resumen", icon: <LayoutDashboard size={16} />, description: "Vista ejecutiva" },
   { key: "generacion", label: "Generacion", icon: <Zap size={16} />, description: "Generacion por equipo y total" },
-  { key: "maquinas", label: "Maquinas", icon: <Gauge size={16} />, description: "Indicadores por unidad" },
+  { key: "maquinas", label: "Indicadores por maquina", icon: <Gauge size={16} />, description: "Indicadores por unidad" },
   { key: "indicadores", label: "Historico de eventos", icon: <BarChart3 size={16} />, description: "Eventos registrados y filtro de fallas" },
   { key: "desviaciones", label: "Desviaciones", icon: <TrendingUp size={16} />, description: "Brechas vs meta" },
   { key: "malos_actores", label: "Malos Actores", icon: <Bug size={16} />, description: "Fallas de impacto" },
@@ -323,6 +323,69 @@ function App() {
   ] as const;
 
   const pageTitle = NAV_ITEMS.find((item) => item.key === activePage)?.label ?? "Resumen";
+  const previousMonthEventLog =
+    activeReport === "gran_tierra" && previousMonthCode
+      ? GRAN_TIERRA_MONTHLY_DATA[previousMonthCode].eventLog
+      : [];
+  const eventStats = useMemo(() => {
+    const byType = {
+      Falla: 0,
+      "Causa comun": 0,
+      Operativo: 0,
+    };
+    const byResponsible = {
+      COPOWER: 0,
+      Cliente: 0,
+      Externo: 0,
+    };
+    const downtimeByEquipment = new Map<string, number>();
+    let downtimeHours = 0;
+    let copowerDowntimeHours = 0;
+
+    for (const event of eventLog) {
+      byType[event.eventType] += 1;
+      byResponsible[event.responsible] += 1;
+      downtimeHours += event.downtimeHours;
+      if (event.responsible === "COPOWER") {
+        copowerDowntimeHours += event.downtimeHours;
+      }
+      downtimeByEquipment.set(event.equipment, (downtimeByEquipment.get(event.equipment) ?? 0) + event.downtimeHours);
+    }
+
+    const topEquipment = [...downtimeByEquipment.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6)
+      .map(([equipment, hours]) => ({ equipment, hours: Number(hours.toFixed(1)) }));
+
+    const typeChart = [
+      { name: "Falla", value: byType.Falla, color: "#ef4444" },
+      { name: "Causa comun", value: byType["Causa comun"], color: "#f59e0b" },
+      { name: "Operativo", value: byType.Operativo, color: "#60a5fa" },
+    ].filter((row) => row.value > 0);
+
+    return {
+      total: eventLog.length,
+      failures: byType.Falla,
+      commonCause: byType["Causa comun"],
+      operative: byType.Operativo,
+      downtimeHours,
+      copowerDowntimeHours,
+      copowerEvents: byResponsible.COPOWER,
+      clientEvents: byResponsible.Cliente + byResponsible.Externo,
+      topEquipment,
+      typeChart,
+      avgDowntime: eventLog.length > 0 ? downtimeHours / eventLog.length : 0,
+    };
+  }, [eventLog]);
+  const previousEventStats = useMemo(() => {
+    const failures = previousMonthEventLog.filter((event) => event.eventType === "Falla").length;
+    const downtimeHours = previousMonthEventLog.reduce((acc, event) => acc + event.downtimeHours, 0);
+    return {
+      total: previousMonthEventLog.length,
+      failures,
+      downtimeHours,
+    };
+  }, [previousMonthEventLog]);
   const filteredEvents = useMemo(
     () => (onlyFailureEvents ? eventLog.filter((event) => event.eventType === "Falla") : eventLog),
     [eventLog, onlyFailureEvents],
@@ -387,8 +450,14 @@ function App() {
     },
   ];
   const generationSourceData = [
-    { source: "Gas", value: summary.energyGasKwh },
-    { source: "Diesel", value: summary.energyDieselKwh },
+    {
+      source: "Gas",
+      value: generationByAssetData.reduce((acc, row) => acc + row.gasKwh, 0),
+    },
+    {
+      source: "Diesel",
+      value: generationByAssetData.reduce((acc, row) => acc + row.dieselKwh, 0),
+    },
   ];
   const sortedEvents = sortRows(filteredEvents, "eventos");
   const sortedMachineIndicators = sortRows(machineIndicators, "maquinas");
@@ -402,11 +471,16 @@ function App() {
       return null;
     }
 
-    const sameFieldRows = generationByEquipment.filter((row) => row.campo === selectedMachine.campo);
+    const campoBase = selectedMachine.campo.startsWith("COSTAYACO")
+      ? "COSTAYACO"
+      : selectedMachine.campo.startsWith("VONU")
+        ? "VONU"
+        : selectedMachine.campo;
+    const sameFieldRows = generationByEquipment.filter((row) => row.campo === campoBase);
     if (selectedMachine.unidad === "SISTEMA N") {
       return {
-        equipo: `SISTEMA N ${selectedMachine.campo}`,
-        campo: selectedMachine.campo,
+        equipo: `SISTEMA N ${campoBase}`,
+        campo: campoBase,
         energiaKwh: sameFieldRows.reduce((acc, row) => acc + row.energiaKwh, 0),
         horasOperacion: sameFieldRows.reduce((acc, row) => acc + row.horasOperacion, 0),
         horasStandBy: sameFieldRows.reduce((acc, row) => acc + row.horasStandBy, 0),
@@ -419,9 +493,9 @@ function App() {
     }
 
     return (
-      generationByEquipment.find(
-        (row) => row.equipo === selectedMachine.unidad && row.campo === selectedMachine.campo,
-      ) ?? null
+      generationByEquipment.find((row) => row.equipo === selectedMachine.unidad && row.campo === campoBase) ??
+      generationByEquipment.find((row) => row.equipo === selectedMachine.unidad) ??
+      null
     );
   }, [selectedMachine, generationByEquipment]);
 
@@ -571,25 +645,30 @@ function App() {
               />
               <KpiCard
                 title="Eventos de falla"
-                reference="Fallas imputables a COPOWER"
+                reference="Fallas imputables a COPOWER (Sistema N Costayaco / PDF)"
                 icon={<Wrench size={18} />}
                 value={String(summary.copowerFailures)}
                 delta={summary.copowerFailures - (previousMonthSummary?.copowerFailures ?? summary.copowerFailures)}
-                target="Meta <= 7"
+                target="Meta contractual <= 7"
                 deltaUnit="count"
               />
               <KpiCard
                 title="Eventos Totales"
-                reference="Registros en bitacora mensual"
+                reference="Bitacora mensual (filas con PF_contr, PF_cli o Falla_evento)"
                 icon={<Zap size={18} />}
-                value={String(summary.totalEvents)}
-                delta={summary.totalEvents - (previousMonthSummary?.totalEvents ?? summary.totalEvents)}
-                target={`Bitacora ${selectedMonth}`}
+                value={summary.totalEvents == null ? "N/D" : String(summary.totalEvents)}
+                delta={
+                  summary.totalEvents == null || previousMonthSummary?.totalEvents == null
+                    ? 0
+                    : summary.totalEvents - previousMonthSummary.totalEvents
+                }
+                target={summary.totalEvents == null ? "No reportado" : `Bitacora ${selectedMonth}`}
                 deltaUnit="count"
+                hideDelta={summary.totalEvents == null}
               />
               <KpiCard
                 title="MTBF"
-                reference="Tiempo medio entre fallas"
+                reference="Tiempo medio entre fallas (Sistema N Costayaco)"
                 icon={<Gauge size={18} />}
                 value={hours(summary.mtbfHours)}
                 delta={summary.mtbfHours - (previousMonthSummary?.mtbfHours ?? summary.mtbfHours)}
@@ -598,7 +677,7 @@ function App() {
               />
               <KpiCard
                 title="MTTR"
-                reference="Tiempo medio de reparacion"
+                reference="Tiempo medio de reparacion (Sistema N Costayaco)"
                 icon={<Wrench size={18} />}
                 value={hours(summary.mttrHours)}
                 delta={summary.mttrHours - (previousMonthSummary?.mttrHours ?? summary.mttrHours)}
@@ -607,7 +686,7 @@ function App() {
               />
               <KpiCard
                 title="Energia Total"
-                reference={`Gas ${kwh(summary.energyGasKwh)} | Diesel ${kwh(summary.energyDieselKwh)}`}
+                reference={`CYC Gas ${kwh(summary.energyGasKwh)} | Diesel ${kwh(summary.energyDieselKwh)} | Vonu ${kwh(totalVonu)}`}
                 icon={<Zap size={18} />}
                 value={kwh((current.generationMwh || 0) * 1000)}
                 delta={(current.generationMwh - previous.generationMwh) * 1000}
@@ -618,38 +697,98 @@ function App() {
                 title="Acciones / RCA Pend."
                 reference="Acciones vencidas y RCA pendientes"
                 icon={<ClipboardList size={18} />}
-                value={`${summary.actionsOverdue} / ${summary.rcaPending}`}
-                delta={summary.actionsOverdue + summary.rcaPending - ((previousMonthSummary?.actionsOverdue ?? summary.actionsOverdue) + (previousMonthSummary?.rcaPending ?? summary.rcaPending))}
-                target="Vencidas / pendientes"
+                value={
+                  summary.actionsOverdue == null || summary.rcaPending == null
+                    ? "N/D"
+                    : `${summary.actionsOverdue} / ${summary.rcaPending}`
+                }
+                delta={
+                  summary.actionsOverdue == null ||
+                  summary.rcaPending == null ||
+                  previousMonthSummary?.actionsOverdue == null ||
+                  previousMonthSummary?.rcaPending == null
+                    ? 0
+                    : summary.actionsOverdue +
+                      summary.rcaPending -
+                      (previousMonthSummary.actionsOverdue + previousMonthSummary.rcaPending)
+                }
+                target={
+                  summary.actionsOverdue == null || summary.rcaPending == null
+                    ? "No reportado en PDF"
+                    : "Vencidas / pendientes"
+                }
                 deltaUnit="count"
+                hideDelta={summary.actionsOverdue == null || summary.rcaPending == null}
               />
             </section>
 
             <section className="panel two-col">
               <article className="card">
-                <h3>Tendencia mensual: Disponibilidad, Confiabilidad, MTBF y MTTR</h3>
+                <h3>Tendencia mensual: Disponibilidad y Confiabilidad</h3>
                 <div className="chart-container">
                   <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={reliabilityTrendData}>
+                    <LineChart data={reliabilityTrendData} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
                       <XAxis dataKey="month" stroke="var(--text-muted)" />
-                      <YAxis yAxisId="pct" stroke="var(--text-muted)" tickFormatter={(v) => `${v * 100}%`} />
-                      <YAxis yAxisId="hrs" orientation="right" stroke="var(--text-muted)" />
-                      <Tooltip />
+                      <YAxis
+                        stroke="var(--text-muted)"
+                        domain={[0.9, 1]}
+                        tickFormatter={(v) => `${(Number(v) * 100).toFixed(0)}%`}
+                        width={48}
+                      />
+                      <Tooltip
+                        formatter={(value, name) => [`${(Number(value) * 100).toFixed(2)}%`, String(name)]}
+                        labelFormatter={(label) => `Mes: ${label}`}
+                      />
                       <Legend />
-                      <Line yAxisId="pct" type="monotone" dataKey="availability" name="Disponibilidad" stroke="#60a5fa" strokeWidth={2} />
-                      <Line yAxisId="pct" type="monotone" dataKey="reliability" name="Confiabilidad" stroke="#34d399" strokeWidth={2} />
-                      <Line yAxisId="hrs" type="monotone" dataKey="mtbfHours" name="MTBF (h)" stroke="#f59e0b" strokeWidth={2} />
-                      <Line yAxisId="hrs" type="monotone" dataKey="mttrHours" name="MTTR (h)" stroke="#ef4444" strokeWidth={2} />
+                      <Line type="monotone" dataKey="availability" name="Disponibilidad" stroke="#60a5fa" strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                      <Line type="monotone" dataKey="reliability" name="Confiabilidad" stroke="#34d399" strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 5 }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
               </article>
 
               <article className="card">
-                <h3>Pareto de fallas por equipo (malos actores)</h3>
+                <h3>Tendencia mensual: MTBF y MTTR</h3>
+                <p className="chart-hint">Ejes separados: MTBF (izq.) y MTTR (der.), por diferencia de escala.</p>
                 <div className="chart-container">
                   <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={reliabilityTrendData} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
+                      <XAxis dataKey="month" stroke="var(--text-muted)" />
+                      <YAxis
+                        yAxisId="mtbf"
+                        stroke="#f59e0b"
+                        tickFormatter={(v) => `${Number(v).toFixed(0)}`}
+                        width={48}
+                        label={{ value: "MTBF (h)", angle: -90, position: "insideLeft", fill: "#f59e0b", fontSize: 11 }}
+                      />
+                      <YAxis
+                        yAxisId="mttr"
+                        orientation="right"
+                        stroke="#ef4444"
+                        tickFormatter={(v) => `${Number(v).toFixed(1)}`}
+                        width={48}
+                        label={{ value: "MTTR (h)", angle: 90, position: "insideRight", fill: "#ef4444", fontSize: 11 }}
+                      />
+                      <Tooltip
+                        formatter={(value, name) => [`${Number(value).toFixed(2)} h`, String(name)]}
+                        labelFormatter={(label) => `Mes: ${label}`}
+                      />
+                      <Legend />
+                      <Line yAxisId="mtbf" type="monotone" dataKey="mtbfHours" name="MTBF (h)" stroke="#f59e0b" strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                      <Line yAxisId="mttr" type="monotone" dataKey="mttrHours" name="MTTR (h)" stroke="#ef4444" strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </article>
+            </section>
+
+            <section className="panel two-col">
+              <article className="card">
+                <h3>Pareto de fallas por equipo (malos actores)</h3>
+                <div className="chart-container compact">
+                  <ResponsiveContainer width="100%" height={260}>
                     <BarChart data={topBadActors}>
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
                       <XAxis dataKey="equipment" stroke="var(--text-muted)" />
@@ -660,9 +799,7 @@ function App() {
                   </ResponsiveContainer>
                 </div>
               </article>
-            </section>
 
-            <section className="panel two-col">
               <article className="card">
                 <h3>Pareto de causas (bitacora)</h3>
                 <div className="chart-container compact">
@@ -677,7 +814,9 @@ function App() {
                   </ResponsiveContainer>
                 </div>
               </article>
+            </section>
 
+            <section className="panel">
               <article className="card">
                 <h3>Horas apiladas: operacion, stand-by y fallas</h3>
                 <div className="chart-container compact">
@@ -737,118 +876,262 @@ function App() {
         )}
 
         {activePage === "indicadores" && (
-          <section className="panel">
-            <article className="card">
-              <h3>Eventos registrados en {selectedMonth}</h3>
-              <div className="event-filters">
-                <label className="event-filter-check">
-                  <input type="checkbox" checked={onlyFailureEvents} onChange={(e) => setOnlyFailureEvents(e.target.checked)} />
-                  Mostrar solo eventos de falla
-                </label>
-                <span className="event-count">
-                  {filteredEvents.length} evento(s) {onlyFailureEvents ? "de falla" : "totales"}
-                </span>
-              </div>
-              <table>
-                <thead>
-                  <tr>
-                    <th><button className="sort-button" onClick={() => toggleSort("eventos", "date")}>Fecha {getSortIndicator("eventos", "date")}</button></th>
-                    <th><button className="sort-button" onClick={() => toggleSort("eventos", "equipment")}>Equipo / Sistema {getSortIndicator("eventos", "equipment")}</button></th>
-                    <th><button className="sort-button" onClick={() => toggleSort("eventos", "eventType")}>Tipo {getSortIndicator("eventos", "eventType")}</button></th>
-                    <th><button className="sort-button" onClick={() => toggleSort("eventos", "cause")}>Causa {getSortIndicator("eventos", "cause")}</button></th>
-                    <th><button className="sort-button" onClick={() => toggleSort("eventos", "downtimeHours")}>Horas {getSortIndicator("eventos", "downtimeHours")}</button></th>
-                    <th><button className="sort-button" onClick={() => toggleSort("eventos", "responsible")}>Responsable {getSortIndicator("eventos", "responsible")}</button></th>
-                    <th><button className="sort-button" onClick={() => toggleSort("eventos", "notes")}>Observaciones {getSortIndicator("eventos", "notes")}</button></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredEvents.length === 0 ? (
-                    <tr>
-                      <td colSpan={7}>Sin eventos para el filtro seleccionado.</td>
-                    </tr>
+          <>
+            <section className="kpi-grid">
+              <KpiCard
+                title="Eventos totales"
+                reference={`Bitacora ${selectedMonth}`}
+                icon={<BarChart3 size={18} />}
+                value={String(eventStats.total)}
+                delta={eventStats.total - previousEventStats.total}
+                target="Registros del mes"
+                deltaUnit="count"
+              />
+              <KpiCard
+                title="Eventos de falla"
+                reference="Falla_evento > 0 en Excel (bitacora)"
+                icon={<AlertTriangle size={18} />}
+                value={String(eventStats.failures)}
+                delta={eventStats.failures - previousEventStats.failures}
+                target={
+                  eventStats.failures <= 7
+                    ? "Meta bitacora <= 7 · Cumple"
+                    : `Meta bitacora <= 7 · No cumple (${eventStats.failures} > 7)`
+                }
+                deltaUnit="count"
+              />
+              <KpiCard
+                title="Imputables COPOWER"
+                reference="PF_contr > 0 · eventos Sistema CPW del PDF"
+                icon={<Wrench size={18} />}
+                value={String(eventStats.copowerEvents)}
+                delta={0}
+                target={
+                  eventStats.copowerEvents <= 7
+                    ? `Meta contractual <= 7 · Cumple · ${hours(eventStats.copowerDowntimeHours)}`
+                    : `Meta contractual <= 7 · No cumple · ${hours(eventStats.copowerDowntimeHours)}`
+                }
+                deltaUnit="count"
+                hideDelta
+              />
+              <KpiCard
+                title="Cliente / Externo"
+                reference="Eventos no imputables a COPOWER (PF_cli)"
+                icon={<ClipboardList size={18} />}
+                value={String(eventStats.clientEvents)}
+                delta={0}
+                target={`${eventStats.total > 0 ? ((eventStats.clientEvents / eventStats.total) * 100).toFixed(0) : 0}% del total`}
+                deltaUnit="count"
+                hideDelta
+              />
+              <KpiCard
+                title="Horas afectadas"
+                reference="PF_contr + PF_cli (20 h contractuales + resto cliente)"
+                icon={<Gauge size={18} />}
+                value={hours(eventStats.downtimeHours)}
+                delta={eventStats.downtimeHours - previousEventStats.downtimeHours}
+                target={`Promedio ${hours(eventStats.avgDowntime)}`}
+                deltaUnit="hours"
+              />
+              <KpiCard
+                title="Causa comun"
+                reference="Clasificacion no definida en el Excel de soporte"
+                icon={<ShieldAlert size={18} />}
+                value="N/D"
+                delta={0}
+                target="Pendiente de metodologia"
+                deltaUnit="count"
+                hideDelta
+              />
+            </section>
+
+            <section className="panel two-col">
+              <article className="card">
+                <h3>Distribucion por tipo de evento</h3>
+                <div className="chart-container compact">
+                  {eventStats.typeChart.length === 0 ? (
+                    <div className="no-data-state">
+                      <p>Sin eventos registrados para {selectedMonth}.</p>
+                    </div>
                   ) : (
-                    sortedEvents.map((event) => (
-                      <tr key={`${event.date}-${event.equipment}-${event.cause}`}>
-                        <td>{event.date}</td>
-                        <td>{event.equipment}</td>
-                        <td>
-                          <span
-                            className={`badge ${
-                              event.eventType === "Falla" ? "danger" : event.eventType === "Causa comun" ? "warning" : "info"
-                            }`}
-                          >
-                            {event.eventType}
-                          </span>
-                        </td>
-                        <td>{event.cause}</td>
-                        <td>{event.downtimeHours.toFixed(1)} h</td>
-                        <td>{event.responsible}</td>
-                        <td>{event.notes}</td>
-                      </tr>
-                    ))
+                    <ResponsiveContainer width="100%" height={260}>
+                      <PieChart>
+                        <Pie data={eventStats.typeChart} dataKey="value" nameKey="name" innerRadius={45} outerRadius={85}>
+                          {eventStats.typeChart.map((row) => (
+                            <Cell key={row.name} fill={row.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip formatter={(value) => `${Number(value)} eventos`} />
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
                   )}
-                </tbody>
-              </table>
-            </article>
-          </section>
+                </div>
+              </article>
+
+              <article className="card">
+                <h3>Equipos con mayor downtime</h3>
+                <div className="chart-container compact">
+                  {eventStats.topEquipment.length === 0 ? (
+                    <div className="no-data-state">
+                      <p>Sin horas de afectacion registradas.</p>
+                    </div>
+                  ) : (
+                    <ResponsiveContainer width="100%" height={260}>
+                      <BarChart data={eventStats.topEquipment} layout="vertical" margin={{ left: 24, right: 12 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
+                        <XAxis type="number" stroke="var(--text-muted)" unit=" h" />
+                        <YAxis type="category" dataKey="equipment" stroke="var(--text-muted)" width={78} />
+                        <Tooltip formatter={(value) => `${Number(value).toFixed(1)} h`} />
+                        <Bar dataKey="hours" name="Horas" fill="#f97316" radius={[0, 6, 6, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  )}
+                </div>
+              </article>
+            </section>
+
+            <section className="panel">
+              <article className="card">
+                <div className="section-header-row">
+                  <div>
+                    <h3>Eventos registrados en {selectedMonth}</h3>
+                    <p className="muted">Detalle de la bitacora mensual con filtro por tipo de evento.</p>
+                  </div>
+                  <div className="event-filters">
+                    <label className="event-filter-check">
+                      <input type="checkbox" checked={onlyFailureEvents} onChange={(e) => setOnlyFailureEvents(e.target.checked)} />
+                      Mostrar solo eventos de falla
+                    </label>
+                    <span className="event-count">
+                      {filteredEvents.length} de {eventStats.total} evento(s)
+                    </span>
+                  </div>
+                </div>
+                <div className="table-scroll">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th><button className="sort-button" onClick={() => toggleSort("eventos", "date")}>Fecha {getSortIndicator("eventos", "date")}</button></th>
+                        <th><button className="sort-button" onClick={() => toggleSort("eventos", "equipment")}>Equipo / Sistema {getSortIndicator("eventos", "equipment")}</button></th>
+                        <th><button className="sort-button" onClick={() => toggleSort("eventos", "eventType")}>Tipo {getSortIndicator("eventos", "eventType")}</button></th>
+                        <th><button className="sort-button" onClick={() => toggleSort("eventos", "cause")}>Causa {getSortIndicator("eventos", "cause")}</button></th>
+                        <th><button className="sort-button" onClick={() => toggleSort("eventos", "downtimeHours")}>Horas {getSortIndicator("eventos", "downtimeHours")}</button></th>
+                        <th><button className="sort-button" onClick={() => toggleSort("eventos", "responsible")}>Responsable {getSortIndicator("eventos", "responsible")}</button></th>
+                        <th><button className="sort-button" onClick={() => toggleSort("eventos", "notes")}>Observaciones {getSortIndicator("eventos", "notes")}</button></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredEvents.length === 0 ? (
+                        <tr>
+                          <td colSpan={7}>Sin eventos para el filtro seleccionado.</td>
+                        </tr>
+                      ) : (
+                        sortedEvents.map((event) => (
+                          <tr key={`${event.date}-${event.equipment}-${event.cause}-${event.downtimeHours}`}>
+                            <td>{event.date}</td>
+                            <td>{event.equipment}</td>
+                            <td>
+                              <span
+                                className={`badge ${
+                                  event.eventType === "Falla" ? "danger" : event.eventType === "Causa comun" ? "warning" : "info"
+                                }`}
+                              >
+                                {event.eventType}
+                              </span>
+                            </td>
+                            <td>{event.cause}</td>
+                            <td>{event.downtimeHours.toFixed(1)} h</td>
+                            <td>
+                              <span
+                                className={`badge ${
+                                  event.responsible === "COPOWER" ? "danger" : event.responsible === "Cliente" ? "warning" : "info"
+                                }`}
+                              >
+                                {event.responsible}
+                              </span>
+                            </td>
+                            <td>{event.notes}</td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </article>
+            </section>
+          </>
         )}
 
         {activePage === "maquinas" && (
           <section className="panel">
             <article className="card">
-              <h3>Indicadores por maquina - {selectedMonth}</h3>
-              <table>
-                <thead>
-                  <tr>
-                    <th><button className="sort-button" onClick={() => toggleSort("maquinas", "unidad")}>Unidad {getSortIndicator("maquinas", "unidad")}</button></th>
-                    <th><button className="sort-button" onClick={() => toggleSort("maquinas", "campo")}>Campo {getSortIndicator("maquinas", "campo")}</button></th>
-                    <th><button className="sort-button" onClick={() => toggleSort("maquinas", "horasStandBy")}>Horas Stand By {getSortIndicator("maquinas", "horasStandBy")}</button></th>
-                    <th><button className="sort-button" onClick={() => toggleSort("maquinas", "disponibilidadPct")}>Disponibilidad % {getSortIndicator("maquinas", "disponibilidadPct")}</button></th>
-                    <th><button className="sort-button" onClick={() => toggleSort("maquinas", "confiabilidadPct")}>Confiabilidad % {getSortIndicator("maquinas", "confiabilidadPct")}</button></th>
-                    <th><button className="sort-button" onClick={() => toggleSort("maquinas", "fallas")}>#Fallas {getSortIndicator("maquinas", "fallas")}</button></th>
-                    <th><button className="sort-button" onClick={() => toggleSort("maquinas", "mtbfLabel")}>MTBF_h {getSortIndicator("maquinas", "mtbfLabel")}</button></th>
-                    <th><button className="sort-button" onClick={() => toggleSort("maquinas", "mttrHours")}>MTTR_h {getSortIndicator("maquinas", "mttrHours")}</button></th>
-                    <th><button className="sort-button" onClick={() => toggleSort("maquinas", "riesgoTecnico")}>Riesgo tecnico {getSortIndicator("maquinas", "riesgoTecnico")}</button></th>
-                    <th><button className="sort-button" onClick={() => toggleSort("maquinas", "cumplimiento")}>Cumplimiento {getSortIndicator("maquinas", "cumplimiento")}</button></th>
-                    <th>Detalle</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {machineIndicators.length === 0 ? (
-                    <tr>
-                      <td colSpan={11}>Sin datos por unidad para este reporte.</td>
-                    </tr>
-                  ) : (
-                    sortedMachineIndicators.map((row) => (
-                      <tr key={`${row.unidad}-${row.campo}`}>
-                        <td>{row.unidad}</td>
-                        <td>{row.campo}</td>
-                        <td>{row.horasStandBy}</td>
-                        <td>{row.disponibilidadPct.toFixed(2)}%</td>
-                        <td>{row.confiabilidadPct.toFixed(2)}%</td>
-                        <td>{row.fallas}</td>
-                        <td>{row.mtbfLabel}</td>
-                        <td>{row.mttrHours}</td>
-                        <td>
-                          <span className={`badge ${row.riesgoTecnico === "RIESGO MEDIO" ? "warning" : row.riesgoTecnico === "RIESGO ALTO" ? "danger" : "success"}`}>
-                            {row.riesgoTecnico}
-                          </span>
-                        </td>
-                        <td>
-                          <span className={`badge ${row.cumplimiento === "CUMPLE" ? "success" : "danger"}`}>{row.cumplimiento}</span>
-                        </td>
-                        <td>
-                          <button className="open-popup-btn" onClick={() => setSelectedMachine(row)}>
-                            Ver detalle
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+              <h3>Indicadores por maquina - {activeMonthData?.label ?? selectedMonth}</h3>
               <p className="muted">
-                Premisa de estabilizacion: JIN11 y JIN12 se evaluan individualmente sobre una ventana de 19 dias y no se incorporan al calculo sistemico de Costayaco para junio.
+                Criterio de imputabilidad del PDF: solo cuentan horas/fallas atribuidas a COPOWER (contratista). Las fallas-cliente no afectan disponibilidad ni #fallas contractuales.
+              </p>
+              <div className="table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th><button className="sort-button" onClick={() => toggleSort("maquinas", "unidad")}>Unidad {getSortIndicator("maquinas", "unidad")}</button></th>
+                      <th><button className="sort-button" onClick={() => toggleSort("maquinas", "campo")}>Campo {getSortIndicator("maquinas", "campo")}</button></th>
+                      <th><button className="sort-button" onClick={() => toggleSort("maquinas", "horasStandBy")}>Horas Stand By {getSortIndicator("maquinas", "horasStandBy")}</button></th>
+                      <th><button className="sort-button" onClick={() => toggleSort("maquinas", "disponibilidadPct")}>Disponibilidad % {getSortIndicator("maquinas", "disponibilidadPct")}</button></th>
+                      <th><button className="sort-button" onClick={() => toggleSort("maquinas", "confiabilidadPct")}>Confiabilidad % {getSortIndicator("maquinas", "confiabilidadPct")}</button></th>
+                      <th><button className="sort-button" onClick={() => toggleSort("maquinas", "fallas")}>#Fallas {getSortIndicator("maquinas", "fallas")}</button></th>
+                      <th><button className="sort-button" onClick={() => toggleSort("maquinas", "mtbfLabel")}>MTBF_h {getSortIndicator("maquinas", "mtbfLabel")}</button></th>
+                      <th><button className="sort-button" onClick={() => toggleSort("maquinas", "mttrHours")}>MTTR_h {getSortIndicator("maquinas", "mttrHours")}</button></th>
+                      <th><button className="sort-button" onClick={() => toggleSort("maquinas", "riesgoTecnico")}>Riesgo tecnico {getSortIndicator("maquinas", "riesgoTecnico")}</button></th>
+                      <th><button className="sort-button" onClick={() => toggleSort("maquinas", "cumplimiento")}>Cumplimiento {getSortIndicator("maquinas", "cumplimiento")}</button></th>
+                      <th>Detalle</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {machineIndicators.length === 0 ? (
+                      <tr>
+                        <td colSpan={12}>Sin datos por unidad para este reporte.</td>
+                      </tr>
+                    ) : (
+                      sortedMachineIndicators.map((row) => (
+                        <tr key={`${row.unidad}-${row.campo}`}>
+                          <td>{row.unidad}</td>
+                          <td>{row.campo}</td>
+                          <td>{row.horasStandBy == null ? "—" : row.horasStandBy}</td>
+                          <td>{row.disponibilidadPct.toFixed(2)}%</td>
+                          <td>{row.confiabilidadPct.toFixed(2)}%</td>
+                          <td>{row.fallas}</td>
+                          <td>{row.mtbfLabel}</td>
+                          <td>{row.mttrHours}</td>
+                          <td>
+                            <span className={`badge ${row.riesgoTecnico === "RIESGO MEDIO" ? "warning" : row.riesgoTecnico === "RIESGO ALTO" ? "danger" : "success"}`}>
+                              {row.riesgoTecnico}
+                            </span>
+                          </td>
+                          <td>
+                            <span
+                              className={`badge ${
+                                row.cumplimiento === "CUMPLE" ? "success" : row.cumplimiento === "N/A" ? "info" : "danger"
+                              }`}
+                            >
+                              {row.cumplimiento}
+                            </span>
+                          </td>
+                          <td className="detalle-cell">{row.detalle ?? "—"}</td>
+                          <td>
+                            <button className="open-popup-btn" onClick={() => setSelectedMachine(row)}>
+                              Ver mas
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+              <p className="muted">
+                Premisa de estabilizacion: JIN-11 y JIN-12 se evaluan individualmente sobre una ventana de ~19 dias y no se incorporan al calculo sistemico de Costayaco. Sus % vienen del Excel (0 PF_contr / 0 PF_cli); el PDF no publica su % individual en el Anexo.
               </p>
             </article>
           </section>
@@ -1297,6 +1580,7 @@ function App() {
               <div className="modal-grid">
                 <div>
                   <p><strong>Campo:</strong> {selectedMachine.campo}</p>
+                  <p><strong>Horas Stand By:</strong> {selectedMachine.horasStandBy == null ? "—" : selectedMachine.horasStandBy}</p>
                   <p><strong>Disponibilidad:</strong> {selectedMachine.disponibilidadPct.toFixed(2)}%</p>
                   <p><strong>Confiabilidad:</strong> {selectedMachine.confiabilidadPct.toFixed(2)}%</p>
                   <p><strong># Fallas:</strong> {selectedMachine.fallas}</p>
@@ -1304,16 +1588,19 @@ function App() {
                   <p><strong>MTTR:</strong> {selectedMachine.mttrHours} h</p>
                   <p><strong>Riesgo tecnico:</strong> {selectedMachine.riesgoTecnico}</p>
                   <p><strong>Cumplimiento:</strong> {selectedMachine.cumplimiento}</p>
+                  {selectedMachine.detalle ? (
+                    <p><strong>Nota del anexo:</strong> {selectedMachine.detalle}</p>
+                  ) : null}
                 </div>
                 <div>
                   <p><strong>Energia:</strong> {selectedMachineGeneration ? kwh(selectedMachineGeneration.energiaKwh) : "Sin dato"}</p>
                   <p><strong>Horas operacion:</strong> {selectedMachineGeneration?.horasOperacion ?? "Sin dato"}</p>
-                  <p><strong>Horas stand-by:</strong> {selectedMachineGeneration?.horasStandBy ?? "Sin dato"}</p>
+                  <p><strong>Horas stand-by (Excel):</strong> {selectedMachineGeneration?.horasStandBy ?? "Sin dato"}</p>
                   <p><strong>Horas PP:</strong> {selectedMachineGeneration?.horasPP ?? "Sin dato"}</p>
                   <p><strong>Horas PF contratista:</strong> {selectedMachineGeneration?.horasPFContr ?? "Sin dato"}</p>
                   <p><strong>Horas PF cliente:</strong> {selectedMachineGeneration?.horasPFCli ?? "Sin dato"}</p>
                   <p><strong>Horas calculadas:</strong> {selectedMachineGeneration?.horasCalDia ?? "Sin dato"}</p>
-                  <p><strong># Falla evento:</strong> {selectedMachineGeneration?.fallaEvento ?? "Sin dato"}</p>
+                  <p><strong># Falla evento (Excel):</strong> {selectedMachineGeneration?.fallaEvento ?? "Sin dato"}</p>
                 </div>
               </div>
             </div>
@@ -1332,9 +1619,10 @@ type KpiCardProps = {
   delta: number;
   target: string;
   deltaUnit?: "pp" | "mwh" | "hours" | "count";
+  hideDelta?: boolean;
 };
 
-function KpiCard({ title, reference, icon, value, delta, target, deltaUnit = "pp" }: KpiCardProps) {
+function KpiCard({ title, reference, icon, value, delta, target, deltaUnit = "pp", hideDelta = false }: KpiCardProps) {
   const positive = delta >= 0;
   let deltaText = `${positive ? "+" : ""}${delta.toFixed(1)} pp`;
 
@@ -1356,7 +1644,11 @@ function KpiCard({ title, reference, icon, value, delta, target, deltaUnit = "pp
         </div>
       </div>
       <h3>{value}</h3>
-      <p className={positive ? "delta positive" : "delta negative"}>{deltaText} vs mes anterior</p>
+      {hideDelta ? (
+        <p className="delta">Sin dato vs mes anterior</p>
+      ) : (
+        <p className={positive ? "delta positive" : "delta negative"}>{deltaText} vs mes anterior</p>
+      )}
       <small>Meta: {target}</small>
     </article>
   );
