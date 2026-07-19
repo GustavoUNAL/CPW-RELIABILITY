@@ -32,17 +32,18 @@ import {
   YAxis,
 } from "recharts";
 import { REPORT_DATASETS } from "./domain/reliability/reports";
+import {
+  GRAN_TIERRA_KPI_FROM_MONTHS,
+  GRAN_TIERRA_MONTHLY_DATA,
+  GRAN_TIERRA_MONTH_ORDER,
+  type GranTierraMonthKey,
+} from "./domain/reliability/reports/granTierraMonthly";
 import type {
   ActionRow,
-  Deviation,
-  EventRecord,
-  GenerationAssetRow,
-  GenerationByEquipmentRow,
   MachineIndicatorRow,
   MaintenanceRow,
   PageKey,
   ReportKey,
-  SummaryMetrics,
 } from "./domain/reliability/types";
 
 type NavItem = {
@@ -85,70 +86,6 @@ const mwh = (value: number) => `${Math.round(value).toLocaleString("es-CO")} MWh
 const kwh = (value: number) => `${Math.round(value).toLocaleString("es-CO")} kWh`;
 const hours = (value: number) => `${value.toFixed(2)} h`;
 
-const MAY_SUMMARY: SummaryMetrics = {
-  copowerFailures: 10,
-  totalEvents: 10,
-  mtbfHours: 500.39,
-  mttrHours: 5.32,
-  actionsOverdue: 2,
-  rcaPending: 4,
-  hoursOperated: 6141.75,
-  hoursStandby: 3262,
-  hoursPreventive: 31,
-  hoursCorrective: 66.25,
-  hoursFailureCopower: 66.25,
-  hoursFailureClient: 3,
-  energyGasKwh: 3737235,
-  energyDieselKwh: 217947,
-};
-
-const MAY_GENERATION_BY_ASSET: GenerationAssetRow[] = [
-  { asset: "Costayaco", gasKwh: 3415843, dieselKwh: 217947 },
-  { asset: "Vonu", gasKwh: 321392, dieselKwh: 0 },
-];
-
-const MAY_GENERATION_BY_EQUIPMENT: GenerationByEquipmentRow[] = [
-  { equipo: "CPW01", campo: "COSTAYACO", energiaKwh: 471917, horasOperacion: 711, horasStandBy: 24, horasPP: 5, horasPFContr: 4, horasPFCli: 0, horasCalDia: 744, fallaEvento: 1 },
-  { equipo: "CPW02", campo: "COSTAYACO", energiaKwh: 477675, horasOperacion: 726, horasStandBy: 18, horasPP: 0, horasPFContr: 0, horasPFCli: 0, horasCalDia: 744, fallaEvento: 0 },
-  { equipo: "CPW03", campo: "COSTAYACO", energiaKwh: 478517, horasOperacion: 723, horasStandBy: 21, horasPP: 0, horasPFContr: 0, horasPFCli: 0, horasCalDia: 744, fallaEvento: 0 },
-  { equipo: "CPW04", campo: "COSTAYACO", energiaKwh: 529307, horasOperacion: 652, horasStandBy: 62, horasPP: 0, horasPFContr: 30, horasPFCli: 0, horasCalDia: 744, fallaEvento: 4 },
-  { equipo: "CPW05", campo: "COSTAYACO", energiaKwh: 582181, horasOperacion: 690.75, horasStandBy: 50, horasPP: 0, horasPFContr: 3.25, horasPFCli: 0, horasCalDia: 744, fallaEvento: 2 },
-  { equipo: "CPW06", campo: "COSTAYACO", energiaKwh: 659082, horasOperacion: 708, horasStandBy: 27, horasPP: 9, horasPFContr: 0, horasPFCli: 0, horasCalDia: 744, fallaEvento: 0 },
-  { equipo: "G101V", campo: "COSTAYACO", energiaKwh: 42884, horasOperacion: 127, horasStandBy: 617, horasPP: 0, horasPFContr: 0, horasPFCli: 0, horasCalDia: 744, fallaEvento: 0 },
-  { equipo: "G102J", campo: "COSTAYACO", energiaKwh: 52230, horasOperacion: 69, horasStandBy: 675, horasPP: 0, horasPFContr: 0, horasPFCli: 0, horasCalDia: 744, fallaEvento: 0 },
-  { equipo: "G102K", campo: "COSTAYACO", energiaKwh: 122833, horasOperacion: 163, horasStandBy: 581, horasPP: 0, horasPFContr: 0, horasPFCli: 0, horasCalDia: 744, fallaEvento: 0 },
-  { equipo: "JIN-01", campo: "VONU", energiaKwh: 217961, horasOperacion: 629, horasStandBy: 84, horasPP: 8, horasPFContr: 20, horasPFCli: 3, horasCalDia: 744, fallaEvento: 1 },
-  { equipo: "JIN-02", campo: "VONU", energiaKwh: 103356, horasOperacion: 318, horasStandBy: 424, horasPP: 0, horasPFContr: 2, horasPFCli: 0, horasCalDia: 744, fallaEvento: 1 },
-  { equipo: "JIN-10", campo: "COSTAYACO", energiaKwh: 217164, horasOperacion: 625, horasStandBy: 103, horasPP: 9, horasPFContr: 7, horasPFCli: 0, horasCalDia: 744, fallaEvento: 1 },
-];
-
-const MAY_MACHINE_INDICATORS: MachineIndicatorRow[] = [
-  { unidad: "CPW01", campo: "COSTAYACO", horasStandBy: 24, disponibilidadPct: 98.79, confiabilidadPct: 99.46, fallas: 1, mtbfLabel: "711.00", mttrHours: 4, riesgoTecnico: "RIESGO BAJO", cumplimiento: "CUMPLE" },
-  { unidad: "CPW02", campo: "COSTAYACO", horasStandBy: 18, disponibilidadPct: 100, confiabilidadPct: 100, fallas: 0, mtbfLabel: "Sin Fallas", mttrHours: 0, riesgoTecnico: "RIESGO BAJO", cumplimiento: "CUMPLE" },
-  { unidad: "CPW03", campo: "COSTAYACO", horasStandBy: 21, disponibilidadPct: 100, confiabilidadPct: 100, fallas: 0, mtbfLabel: "Sin Fallas", mttrHours: 0, riesgoTecnico: "RIESGO BAJO", cumplimiento: "CUMPLE" },
-  { unidad: "CPW04", campo: "COSTAYACO", horasStandBy: 62, disponibilidadPct: 95.97, confiabilidadPct: 95.97, fallas: 4, mtbfLabel: "163.00", mttrHours: 7.5, riesgoTecnico: "RIESGO MEDIO", cumplimiento: "CUMPLE" },
-  { unidad: "CPW05", campo: "COSTAYACO", horasStandBy: 50, disponibilidadPct: 99.56, confiabilidadPct: 99.56, fallas: 2, mtbfLabel: "345.38", mttrHours: 1.63, riesgoTecnico: "RIESGO BAJO", cumplimiento: "CUMPLE" },
-  { unidad: "CPW06", campo: "COSTAYACO", horasStandBy: 27, disponibilidadPct: 98.79, confiabilidadPct: 100, fallas: 0, mtbfLabel: "Sin Fallas", mttrHours: 0, riesgoTecnico: "RIESGO BAJO", cumplimiento: "CUMPLE" },
-  { unidad: "JIN-01", campo: "VONU", horasStandBy: 84, disponibilidadPct: 95.83, confiabilidadPct: 97.31, fallas: 1, mtbfLabel: "629.00", mttrHours: 20, riesgoTecnico: "RIESGO MEDIO", cumplimiento: "CUMPLE" },
-  { unidad: "JIN-02", campo: "VONU", horasStandBy: 424, disponibilidadPct: 99.73, confiabilidadPct: 99.73, fallas: 1, mtbfLabel: "318.00", mttrHours: 2, riesgoTecnico: "RIESGO BAJO", cumplimiento: "CUMPLE" },
-  { unidad: "JIN-10", campo: "COSTAYACO", horasStandBy: 103, disponibilidadPct: 97.85, confiabilidadPct: 99.06, fallas: 1, mtbfLabel: "625.00", mttrHours: 7, riesgoTecnico: "RIESGO BAJO", cumplimiento: "CUMPLE" },
-  { unidad: "SISTEMA N", campo: "COSTAYACO", horasStandBy: 3262, disponibilidadPct: 92.88, confiabilidadPct: 94.05, fallas: 7, mtbfLabel: "500.39", mttrHours: 5.32, riesgoTecnico: "RIESGO MEDIO", cumplimiento: "CUMPLE" },
-  { unidad: "SISTEMA N", campo: "VONU", horasStandBy: 508, disponibilidadPct: 95.97, confiabilidadPct: 97.04, fallas: 2, mtbfLabel: "473.50", mttrHours: 11, riesgoTecnico: "RIESGO MEDIO", cumplimiento: "CUMPLE" },
-];
-
-const MAY_EVENT_LOG: EventRecord[] = [
-  { date: "2026-05-03", equipment: "CPW04", eventType: "Falla", cause: "Salida repetitiva en sistema de control", downtimeHours: 8, responsible: "COPOWER", notes: "Primer evento relevante del mes." },
-  { date: "2026-05-08", equipment: "CPW04", eventType: "Falla", cause: "Disparo por proteccion electrica", downtimeHours: 7.5, responsible: "COPOWER", notes: "Evento recurrente en CPW04." },
-  { date: "2026-05-11", equipment: "CPW04", eventType: "Falla", cause: "Desbalance de carga", downtimeHours: 7, responsible: "COPOWER", notes: "Tercer evento en CPW04." },
-  { date: "2026-05-15", equipment: "CPW04", eventType: "Falla", cause: "Parada no programada por proteccion", downtimeHours: 7.5, responsible: "COPOWER", notes: "Cuarta recurrencia del activo dominante." },
-  { date: "2026-05-18", equipment: "CPW05", eventType: "Falla", cause: "Falla de gobernacion", downtimeHours: 1.5, responsible: "COPOWER", notes: "Evento aislado." },
-  { date: "2026-05-20", equipment: "CPW05", eventType: "Falla", cause: "Potencia inversa", downtimeHours: 1.75, responsible: "COPOWER", notes: "Segundo evento de CPW05." },
-  { date: "2026-05-22", equipment: "CPW01", eventType: "Falla", cause: "Interrupcion en sistema de escape", downtimeHours: 4, responsible: "COPOWER", notes: "Correctivo puntual." },
-  { date: "2026-05-25", equipment: "JIN-01", eventType: "Falla", cause: "Parada correctiva en unidad Vonu", downtimeHours: 20, responsible: "COPOWER", notes: "Afecta confiabilidad de Vonu." },
-  { date: "2026-05-26", equipment: "JIN-02", eventType: "Falla", cause: "Parada por ajuste de operacion", downtimeHours: 2, responsible: "COPOWER", notes: "Segundo evento Vonu." },
-  { date: "2026-05-28", equipment: "JIN-10", eventType: "Falla", cause: "Evento correctivo aislado", downtimeHours: 7, responsible: "COPOWER", notes: "Sin recurrencia posterior en mayo." },
-];
-
 function App() {
   const [activeReport, setActiveReport] = useState<ReportKey>("gran_tierra");
   const [maintenanceByReport, setMaintenanceByReport] = useState<Record<ReportKey, MaintenanceRow[]>>({
@@ -162,7 +99,7 @@ function App() {
   const [activePage, setActivePage] = useState<PageKey>("resumen");
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [onlyFailureEvents, setOnlyFailureEvents] = useState(false);
-  const [selectedMonth, setSelectedMonth] = useState("Jun");
+  const [selectedMonth, setSelectedMonth] = useState<GranTierraMonthKey>("Jun");
   const [selectedMachine, setSelectedMachine] = useState<MachineIndicatorRow | null>(null);
   const [tableSorts, setTableSorts] = useState<Record<string, SortConfig>>({
     eventos: { key: "date", direction: "desc" },
@@ -175,16 +112,19 @@ function App() {
   });
 
   const reportData = REPORT_DATASETS[activeReport];
-  const kpiData = reportData.kpiData;
+  const monthOptions = activeReport === "gran_tierra" ? GRAN_TIERRA_MONTH_ORDER : ["Jun"];
+  const activeMonthData = activeReport === "gran_tierra" ? GRAN_TIERRA_MONTHLY_DATA[selectedMonth] : null;
+  const kpiData = activeReport === "gran_tierra" ? GRAN_TIERRA_KPI_FROM_MONTHS : reportData.kpiData;
   const targets = reportData.kpiTargets;
   const badActors = reportData.badActors;
   const rcaData = reportData.rca;
   const maintenancePlan = maintenanceByReport[activeReport];
   const actionPlan = actionsByReport[activeReport];
-  const eventLog = selectedMonth === "May" ? MAY_EVENT_LOG : reportData.eventLog;
-  const machineIndicators = selectedMonth === "May" ? MAY_MACHINE_INDICATORS : reportData.machineIndicators;
-  const generationByEquipment = selectedMonth === "May" ? MAY_GENERATION_BY_EQUIPMENT : reportData.generationByEquipment;
-  const totalGenerationKwh = selectedMonth === "May" ? 3955182 : reportData.totalGenerationKwh;
+  const summary = activeMonthData?.summary ?? reportData.summary;
+  const eventLog = activeMonthData?.eventLog ?? reportData.eventLog;
+  const machineIndicators = activeMonthData?.machineIndicators ?? reportData.machineIndicators;
+  const generationByEquipment = activeMonthData?.generationByEquipment ?? reportData.generationByEquipment;
+  const totalGenerationKwh = activeMonthData?.totalGenerationKwh ?? reportData.totalGenerationKwh;
   const generationCostayaco = generationByEquipment.filter((row) => row.campo === "COSTAYACO");
   const generationVonu = generationByEquipment.filter((row) => row.campo === "VONU");
   const totalCostayaco = generationCostayaco.reduce((acc, row) => acc + row.energiaKwh, 0);
@@ -194,6 +134,9 @@ function App() {
   const safeIndex = monthIndex >= 0 ? monthIndex : kpiData.length - 1;
   const current = kpiData[safeIndex];
   const previous = kpiData[Math.max(0, safeIndex - 1)];
+  const previousMonthCode = activeReport === "gran_tierra" ? GRAN_TIERRA_MONTH_ORDER[Math.max(0, safeIndex - 1)] : null;
+  const previousMonthSummary =
+    activeReport === "gran_tierra" && previousMonthCode ? GRAN_TIERRA_MONTHLY_DATA[previousMonthCode].summary : null;
   const isNoDataReport =
     !reportData.source &&
     kpiData.every(
@@ -206,12 +149,14 @@ function App() {
         row.contractualCompliance === 0,
     );
 
-  const deviations: Deviation[] = useMemo(
+  const deviations = useMemo(
     () => [
       {
         indicator: "Disponibilidad",
         value: current.availability,
         target: targets.availability,
+        unit: "pct" as const,
+        higherIsBetter: true,
         technicalExplanation:
           isNoDataReport
             ? "Sin datos reportados para este periodo."
@@ -223,6 +168,8 @@ function App() {
         indicator: "Confiabilidad",
         value: current.reliability,
         target: targets.reliability,
+        unit: "pct" as const,
+        higherIsBetter: true,
         technicalExplanation:
           isNoDataReport
             ? "Sin datos reportados para este periodo."
@@ -234,6 +181,8 @@ function App() {
         indicator: "Mantenibilidad",
         value: current.maintainability,
         target: targets.maintainability,
+        unit: "pct" as const,
+        higherIsBetter: true,
         technicalExplanation:
           isNoDataReport
             ? "Sin datos reportados para este periodo."
@@ -242,25 +191,88 @@ function App() {
             : "Se observan tiempos de reparación por encima del estándar.",
       },
       {
+        indicator: "Generacion",
+        value: current.generationMwh,
+        target: targets.generationMwh,
+        unit: "mwh" as const,
+        higherIsBetter: true,
+        technicalExplanation:
+          isNoDataReport
+            ? "Sin datos reportados para este periodo."
+            : current.generationMwh >= targets.generationMwh
+            ? "La produccion energetica supera la meta mensual."
+            : "La produccion no alcanza el objetivo y requiere refuerzo operativo.",
+      },
+      {
+        indicator: "Perdidas operacionales",
+        value: current.operationalLossesMwh,
+        target: targets.operationalLossesMwh,
+        unit: "mwh" as const,
+        higherIsBetter: false,
+        technicalExplanation:
+          isNoDataReport
+            ? "Sin datos reportados para este periodo."
+            : current.operationalLossesMwh <= targets.operationalLossesMwh
+            ? "Las perdidas estan controladas frente al objetivo."
+            : "Las perdidas exceden meta y deben atacarse con acciones correctivas.",
+      },
+      {
         indicator: "Cumplimiento contractual",
         value: current.contractualCompliance,
         target: targets.contractualCompliance,
+        unit: "pct" as const,
+        higherIsBetter: true,
         technicalExplanation:
           isNoDataReport
             ? "Sin datos reportados para este periodo."
             : current.contractualCompliance >= targets.contractualCompliance
-            ? "Entrega energética alineada a la obligación contractual."
-            : "La menor generación neta reduce el cumplimiento.",
+            ? "Entrega energetica alineada a la obligación contractual."
+            : "La menor generacion neta reduce el cumplimiento.",
+      },
+      {
+        indicator: "MTBF",
+        value: summary.mtbfHours,
+        target: 650,
+        unit: "hours" as const,
+        higherIsBetter: true,
+        technicalExplanation:
+          summary.mtbfHours >= 650
+            ? "Buen intervalo promedio entre fallas para el sistema."
+            : "Frecuencia de fallas alta; se requiere intervencion por recurrencias.",
+      },
+      {
+        indicator: "MTTR",
+        value: summary.mttrHours,
+        target: 4,
+        unit: "hours" as const,
+        higherIsBetter: false,
+        technicalExplanation:
+          summary.mttrHours <= 4
+            ? "Tiempo de recuperacion dentro del objetivo."
+            : "Recuperacion lenta frente a meta, revisar repuestos y tiempos de respuesta.",
+      },
+      {
+        indicator: "Eventos de falla",
+        value: summary.copowerFailures,
+        target: 7,
+        unit: "count" as const,
+        higherIsBetter: false,
+        technicalExplanation:
+          summary.copowerFailures <= 7
+            ? "Numero de fallas controlado frente a referencia."
+            : "Recurrencia superior a meta, priorizar equipos con mayor frecuencia.",
       },
     ],
-    [current, targets, isNoDataReport],
+    [current, targets, isNoDataReport, summary],
   );
 
-  const complianceChartData = deviations.map((d) => ({
+  const complianceChartData = deviations
+    .filter((d) => d.unit === "pct")
+    .map((d) => ({
     indicador: d.indicator,
     actual: Number((d.value * 100).toFixed(1)),
     meta: Number((d.target * 100).toFixed(1)),
-  }));
+    }));
 
   const updateMaintenance = <K extends keyof MaintenanceRow>(id: string, field: K, value: MaintenanceRow[K]) => {
     setMaintenanceByReport((prev) => ({
@@ -361,13 +373,12 @@ function App() {
     return sortConfig.direction === "asc" ? "↑" : "↓";
   };
 
-  const summary = selectedMonth === "May" ? MAY_SUMMARY : reportData.summary;
   const reliabilityTrendData = reportData.reliabilityTrend;
   const causeParetoData = reportData.causePareto;
-  const generationByAssetData = selectedMonth === "May" ? MAY_GENERATION_BY_ASSET : reportData.generationByAsset;
+  const generationByAssetData = activeMonthData?.generationByAsset ?? reportData.generationByAsset;
   const operationHoursData = [
     {
-      name: "Junio",
+      name: selectedMonth,
       operacion: summary.hoursOperated,
       standby: summary.hoursStandby,
       preventivo: summary.hoursPreventive,
@@ -419,6 +430,47 @@ function App() {
     setActivePage(page);
   };
 
+  const formatDeviationValue = (value: number, unit: "pct" | "mwh" | "hours" | "count") => {
+    if (unit === "pct") return `${(value * 100).toFixed(2)}%`;
+    if (unit === "mwh") return `${value.toFixed(1)} MWh`;
+    if (unit === "hours") return `${value.toFixed(2)} h`;
+    return `${Math.round(value)}`;
+  };
+
+  const formatDeviationGap = (
+    value: number,
+    target: number,
+    unit: "pct" | "mwh" | "hours" | "count",
+    higherIsBetter: boolean,
+  ) => {
+    const rawGap = value - target;
+    const normalizedGap = higherIsBetter ? rawGap : -rawGap;
+    const gapClass = normalizedGap >= 0 ? "badge success" : "badge danger";
+
+    if (unit === "pct") {
+      return {
+        className: gapClass,
+        text: `${rawGap >= 0 ? "+" : ""}${(rawGap * 100).toFixed(2)} pp`,
+      };
+    }
+    if (unit === "mwh") {
+      return {
+        className: gapClass,
+        text: `${rawGap >= 0 ? "+" : ""}${rawGap.toFixed(1)} MWh`,
+      };
+    }
+    if (unit === "hours") {
+      return {
+        className: gapClass,
+        text: `${rawGap >= 0 ? "+" : ""}${rawGap.toFixed(2)} h`,
+      };
+    }
+    return {
+      className: gapClass,
+      text: `${rawGap >= 0 ? "+" : ""}${Math.round(rawGap)}`,
+    };
+  };
+
   return (
     <div className={`app-shell ${theme}`}>
       <aside className="sidebar">
@@ -429,9 +481,16 @@ function App() {
         <div className="sidebar-controls">
           <div className="month-picker">
             <label htmlFor="month-selector">Mes analizado</label>
-            <select id="month-selector" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)}>
-              <option value="May">May</option>
-              <option value="Jun">Jun</option>
+            <select
+              id="month-selector"
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value as GranTierraMonthKey)}
+            >
+              {monthOptions.map((month) => (
+                <option key={month} value={month}>
+                  {month}
+                </option>
+              ))}
             </select>
           </div>
           <div className="header-theme-switch">
@@ -518,20 +577,20 @@ function App() {
                 icon={<Zap size={18} />}
                 value={String(summary.totalEvents)}
                 delta={0}
-                target="Bitacora junio"
+                target={`Bitacora ${selectedMonth}`}
               />
               <KpiCard
                 title="MTBF"
                 icon={<Gauge size={18} />}
                 value={hours(summary.mtbfHours)}
-                delta={summary.mtbfHours - reportData.reliabilityTrend[Math.max(0, reportData.reliabilityTrend.length - 2)].mtbfHours}
+                delta={summary.mtbfHours - (previousMonthSummary?.mtbfHours ?? summary.mtbfHours)}
                 target="Meta >= 650 h"
               />
               <KpiCard
                 title="MTTR"
                 icon={<Wrench size={18} />}
                 value={hours(summary.mttrHours)}
-                delta={summary.mttrHours - reportData.reliabilityTrend[Math.max(0, reportData.reliabilityTrend.length - 2)].mttrHours}
+                delta={summary.mttrHours - (previousMonthSummary?.mttrHours ?? summary.mttrHours)}
                 target="Meta <= 4 h"
               />
               <KpiCard
@@ -918,18 +977,14 @@ function App() {
                 </thead>
                 <tbody>
                   {sortedDeviations.map((d) => {
-                    const diff = (d.value - d.target) * 100;
-                    const diffClass = isNoDataReport ? "badge info" : diff >= 0 ? "badge success" : "badge danger";
+                    const gap = formatDeviationGap(d.value, d.target, d.unit, d.higherIsBetter);
                     return (
                       <tr key={d.indicator}>
                         <td>{d.indicator}</td>
-                        <td>{percent(d.value)}</td>
-                        <td>{percent(d.target)}</td>
+                        <td>{formatDeviationValue(d.value, d.unit)}</td>
+                        <td>{formatDeviationValue(d.target, d.unit)}</td>
                         <td>
-                          <span className={diffClass}>
-                            {diff >= 0 ? "+" : ""}
-                            {diff.toFixed(1)} pp
-                          </span>
+                          <span className={gap.className}>{gap.text}</span>
                         </td>
                         <td>{d.technicalExplanation}</td>
                       </tr>
