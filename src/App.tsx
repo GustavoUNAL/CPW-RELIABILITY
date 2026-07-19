@@ -23,8 +23,6 @@ import {
   CartesianGrid,
   Cell,
   Legend,
-  Line,
-  LineChart,
   Pie,
   PieChart,
   ResponsiveContainer,
@@ -38,7 +36,6 @@ import {
   GRAN_TIERRA_KPI_FROM_MONTHS,
   GRAN_TIERRA_MONTHLY_DATA,
   GRAN_TIERRA_MONTH_ORDER,
-  GRAN_TIERRA_TREND_FROM_MONTHS,
   granTierraMonthLabel,
   type GranTierraMonthKey,
 } from "./domain/reliability/reports/granTierraMonthly";
@@ -48,7 +45,6 @@ import {
   CONTRACT_FRAMEWORK_CONCLUSION,
   CONTRACT_ORDERS_OVERVIEW,
   getReliabilityDeduction,
-  getShutdownDeduction,
   RELIABILITY_DEDUCTION_BANDS,
   SHUTDOWN_PENALTY_BANDS,
 } from "./domain/reliability/contracts/gteOrders";
@@ -119,12 +115,6 @@ const mwh = (value: number) => `${Math.round(value).toLocaleString("es-CO")} MWh
 const kwh = (value: number) => `${Math.round(value).toLocaleString("es-CO")} kWh`;
 const hours = (value: number | null | undefined) =>
   value == null || Number.isNaN(value) ? "N/A" : `${value.toFixed(2)} h`;
-const numOrNA = (value: number | null | undefined, digits = 2) =>
-  value == null || Number.isNaN(value) ? "N/A" : value.toFixed(digits);
-const deltaOrZero = (curr: number | null | undefined, prev: number | null | undefined) =>
-  curr == null || prev == null ? 0 : (curr - prev) * 100;
-const formatMachinePct = (value: number | null | undefined) =>
-  value == null || Number.isNaN(value) ? "N/A" : `${value.toFixed(2)}%`;
 const riesgoBadgeClass = (riesgo: string) =>
   riesgo === "RIESGO MEDIO" ? "warning" : riesgo === "RIESGO ALTO" ? "danger" : riesgo === "N/A" ? "info" : "success";
 const riskAxisLabel = (level: RiskAxisLevel | null) => (level == null ? "—" : level);
@@ -214,13 +204,8 @@ function App() {
   const monthIndex = kpiData.findIndex((row) => row.month === selectedMonth);
   const safeIndex = monthIndex >= 0 ? monthIndex : kpiData.length - 1;
   const current = kpiData[safeIndex];
-  const previous = kpiData[Math.max(0, safeIndex - 1)];
   const monthLabel = activeMonthData?.label ?? granTierraMonthLabel(selectedMonth);
   const previousMonthCode = activeReport === "gran_tierra" ? GRAN_TIERRA_MONTH_ORDER[Math.max(0, safeIndex - 1)] : null;
-  const previousMonthSummary =
-    activeReport === "gran_tierra" && previousMonthCode ? GRAN_TIERRA_MONTHLY_DATA[previousMonthCode].summary : null;
-  const sistemaCostayaco = machineIndicators.find((m) => m.unidad === "SISTEMA N" && m.campo === "COSTAYACO") ?? null;
-  const sistemaVonu = machineIndicators.find((m) => m.unidad === "SISTEMA N" && m.campo === "VONU") ?? null;
   const indicatorsSourceNote =
     selectedMonth === "Jun"
       ? "Fuente: anexo PDF/DOCX junio (data/GTE/Junio). Cumplimiento de sistema vs ≥98% Orden 1."
@@ -560,12 +545,6 @@ function App() {
     failing: deviations.filter((d) => d.status === "no_cumple").length,
     tracking: deviations.filter((d) => d.status === "seguimiento").length,
   };
-  const actionStats = {
-    total: actionPlan.length,
-    pending: actionPlan.filter((a) => a.status === "Pendiente").length,
-    inProgress: actionPlan.filter((a) => a.status === "En curso").length,
-    done: actionPlan.filter((a) => a.status === "Completada").length,
-  };
   const machineRiskStats = {
     high: machineIndicators.filter((m) => m.unidad !== "SISTEMA N" && m.riesgoTecnico === "RIESGO ALTO").length,
     medium: machineIndicators.filter((m) => m.unidad !== "SISTEMA N" && m.riesgoTecnico === "RIESGO MEDIO").length,
@@ -643,85 +622,9 @@ function App() {
   ];
   const activeReliabilityBand =
     current.reliability == null ? null : getReliabilityDeduction(current.reliability);
-  const failuresDelta =
-    previousMonthSummary != null ? summary.copowerFailures - previousMonthSummary.copowerFailures : null;
   const focalRiskUnits = machineIndicators.filter(
     (m) => m.unidad !== "SISTEMA N" && (m.riesgoTecnico === "RIESGO MEDIO" || m.riesgoTecnico === "RIESGO ALTO"),
   );
-  const consecutiveReliabilityMisses = useMemo(() => {
-    if (activeReport !== "gran_tierra") return 0;
-    let streak = 0;
-    for (let i = safeIndex; i >= 0; i -= 1) {
-      const rel = GRAN_TIERRA_KPI_FROM_MONTHS[i]?.reliability;
-      if (rel == null || rel >= CONTRACTUAL_KPI_TARGETS.reliability) break;
-      streak += 1;
-    }
-    return streak;
-  }, [activeReport, safeIndex]);
-  const consecutiveAvailabilityMisses = useMemo(() => {
-    if (activeReport !== "gran_tierra") return 0;
-    let streak = 0;
-    for (let i = safeIndex; i >= 0; i -= 1) {
-      const avail = GRAN_TIERRA_KPI_FROM_MONTHS[i]?.availability;
-      if (avail == null || avail >= CONTRACTUAL_KPI_TARGETS.availability) break;
-      streak += 1;
-    }
-    return streak;
-  }, [activeReport, safeIndex]);
-  const shutdownBandPending = getShutdownDeduction(summary.copowerFailures);
-  const generationTargetKwh = targets.generationMwh * 1000;
-  const generationActualKwh = current.generationMwh * 1000;
-  const dieselSharePct =
-    generationActualKwh > 0 ? (summary.energyDieselKwh / generationActualKwh) * 100 : null;
-  const unitDetailRows = useMemo(
-    () =>
-      [...machineIndicators].sort((a, b) => {
-        const aSys = a.unidad === "SISTEMA N" ? 0 : 1;
-        const bSys = b.unidad === "SISTEMA N" ? 0 : 1;
-        if (aSys !== bSys) return aSys - bSys;
-        if (a.campo !== b.campo) return a.campo.localeCompare(b.campo);
-        return a.unidad.localeCompare(b.unidad);
-      }),
-    [machineIndicators],
-  );
-  const executiveAlerts = [
-    {
-      active: current.reliability != null && !reliabilityMeetsContract,
-      title: "Confiabilidad < 98%",
-      detail:
-        current.reliability == null
-          ? "N/A"
-          : `Deducción aplicable: ${
-              activeReliabilityBand?.terminationRisk
-                ? "terminación anticipada"
-                : `${activeReliabilityBand?.deductionPct ?? 0}%`
-            } (banda ${activeReliabilityBand?.rangeLabel ?? "N/A"})`,
-    },
-    {
-      active: consecutiveReliabilityMisses >= 2 || consecutiveAvailabilityMisses >= 2,
-      title: "Incumplimiento reiterado",
-      detail:
-        consecutiveReliabilityMisses >= 2 || consecutiveAvailabilityMisses >= 2
-          ? `${Math.max(consecutiveReliabilityMisses, consecutiveAvailabilityMisses)} mes(es) consecutivos bajo meta — riesgo de terminación anticipada (reincidencia Orden 1)`
-          : "Sin racha de incumplimientos consecutivos",
-    },
-    {
-      active: selectedMonth === "Jun",
-      title: "Eventos sin RCA / reporte de falla",
-      detail:
-        selectedMonth === "Jun"
-          ? `0/${summary.copowerFailures} reportes entregados → expuesto a multa adicional 4%`
-          : "N/A — sin evidencia verificable en carpeta del mes",
-    },
-    {
-      active: focalRiskUnits.length > 0,
-      title: "Riesgo técnico focalizado",
-      detail:
-        focalRiskUnits.length > 0
-          ? focalRiskUnits.map((u) => `${u.unidad} (${u.riesgoTecnico.replace("RIESGO ", "")})`).join(" · ")
-          : "Ninguna unidad en Riesgo Medio/Alto (matriz propuesta)",
-    },
-  ];
 
   const riskCards = [
     {
@@ -894,38 +797,6 @@ function App() {
     return sortConfig.direction === "asc" ? "↑" : "↓";
   };
 
-  const reliabilityTrendData =
-    activeReport === "gran_tierra"
-      ? GRAN_TIERRA_TREND_FROM_MONTHS
-      : reportData.reliabilityTrend.map((row) => ({
-          month: row.month,
-          availability: row.availability,
-          reliability: row.reliability,
-          mtbfHours: row.mtbfHours,
-          mttrHours: row.mttrHours,
-        }));
-  const causeParetoData = hasJuneAnalysis ? reportData.causePareto : [];
-  const generationByAssetData = activeMonthData?.generationByAsset ?? reportData.generationByAsset;
-  const operationHoursData = [
-    {
-      name: selectedMonth,
-      operacion: summary.hoursOperated,
-      standby: summary.hoursStandby,
-      preventivo: summary.hoursPreventive,
-      fallaCopower: summary.hoursFailureCopower,
-      fallaCliente: summary.hoursFailureClient,
-    },
-  ];
-  const generationSourceData = [
-    {
-      source: "Gas",
-      value: generationByAssetData.reduce((acc, row) => acc + row.gasKwh, 0),
-    },
-    {
-      source: "Diesel",
-      value: generationByAssetData.reduce((acc, row) => acc + row.dieselKwh, 0),
-    },
-  ];
   const sortedEvents = sortRows(filteredEvents, "eventos");
   const sortedMachineIndicators = sortRows(machineIndicators, "maquinas");
   const sortedDeviations = sortRows(deviations, "desviaciones");

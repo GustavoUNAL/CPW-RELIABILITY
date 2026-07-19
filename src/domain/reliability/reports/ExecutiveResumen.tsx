@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import {
   AlertTriangle,
   ChevronDown,
@@ -49,7 +49,7 @@ function gapPp(value: number, meta: number) {
   return (meta - value) * 100;
 }
 
-function SourceTag({ children }: { children: string }) {
+function SourceTag({ children }: { children: ReactNode }) {
   return <span className="exec-source">{children}</span>;
 }
 
