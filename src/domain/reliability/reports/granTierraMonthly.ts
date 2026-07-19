@@ -1,6 +1,6 @@
 import type { EventRecord, GenerationAssetRow, GenerationByEquipmentRow, KpiRow, MachineIndicatorRow, SummaryMetrics } from "../types";
 
-export type GranTierraMonthKey = "Ene" | "Feb" | "Mar" | "May" | "Jun";
+export type GranTierraMonthKey = "Ene" | "Feb" | "Mar" | "Abr" | "May" | "Jun";
 
 export type GranTierraMonthlySnapshot = {
   label: string;
@@ -14,7 +14,7 @@ export type GranTierraMonthlySnapshot = {
   kpi: Omit<KpiRow, "month">;
 };
 
-export const GRAN_TIERRA_MONTH_ORDER: GranTierraMonthKey[] = ["Ene", "Feb", "Mar", "May", "Jun"];
+export const GRAN_TIERRA_MONTH_ORDER: GranTierraMonthKey[] = ["Ene", "Feb", "Mar", "Abr", "May", "Jun"];
 
 export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMonthlySnapshot> = {
   "Ene": {
@@ -1611,6 +1611,554 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
       "generationMwh": 0,
       "operationalLossesMwh": 0,
       "contractualCompliance": 0
+    }
+  },
+  "Abr": {
+    "label": "Abril",
+    "sourceFile": "data/GTE/Abril /Data Soporte Cálculo Copower PUTN Abril 2026.xlsx",
+    "summary": {
+      "copowerFailures": 6,
+      "totalEvents": 13,
+      "mtbfHours": 1037.83,
+      "mttrHours": 6.5,
+      "actionsOverdue": 0,
+      "rcaPending": 0,
+      "hoursOperated": 6227,
+      "hoursStandby": 4139,
+      "hoursPreventive": 79,
+      "hoursCorrective": 39,
+      "hoursFailureCopower": 39,
+      "hoursFailureClient": 28,
+      "energyGasKwh": 3363296,
+      "energyDieselKwh": 286034
+    },
+    "generationByAsset": [
+      {
+        "asset": "Costayaco",
+        "gasKwh": 2941284,
+        "dieselKwh": 286034
+      },
+      {
+        "asset": "Vonu",
+        "gasKwh": 422012,
+        "dieselKwh": 0
+      }
+    ],
+    "generationByEquipment": [
+      {
+        "equipo": "CPW01",
+        "campo": "COSTAYACO",
+        "energiaKwh": 442752,
+        "horasOperacion": 676,
+        "horasStandBy": 23,
+        "horasPP": 13,
+        "horasPFContr": 2,
+        "horasPFCli": 6,
+        "horasCalDia": 720,
+        "fallaEvento": 1
+      },
+      {
+        "equipo": "CPW02",
+        "campo": "COSTAYACO",
+        "energiaKwh": 461380,
+        "horasOperacion": 700,
+        "horasStandBy": 15,
+        "horasPP": 0,
+        "horasPFContr": 0,
+        "horasPFCli": 5,
+        "horasCalDia": 720,
+        "fallaEvento": 0
+      },
+      {
+        "equipo": "CPW03",
+        "campo": "COSTAYACO",
+        "energiaKwh": 451979,
+        "horasOperacion": 700,
+        "horasStandBy": 14,
+        "horasPP": 0,
+        "horasPFContr": 0,
+        "horasPFCli": 6,
+        "horasCalDia": 720,
+        "fallaEvento": 0
+      },
+      {
+        "equipo": "CPW04",
+        "campo": "COSTAYACO",
+        "energiaKwh": 492891,
+        "horasOperacion": 570,
+        "horasStandBy": 141,
+        "horasPP": 9,
+        "horasPFContr": 0,
+        "horasPFCli": 0,
+        "horasCalDia": 720,
+        "fallaEvento": 0
+      },
+      {
+        "equipo": "CPW05",
+        "campo": "COSTAYACO",
+        "energiaKwh": 493828,
+        "horasOperacion": 574,
+        "horasStandBy": 139,
+        "horasPP": 0,
+        "horasPFContr": 7,
+        "horasPFCli": 0,
+        "horasCalDia": 720,
+        "fallaEvento": 1
+      },
+      {
+        "equipo": "CPW06",
+        "campo": "COSTAYACO",
+        "energiaKwh": 347712,
+        "horasOperacion": 404,
+        "horasStandBy": 9,
+        "horasPP": 3,
+        "horasPFContr": 16,
+        "horasPFCli": 0,
+        "horasCalDia": 432,
+        "fallaEvento": 2
+      },
+      {
+        "equipo": "G101V",
+        "campo": "COSTAYACO",
+        "energiaKwh": 23685,
+        "horasOperacion": 69,
+        "horasStandBy": 651,
+        "horasPP": 0,
+        "horasPFContr": 0,
+        "horasPFCli": 0,
+        "horasCalDia": 720,
+        "fallaEvento": 0
+      },
+      {
+        "equipo": "G102A",
+        "campo": "COSTAYACO",
+        "energiaKwh": 27511,
+        "horasOperacion": 79,
+        "horasStandBy": 641,
+        "horasPP": 0,
+        "horasPFContr": 0,
+        "horasPFCli": 0,
+        "horasCalDia": 720,
+        "fallaEvento": 0
+      },
+      {
+        "equipo": "G102E",
+        "campo": "COSTAYACO",
+        "energiaKwh": 28738,
+        "horasOperacion": 82,
+        "horasStandBy": 638,
+        "horasPP": 0,
+        "horasPFContr": 0,
+        "horasPFCli": 0,
+        "horasCalDia": 720,
+        "fallaEvento": 0
+      },
+      {
+        "equipo": "G102I",
+        "campo": "COSTAYACO",
+        "energiaKwh": 39681,
+        "horasOperacion": 115,
+        "horasStandBy": 605,
+        "horasPP": 0,
+        "horasPFContr": 0,
+        "horasPFCli": 0,
+        "horasCalDia": 720,
+        "fallaEvento": 0
+      },
+      {
+        "equipo": "G102J",
+        "campo": "COSTAYACO",
+        "energiaKwh": 60947,
+        "horasOperacion": 82,
+        "horasStandBy": 638,
+        "horasPP": 0,
+        "horasPFContr": 0,
+        "horasPFCli": 0,
+        "horasCalDia": 720,
+        "fallaEvento": 0
+      },
+      {
+        "equipo": "G102K",
+        "campo": "COSTAYACO",
+        "energiaKwh": 105472,
+        "horasOperacion": 141,
+        "horasStandBy": 579,
+        "horasPP": 0,
+        "horasPFContr": 0,
+        "horasPFCli": 0,
+        "horasCalDia": 720,
+        "fallaEvento": 0
+      },
+      {
+        "equipo": "JIN-01",
+        "campo": "VONU",
+        "energiaKwh": 208756,
+        "horasOperacion": 684,
+        "horasStandBy": 3,
+        "horasPP": 13,
+        "horasPFContr": 14,
+        "horasPFCli": 6,
+        "horasCalDia": 720,
+        "fallaEvento": 2
+      },
+      {
+        "equipo": "JIN-02",
+        "campo": "VONU",
+        "energiaKwh": 213256,
+        "horasOperacion": 702,
+        "horasStandBy": 8,
+        "horasPP": 6,
+        "horasPFContr": 0,
+        "horasPFCli": 4,
+        "horasCalDia": 720,
+        "fallaEvento": 0
+      },
+      {
+        "equipo": "JIN-10",
+        "campo": "COSTAYACO",
+        "energiaKwh": 250742,
+        "horasOperacion": 649,
+        "horasStandBy": 35,
+        "horasPP": 35,
+        "horasPFContr": 0,
+        "horasPFCli": 1,
+        "horasCalDia": 720,
+        "fallaEvento": 0
+      }
+    ],
+    "totalGenerationKwh": 3649330,
+    "machineIndicators": [
+      {
+        "unidad": "CPW01",
+        "campo": "COSTAYACO",
+        "horasStandBy": 23,
+        "disponibilidadPct": 97.08,
+        "confiabilidadPct": 99.72,
+        "fallas": 1,
+        "mtbfLabel": "676.00",
+        "mttrHours": 2,
+        "riesgoTecnico": "RIESGO BAJO",
+        "cumplimiento": "CUMPLE"
+      },
+      {
+        "unidad": "CPW02",
+        "campo": "COSTAYACO",
+        "horasStandBy": 15,
+        "disponibilidadPct": 99.31,
+        "confiabilidadPct": 100,
+        "fallas": 0,
+        "mtbfLabel": "Sin Fallas",
+        "mttrHours": 0,
+        "riesgoTecnico": "RIESGO BAJO",
+        "cumplimiento": "CUMPLE"
+      },
+      {
+        "unidad": "CPW03",
+        "campo": "COSTAYACO",
+        "horasStandBy": 14,
+        "disponibilidadPct": 99.17,
+        "confiabilidadPct": 100,
+        "fallas": 0,
+        "mtbfLabel": "Sin Fallas",
+        "mttrHours": 0,
+        "riesgoTecnico": "RIESGO BAJO",
+        "cumplimiento": "CUMPLE"
+      },
+      {
+        "unidad": "CPW04",
+        "campo": "COSTAYACO",
+        "horasStandBy": 141,
+        "disponibilidadPct": 98.75,
+        "confiabilidadPct": 100,
+        "fallas": 0,
+        "mtbfLabel": "Sin Fallas",
+        "mttrHours": 0,
+        "riesgoTecnico": "RIESGO BAJO",
+        "cumplimiento": "CUMPLE"
+      },
+      {
+        "unidad": "CPW05",
+        "campo": "COSTAYACO",
+        "horasStandBy": 139,
+        "disponibilidadPct": 99.03,
+        "confiabilidadPct": 99.03,
+        "fallas": 1,
+        "mtbfLabel": "574.00",
+        "mttrHours": 7,
+        "riesgoTecnico": "RIESGO BAJO",
+        "cumplimiento": "CUMPLE"
+      },
+      {
+        "unidad": "CPW06",
+        "campo": "COSTAYACO",
+        "horasStandBy": 9,
+        "disponibilidadPct": 95.6,
+        "confiabilidadPct": 96.3,
+        "fallas": 2,
+        "mtbfLabel": "202.00",
+        "mttrHours": 8,
+        "riesgoTecnico": "RIESGO MEDIO",
+        "cumplimiento": "NO CUMPLE"
+      },
+      {
+        "unidad": "G101V",
+        "campo": "COSTAYACO",
+        "horasStandBy": 651,
+        "disponibilidadPct": 100,
+        "confiabilidadPct": 100,
+        "fallas": 0,
+        "mtbfLabel": "Sin Fallas",
+        "mttrHours": 0,
+        "riesgoTecnico": "RIESGO BAJO",
+        "cumplimiento": "CUMPLE"
+      },
+      {
+        "unidad": "G102A",
+        "campo": "COSTAYACO",
+        "horasStandBy": 641,
+        "disponibilidadPct": 100,
+        "confiabilidadPct": 100,
+        "fallas": 0,
+        "mtbfLabel": "Sin Fallas",
+        "mttrHours": 0,
+        "riesgoTecnico": "RIESGO BAJO",
+        "cumplimiento": "CUMPLE"
+      },
+      {
+        "unidad": "G102E",
+        "campo": "COSTAYACO",
+        "horasStandBy": 638,
+        "disponibilidadPct": 100,
+        "confiabilidadPct": 100,
+        "fallas": 0,
+        "mtbfLabel": "Sin Fallas",
+        "mttrHours": 0,
+        "riesgoTecnico": "RIESGO BAJO",
+        "cumplimiento": "CUMPLE"
+      },
+      {
+        "unidad": "G102I",
+        "campo": "COSTAYACO",
+        "horasStandBy": 605,
+        "disponibilidadPct": 100,
+        "confiabilidadPct": 100,
+        "fallas": 0,
+        "mtbfLabel": "Sin Fallas",
+        "mttrHours": 0,
+        "riesgoTecnico": "RIESGO BAJO",
+        "cumplimiento": "CUMPLE"
+      },
+      {
+        "unidad": "G102J",
+        "campo": "COSTAYACO",
+        "horasStandBy": 638,
+        "disponibilidadPct": 100,
+        "confiabilidadPct": 100,
+        "fallas": 0,
+        "mtbfLabel": "Sin Fallas",
+        "mttrHours": 0,
+        "riesgoTecnico": "RIESGO BAJO",
+        "cumplimiento": "CUMPLE"
+      },
+      {
+        "unidad": "G102K",
+        "campo": "COSTAYACO",
+        "horasStandBy": 579,
+        "disponibilidadPct": 100,
+        "confiabilidadPct": 100,
+        "fallas": 0,
+        "mtbfLabel": "Sin Fallas",
+        "mttrHours": 0,
+        "riesgoTecnico": "RIESGO BAJO",
+        "cumplimiento": "CUMPLE"
+      },
+      {
+        "unidad": "JIN-01",
+        "campo": "VONU",
+        "horasStandBy": 3,
+        "disponibilidadPct": 95.42,
+        "confiabilidadPct": 98.06,
+        "fallas": 2,
+        "mtbfLabel": "342.00",
+        "mttrHours": 7,
+        "riesgoTecnico": "RIESGO MEDIO",
+        "cumplimiento": "NO CUMPLE"
+      },
+      {
+        "unidad": "JIN-02",
+        "campo": "VONU",
+        "horasStandBy": 8,
+        "disponibilidadPct": 98.61,
+        "confiabilidadPct": 100,
+        "fallas": 0,
+        "mtbfLabel": "Sin Fallas",
+        "mttrHours": 0,
+        "riesgoTecnico": "RIESGO BAJO",
+        "cumplimiento": "CUMPLE"
+      },
+      {
+        "unidad": "JIN-10",
+        "campo": "COSTAYACO",
+        "horasStandBy": 35,
+        "disponibilidadPct": 95,
+        "confiabilidadPct": 100,
+        "fallas": 0,
+        "mtbfLabel": "Sin Fallas",
+        "mttrHours": 0,
+        "riesgoTecnico": "RIESGO MEDIO",
+        "cumplimiento": "NO CUMPLE"
+      },
+      {
+        "unidad": "SISTEMA N",
+        "campo": "COSTAYACO",
+        "horasStandBy": 4128,
+        "disponibilidadPct": 98.86,
+        "confiabilidadPct": 99.72,
+        "fallas": 4,
+        "mtbfLabel": "1210.25",
+        "mttrHours": 6.25,
+        "riesgoTecnico": "RIESGO MEDIO",
+        "cumplimiento": "CUMPLE"
+      },
+      {
+        "unidad": "SISTEMA N",
+        "campo": "VONU",
+        "horasStandBy": 11,
+        "disponibilidadPct": 97.01,
+        "confiabilidadPct": 99.03,
+        "fallas": 2,
+        "mtbfLabel": "693.00",
+        "mttrHours": 7,
+        "riesgoTecnico": "RIESGO MEDIO",
+        "cumplimiento": "CUMPLE"
+      }
+    ],
+    "eventLog": [
+      {
+        "date": "2026-04-28",
+        "equipment": "CPW06",
+        "eventType": "Falla",
+        "cause": "Evento reportado en soporte mensual",
+        "downtimeHours": 12,
+        "responsible": "COPOWER",
+        "notes": "PP 0 h | StandBy 0 h"
+      },
+      {
+        "date": "2026-04-24",
+        "equipment": "JIN-01",
+        "eventType": "Falla",
+        "cause": "Evento reportado en soporte mensual",
+        "downtimeHours": 13,
+        "responsible": "COPOWER",
+        "notes": "PP 0 h | StandBy 0 h"
+      },
+      {
+        "date": "2026-04-22",
+        "equipment": "JIN-01",
+        "eventType": "Falla",
+        "cause": "Evento reportado en soporte mensual",
+        "downtimeHours": 1,
+        "responsible": "COPOWER",
+        "notes": "PP 0 h | StandBy 0 h"
+      },
+      {
+        "date": "2026-04-21",
+        "equipment": "CPW01",
+        "eventType": "Falla",
+        "cause": "Evento reportado en soporte mensual",
+        "downtimeHours": 2,
+        "responsible": "COPOWER",
+        "notes": "PP 0 h | StandBy 5 h"
+      },
+      {
+        "date": "2026-04-18",
+        "equipment": "CPW05",
+        "eventType": "Falla",
+        "cause": "Evento reportado en soporte mensual",
+        "downtimeHours": 7,
+        "responsible": "COPOWER",
+        "notes": "PP 0 h | StandBy 0 h"
+      },
+      {
+        "date": "2026-04-18",
+        "equipment": "CPW06",
+        "eventType": "Falla",
+        "cause": "Evento reportado en soporte mensual",
+        "downtimeHours": 4,
+        "responsible": "COPOWER",
+        "notes": "PP 0 h | StandBy 0 h"
+      },
+      {
+        "date": "2026-04-14",
+        "equipment": "CPW03",
+        "eventType": "Operativo",
+        "cause": "Evento reportado en soporte mensual",
+        "downtimeHours": 1,
+        "responsible": "Cliente",
+        "notes": "PP 0 h | StandBy 0 h"
+      },
+      {
+        "date": "2026-04-14",
+        "equipment": "JIN-01",
+        "eventType": "Operativo",
+        "cause": "Evento reportado en soporte mensual",
+        "downtimeHours": 6,
+        "responsible": "Cliente",
+        "notes": "PP 0 h | StandBy 0 h"
+      },
+      {
+        "date": "2026-04-14",
+        "equipment": "JIN-02",
+        "eventType": "Operativo",
+        "cause": "Evento reportado en soporte mensual",
+        "downtimeHours": 4,
+        "responsible": "Cliente",
+        "notes": "PP 0 h | StandBy 0 h"
+      },
+      {
+        "date": "2026-04-12",
+        "equipment": "JIN-10",
+        "eventType": "Operativo",
+        "cause": "Evento reportado en soporte mensual",
+        "downtimeHours": 1,
+        "responsible": "Cliente",
+        "notes": "PP 0 h | StandBy 0 h"
+      },
+      {
+        "date": "2026-04-06",
+        "equipment": "CPW01",
+        "eventType": "Operativo",
+        "cause": "Evento reportado en soporte mensual",
+        "downtimeHours": 6,
+        "responsible": "Cliente",
+        "notes": "PP 0 h | StandBy 0 h"
+      },
+      {
+        "date": "2026-04-06",
+        "equipment": "CPW02",
+        "eventType": "Operativo",
+        "cause": "Evento reportado en soporte mensual",
+        "downtimeHours": 5,
+        "responsible": "Cliente",
+        "notes": "PP 0 h | StandBy 0 h"
+      },
+      {
+        "date": "2026-04-06",
+        "equipment": "CPW03",
+        "eventType": "Operativo",
+        "cause": "Evento reportado en soporte mensual",
+        "downtimeHours": 5,
+        "responsible": "Cliente",
+        "notes": "PP 0 h | StandBy 0 h"
+      }
+    ],
+    "kpi": {
+      "availability": 0.9861,
+      "reliability": 0.9963,
+      "maintainability": 0.9938,
+      "generationMwh": 3649.33,
+      "operationalLossesMwh": 85.563,
+      "contractualCompliance": 0.9123
     }
   },
   "May": {

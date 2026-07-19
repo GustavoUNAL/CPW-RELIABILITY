@@ -553,60 +553,75 @@ function App() {
             <section className="kpi-grid">
               <KpiCard
                 title="Disponib. Sist. Costayaco"
+                reference="Disponibilidad sistémica mensual"
                 icon={<Gauge size={18} />}
                 value={percent(current.availability)}
                 delta={(current.availability - previous.availability) * 100}
                 target={percent(targets.availability)}
+                deltaUnit="pp"
               />
               <KpiCard
                 title="Confiab. Sist. Costayaco"
+                reference="Confiabilidad sistémica mensual"
                 icon={<ShieldCheck size={18} />}
                 value={percent(current.reliability)}
                 delta={(current.reliability - previous.reliability) * 100}
                 target={percent(targets.reliability)}
+                deltaUnit="pp"
               />
               <KpiCard
                 title="Eventos de falla"
+                reference="Fallas imputables a COPOWER"
                 icon={<Wrench size={18} />}
                 value={String(summary.copowerFailures)}
-                delta={0}
+                delta={summary.copowerFailures - (previousMonthSummary?.copowerFailures ?? summary.copowerFailures)}
                 target="Meta <= 7"
+                deltaUnit="count"
               />
               <KpiCard
                 title="Eventos Totales"
+                reference="Registros en bitacora mensual"
                 icon={<Zap size={18} />}
                 value={String(summary.totalEvents)}
-                delta={0}
+                delta={summary.totalEvents - (previousMonthSummary?.totalEvents ?? summary.totalEvents)}
                 target={`Bitacora ${selectedMonth}`}
+                deltaUnit="count"
               />
               <KpiCard
                 title="MTBF"
+                reference="Tiempo medio entre fallas"
                 icon={<Gauge size={18} />}
                 value={hours(summary.mtbfHours)}
                 delta={summary.mtbfHours - (previousMonthSummary?.mtbfHours ?? summary.mtbfHours)}
                 target="Meta >= 650 h"
+                deltaUnit="hours"
               />
               <KpiCard
                 title="MTTR"
+                reference="Tiempo medio de reparacion"
                 icon={<Wrench size={18} />}
                 value={hours(summary.mttrHours)}
                 delta={summary.mttrHours - (previousMonthSummary?.mttrHours ?? summary.mttrHours)}
                 target="Meta <= 4 h"
+                deltaUnit="hours"
               />
               <KpiCard
                 title="Energia Total"
+                reference={`Gas ${kwh(summary.energyGasKwh)} | Diesel ${kwh(summary.energyDieselKwh)}`}
                 icon={<Zap size={18} />}
                 value={kwh((current.generationMwh || 0) * 1000)}
                 delta={(current.generationMwh - previous.generationMwh) * 1000}
                 target={kwh(targets.generationMwh * 1000)}
-                isEnergy
+                deltaUnit="mwh"
               />
               <KpiCard
                 title="Acciones / RCA Pend."
+                reference="Acciones vencidas y RCA pendientes"
                 icon={<ClipboardList size={18} />}
                 value={`${summary.actionsOverdue} / ${summary.rcaPending}`}
-                delta={0}
+                delta={summary.actionsOverdue + summary.rcaPending - ((previousMonthSummary?.actionsOverdue ?? summary.actionsOverdue) + (previousMonthSummary?.rcaPending ?? summary.rcaPending))}
                 target="Vencidas / pendientes"
+                deltaUnit="count"
               />
             </section>
 
@@ -845,29 +860,33 @@ function App() {
               <h3>Generacion por equipo y total mensual - {selectedMonth}</h3>
               <p className="muted">Fuente: carpeta data/GTE (archivos de mayo y junio 2026).</p>
               <div className="kpi-grid">
-                <KpiCard title="Total generado" icon={<Zap size={18} />} value={kwh(totalGenerationKwh)} delta={0} target="Total general Excel" isEnergy />
+                <KpiCard title="Total generado" reference="Suma de todos los equipos" icon={<Zap size={18} />} value={kwh(totalGenerationKwh)} delta={0} target="Total general Excel" deltaUnit="mwh" />
                 <KpiCard
                   title="Total Costayaco"
+                  reference="Energia total campo Costayaco"
                   icon={<Gauge size={18} />}
                   value={kwh(totalCostayaco)}
                   delta={0}
                   target="Campo COSTAYACO"
-                  isEnergy
+                  deltaUnit="mwh"
                 />
                 <KpiCard
                   title="Total Vonu"
+                  reference="Energia total campo Vonu"
                   icon={<Gauge size={18} />}
                   value={kwh(totalVonu)}
                   delta={0}
                   target="Campo VONU"
-                  isEnergy
+                  deltaUnit="mwh"
                 />
                 <KpiCard
                   title="Equipos reportados"
+                  reference="Unidades con registro en el mes"
                   icon={<Gauge size={18} />}
                   value={String(generationByEquipment.length)}
                   delta={0}
                   target="Unidades con energia"
+                  deltaUnit="count"
                 />
               </div>
               <div className="chart-container">
@@ -1307,24 +1326,34 @@ function App() {
 
 type KpiCardProps = {
   title: string;
+  reference?: string;
   icon: ReactNode;
   value: string;
   delta: number;
   target: string;
-  isEnergy?: boolean;
+  deltaUnit?: "pp" | "mwh" | "hours" | "count";
 };
 
-function KpiCard({ title, icon, value, delta, target, isEnergy = false }: KpiCardProps) {
+function KpiCard({ title, reference, icon, value, delta, target, deltaUnit = "pp" }: KpiCardProps) {
   const positive = delta >= 0;
-  const deltaText = isEnergy
-    ? `${positive ? "+" : ""}${Math.round(delta).toLocaleString("es-CO")} MWh`
-    : `${positive ? "+" : ""}${delta.toFixed(1)} pp`;
+  let deltaText = `${positive ? "+" : ""}${delta.toFixed(1)} pp`;
+
+  if (deltaUnit === "mwh") {
+    deltaText = `${positive ? "+" : ""}${Math.round(delta).toLocaleString("es-CO")} MWh`;
+  } else if (deltaUnit === "hours") {
+    deltaText = `${positive ? "+" : ""}${delta.toFixed(2)} h`;
+  } else if (deltaUnit === "count") {
+    deltaText = `${positive ? "+" : ""}${Math.round(delta)} eventos`;
+  }
 
   return (
     <article className="kpi-card">
       <div className="kpi-title">
         <span>{icon}</span>
-        <p>{title}</p>
+        <div className="kpi-title-text">
+          <p>{title}</p>
+          {reference ? <small>{reference}</small> : null}
+        </div>
       </div>
       <h3>{value}</h3>
       <p className={positive ? "delta positive" : "delta negative"}>{deltaText} vs mes anterior</p>

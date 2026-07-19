@@ -356,6 +356,18 @@ textarea {
   color: var(--text-muted);
 }
 
+.kpi-title-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.08rem;
+}
+
+.kpi-title-text small {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  line-height: 1.2;
+}
+
 .kpi-card h3 {
   margin: 0.55rem 0 0.35rem;
 }
