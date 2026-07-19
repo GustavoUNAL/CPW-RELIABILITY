@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Dashboard de confiabilidad para parques de generacion.",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --port 5175 --strictPort",
     "build": "tsc -b && vite build",
     "preview": "vite preview"
   },
@@ -15,7 +15,8 @@
     "lucide-react": "^1.25.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "recharts": "^3.9.2"
+    "recharts": "^3.9.2",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/node": "^26.1.1",

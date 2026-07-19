@@ -12,6 +12,28 @@ Aplicacion web moderna en React + Vite + TypeScript para seguimiento integral de
 - Plan de mantenimiento editable en pantalla.
 - Riesgos y tendencias con alertas visuales.
 - Plan de accion editable con responsable, fecha compromiso, estado, evidencia y resultado esperado.
+- Contexto dual de reportes: `Gran Tierra Energy` y `CoPower Interno`.
+
+## Estructura del proyecto
+
+```text
+src/
+  App.tsx
+  main.tsx
+  styles.css
+  domain/
+    reliability/
+      types.ts
+      reports/
+        granTierra.ts
+        copowerInterno.ts
+        index.ts
+```
+
+- `types.ts`: contratos de datos comunes (KPIs, malos actores, RCA, mantenimiento, acciones).
+- `reports/granTierra.ts`: dataset y metas del reporte de Gran Tierra Energy.
+- `reports/copowerInterno.ts`: dataset y metas del reporte interno de CoPower.
+- `reports/index.ts`: punto unico de carga de datasets por reporte.
 
 ## Ejecutar
 
