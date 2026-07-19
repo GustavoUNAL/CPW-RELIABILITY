@@ -255,7 +255,7 @@ export const granTierraReport: ReportDataset = {
       eventType: "Causa comun",
       cause: "Parada de MRU por nivel alto NGL",
       downtimeHours: 8,
-      responsible: "Cliente",
+      responsible: "GTE",
       notes: "Se activa respaldo diesel.",
     },
     {
@@ -273,7 +273,7 @@ export const granTierraReport: ReportDataset = {
       eventType: "Operativo",
       cause: "Baja presion de gas CYC",
       downtimeHours: 3,
-      responsible: "Cliente",
+      responsible: "GTE",
       notes: "Unidad en etapa de estabilizacion.",
     },
   ],

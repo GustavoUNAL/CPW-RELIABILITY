@@ -21,7 +21,7 @@ import {
   YAxis,
 } from "recharts";
 import { getReliabilityDeduction } from "../contracts/gteOrders";
-import { GRAN_TIERRA_TREND_FROM_MONTHS } from "./granTierraMonthly";
+import { MetricGlossary, MetricLabel } from "../ui/metricDefs";
 import {
   EXEC_BLIND_SPOTS,
   EXEC_JUN,
@@ -29,7 +29,10 @@ import {
   EXEC_JUN_UNITS,
   EXEC_MAY,
   EXEC_META,
+  EXEC_ORDEN1_VALUE_NOTE,
   EXEC_SOURCES,
+  EXEC_TREND_CHART,
+  EXEC_TREND_FOOTER,
   type ExecUnitRow,
 } from "./executiveJune2026";
 
@@ -71,15 +74,7 @@ export function ExecutiveResumen() {
   const mayAvailGapToJun = (EXEC_JUN.availability - EXEC_MAY.availability) * 100;
   const mayConfGapToJun = (EXEC_JUN.reliability - EXEC_MAY.reliability) * 100;
 
-  const trendAllMonths = useMemo(
-    () =>
-      GRAN_TIERRA_TREND_FROM_MONTHS.map((row) => ({
-        ...row,
-        meta: EXEC_META.availability,
-        fuente: row.monthKey === "May" || row.monthKey === "Jun" ? "Oficial" : "Excel",
-      })),
-    [],
-  );
+  const trendChartData = useMemo(() => [...EXEC_TREND_CHART], []);
 
   const alerts = [
     {
@@ -212,6 +207,7 @@ export function ExecutiveResumen() {
         <article className="card">
           <p className="eyebrow">3 · Frecuencia y severidad</p>
           <h3>Por qué no se cumplió la meta</h3>
+          <MetricGlossary />
           <div className="exec-kpi-row">
             <div className="exec-kpi">
               <Wrench size={16} />
@@ -225,7 +221,7 @@ export function ExecutiveResumen() {
             </div>
             <div className="exec-kpi">
               <Gauge size={16} />
-              <span>MTBF</span>
+              <MetricLabel code="MTBF" />
               <strong>{EXEC_JUN.mtbfHours.toFixed(2)} h</strong>
               <small className="positive">
                 mayo {EXEC_MAY.mtbfHours.toFixed(2)} h · mejora +{mtbfDelta.toFixed(2)} h
@@ -234,7 +230,7 @@ export function ExecutiveResumen() {
             </div>
             <div className="exec-kpi">
               <Gauge size={16} />
-              <span>MTTR</span>
+              <MetricLabel code="MTTR" />
               <strong>{EXEC_JUN.mttrHours.toFixed(2)} h</strong>
               <small className="positive">
                 mayo {EXEC_MAY.mttrHours.toFixed(2)} h · mejora {mttrDelta.toFixed(2)} h
@@ -308,7 +304,7 @@ export function ExecutiveResumen() {
               </div>
             ))}
           </div>
-          <SourceTag>{EXEC_SOURCES.contract} · valor: {EXEC_SOURCES.none}</SourceTag>
+          <SourceTag>{EXEC_ORDEN1_VALUE_NOTE}</SourceTag>
         </article>
       </section>
 
@@ -352,18 +348,18 @@ export function ExecutiveResumen() {
         </article>
       </section>
 
-      {/* 7. Tendencias — todos los meses con dato */}
+      {/* 7. Tendencias — Ene a Jun con fuente por mes */}
       <section className="panel">
         <article className="card">
           <p className="eyebrow">7 · Tendencia</p>
           <h3>Disponibilidad / Confiabilidad — Ene a Jun</h3>
           <p className="chart-hint">
-            Serie completa con los meses cargados en data/GTE. Ene–Abr: SISTEMA N Costayaco desde Excel (PF_contr).
-            May–Jun: valor oficial del informe/anexo. Línea punteada = meta contractual 98%.
+            Serie mensual completa. Ene–Abr desde Excel Data Soporte de cada mes; Mayo–Junio oficiales (PDF). Línea
+            punteada = meta contractual 98%.
           </p>
           <div className="chart-container exec-chart">
             <ResponsiveContainer width="100%" height={320}>
-              <LineChart data={trendAllMonths} margin={{ top: 12, right: 20, left: 4, bottom: 8 }}>
+              <LineChart data={trendChartData} margin={{ top: 12, right: 20, left: 4, bottom: 8 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
                 <XAxis dataKey="month" stroke="var(--text-muted)" tick={{ fontSize: 12 }} />
                 <YAxis
@@ -412,9 +408,7 @@ export function ExecutiveResumen() {
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <SourceTag>
-            Ene–Abr: Excel Data Soporte · May–Jun: {EXEC_SOURCES.pdf}
-          </SourceTag>
+          <SourceTag>{EXEC_TREND_FOOTER}</SourceTag>
         </article>
       </section>
 
@@ -422,13 +416,13 @@ export function ExecutiveResumen() {
         <article className="card">
           <p className="eyebrow">7 · Tendencia</p>
           <h3>MTBF / MTTR — Ene a Jun</h3>
+          <MetricGlossary />
           <p className="chart-hint">
-            Misma serie mensual. MTBF (eje izquierdo) y MTTR (eje derecho). May–Jun oficiales; Ene–Abr desde Excel
-            Costayaco (oper / fallas · PF_contr / fallas).
+            Misma serie mensual. Ene–Abr Excel por mes; Mayo–Junio PDF oficial. MTBF eje izquierdo · MTTR eje derecho.
           </p>
           <div className="chart-container exec-chart">
             <ResponsiveContainer width="100%" height={320}>
-              <LineChart data={trendAllMonths} margin={{ top: 12, right: 20, left: 4, bottom: 8 }}>
+              <LineChart data={trendChartData} margin={{ top: 12, right: 20, left: 4, bottom: 8 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
                 <XAxis dataKey="month" stroke="var(--text-muted)" tick={{ fontSize: 12 }} />
                 <YAxis
@@ -483,9 +477,7 @@ export function ExecutiveResumen() {
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <SourceTag>
-            Ene–Abr: Excel Data Soporte · May–Jun: {EXEC_SOURCES.pdf}
-          </SourceTag>
+          <SourceTag>{EXEC_TREND_FOOTER}</SourceTag>
         </article>
       </section>
 
@@ -535,12 +527,14 @@ export function ExecutiveResumen() {
                       </th>
                       <th>
                         <button type="button" className="sort-button" onClick={() => toggleSort("mtbfLabel")}>
-                          MTBF{sortMark("mtbfLabel")}
+                          <MetricLabel code="MTBF" showHours />
+                          {sortMark("mtbfLabel")}
                         </button>
                       </th>
                       <th>
                         <button type="button" className="sort-button" onClick={() => toggleSort("mttrHours")}>
-                          MTTR{sortMark("mttrHours")}
+                          <MetricLabel code="MTTR" showHours />
+                          {sortMark("mttrHours")}
                         </button>
                       </th>
                       <th>

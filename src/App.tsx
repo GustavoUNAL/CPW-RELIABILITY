@@ -59,6 +59,21 @@ import type {
   PageKey,
   ReportKey,
 } from "./domain/reliability/types";
+import {
+  assessTechnicalRisk,
+  RISK_COMBINATION_RULES,
+  RISK_PROBABILITY_RULES,
+  RISK_SEVERITY_RULES,
+  TECHNICAL_RISK_METHODOLOGY_NOTE,
+  type RiskAxisLevel,
+  type TechnicalRiskLabel,
+} from "./domain/reliability/risk/technicalRisk";
+import { MetricGlossary, MetricLabel, METRIC_DEFS } from "./domain/reliability/ui/metricDefs";
+
+type AssessedMachineRow = MachineIndicatorRow & {
+  probabilidad: RiskAxisLevel | null;
+  severidad: RiskAxisLevel | null;
+};
 
 type NavItem = {
   key: PageKey;
@@ -84,11 +99,11 @@ const NAV_ITEMS: NavItem[] = [
   { key: "generacion", label: "Generacion", icon: <Zap size={16} />, description: "Generacion por equipo y total" },
   { key: "maquinas", label: "Indicadores por maquina", icon: <Gauge size={16} />, description: "Indicadores por unidad" },
   { key: "indicadores", label: "Historico de eventos", icon: <BarChart3 size={16} />, description: "Eventos registrados y filtro de fallas" },
+  { key: "riesgos", label: "Riesgos", icon: <ShieldAlert size={16} />, description: "Matriz Prob × Consecuencia" },
   { key: "desviaciones", label: "Desviaciones", icon: <TrendingUp size={16} />, description: "Brechas vs meta" },
   { key: "malos_actores", label: "Malos Actores", icon: <Bug size={16} />, description: "Fallas de impacto" },
   { key: "causas_raiz", label: "Causas Raiz", icon: <Search size={16} />, description: "Estado RCA" },
   { key: "mantenimiento", label: "Mantenimiento", icon: <Wrench size={16} />, description: "Plan tecnico" },
-  { key: "riesgos", label: "Riesgos", icon: <ShieldAlert size={16} />, description: "Tendencias y alertas" },
   { key: "acciones", label: "Plan de Accion", icon: <ClipboardList size={16} />, description: "Seguimiento" },
 ];
 
@@ -111,7 +126,10 @@ const deltaOrZero = (curr: number | null | undefined, prev: number | null | unde
 const formatMachinePct = (value: number | null | undefined) =>
   value == null || Number.isNaN(value) ? "N/A" : `${value.toFixed(2)}%`;
 const riesgoBadgeClass = (riesgo: string) =>
-  riesgo === "RIESGO MEDIO" ? "warning" : riesgo === "RIESGO ALTO" ? "danger" : "success";
+  riesgo === "RIESGO MEDIO" ? "warning" : riesgo === "RIESGO ALTO" ? "danger" : riesgo === "N/A" ? "info" : "success";
+const riskAxisLabel = (level: RiskAxisLevel | null) => (level == null ? "—" : level);
+const riskScore = (riesgo: TechnicalRiskLabel) =>
+  riesgo === "RIESGO ALTO" ? 2 : riesgo === "RIESGO MEDIO" ? 1 : riesgo === "RIESGO BAJO" ? 0 : null;
 const cumplimientoBadgeClass = (cumplimiento: string) =>
   cumplimiento === "CUMPLE" ? "success" : cumplimiento === "N/A" ? "info" : "danger";
 
@@ -129,7 +147,7 @@ function App() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [onlyFailureEvents, setOnlyFailureEvents] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState<GranTierraMonthKey>("Jun");
-  const [selectedMachine, setSelectedMachine] = useState<MachineIndicatorRow | null>(null);
+  const [selectedMachine, setSelectedMachine] = useState<AssessedMachineRow | null>(null);
   const [tableSorts, setTableSorts] = useState<Record<string, SortConfig>>({
     eventos: { key: "date", direction: "desc" },
     maquinas: { key: "unidad", direction: "asc" },
@@ -164,7 +182,28 @@ function App() {
   const actionPlan = actionsByReport[activeReport];
   const summary = activeMonthData?.summary ?? reportData.summary;
   const eventLog = activeMonthData?.eventLog ?? reportData.eventLog;
-  const machineIndicators = activeMonthData?.machineIndicators ?? reportData.machineIndicators;
+  const machineIndicatorsRaw = activeMonthData?.machineIndicators ?? reportData.machineIndicators;
+  const machineIndicators = useMemo<AssessedMachineRow[]>(
+    () =>
+      machineIndicatorsRaw.map((row) => {
+        const skip =
+          row.cumplimiento === "N/A" || /estabili|excluida/i.test(row.campo);
+        const assessed = assessTechnicalRisk({
+          fallas: row.fallas,
+          mtbfLabel: row.mtbfLabel,
+          mttrHours: row.mttrHours,
+          disponibilidadPct: row.disponibilidadPct,
+          skip,
+        });
+        return {
+          ...row,
+          riesgoTecnico: assessed.riesgo,
+          probabilidad: assessed.probabilidad,
+          severidad: assessed.severidad,
+        };
+      }),
+    [machineIndicatorsRaw],
+  );
   const generationByEquipment = activeMonthData?.generationByEquipment ?? reportData.generationByEquipment;
   const totalGenerationKwh = activeMonthData?.totalGenerationKwh ?? reportData.totalGenerationKwh;
   const generationCostayaco = generationByEquipment.filter((row) => row.campo === "COSTAYACO");
@@ -316,12 +355,12 @@ function App() {
       source: summary.mtbfHours == null ? srcNd : srcOfficial,
       technicalExplanation:
         summary.mtbfHours == null
-          ? "N/D — sin MTBF publicado."
+          ? `N/D — sin ${METRIC_DEFS.MTBF.es} publicado.`
           : selectedMonth === "Jun"
-            ? "711.57 h (anexo). Mayo 500.39 h. Orden 1: solo seguimiento, sin umbral fijo."
+            ? `${METRIC_DEFS.MTBF.es}. 711.57 h (anexo). Mayo 500.39 h. Orden 1: solo seguimiento, sin umbral fijo.`
             : selectedMonth === "May"
-              ? "500.39 h (citado en informe junio). Solo seguimiento."
-              : `${summary.mtbfHours.toFixed(2)} h (Excel). Solo seguimiento.`,
+              ? `${METRIC_DEFS.MTBF.es}. 500.39 h (citado en informe junio). Solo seguimiento.`
+              : `${METRIC_DEFS.MTBF.es}. ${summary.mtbfHours.toFixed(2)} h (Excel). Solo seguimiento.`,
     });
 
     // MTTR — seguimiento
@@ -335,12 +374,12 @@ function App() {
       source: summary.mttrHours == null ? srcNd : srcOfficial,
       technicalExplanation:
         summary.mttrHours == null
-          ? "N/D — sin MTTR publicado."
+          ? `N/D — sin ${METRIC_DEFS.MTTR.es} publicado.`
           : selectedMonth === "Jun"
-            ? "2.86 h (anexo). Mayo 5.32 h. Orden 1: solo seguimiento, sin umbral fijo."
+            ? `${METRIC_DEFS.MTTR.es}. 2.86 h (anexo). Mayo 5.32 h. Orden 1: solo seguimiento, sin umbral fijo.`
             : selectedMonth === "May"
-              ? "5.32 h (citado en informe junio). Solo seguimiento."
-              : `${summary.mttrHours.toFixed(2)} h (Excel). Solo seguimiento.`,
+              ? `${METRIC_DEFS.MTTR.es}. 5.32 h (citado en informe junio). Solo seguimiento.`
+              : `${METRIC_DEFS.MTTR.es}. ${summary.mttrHours.toFixed(2)} h (Excel). Solo seguimiento.`,
     });
 
     // Fallas imputables
@@ -358,6 +397,51 @@ function App() {
           : selectedMonth === "May"
             ? "7 imputables (informe junio). Ideal: 0."
             : `${summary.copowerFailures} (Σ Falla_evento Excel). Ideal: 0.`,
+    });
+
+    // Riesgo técnico (metodología propuesta Prob × Consecuencia)
+    const evaluableUnits = machineIndicators.filter(
+      (m) => m.unidad !== "SISTEMA N" && m.riesgoTecnico !== "N/A",
+    );
+    const highRiskUnits = evaluableUnits.filter((m) => m.riesgoTecnico === "RIESGO ALTO");
+    const mediumRiskUnits = evaluableUnits.filter((m) => m.riesgoTecnico === "RIESGO MEDIO");
+    const elevatedCount = highRiskUnits.length + mediumRiskUnits.length;
+    const sistemaRisk = machineIndicators.find((m) => m.unidad === "SISTEMA N" && m.campo === "COSTAYACO");
+    const worstPark: TechnicalRiskLabel =
+      highRiskUnits.length > 0
+        ? "RIESGO ALTO"
+        : mediumRiskUnits.length > 0
+          ? "RIESGO MEDIO"
+          : evaluableUnits.length > 0
+            ? "RIESGO BAJO"
+            : "N/A";
+    const riskStatus: DeviationRow["status"] =
+      worstPark === "N/A"
+        ? "nd"
+        : worstPark === "RIESGO ALTO"
+          ? "no_cumple"
+          : worstPark === "RIESGO MEDIO"
+            ? "seguimiento"
+            : "cumple";
+    rows.push({
+      indicator: "Riesgo técnico (parque)",
+      value: elevatedCount,
+      target: 0,
+      unit: "count",
+      higherIsBetter: false,
+      status: riskStatus,
+      source: "Metodología propuesta (no contractual)",
+      technicalExplanation:
+        worstPark === "N/A"
+          ? "N/D — sin unidades evaluables este mes."
+          : `${worstPark.replace("RIESGO ", "")} (máx. parque). ${mediumRiskUnits.length} medio · ${highRiskUnits.length} alto` +
+            (mediumRiskUnits.length || highRiskUnits.length
+              ? `: ${[...mediumRiskUnits, ...highRiskUnits].map((u) => u.unidad).join(", ")}.`
+              : ".") +
+            (sistemaRisk
+              ? ` SISTEMA N Costayaco → ${sistemaRisk.riesgoTecnico.replace("RIESGO ", "")} (P:${riskAxisLabel(sistemaRisk.probabilidad)} × S:${riskAxisLabel(sistemaRisk.severidad)}).`
+              : "") +
+            " Separado del cumplimiento contractual. Pendiente de aprobación formal.",
     });
 
     // RCA / reportes
@@ -418,7 +502,7 @@ function App() {
     });
 
     return rows;
-  }, [current, targets, summary, selectedMonth]);
+  }, [current, targets, summary, selectedMonth, machineIndicators]);
 
   const complianceChartData = deviations
     .filter((d) => d.unit === "pct" && d.value != null && d.target != null && d.status !== "nd")
@@ -483,10 +567,20 @@ function App() {
     done: actionPlan.filter((a) => a.status === "Completada").length,
   };
   const machineRiskStats = {
-    high: machineIndicators.filter((m) => m.riesgoTecnico === "RIESGO ALTO").length,
-    medium: machineIndicators.filter((m) => m.riesgoTecnico === "RIESGO MEDIO").length,
-    low: machineIndicators.filter((m) => m.riesgoTecnico === "RIESGO BAJO").length,
+    high: machineIndicators.filter((m) => m.unidad !== "SISTEMA N" && m.riesgoTecnico === "RIESGO ALTO").length,
+    medium: machineIndicators.filter((m) => m.unidad !== "SISTEMA N" && m.riesgoTecnico === "RIESGO MEDIO").length,
+    low: machineIndicators.filter((m) => m.unidad !== "SISTEMA N" && m.riesgoTecnico === "RIESGO BAJO").length,
+    na: machineIndicators.filter((m) => m.unidad !== "SISTEMA N" && m.riesgoTecnico === "N/A").length,
   };
+  const machineRiskDetailRows = useMemo(
+    () =>
+      machineIndicators
+        .filter((m) => m.unidad !== "SISTEMA N")
+        .sort((a, b) => (riskScore(b.riesgoTecnico) ?? -1) - (riskScore(a.riesgoTecnico) ?? -1)),
+    [machineIndicators],
+  );
+  const sistemaCostayacoRisk = machineIndicators.find((m) => m.unidad === "SISTEMA N" && m.campo === "COSTAYACO");
+  const sistemaVonuRisk = machineIndicators.find((m) => m.unidad === "SISTEMA N" && m.campo === "VONU");
   const reliabilityDeduction =
     current.reliability == null ? null : getReliabilityDeduction(current.reliability);
   const availabilityMeetsContract =
@@ -526,13 +620,13 @@ function App() {
       name: "MTBF",
       valueLabel: summary.mtbfHours == null ? "N/A" : `${summary.mtbfHours.toFixed(2)} h`,
       meets: null as boolean | null,
-      detail: "Solo seguimiento, sin umbral fijo",
+      detail: `${METRIC_DEFS.MTBF.es}. Solo seguimiento, sin umbral fijo`,
     },
     {
       name: "MTTR",
       valueLabel: summary.mttrHours == null ? "N/A" : `${summary.mttrHours.toFixed(2)} h`,
       meets: null as boolean | null,
-      detail: "Solo seguimiento, sin umbral fijo",
+      detail: `${METRIC_DEFS.MTTR.es}. Solo seguimiento, sin umbral fijo`,
     },
     {
       name: "Reportes de falla / RCA",
@@ -551,7 +645,9 @@ function App() {
     current.reliability == null ? null : getReliabilityDeduction(current.reliability);
   const failuresDelta =
     previousMonthSummary != null ? summary.copowerFailures - previousMonthSummary.copowerFailures : null;
-  const focalRiskUnits = machineIndicators.filter((m) => m.unidad !== "SISTEMA N" && m.fallas >= 3);
+  const focalRiskUnits = machineIndicators.filter(
+    (m) => m.unidad !== "SISTEMA N" && (m.riesgoTecnico === "RIESGO MEDIO" || m.riesgoTecnico === "RIESGO ALTO"),
+  );
   const consecutiveReliabilityMisses = useMemo(() => {
     if (activeReport !== "gran_tierra") return 0;
     let streak = 0;
@@ -622,8 +718,8 @@ function App() {
       title: "Riesgo técnico focalizado",
       detail:
         focalRiskUnits.length > 0
-          ? focalRiskUnits.map((u) => `${u.unidad} (${u.fallas} fallas)`).join(" · ")
-          : "Ningún activo con ≥3 fallas este mes",
+          ? focalRiskUnits.map((u) => `${u.unidad} (${u.riesgoTecnico.replace("RIESGO ", "")})`).join(" · ")
+          : "Ninguna unidad en Riesgo Medio/Alto (matriz propuesta)",
     },
   ];
 
@@ -643,16 +739,15 @@ function App() {
     },
     {
       title: "Activo dominante / recurrencia",
-      value: hasJuneAnalysis
-        ? "CPW06 · RIESGO MEDIO"
-        : machineRiskStats.medium + machineRiskStats.high > 0
+      value:
+        machineRiskStats.high + machineRiskStats.medium > 0
           ? `${machineRiskStats.high} alto · ${machineRiskStats.medium} medio`
-          : "Riesgo bajo",
-      status:
-        machineRiskStats.high > 0 ? "warning" : hasJuneAnalysis || machineRiskStats.medium > 0 ? "warning" : "ok",
-      note: hasJuneAnalysis
-        ? "Recurrencia CPW06 (3 eventos, MTBF 222.33 h) según anexo junio. DOCX recomienda RCA."
-        : "Riesgo técnico derivado de #fallas y MTBF por unidad (misma base del mes).",
+          : "Parque en Bajo",
+      status: machineRiskStats.high > 0 || machineRiskStats.medium > 0 ? "warning" : "ok",
+      note:
+        focalRiskUnits.length > 0
+          ? `${focalRiskUnits.map((u) => u.unidad).join(", ")} — matriz Prob×Consecuencia (propuesta).`
+          : "Sin unidades en Riesgo Medio/Alto según metodología propuesta.",
     },
     {
       title: "Causas externas (aguas arriba)",
@@ -698,7 +793,7 @@ function App() {
     };
     const byResponsible = {
       COPOWER: 0,
-      Cliente: 0,
+      GTE: 0,
       Externo: 0,
     };
     const downtimeByEquipment = new Map<string, number>();
@@ -734,7 +829,7 @@ function App() {
       downtimeHours,
       copowerDowntimeHours,
       copowerEvents: byResponsible.COPOWER,
-      clientEvents: byResponsible.Cliente + byResponsible.Externo,
+      clientEvents: byResponsible.GTE + byResponsible.Externo,
       topEquipment,
       typeChart,
       avgDowntime: eventLog.length > 0 ? downtimeHours / eventLog.length : 0,
@@ -1040,7 +1135,11 @@ function App() {
                   {contractualScorecard.map((item) => (
                     <div key={item.name} className="contract-score-card">
                       <div className="contract-score-head">
-                        <strong>{item.name}</strong>
+                        {item.name === "MTBF" || item.name === "MTTR" ? (
+                          <MetricLabel code={item.name} />
+                        ) : (
+                          <strong>{item.name}</strong>
+                        )}
                         {item.meets == null ? (
                           <span className="badge info">Seguimiento</span>
                         ) : item.meets ? (
@@ -1277,8 +1376,8 @@ function App() {
                 hideDelta
               />
               <KpiCard
-                title="Cliente / Externo"
-                reference="Eventos no imputables a COPOWER (PF_cli)"
+                title="GTE / Externo"
+                reference="Eventos no imputables a COPOWER (PF_cli · Gran Tierra Energy)"
                 icon={<ClipboardList size={18} />}
                 value={String(eventStats.clientEvents)}
                 delta={0}
@@ -1407,7 +1506,7 @@ function App() {
                             <td>
                               <span
                                 className={`badge ${
-                                  event.responsible === "COPOWER" ? "danger" : event.responsible === "Cliente" ? "warning" : "info"
+                                  event.responsible === "COPOWER" ? "danger" : event.responsible === "GTE" ? "warning" : "info"
                                 }`}
                               >
                                 {event.responsible}
@@ -1430,6 +1529,7 @@ function App() {
             <article className="card">
               <h3>Indicadores por maquina - {monthLabel}</h3>
               <p className="muted">{indicatorsSourceNote}</p>
+              <MetricGlossary />
               <div className="table-scroll">
                 <table>
                   <thead>
@@ -1440,9 +1540,19 @@ function App() {
                       <th><button className="sort-button" onClick={() => toggleSort("maquinas", "disponibilidadPct")}>Disponibilidad % {getSortIndicator("maquinas", "disponibilidadPct")}</button></th>
                       <th><button className="sort-button" onClick={() => toggleSort("maquinas", "confiabilidadPct")}>Confiabilidad % {getSortIndicator("maquinas", "confiabilidadPct")}</button></th>
                       <th><button className="sort-button" onClick={() => toggleSort("maquinas", "fallas")}>#Fallas {getSortIndicator("maquinas", "fallas")}</button></th>
-                      <th><button className="sort-button" onClick={() => toggleSort("maquinas", "mtbfLabel")}>MTBF_h {getSortIndicator("maquinas", "mtbfLabel")}</button></th>
-                      <th><button className="sort-button" onClick={() => toggleSort("maquinas", "mttrHours")}>MTTR_h {getSortIndicator("maquinas", "mttrHours")}</button></th>
+                      <th>
+                        <button className="sort-button" onClick={() => toggleSort("maquinas", "mtbfLabel")}>
+                          <MetricLabel code="MTBF" showHours /> {getSortIndicator("maquinas", "mtbfLabel")}
+                        </button>
+                      </th>
+                      <th>
+                        <button className="sort-button" onClick={() => toggleSort("maquinas", "mttrHours")}>
+                          <MetricLabel code="MTTR" showHours /> {getSortIndicator("maquinas", "mttrHours")}
+                        </button>
+                      </th>
                       <th><button className="sort-button" onClick={() => toggleSort("maquinas", "riesgoTecnico")}>Riesgo tecnico {getSortIndicator("maquinas", "riesgoTecnico")}</button></th>
+                      <th>Prob.</th>
+                      <th>Sev.</th>
                       <th><button className="sort-button" onClick={() => toggleSort("maquinas", "cumplimiento")}>Cumplimiento {getSortIndicator("maquinas", "cumplimiento")}</button></th>
                       <th>Detalle</th>
                       <th></th>
@@ -1451,7 +1561,7 @@ function App() {
                   <tbody>
                     {machineIndicators.length === 0 ? (
                       <tr>
-                        <td colSpan={12}>Sin datos por unidad para este reporte.</td>
+                        <td colSpan={14}>Sin datos por unidad para este reporte.</td>
                       </tr>
                     ) : (
                       sortedMachineIndicators.map((row) => (
@@ -1469,6 +1579,8 @@ function App() {
                               {row.riesgoTecnico}
                             </span>
                           </td>
+                          <td>{riskAxisLabel(row.probabilidad)}</td>
+                          <td>{riskAxisLabel(row.severidad)}</td>
                           <td>
                             <span className={`badge ${cumplimientoBadgeClass(row.cumplimiento)}`}>
                               {row.cumplimiento}
@@ -1487,7 +1599,7 @@ function App() {
                 </table>
               </div>
               <p className="muted">
-                Premisa de estabilizacion: JIN-11 y JIN-12 se evaluan individualmente sobre una ventana de ~19 dias y no se incorporan al calculo sistemico de Costayaco. Sus % vienen del Excel (0 PF_contr / 0 PF_cli); el PDF no publica su % individual en el Anexo.
+                Premisa de estabilizacion: JIN-11 y JIN-12 se evaluan individualmente sobre una ventana de ~19 dias y no se incorporan al calculo sistemico de Costayaco. Sus % vienen del Excel (0 PF_contr / 0 PF_cli); el PDF no publica su % individual en el Anexo. Riesgo técnico = matriz propuesta Probabilidad × Consecuencia (pendiente de aprobación formal), no etiqueta contractual.
               </p>
             </article>
           </section>
@@ -1674,9 +1786,11 @@ function App() {
               <article className="card">
                 <h3>Brechas vs metas contractuales — {monthLabel}</h3>
                 <p className="muted">
-                  Semáforos calculados en código vs Orden 1. MTBF/MTTR sin umbral fijo (seguimiento). Puntos ciegos =
-                  N/D pendiente de fuente.
+                  Semáforos calculados en código vs Orden 1. Fila de Riesgo técnico = matriz Prob×Consecuencia
+                  (propuesta, no contractual). MTBF/MTTR sin umbral fijo (seguimiento). Puntos ciegos = N/D
+                  pendiente de fuente.
                 </p>
+                <MetricGlossary />
                 <div className="table-scroll">
                   <table>
                     <thead>
@@ -1713,7 +1827,11 @@ function App() {
                         return (
                           <tr key={d.indicator} className={d.status === "no_cumple" ? "row-highlight" : undefined}>
                             <td>
-                              <strong>{d.indicator}</strong>
+                              {d.indicator === "MTBF" || d.indicator === "MTTR" ? (
+                                <MetricLabel code={d.indicator} />
+                              ) : (
+                                <strong>{d.indicator}</strong>
+                              )}
                             </td>
                             <td>{formatDeviationValue(d.value, d.unit)}</td>
                             <td>{d.target == null ? "—" : formatDeviationValue(d.target, d.unit)}</td>
@@ -2053,11 +2171,161 @@ function App() {
         {activePage === "riesgos" && (
           <>
             <section className="kpi-grid">
-              <KpiCard title="Riesgo medio" reference="Unidades / sistemas" icon={<ShieldAlert size={18} />} value={String(machineRiskStats.medium)} delta={0} target="CPW06 + Sistema N Costayaco" deltaUnit="count" hideDelta />
-              <KpiCard title="Riesgo bajo" reference="Resto del parque evaluado" icon={<ShieldCheck size={18} />} value={String(machineRiskStats.low)} delta={0} target="Incluye Vonu 100%" deltaUnit="count" hideDelta />
-              <KpiCard title="Causa comun" reference="Fechas multi-activo junio" icon={<AlertTriangle size={18} />} value={String(commonCauseEvents.length)} delta={0} target="~1/3 de dias del mes" deltaUnit="count" hideDelta />
-              <KpiCard title="Diesel respaldo" reference="% energia total" icon={<Zap size={18} />} value="2.91%" delta={0} target="119,716 kWh" deltaUnit="count" hideDelta />
+              <KpiCard
+                title="Riesgo alto"
+                reference="Unidades (matriz propuesta)"
+                icon={<ShieldAlert size={18} />}
+                value={String(machineRiskStats.high)}
+                delta={0}
+                target={`${machineRiskStats.medium} medio`}
+                deltaUnit="count"
+                hideDelta
+              />
+              <KpiCard
+                title="Riesgo medio"
+                reference="Unidades (matriz propuesta)"
+                icon={<AlertTriangle size={18} />}
+                value={String(machineRiskStats.medium)}
+                delta={0}
+                target={`${machineRiskStats.low} bajo`}
+                deltaUnit="count"
+                hideDelta
+              />
+              <KpiCard
+                title="SISTEMA N Costayaco"
+                reference="P × S calculado"
+                icon={<Gauge size={18} />}
+                value={sistemaCostayacoRisk?.riesgoTecnico.replace("RIESGO ", "") ?? "N/D"}
+                delta={0}
+                target={
+                  sistemaCostayacoRisk
+                    ? `P:${riskAxisLabel(sistemaCostayacoRisk.probabilidad)} · S:${riskAxisLabel(sistemaCostayacoRisk.severidad)}`
+                    : "N/D"
+                }
+                deltaUnit="count"
+                hideDelta
+              />
+              <KpiCard
+                title="SISTEMA N Vonú"
+                reference="P × S calculado"
+                icon={<ShieldCheck size={18} />}
+                value={sistemaVonuRisk?.riesgoTecnico.replace("RIESGO ", "") ?? "N/D"}
+                delta={0}
+                target={
+                  sistemaVonuRisk
+                    ? `P:${riskAxisLabel(sistemaVonuRisk.probabilidad)} · S:${riskAxisLabel(sistemaVonuRisk.severidad)}`
+                    : "N/D"
+                }
+                deltaUnit="count"
+                hideDelta
+              />
             </section>
+
+            <section className="panel">
+              <article className="card">
+                <h3>Metodología de Riesgo Técnico</h3>
+                <p className="muted">{TECHNICAL_RISK_METHODOLOGY_NOTE}</p>
+                <div className="table-scroll" style={{ marginTop: "0.75rem" }}>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Eje</th>
+                        <th>Nivel</th>
+                        <th>Regla</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {RISK_PROBABILITY_RULES.map((r) => (
+                        <tr key={`p-${r.level}`}>
+                          <td>Probabilidad / Recurrencia</td>
+                          <td>{r.level}</td>
+                          <td>{r.rule}</td>
+                        </tr>
+                      ))}
+                      {RISK_SEVERITY_RULES.map((r) => (
+                        <tr key={`s-${r.level}`}>
+                          <td>Severidad / Consecuencia</td>
+                          <td>{r.level}</td>
+                          <td>{r.rule}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <ul className="muted" style={{ marginTop: "0.75rem" }}>
+                  {RISK_COMBINATION_RULES.map((rule) => (
+                    <li key={rule}>{rule}</li>
+                  ))}
+                </ul>
+                <p className="muted" style={{ marginTop: "0.5rem" }}>
+                  Referencia de consistencia: CPW06 (3 fallas, MTBF 222 h → P Alta; MTTR 2 h, Disp 99.03% → S Baja) → Riesgo Medio.
+                </p>
+              </article>
+            </section>
+
+            <section className="panel">
+              <article className="card">
+                <h3>Semáforo por unidad — {monthLabel}</h3>
+                <p className="muted">Calculado automáticamente con la matriz; no usa la etiqueta cualitativa del anexo como fuente.</p>
+                <MetricGlossary />
+                <div className="table-scroll">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Unidad</th>
+                        <th>Campo</th>
+                        <th># Fallas</th>
+                        <th>
+                          <MetricLabel code="MTBF" />
+                        </th>
+                        <th>
+                          <MetricLabel code="MTTR" />
+                        </th>
+                        <th>Disp. %</th>
+                        <th>Probabilidad</th>
+                        <th>Severidad</th>
+                        <th>Riesgo</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {machineRiskDetailRows.length === 0 ? (
+                        <tr>
+                          <td colSpan={9}>Sin unidades para evaluar.</td>
+                        </tr>
+                      ) : (
+                        machineRiskDetailRows.map((row) => (
+                          <tr
+                            key={`risk-${row.unidad}-${row.campo}`}
+                            className={
+                              row.riesgoTecnico === "RIESGO ALTO" || row.riesgoTecnico === "RIESGO MEDIO"
+                                ? "row-highlight"
+                                : undefined
+                            }
+                          >
+                            <td>
+                              <strong>{row.unidad}</strong>
+                            </td>
+                            <td>{row.campo}</td>
+                            <td>{row.fallas}</td>
+                            <td>{row.mtbfLabel}</td>
+                            <td>{row.mttrHours == null ? "N/A" : `${row.mttrHours} h`}</td>
+                            <td>{row.disponibilidadPct == null ? "N/A" : `${row.disponibilidadPct.toFixed(2)}%`}</td>
+                            <td>{riskAxisLabel(row.probabilidad)}</td>
+                            <td>{riskAxisLabel(row.severidad)}</td>
+                            <td>
+                              <span className={`badge ${riesgoBadgeClass(row.riesgoTecnico)}`}>
+                                {row.riesgoTecnico}
+                              </span>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </article>
+            </section>
+
             <section className="panel two-col">
               <article className="card">
                 <h3>Riesgos y continuidad de servicio</h3>
@@ -2208,9 +2476,18 @@ function App() {
                   <p><strong>Disponibilidad:</strong> {selectedMachine.disponibilidadPct == null ? "N/A" : `${selectedMachine.disponibilidadPct.toFixed(2)}%`}</p>
                   <p><strong>Confiabilidad:</strong> {selectedMachine.confiabilidadPct == null ? "N/A" : `${selectedMachine.confiabilidadPct.toFixed(2)}%`}</p>
                   <p><strong># Fallas:</strong> {selectedMachine.fallas}</p>
-                  <p><strong>MTBF:</strong> {selectedMachine.mtbfLabel}</p>
-                  <p><strong>MTTR:</strong> {selectedMachine.mttrHours == null ? "N/A" : `${selectedMachine.mttrHours} h`}</p>
+                  <p>
+                    <strong>MTBF:</strong> {selectedMachine.mtbfLabel}{" "}
+                    <span className="metric-def">{METRIC_DEFS.MTBF.es}</span>
+                  </p>
+                  <p>
+                    <strong>MTTR:</strong>{" "}
+                    {selectedMachine.mttrHours == null ? "N/A" : `${selectedMachine.mttrHours} h`}{" "}
+                    <span className="metric-def">{METRIC_DEFS.MTTR.es}</span>
+                  </p>
                   <p><strong>Riesgo tecnico:</strong> {selectedMachine.riesgoTecnico}</p>
+                  <p><strong>Probabilidad:</strong> {riskAxisLabel(selectedMachine.probabilidad)}</p>
+                  <p><strong>Severidad:</strong> {riskAxisLabel(selectedMachine.severidad)}</p>
                   <p><strong>Cumplimiento:</strong> {selectedMachine.cumplimiento}</p>
                   {selectedMachine.detalle ? (
                     <p><strong>Nota del anexo:</strong> {selectedMachine.detalle}</p>

@@ -410,7 +410,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Evento con PF/falla en Data Soporte",
         "downtimeHours": 1.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 1.0 h | Falla_evento 0"
       },
       {
@@ -419,7 +419,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Evento con PF/falla en Data Soporte",
         "downtimeHours": 1.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 1.0 h | Falla_evento 0"
       },
       {
@@ -428,7 +428,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Evento con PF/falla en Data Soporte",
         "downtimeHours": 1.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 1.0 h | Falla_evento 0"
       },
       {
@@ -437,7 +437,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Evento con PF/falla en Data Soporte",
         "downtimeHours": 2.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 2.0 h | Falla_evento 0"
       },
       {
@@ -920,7 +920,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Evento con PF/falla en Data Soporte",
         "downtimeHours": 3.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 3.0 h | Falla_evento 0"
       },
       {
@@ -929,7 +929,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Evento con PF/falla en Data Soporte",
         "downtimeHours": 2.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 2.0 h | Falla_evento 0"
       },
       {
@@ -1403,7 +1403,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Parada programada por mantenimiento de la MRU",
         "downtimeHours": 3.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 3.0 h | Falla_evento 0"
       },
       {
@@ -1412,7 +1412,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "sale de linea por mantenimiento de la MRU",
         "downtimeHours": 3.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 3.0 h | Falla_evento 0"
       },
       {
@@ -1421,7 +1421,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "sale de linea por mantenimiento de la MRU",
         "downtimeHours": 3.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 3.0 h | Falla_evento 0"
       },
       {
@@ -1430,7 +1430,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Salida de equipos durante parada de la red de distribución interna por falla en R2A & R5B.",
         "downtimeHours": 3.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 3.0 h | Falla_evento 0"
       },
       {
@@ -1439,7 +1439,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Salida de equipos durante parada de la red de distribución interna por falla en R2A & R5B.",
         "downtimeHours": 2.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 2.0 h | Falla_evento 0"
       },
       {
@@ -1448,7 +1448,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Salida de equipos durante parada de la red de distribución interna por falla en R2A & R5B.",
         "downtimeHours": 2.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 2.0 h | Falla_evento 0"
       },
       {
@@ -1457,7 +1457,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Salida de MRU al momento de apertura RL",
         "downtimeHours": 1.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 1.0 h | Falla_evento 0"
       },
       {
@@ -1466,7 +1466,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Salida de MRU al momento de apertura RL",
         "downtimeHours": 1.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 1.0 h | Falla_evento 0"
       },
       {
@@ -1475,7 +1475,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Salida de MRU al momento de apertura RL",
         "downtimeHours": 1.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 1.0 h | Falla_evento 0"
       },
       {
@@ -1493,7 +1493,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Salida mantenimiento de chiller, falla bomba Dinalyne.",
         "downtimeHours": 7.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 7.0 h | Falla_evento 0"
       },
       {
@@ -1502,7 +1502,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Salida mantenimiento de chiller, falla bomba Dinalyne.",
         "downtimeHours": 8.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 8.0 h | Falla_evento 0"
       },
       {
@@ -1511,7 +1511,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "sd parcial de campo por apertura de RL",
         "downtimeHours": 6.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 6.0 h | Falla_evento 0"
       },
       {
@@ -1538,7 +1538,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "SD parcial de campo por apertura de RL, salida sin documentar en el RF por Copower.",
         "downtimeHours": 3.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 3.0 h | Falla_evento 0"
       },
       {
@@ -1547,7 +1547,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "07:47 Salen equipos CPW 01, 02, 03, apagando MRU, por bloqueó en válvula de drenaje tanque B.Ingresa CAT # 2 y diésel CPW G102j.",
         "downtimeHours": 1.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 1.0 h | Falla_evento 0"
       },
       {
@@ -1556,7 +1556,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "07:47 Salen equipos CPW 01, 02, 03, apagando MRU, por bloqueó en válvula de drenaje tanque B.Ingresa CAT # 2 y diésel CPW G102j.",
         "downtimeHours": 1.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 1.0 h | Falla_evento 0"
       },
       {
@@ -1565,7 +1565,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Parada de equipo por mantenimiento de la MRU",
         "downtimeHours": 3.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 3.0 h | Falla_evento 0"
       },
       {
@@ -1601,7 +1601,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "17:05 @ 19:00 EQUIPOS SALEN POR  FALLA RED ELECTRICA INTERNA , FDL MRU.",
         "downtimeHours": 2.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 2.0 h | Falla_evento 0"
       },
       {
@@ -2199,7 +2199,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Evento con PF/falla en Data Soporte",
         "downtimeHours": 1.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 1.0 h | Falla_evento 0"
       },
       {
@@ -2208,7 +2208,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Evento con PF/falla en Data Soporte",
         "downtimeHours": 6.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 6.0 h | Falla_evento 0"
       },
       {
@@ -2217,7 +2217,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Evento con PF/falla en Data Soporte",
         "downtimeHours": 4.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 4.0 h | Falla_evento 0"
       },
       {
@@ -2226,7 +2226,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Evento con PF/falla en Data Soporte",
         "downtimeHours": 1.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 1.0 h | Falla_evento 0"
       },
       {
@@ -2235,7 +2235,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Evento con PF/falla en Data Soporte",
         "downtimeHours": 6.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 6.0 h | Falla_evento 0"
       },
       {
@@ -2244,7 +2244,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Evento con PF/falla en Data Soporte",
         "downtimeHours": 5.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 5.0 h | Falla_evento 0"
       },
       {
@@ -2253,7 +2253,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Evento con PF/falla en Data Soporte",
         "downtimeHours": 5.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 5.0 h | Falla_evento 0"
       }
     ],
@@ -2779,7 +2779,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Evento con PF/falla en Data Soporte",
         "downtimeHours": 2.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 5946.0 h | PF_contr 0.0 h | PF_cli 2.0 h | Falla_evento 0"
       },
       {
@@ -2806,7 +2806,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Evento con PF/falla en Data Soporte",
         "downtimeHours": 2.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 20095.0 h | PF_contr 0.0 h | PF_cli 2.0 h | Falla_evento 0"
       },
       {
@@ -2815,7 +2815,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Evento con PF/falla en Data Soporte",
         "downtimeHours": 7.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 5611.0 h | PF_contr 0.0 h | PF_cli 7.0 h | Falla_evento 0"
       },
       {
@@ -2842,7 +2842,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Evento con PF/falla en Data Soporte",
         "downtimeHours": 10.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 3983.0 h | PF_contr 0.0 h | PF_cli 10.0 h | Falla_evento 0"
       },
       {
@@ -2851,7 +2851,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Evento con PF/falla en Data Soporte",
         "downtimeHours": 3.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 3.0 h | Falla_evento 0"
       }
     ],
@@ -3314,7 +3314,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "7:14hr sale de linea equipo cpw01 por salida MRU. 8:28 hr ingresa a linea modo reparto de carga",
         "downtimeHours": 1.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 1.0 h | Falla_evento 0"
       },
       {
@@ -3323,7 +3323,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "7:14hr sale de linea equipo cpw02 por salida MRU. 8:26 hr ingresa a linea modo reparto de carga",
         "downtimeHours": 1.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 1.0 h | Falla_evento 0"
       },
       {
@@ -3332,7 +3332,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "7:14hr sale de linea equipo cpw03 por salida MRU. 8:23 hr ingresa a linea modo reparto de carga",
         "downtimeHours": 1.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 1.0 h | Falla_evento 0"
       },
       {
@@ -3359,7 +3359,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "7:14hr sale de linea equipo cpw07 por salida MRU. 8:20 hr ingresa a linea modo reparto de carga",
         "downtimeHours": 1.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 1.0 h | Falla_evento 0"
       },
       {
@@ -3386,7 +3386,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "01:00 FDL generación a gas CPW 01-02-03-04-05-06-07- Jinan 10 por disparo de C9 y reconectador RX por sobrecorriente. FDL - Parada Externa - Coordinación por parte de GTE",
         "downtimeHours": 2.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 2.0 h | Falla_evento 0"
       },
       {
@@ -3395,7 +3395,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "01:00 FDL generación a gas CPW 01-02-03-04-05-06-07- Jinan 10 por disparo de C9 y reconectador RX por sobrecorriente. FDL - Parada Externa - Coordinación por parte de GTE",
         "downtimeHours": 2.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 2.0 h | Falla_evento 0"
       },
       {
@@ -3404,7 +3404,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "01:00 FDL generación a gas CPW 01-02-03-04-05-06-07- Jinan 10 por disparo de C9 y reconectador RX por sobrecorriente. FDL - Parada Externa - Coordinación por parte de GTE",
         "downtimeHours": 2.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 2.0 h | Falla_evento 0"
       },
       {
@@ -3413,7 +3413,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "01:00 FDL generación a gas CPW 01-02-03-04-05-06-07- Jinan 10 por disparo de C9 y reconectador RX por sobrecorriente. FDL. 13:26:00 p. m. se coordina con CCM se realiza el apagado ",
         "downtimeHours": 3.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 3.0 h | Falla_evento 0"
       },
       {
@@ -3422,7 +3422,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "01:00 FDL generación a gas CPW 01-02-03-04-05-06-07- Jinan 10 por disparo de C9 y reconectador RX por sobrecorriente. FDL. 13:26:00 p. m. se coordina con CCM se realiza el apagado ",
         "downtimeHours": 3.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 3.0 h | Falla_evento 0"
       },
       {
@@ -3431,7 +3431,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "11:30:00 a. m. salen de lienas equipos CPW001,CPW002,CPW003,CPW007,CPW010 y CPW011, por protección parada MRU. Sale MRU de operación por activación de nivel alto en tanque de NGL L",
         "downtimeHours": 12.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 12.0 h | Falla_evento 0"
       },
       {
@@ -3440,7 +3440,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "11:30:00 a. m. salen de lienas equipos CPW001,CPW002,CPW003,CPW007,CPW010 y CPW011, por protección parada MRU. Sale MRU de operación por activación de nivel alto en tanque de NGL L",
         "downtimeHours": 11.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 11.0 h | Falla_evento 0"
       },
       {
@@ -3449,7 +3449,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "11:30:00 a. m. salen de lienas equipos CPW001,CPW002,CPW003,CPW007,CPW010 y CPW011, por protección parada MRU. Sale MRU de operación por activación de nivel alto en tanque de NGL L",
         "downtimeHours": 12.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 12.0 h | Falla_evento 0"
       },
       {
@@ -3458,7 +3458,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "11:30:00 a. m. salen de lienas equipos CPW001,CPW002,CPW003,CPW007,CPW010 y CPW011, por protección parada MRU. Sale MRU de operación por activación de nivel alto en tanque de NGL L",
         "downtimeHours": 12.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 12.0 h | Falla_evento 0"
       },
       {
@@ -3467,7 +3467,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "05:13 EEP reporta disparo de reconectador línea 34.5 Kv Jauno - Piamonte, FDL generación CPW. FDL manual sistema inyección para control de cargas,  8:16 hrs equipo cpw01 en coordin",
         "downtimeHours": 6.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 6.0 h | Falla_evento 0"
       },
       {
@@ -3476,7 +3476,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "05:13 EEP reporta disparo de reconectador línea 34.5 Kv Jauno - Piamonte, FDL generación CPW. FDL manual sistema inyección para control de cargas,  8:11 hrs equipo cpw02 en coordin",
         "downtimeHours": 11.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 11.0 h | Falla_evento 0"
       },
       {
@@ -3485,7 +3485,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "05:13 EEP reporta disparo de reconectador línea 34.5 Kv Jauno - Piamonte, FDL generación CPW. FDL manual sistema inyección para control de cargas,  8:16 hrs equipo cpw01 en coordin",
         "downtimeHours": 6.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 6.0 h | Falla_evento 0"
       },
       {
@@ -3494,7 +3494,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "05:13 EEP reporta disparo de reconectador línea 34.5 Kv Jauno - Piamonte, FDL generación CPW. FDL manual sistema inyección para control de cargas",
         "downtimeHours": 1.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 1.0 h | Falla_evento 0"
       },
       {
@@ -3503,7 +3503,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "05:13 EEP reporta disparo de reconectador línea 34.5 Kv Jauno - Piamonte, FDL generación CPW. FDL manual sistema inyección para control de cargas",
         "downtimeHours": 1.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 1.0 h | Falla_evento 0"
       },
       {
@@ -3512,7 +3512,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "8:19 hrs equipo cpw07 en coordinación con CCM , sale de línea equipos cpw alineados con gas MRU+CHILLER,  causa corrección fuga de aceite en sistema QUINCY.  10:13  hrs ingresa a l",
         "downtimeHours": 6.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 6.0 h | Falla_evento 0"
       },
       {
@@ -3521,7 +3521,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "10:43 hrs equipo jinan 2  en coordinación con CCM sale de línea equipo Jinan 02 por mantenimiento cyc 19.  16:20 hr equipo ingresa a linea",
         "downtimeHours": 6.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 6.0 h | Falla_evento 0"
       },
       {
@@ -3530,7 +3530,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Falla",
         "cause": "se presentan dos salidas en las cuales se abre el totalizador principal de tablero de auxiliares 480V-Pendiente verificar reprote de configuración de protecciónes",
         "downtimeHours": 1.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 1.0 h | Falla_evento 1"
       },
       {
@@ -3539,7 +3539,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Falla",
         "cause": "se presentan dos salidas en las cuales se abre el totalizador principal de tablero de auxiliares 480V-Pendiente verificar reprote de configuración de protecciónes",
         "downtimeHours": 2.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 2.0 h | Falla_evento 1"
       },
       {
@@ -3548,7 +3548,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "8:10 pm  4 horas en stanby por daño en tuberia de cyc 19 inicia nuevamente a las 11:52 pm",
         "downtimeHours": 4.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 4.0 h | Falla_evento 0"
       },
       {
@@ -3566,7 +3566,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "14:20 hrs Parada manual equipo CPW07 por protección presenta altas vivraciones y se nota alta oscilación de carga al pasar la turbina a diesel se informa a CCM.\n14:50 hrs Ingresa e",
         "downtimeHours": 1.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 1.0 h | Falla_evento 0"
       },
       {
@@ -3575,7 +3575,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Equipos entregado a GTE para inicio de arranque sobre las 15:00 se realiza verifiación y pruebas de magnetización de equipo.",
         "downtimeHours": 10.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 9.0 h | PF_contr 0.0 h | PF_cli 10.0 h | Falla_evento 0"
       },
       {
@@ -3584,7 +3584,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Sale de linea equipo CPW010, 18:30 Se informa equipo disponible para magnetizar transformador 5MVA. Se solicita por Copower realizar el arranque al dia siguiente debido a falta de ",
         "downtimeHours": 5.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 19.0 h | PF_contr 0.0 h | PF_cli 5.0 h | Falla_evento 0"
       },
       {
@@ -3593,7 +3593,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Falla",
         "cause": "FDL por SD detonación. Se evidencia en las tendencias de operación del equipo caída de presión de gas.se realiza cambio de base y rele k4, alimentación válvula shutoff suministro d",
         "downtimeHours": 3.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 3.0 h | Falla_evento 1"
       },
       {
@@ -3602,7 +3602,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Sale de línea equipo JINAN-01 parada manual, se realizará cambio de válvula 3/4\" por parte de Confipetrol\nTiempo estimado 1 hora.",
         "downtimeHours": 1.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 1.0 h | Falla_evento 0"
       },
       {
@@ -3620,7 +3620,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Hora de operación posterior a el mantenimiento debido a daño en el tren de admision.",
         "downtimeHours": 23.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 23.0 h | Falla_evento 0"
       },
       {
@@ -3629,7 +3629,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Falla en el sistema de admision.",
         "downtimeHours": 24.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 24.0 h | Falla_evento 0"
       },
       {
@@ -3647,7 +3647,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Operativo",
         "cause": "Sale para mantenimiento semanal de MRU posteriormente presenta detonación al momento de iniciar en línea, el cual nos produjo daño en la integridad de el equipo. Pendiente procedim",
         "downtimeHours": 15.0,
-        "responsible": "Cliente",
+        "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 15.0 h | Falla_evento 0"
       }
     ],

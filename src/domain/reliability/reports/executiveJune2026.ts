@@ -91,23 +91,63 @@ export const EXEC_JUN_STABILIZATION: ExecUnitRow[] = [
   { unidad: "JIN-12", campo: "COSTAYACO (estabilización ~19 días)", disponibilidadPct: 100, confiabilidadPct: 100, fallas: 0, mtbfLabel: "Sin Fallas", mttrHours: 0, riesgoTecnico: "RIESGO BAJO" },
 ];
 
-/** Tendencia solo con puntos reales May–Jun. */
-export const EXEC_TREND_MAY_JUN = [
+/** Serie Ene–Jun con fuente real por mes (no inventar). */
+export const EXEC_TREND_CHART = [
   {
-    month: "May",
+    month: "Enero",
+    availability: 0.9996,
+    reliability: 0.9996,
+    mtbfHours: 1307.0,
+    mttrHours: 0.5,
+    fuente: "Excel Data Soporte Enero 2026",
+  },
+  {
+    month: "Febrero",
+    availability: 0.9964,
+    reliability: 0.9964,
+    mtbfHours: 1187.25,
+    mttrHours: 4.25,
+    fuente: "Excel Data Soporte Febrero 2026",
+  },
+  {
+    month: "Marzo",
+    availability: 0.963,
+    reliability: 0.963,
+    mtbfHours: 531.38,
+    mttrHours: 20.4,
+    fuente: "Excel Data Soporte Marzo 2026",
+  },
+  {
+    month: "Abril",
+    availability: 0.9949,
+    reliability: 0.9949,
+    mtbfHours: 1210.25,
+    mttrHours: 6.25,
+    fuente: "Excel Data Soporte Abril 2026",
+  },
+  {
+    month: "Mayo",
     availability: EXEC_MAY.availability,
     reliability: EXEC_MAY.reliability,
     mtbfHours: EXEC_MAY.mtbfHours,
     mttrHours: EXEC_MAY.mttrHours,
+    fuente: "PDF oficial (citado en informe junio)",
   },
   {
-    month: "Jun",
+    month: "Junio",
     availability: EXEC_JUN.availability,
     reliability: EXEC_JUN.reliability,
     mtbfHours: EXEC_JUN.mtbfHours,
     mttrHours: EXEC_JUN.mttrHours,
+    fuente: "PDF oficial junio",
   },
 ] as const;
+
+export const EXEC_TREND_FOOTER =
+  "Ene–Abr: Excel Data Soporte de cada mes (carpeta data/GTE — SISTEMA N Costayaco, PF_contr). Mayo: PDF oficial (variación citada en informe junio). Junio: PDF oficial — Análisis Indicadores Copower PUTN Jun 2026 (Gran Tierra).";
+
+export const EXEC_ORDEN1_VALUE_NOTE =
+  "Orden de Servicio Costayaco (Orden 1) · valor estimado: COP $5.000.000.000 · cláusula penal 15% = COP $750.000.000";
 
 export const EXEC_BLIND_SPOTS = [
   { name: "Capacidad de Potencia (PMC)", meta: "≥ PMC comprometida", status: "N/D — pendiente de fuente" },

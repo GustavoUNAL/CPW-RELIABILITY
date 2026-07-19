@@ -711,6 +711,61 @@ tr.row-highlight td {
   font-size: 0.92rem;
 }
 
+.metric-label {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  line-height: 1.2;
+  text-align: left;
+}
+
+.metric-code {
+  font-weight: 700;
+}
+
+.metric-def {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.01em;
+  max-width: 11rem;
+  white-space: normal;
+}
+
+.metric-glossary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.55rem;
+  margin: 0.35rem 0 0.15rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 8px;
+  border: 1px dashed var(--border);
+  background: color-mix(in oklab, var(--panel-soft) 92%, transparent);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.metric-glossary strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.metric-glossary-sep {
+  opacity: 0.45;
+}
+
+th .metric-label {
+  max-width: 7.5rem;
+}
+
+th .metric-def {
+  max-width: 7.5rem;
+}
+
 .editable-grid {
   display: grid;
   gap: 0.85rem;
@@ -1084,6 +1139,165 @@ tr.row-highlight td {
   }
 }
 
+/* iPhone 14 Pro (~393px) y móviles estrechos */
+@media (max-width: 430px) {
+  .app-shell {
+    min-height: 100dvh;
+  }
+
+  .sidebar {
+    padding: 0.75rem max(0.75rem, env(safe-area-inset-right)) 0.65rem max(0.75rem, env(safe-area-inset-left));
+  }
+
+  .brand h1 {
+    font-size: 0.98rem;
+  }
+
+  .main {
+    padding: 0.65rem max(0.65rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom))
+      max(0.65rem, env(safe-area-inset-left));
+    overflow-x: hidden;
+  }
+
+  .topbar {
+    top: 0.35rem;
+    gap: 0.55rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .page-title {
+    font-size: 1.2rem;
+  }
+
+  .subtitle {
+    font-size: 0.82rem;
+  }
+
+  .header-theme-switch {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
+  }
+
+  .kpi-card {
+    padding: 0.8rem;
+  }
+
+  .card {
+    padding: 0.75rem;
+    border-radius: 12px;
+  }
+
+  .card h3 {
+    font-size: 0.98rem;
+  }
+
+  .metric-glossary {
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.68rem;
+    padding: 0.5rem 0.55rem;
+  }
+
+  .metric-glossary-sep {
+    display: none;
+  }
+
+  .metric-def {
+    font-size: 0.64rem;
+    max-width: 100%;
+  }
+
+  .table-scroll {
+    margin-inline: -0.15rem;
+    padding-bottom: 0.25rem;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+
+  .table-scroll table {
+    font-size: 0.76rem;
+    min-width: 520px;
+  }
+
+  .table-scroll th,
+  .table-scroll td {
+    padding: 0.4rem 0.45rem;
+    white-space: nowrap;
+  }
+
+  .table-scroll .detalle-cell {
+    white-space: normal;
+    max-width: 160px;
+  }
+
+  .sistema-strip,
+  .sistema-metrics,
+  .exec-hours-grid,
+  .exec-blind-grid,
+  .contract-score-grid,
+  .contract-score-grid-2,
+  .contract-overview-grid,
+  .contract-overview-grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .exec-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .exec-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .exec-kpi-row {
+    grid-template-columns: 1fr;
+  }
+
+  .exec-core strong {
+    font-size: 1.45rem;
+  }
+
+  .chart-container {
+    min-height: 220px;
+  }
+
+  .chart-container .recharts-responsive-container {
+    min-height: 220px !important;
+  }
+
+  .modal-overlay {
+    padding: max(0.5rem, env(safe-area-inset-top)) 0.5rem max(0.5rem, env(safe-area-inset-bottom));
+  }
+
+  .modal-card {
+    max-width: 100%;
+    max-height: calc(100dvh - 1rem);
+    overflow: auto;
+  }
+
+  .open-popup-btn {
+    font-size: 0.78rem;
+    padding: 0.35rem 0.55rem;
+  }
+
+  .menu-item {
+    font-size: 0.84rem;
+    padding: 0.5rem 0.6rem;
+  }
+
+  .sort-button {
+    font-size: inherit;
+    white-space: normal;
+    text-align: left;
+  }
+}
+
 /* —— Tablero ejecutivo gerencial (junio 2026) —— */
 .exec-dashboard {
   display: flex;
@@ -1384,5 +1598,9 @@ tr.row-focal td {
 
   .exec-core strong {
     font-size: 1.65rem;
+  }
+
+  .exec-kpi-row {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   }
 }
