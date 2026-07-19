@@ -25,6 +25,8 @@ export const copowerInternoReport: ReportDataset = {
     { status: "En curso", value: 0, color: "#f59e0b" },
     { status: "Cerrado", value: 0, color: "#22c55e" },
   ],
+  rcaCases: [],
+  commonCauseEvents: [],
   maintenancePlan: [],
   actionPlan: [],
   summary: {
@@ -52,6 +54,7 @@ export const copowerInternoReport: ReportDataset = {
     { month: "Jun", availability: 0, reliability: 0, mtbfHours: 0, mttrHours: 0 },
   ],
   causePareto: [],
+  analysisHighlights: [],
   generationByAsset: [],
   generationByEquipment: [],
   totalGenerationKwh: 0,

@@ -1,10 +1,11 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   AlertTriangle,
   BarChart3,
   Bug,
   CheckCircle2,
   ClipboardList,
+  FileText,
   Gauge,
   LayoutDashboard,
   Search,
@@ -31,13 +32,26 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { ExecutiveResumen } from "./domain/reliability/reports/ExecutiveResumen";
 import { REPORT_DATASETS } from "./domain/reliability/reports";
 import {
   GRAN_TIERRA_KPI_FROM_MONTHS,
   GRAN_TIERRA_MONTHLY_DATA,
   GRAN_TIERRA_MONTH_ORDER,
+  GRAN_TIERRA_TREND_FROM_MONTHS,
+  granTierraMonthLabel,
   type GranTierraMonthKey,
 } from "./domain/reliability/reports/granTierraMonthly";
+import {
+  CONTRACTUAL_KPI_TARGETS,
+  CONTRACT_CALC_BASE,
+  CONTRACT_FRAMEWORK_CONCLUSION,
+  CONTRACT_ORDERS_OVERVIEW,
+  getReliabilityDeduction,
+  getShutdownDeduction,
+  RELIABILITY_DEDUCTION_BANDS,
+  SHUTDOWN_PENALTY_BANDS,
+} from "./domain/reliability/contracts/gteOrders";
 import type {
   ActionRow,
   MachineIndicatorRow,
@@ -66,6 +80,7 @@ type SortConfig = {
 
 const NAV_ITEMS: NavItem[] = [
   { key: "resumen", label: "Resumen", icon: <LayoutDashboard size={16} />, description: "Vista ejecutiva" },
+  { key: "compromiso", label: "Compromiso contractual", icon: <FileText size={16} />, description: "Ordenes y metas de contrato" },
   { key: "generacion", label: "Generacion", icon: <Zap size={16} />, description: "Generacion por equipo y total" },
   { key: "maquinas", label: "Indicadores por maquina", icon: <Gauge size={16} />, description: "Indicadores por unidad" },
   { key: "indicadores", label: "Historico de eventos", icon: <BarChart3 size={16} />, description: "Eventos registrados y filtro de fallas" },
@@ -81,10 +96,24 @@ const REPORT_TREE: ReportTree[] = [
   { key: "gran_tierra", label: "Gran Tierra Energy" },
 ];
 
-const percent = (value: number) => `${(value * 100).toFixed(1)}%`;
+const percent = (value: number | null | undefined) =>
+  value == null || Number.isNaN(value) ? "N/A" : `${(value * 100).toFixed(1)}%`;
+const percentPrecise = (value: number | null | undefined, digits = 2) =>
+  value == null || Number.isNaN(value) ? "N/A" : `${(value * 100).toFixed(digits)}%`;
 const mwh = (value: number) => `${Math.round(value).toLocaleString("es-CO")} MWh`;
 const kwh = (value: number) => `${Math.round(value).toLocaleString("es-CO")} kWh`;
-const hours = (value: number) => `${value.toFixed(2)} h`;
+const hours = (value: number | null | undefined) =>
+  value == null || Number.isNaN(value) ? "N/A" : `${value.toFixed(2)} h`;
+const numOrNA = (value: number | null | undefined, digits = 2) =>
+  value == null || Number.isNaN(value) ? "N/A" : value.toFixed(digits);
+const deltaOrZero = (curr: number | null | undefined, prev: number | null | undefined) =>
+  curr == null || prev == null ? 0 : (curr - prev) * 100;
+const formatMachinePct = (value: number | null | undefined) =>
+  value == null || Number.isNaN(value) ? "N/A" : `${value.toFixed(2)}%`;
+const riesgoBadgeClass = (riesgo: string) =>
+  riesgo === "RIESGO MEDIO" ? "warning" : riesgo === "RIESGO ALTO" ? "danger" : "success";
+const cumplimientoBadgeClass = (cumplimiento: string) =>
+  cumplimiento === "CUMPLE" ? "success" : cumplimiento === "N/A" ? "info" : "danger";
 
 function App() {
   const [activeReport, setActiveReport] = useState<ReportKey>("gran_tierra");
@@ -105,18 +134,31 @@ function App() {
     eventos: { key: "date", direction: "desc" },
     maquinas: { key: "unidad", direction: "asc" },
     desviaciones: { key: "indicator", direction: "asc" },
-    malosActores: { key: "generationImpactMwh", direction: "desc" },
+    malosActores: { key: "unavailabilityHours", direction: "desc" },
     rca: { key: "value", direction: "desc" },
     generacionCostayaco: { key: "energiaKwh", direction: "desc" },
     generacionVonu: { key: "energiaKwh", direction: "desc" },
   });
+
+  useEffect(() => {
+    setMaintenanceByReport({
+      gran_tierra: REPORT_DATASETS.gran_tierra.maintenancePlan,
+      copower_interno: REPORT_DATASETS.copower_interno.maintenancePlan,
+    });
+    setActionsByReport({
+      gran_tierra: REPORT_DATASETS.gran_tierra.actionPlan,
+      copower_interno: REPORT_DATASETS.copower_interno.actionPlan,
+    });
+  }, []);
 
   const reportData = REPORT_DATASETS[activeReport];
   const monthOptions = activeReport === "gran_tierra" ? GRAN_TIERRA_MONTH_ORDER : ["Jun"];
   const activeMonthData = activeReport === "gran_tierra" ? GRAN_TIERRA_MONTHLY_DATA[selectedMonth] : null;
   const kpiData = activeReport === "gran_tierra" ? GRAN_TIERRA_KPI_FROM_MONTHS : reportData.kpiData;
   const targets = reportData.kpiTargets;
-  const badActors = reportData.badActors;
+  /** Análisis narrativo (DOCX/PDF) solo existe para junio. */
+  const hasJuneAnalysis = selectedMonth === "Jun";
+  const badActors = hasJuneAnalysis ? reportData.badActors : [];
   const rcaData = reportData.rca;
   const maintenancePlan = maintenanceByReport[activeReport];
   const actionPlan = actionsByReport[activeReport];
@@ -134,9 +176,18 @@ function App() {
   const safeIndex = monthIndex >= 0 ? monthIndex : kpiData.length - 1;
   const current = kpiData[safeIndex];
   const previous = kpiData[Math.max(0, safeIndex - 1)];
+  const monthLabel = activeMonthData?.label ?? granTierraMonthLabel(selectedMonth);
   const previousMonthCode = activeReport === "gran_tierra" ? GRAN_TIERRA_MONTH_ORDER[Math.max(0, safeIndex - 1)] : null;
   const previousMonthSummary =
     activeReport === "gran_tierra" && previousMonthCode ? GRAN_TIERRA_MONTHLY_DATA[previousMonthCode].summary : null;
+  const sistemaCostayaco = machineIndicators.find((m) => m.unidad === "SISTEMA N" && m.campo === "COSTAYACO") ?? null;
+  const sistemaVonu = machineIndicators.find((m) => m.unidad === "SISTEMA N" && m.campo === "VONU") ?? null;
+  const indicatorsSourceNote =
+    selectedMonth === "Jun"
+      ? "Fuente: anexo PDF/DOCX junio (data/GTE/Junio). Cumplimiento de sistema vs ≥98% Orden 1."
+      : selectedMonth === "May"
+        ? "Fuente: SISTEMA N oficial citado en informe junio; unidades desde Excel Mayo (data/GTE/Mayo). Meta sistema ≥98% Orden 1."
+        : `Fuente: Excel Data Soporte (data/GTE). Calculado con PF_contr. Meta sistema ≥98% Orden 1.`;
   const isNoDataReport =
     !reportData.source &&
     kpiData.every(
@@ -149,129 +200,232 @@ function App() {
         row.contractualCompliance === 0,
     );
 
-  const deviations = useMemo(
-    () => [
-      {
-        indicator: "Disponibilidad",
-        value: current.availability,
-        target: targets.availability,
-        unit: "pct" as const,
-        higherIsBetter: true,
-        technicalExplanation:
-          isNoDataReport
-            ? "Sin datos reportados para este periodo."
-            : current.availability >= targets.availability
-            ? "Control de indisponibilidad forzada dentro del plan."
-            : "Afectada por indisponibilidades recurrentes reportadas en el periodo.",
-      },
-      {
-        indicator: "Confiabilidad",
-        value: current.reliability,
-        target: targets.reliability,
-        unit: "pct" as const,
-        higherIsBetter: true,
-        technicalExplanation:
-          isNoDataReport
-            ? "Sin datos reportados para este periodo."
-            : current.reliability >= targets.reliability
-            ? "Mejor comportamiento de fallas repetitivas en subsistemas críticos."
-            : "Frecuencia de fallas superior al patrón esperado.",
-      },
-      {
-        indicator: "Mantenibilidad",
-        value: current.maintainability,
-        target: targets.maintainability,
-        unit: "pct" as const,
-        higherIsBetter: true,
-        technicalExplanation:
-          isNoDataReport
-            ? "Sin datos reportados para este periodo."
-            : current.maintainability >= targets.maintainability
-            ? "Tiempos de reparación en rango objetivo."
-            : "Se observan tiempos de reparación por encima del estándar.",
-      },
-      {
-        indicator: "Generacion",
-        value: current.generationMwh,
-        target: targets.generationMwh,
-        unit: "mwh" as const,
-        higherIsBetter: true,
-        technicalExplanation:
-          isNoDataReport
-            ? "Sin datos reportados para este periodo."
-            : current.generationMwh >= targets.generationMwh
-            ? "La produccion energetica supera la meta mensual."
-            : "La produccion no alcanza el objetivo y requiere refuerzo operativo.",
-      },
-      {
-        indicator: "Perdidas operacionales",
-        value: current.operationalLossesMwh,
-        target: targets.operationalLossesMwh,
-        unit: "mwh" as const,
-        higherIsBetter: false,
-        technicalExplanation:
-          isNoDataReport
-            ? "Sin datos reportados para este periodo."
-            : current.operationalLossesMwh <= targets.operationalLossesMwh
-            ? "Las perdidas estan controladas frente al objetivo."
-            : "Las perdidas exceden meta y deben atacarse con acciones correctivas.",
-      },
-      {
-        indicator: "Cumplimiento contractual",
-        value: current.contractualCompliance,
-        target: targets.contractualCompliance,
-        unit: "pct" as const,
-        higherIsBetter: true,
-        technicalExplanation:
-          isNoDataReport
-            ? "Sin datos reportados para este periodo."
-            : current.contractualCompliance >= targets.contractualCompliance
-            ? "Entrega energetica alineada a la obligación contractual."
-            : "La menor generacion neta reduce el cumplimiento.",
-      },
-      {
-        indicator: "MTBF",
-        value: summary.mtbfHours,
-        target: 650,
-        unit: "hours" as const,
-        higherIsBetter: true,
-        technicalExplanation:
-          summary.mtbfHours >= 650
-            ? "Buen intervalo promedio entre fallas para el sistema."
-            : "Frecuencia de fallas alta; se requiere intervencion por recurrencias.",
-      },
-      {
-        indicator: "MTTR",
-        value: summary.mttrHours,
-        target: 4,
-        unit: "hours" as const,
-        higherIsBetter: false,
-        technicalExplanation:
-          summary.mttrHours <= 4
-            ? "Tiempo de recuperacion dentro del objetivo."
-            : "Recuperacion lenta frente a meta, revisar repuestos y tiempos de respuesta.",
-      },
-      {
-        indicator: "Eventos de falla",
-        value: summary.copowerFailures,
-        target: 7,
-        unit: "count" as const,
-        higherIsBetter: false,
-        technicalExplanation:
-          summary.copowerFailures <= 7
-            ? "Numero de fallas controlado frente a referencia."
-            : "Recurrencia superior a meta, priorizar equipos con mayor frecuencia.",
-      },
-    ],
-    [current, targets, isNoDataReport, summary],
-  );
+  const deviations = useMemo(() => {
+    type DeviationRow = {
+      indicator: string;
+      value: number | null;
+      target: number | null;
+      unit: "pct" | "mwh" | "hours" | "count";
+      higherIsBetter: boolean;
+      status: "cumple" | "no_cumple" | "seguimiento" | "nd";
+      technicalExplanation: string;
+      source: string;
+    };
+
+    const rows: DeviationRow[] = [];
+    const meta98 = CONTRACTUAL_KPI_TARGETS.availability;
+    const srcOfficial =
+      selectedMonth === "Jun"
+        ? "PDF/anexo junio (Gran Tierra)"
+        : selectedMonth === "May"
+          ? "Oficial citado en informe junio"
+          : "Excel Data Soporte (SISTEMA N Costayaco)";
+    const srcExcel = "Excel Data Soporte data/GTE";
+    const srcContract = "Orden 1 Costayaco";
+    const srcNd = "N/D — pendiente de fuente";
+
+    const statusVsMeta = (value: number | null, target: number, higherIsBetter: boolean): DeviationRow["status"] => {
+      if (value == null) return "nd";
+      const ok = higherIsBetter ? value >= target : value <= target;
+      return ok ? "cumple" : "no_cumple";
+    };
+
+    // Disponibilidad
+    rows.push({
+      indicator: "Disponibilidad del Sistema",
+      value: current.availability,
+      target: meta98,
+      unit: "pct",
+      higherIsBetter: true,
+      status: statusVsMeta(current.availability, meta98, true),
+      source: srcOfficial,
+      technicalExplanation:
+        current.availability == null
+          ? "N/D — sin Disponibilidad sistémica para este mes."
+          : current.availability >= meta98
+            ? `SISTEMA N Costayaco ${percentPrecise(current.availability)}. Cumple meta Orden 1 ≥98%.`
+            : `SISTEMA N Costayaco ${percentPrecise(current.availability)}. No cumple (≥98%). Brecha ${((meta98 - current.availability) * 100).toFixed(2)} pp.`,
+    });
+
+    // Confiabilidad
+    const confStatus = statusVsMeta(current.reliability, meta98, true);
+    rows.push({
+      indicator: "Confiabilidad del Sistema",
+      value: current.reliability,
+      target: meta98,
+      unit: "pct",
+      higherIsBetter: true,
+      status: confStatus,
+      source: srcOfficial,
+      technicalExplanation:
+        current.reliability == null
+          ? "N/D — sin Confiabilidad sistémica para este mes."
+          : current.reliability >= meta98
+            ? `SISTEMA N Costayaco ${percentPrecise(current.reliability)}. Cumple meta Orden 1 ≥98%.`
+            : `SISTEMA N Costayaco ${percentPrecise(current.reliability)}. No cumple. Deducción estimada ${getReliabilityDeduction(current.reliability).deductionPct}% (banda ${getReliabilityDeduction(current.reliability).rangeLabel}).`,
+    });
+
+    // Cumplimiento contractual (min Disp/Conf)
+    const complianceValue =
+      current.availability == null || current.reliability == null
+        ? null
+        : Math.min(current.availability, current.reliability);
+    rows.push({
+      indicator: "Cumplimiento contractual (Orden 1)",
+      value: complianceValue,
+      target: meta98,
+      unit: "pct",
+      higherIsBetter: true,
+      status: statusVsMeta(complianceValue, meta98, true),
+      source: srcContract,
+      technicalExplanation:
+        complianceValue == null
+          ? "N/D — sin Disp/Conf para evaluar Orden 1."
+          : complianceValue >= meta98
+            ? "Disp y Conf ≥98%."
+            : selectedMonth === "Jun"
+              ? "Costayaco 97.92% no cumple; Vonú 100% sí cumple (referencia)."
+              : "SISTEMA N Costayaco bajo meta ≥98%.",
+    });
+
+    // Generación
+    const hasEnergy = current.generationMwh > 0;
+    rows.push({
+      indicator: "Generación total",
+      value: hasEnergy ? current.generationMwh : null,
+      target: targets.generationMwh,
+      unit: "mwh",
+      higherIsBetter: true,
+      status: hasEnergy ? statusVsMeta(current.generationMwh, targets.generationMwh, true) : "nd",
+      source: hasEnergy ? srcExcel : srcNd,
+      technicalExplanation: hasEnergy
+        ? selectedMonth === "Jun"
+          ? "4,110.144 MWh (gas CYC 3,499.84 + diésel 119.72 + Vonú 490.59). Meta 4,000 MWh."
+          : `Generación ${current.generationMwh.toFixed(1)} MWh vs meta ${targets.generationMwh} MWh.`
+        : "N/D energético — Excel sin columna Energia_kWh_dia este mes.",
+    });
+
+    // MTBF — seguimiento (sin umbral Orden 1)
+    rows.push({
+      indicator: "MTBF",
+      value: summary.mtbfHours,
+      target: null,
+      unit: "hours",
+      higherIsBetter: true,
+      status: summary.mtbfHours == null ? "nd" : "seguimiento",
+      source: summary.mtbfHours == null ? srcNd : srcOfficial,
+      technicalExplanation:
+        summary.mtbfHours == null
+          ? "N/D — sin MTBF publicado."
+          : selectedMonth === "Jun"
+            ? "711.57 h (anexo). Mayo 500.39 h. Orden 1: solo seguimiento, sin umbral fijo."
+            : selectedMonth === "May"
+              ? "500.39 h (citado en informe junio). Solo seguimiento."
+              : `${summary.mtbfHours.toFixed(2)} h (Excel). Solo seguimiento.`,
+    });
+
+    // MTTR — seguimiento
+    rows.push({
+      indicator: "MTTR",
+      value: summary.mttrHours,
+      target: null,
+      unit: "hours",
+      higherIsBetter: false,
+      status: summary.mttrHours == null ? "nd" : "seguimiento",
+      source: summary.mttrHours == null ? srcNd : srcOfficial,
+      technicalExplanation:
+        summary.mttrHours == null
+          ? "N/D — sin MTTR publicado."
+          : selectedMonth === "Jun"
+            ? "2.86 h (anexo). Mayo 5.32 h. Orden 1: solo seguimiento, sin umbral fijo."
+            : selectedMonth === "May"
+              ? "5.32 h (citado en informe junio). Solo seguimiento."
+              : `${summary.mttrHours.toFixed(2)} h (Excel). Solo seguimiento.`,
+    });
+
+    // Fallas imputables
+    rows.push({
+      indicator: "Fallas imputables COPOWER",
+      value: summary.copowerFailures,
+      target: 0,
+      unit: "count",
+      higherIsBetter: false,
+      status: statusVsMeta(summary.copowerFailures, 0, false),
+      source: selectedMonth === "Jun" || selectedMonth === "May" ? srcOfficial : srcExcel,
+      technicalExplanation:
+        selectedMonth === "Jun"
+          ? "7 imputables (igual que mayo). Bitácora: 10 Falla_evento; 3 al cliente. Ideal contractual: 0."
+          : selectedMonth === "May"
+            ? "7 imputables (informe junio). Ideal: 0."
+            : `${summary.copowerFailures} (Σ Falla_evento Excel). Ideal: 0.`,
+    });
+
+    // RCA / reportes
+    rows.push({
+      indicator: "Reportes de falla / RCA entregados",
+      value: selectedMonth === "Jun" ? 0 : null,
+      target: selectedMonth === "Jun" ? summary.copowerFailures : null,
+      unit: "count",
+      higherIsBetter: true,
+      status: selectedMonth === "Jun" ? "no_cumple" : "nd",
+      source: selectedMonth === "Jun" ? srcOfficial : srcNd,
+      technicalExplanation:
+        selectedMonth === "Jun"
+          ? "0 de 7 entregados → expuesto a multa adicional 4% (Orden 1)."
+          : "N/D — sin tracker formal de RCA en carpeta del mes.",
+    });
+
+    // Puntos ciegos Orden 1
+    rows.push({
+      indicator: "Eficiencia",
+      value: null,
+      target: CONTRACTUAL_KPI_TARGETS.efficiencyPct / 100,
+      unit: "pct",
+      higherIsBetter: true,
+      status: "nd",
+      source: srcNd,
+      technicalExplanation: "N/D — pendiente de fuente. Meta Orden 1 ≥37%.",
+    });
+    rows.push({
+      indicator: "Plan de Mantenimiento",
+      value: null,
+      target: 1,
+      unit: "pct",
+      higherIsBetter: true,
+      status: "nd",
+      source: srcNd,
+      technicalExplanation: "N/D — pendiente de fuente. Meta Orden 1 = 100%.",
+    });
+    rows.push({
+      indicator: "Stock de Repuestos",
+      value: null,
+      target: 1,
+      unit: "pct",
+      higherIsBetter: true,
+      status: "nd",
+      source: srcNd,
+      technicalExplanation: "N/D — pendiente de fuente. Meta Orden 1 = 100% (trimestral).",
+    });
+    rows.push({
+      indicator: "Capacidad de Potencia (PMC)",
+      value: null,
+      target: null,
+      unit: "pct",
+      higherIsBetter: true,
+      status: "nd",
+      source: srcNd,
+      technicalExplanation: "N/D — pendiente de fuente. Meta ≥ PMC comprometida.",
+    });
+
+    return rows;
+  }, [current, targets, summary, selectedMonth]);
 
   const complianceChartData = deviations
-    .filter((d) => d.unit === "pct")
+    .filter((d) => d.unit === "pct" && d.value != null && d.target != null && d.status !== "nd")
     .map((d) => ({
-    indicador: d.indicator,
-    actual: Number((d.value * 100).toFixed(1)),
-    meta: Number((d.target * 100).toFixed(1)),
+      indicador: d.indicator.replace(" del Sistema", "").replace(" contractual (Orden 1)", ""),
+      actual: Number(((d.value as number) * 100).toFixed(2)),
+      meta: Number(((d.target as number) * 100).toFixed(1)),
     }));
 
   const updateMaintenance = <K extends keyof MaintenanceRow>(id: string, field: K, value: MaintenanceRow[K]) => {
@@ -290,35 +444,244 @@ function App() {
 
   const performanceData = kpiData.map((row) => ({
     ...row,
-    lossesRatio: row.operationalLossesMwh / row.generationMwh,
+    lossesRatio:
+      row.operationalLossesMwh == null || !row.generationMwh
+        ? null
+        : row.operationalLossesMwh / row.generationMwh,
   }));
 
-  const topBadActors = [...badActors].sort((a, b) => b.generationImpactMwh - a.generationImpactMwh);
+  const topBadActors = [...badActors].sort((a, b) => b.unavailabilityHours - a.unavailabilityHours);
+  const rcaCases = reportData.rcaCases;
+  const commonCauseEvents = hasJuneAnalysis ? reportData.commonCauseEvents : [];
+  const analysisHighlights = hasJuneAnalysis
+    ? reportData.analysisHighlights
+    : [
+        `Mes ${selectedMonth}: indicadores por unidad y SISTEMA N desde data/GTE (Excel${selectedMonth === "May" ? "; SISTEMA N oficial citado en informe junio" : ""}).`,
+        "Metas de sistema ≥98% Orden 1. Riesgo técnico derivado de #fallas y MTBF.",
+        "RCA, planes de acción y mantenibilidad: N/A si no hay tracker formal en la carpeta del mes.",
+      ];
+  const causeParetoByHours = hasJuneAnalysis
+    ? [...reportData.causePareto].sort((a, b) => (b.hoursPfClient ?? 0) - (a.hoursPfClient ?? 0))
+    : [];
 
   const rcaTotal = rcaData.reduce((acc, cur) => acc + cur.value, 0);
   const rcaSummary = rcaData.map((item) => ({
     ...item,
     percentage: rcaTotal > 0 ? ((item.value / rcaTotal) * 100).toFixed(1) : "0.0",
   }));
+  const deviationStats = {
+    total: deviations.length,
+    meeting: deviations.filter((d) => d.status === "cumple").length,
+    missing: deviations.filter((d) => d.status === "nd").length,
+    failing: deviations.filter((d) => d.status === "no_cumple").length,
+    tracking: deviations.filter((d) => d.status === "seguimiento").length,
+  };
+  const actionStats = {
+    total: actionPlan.length,
+    pending: actionPlan.filter((a) => a.status === "Pendiente").length,
+    inProgress: actionPlan.filter((a) => a.status === "En curso").length,
+    done: actionPlan.filter((a) => a.status === "Completada").length,
+  };
+  const machineRiskStats = {
+    high: machineIndicators.filter((m) => m.riesgoTecnico === "RIESGO ALTO").length,
+    medium: machineIndicators.filter((m) => m.riesgoTecnico === "RIESGO MEDIO").length,
+    low: machineIndicators.filter((m) => m.riesgoTecnico === "RIESGO BAJO").length,
+  };
+  const reliabilityDeduction =
+    current.reliability == null ? null : getReliabilityDeduction(current.reliability);
+  const availabilityMeetsContract =
+    current.availability != null && current.availability >= CONTRACTUAL_KPI_TARGETS.availability;
+  const reliabilityMeetsContract =
+    current.reliability != null && current.reliability >= CONTRACTUAL_KPI_TARGETS.reliability;
+  const contractualScorecard = [
+    {
+      name: "Disponibilidad",
+      valueLabel:
+        current.availability == null
+          ? "N/A"
+          : `${(current.availability * 100).toFixed(1)}% / meta 98.0%`,
+      meets: current.availability == null ? null : availabilityMeetsContract,
+      detail:
+        current.availability == null
+          ? "Sin Disp sistémica este mes"
+          : availabilityMeetsContract
+            ? "Cumple umbral ≥98%"
+            : `No cumple (brecha ${((CONTRACTUAL_KPI_TARGETS.availability - current.availability) * 100).toFixed(2)} pp)`,
+    },
+    {
+      name: "Confiabilidad",
+      valueLabel:
+        current.reliability == null
+          ? "N/A"
+          : `${(current.reliability * 100).toFixed(1)}% / meta 98.0%`,
+      meets: current.reliability == null ? null : reliabilityMeetsContract,
+      detail:
+        current.reliability == null
+          ? "Sin Conf sistémica este mes"
+          : reliabilityMeetsContract
+            ? "Cumple umbral ≥98%"
+            : `No cumple → deducción estimada ${reliabilityDeduction?.deductionPct ?? "N/A"}%`,
+    },
+    {
+      name: "MTBF",
+      valueLabel: summary.mtbfHours == null ? "N/A" : `${summary.mtbfHours.toFixed(2)} h`,
+      meets: null as boolean | null,
+      detail: "Solo seguimiento, sin umbral fijo",
+    },
+    {
+      name: "MTTR",
+      valueLabel: summary.mttrHours == null ? "N/A" : `${summary.mttrHours.toFixed(2)} h`,
+      meets: null as boolean | null,
+      detail: "Solo seguimiento, sin umbral fijo",
+    },
+    {
+      name: "Reportes de falla / RCA",
+      valueLabel:
+        selectedMonth === "Jun"
+          ? "No entregados (7 eventos)"
+          : "N/A — sin tracker formal en carpeta del mes",
+      meets: selectedMonth === "Jun" ? false : null,
+      detail:
+        selectedMonth === "Jun"
+          ? "Expuesto a multa del 4% adicional (Orden 1) si se confirma la ausencia"
+          : "Pendiente evidencia de entregas documentadas",
+    },
+  ];
+  const activeReliabilityBand =
+    current.reliability == null ? null : getReliabilityDeduction(current.reliability);
+  const failuresDelta =
+    previousMonthSummary != null ? summary.copowerFailures - previousMonthSummary.copowerFailures : null;
+  const focalRiskUnits = machineIndicators.filter((m) => m.unidad !== "SISTEMA N" && m.fallas >= 3);
+  const consecutiveReliabilityMisses = useMemo(() => {
+    if (activeReport !== "gran_tierra") return 0;
+    let streak = 0;
+    for (let i = safeIndex; i >= 0; i -= 1) {
+      const rel = GRAN_TIERRA_KPI_FROM_MONTHS[i]?.reliability;
+      if (rel == null || rel >= CONTRACTUAL_KPI_TARGETS.reliability) break;
+      streak += 1;
+    }
+    return streak;
+  }, [activeReport, safeIndex]);
+  const consecutiveAvailabilityMisses = useMemo(() => {
+    if (activeReport !== "gran_tierra") return 0;
+    let streak = 0;
+    for (let i = safeIndex; i >= 0; i -= 1) {
+      const avail = GRAN_TIERRA_KPI_FROM_MONTHS[i]?.availability;
+      if (avail == null || avail >= CONTRACTUAL_KPI_TARGETS.availability) break;
+      streak += 1;
+    }
+    return streak;
+  }, [activeReport, safeIndex]);
+  const shutdownBandPending = getShutdownDeduction(summary.copowerFailures);
+  const generationTargetKwh = targets.generationMwh * 1000;
+  const generationActualKwh = current.generationMwh * 1000;
+  const dieselSharePct =
+    generationActualKwh > 0 ? (summary.energyDieselKwh / generationActualKwh) * 100 : null;
+  const unitDetailRows = useMemo(
+    () =>
+      [...machineIndicators].sort((a, b) => {
+        const aSys = a.unidad === "SISTEMA N" ? 0 : 1;
+        const bSys = b.unidad === "SISTEMA N" ? 0 : 1;
+        if (aSys !== bSys) return aSys - bSys;
+        if (a.campo !== b.campo) return a.campo.localeCompare(b.campo);
+        return a.unidad.localeCompare(b.unidad);
+      }),
+    [machineIndicators],
+  );
+  const executiveAlerts = [
+    {
+      active: current.reliability != null && !reliabilityMeetsContract,
+      title: "Confiabilidad < 98%",
+      detail:
+        current.reliability == null
+          ? "N/A"
+          : `Deducción aplicable: ${
+              activeReliabilityBand?.terminationRisk
+                ? "terminación anticipada"
+                : `${activeReliabilityBand?.deductionPct ?? 0}%`
+            } (banda ${activeReliabilityBand?.rangeLabel ?? "N/A"})`,
+    },
+    {
+      active: consecutiveReliabilityMisses >= 2 || consecutiveAvailabilityMisses >= 2,
+      title: "Incumplimiento reiterado",
+      detail:
+        consecutiveReliabilityMisses >= 2 || consecutiveAvailabilityMisses >= 2
+          ? `${Math.max(consecutiveReliabilityMisses, consecutiveAvailabilityMisses)} mes(es) consecutivos bajo meta — riesgo de terminación anticipada (reincidencia Orden 1)`
+          : "Sin racha de incumplimientos consecutivos",
+    },
+    {
+      active: selectedMonth === "Jun",
+      title: "Eventos sin RCA / reporte de falla",
+      detail:
+        selectedMonth === "Jun"
+          ? `0/${summary.copowerFailures} reportes entregados → expuesto a multa adicional 4%`
+          : "N/A — sin evidencia verificable en carpeta del mes",
+    },
+    {
+      active: focalRiskUnits.length > 0,
+      title: "Riesgo técnico focalizado",
+      detail:
+        focalRiskUnits.length > 0
+          ? focalRiskUnits.map((u) => `${u.unidad} (${u.fallas} fallas)`).join(" · ")
+          : "Ningún activo con ≥3 fallas este mes",
+    },
+  ];
 
   const riskCards = [
     {
-      title: "Confiabilidad en tendencia",
+      title: "Confiabilidad sistemica",
       value: percent(current.reliability),
-      status: isNoDataReport ? "neutral" : current.reliability >= targets.reliability ? "ok" : "warning",
-      note: "Promedio movil de confiabilidad en periodo reciente.",
+      status: current.reliability == null ? "neutral" : reliabilityMeetsContract ? "ok" : "warning",
+      note:
+        current.reliability == null
+          ? "Sin Confiabilidad sistémica para este mes."
+          : selectedMonth === "Jun"
+            ? "97.92% Costayaco. Orden 1 ≥98% → No cumple; deducción estimada 4%."
+            : selectedMonth === "May"
+              ? "94.05% Costayaco (citado en informe junio). Bajo ≥98% contractual."
+              : `Excel Costayaco ${percentPrecise(current.reliability)} vs meta Orden 1 ≥98%.`,
     },
     {
-      title: "Perdidas operacionales",
-      value: mwh(current.operationalLossesMwh),
-      status: isNoDataReport ? "neutral" : current.operationalLossesMwh <= targets.operationalLossesMwh ? "ok" : "warning",
-      note: "Comparado con meta operacional mensual.",
+      title: "Activo dominante / recurrencia",
+      value: hasJuneAnalysis
+        ? "CPW06 · RIESGO MEDIO"
+        : machineRiskStats.medium + machineRiskStats.high > 0
+          ? `${machineRiskStats.high} alto · ${machineRiskStats.medium} medio`
+          : "Riesgo bajo",
+      status:
+        machineRiskStats.high > 0 ? "warning" : hasJuneAnalysis || machineRiskStats.medium > 0 ? "warning" : "ok",
+      note: hasJuneAnalysis
+        ? "Recurrencia CPW06 (3 eventos, MTBF 222.33 h) según anexo junio. DOCX recomienda RCA."
+        : "Riesgo técnico derivado de #fallas y MTBF por unidad (misma base del mes).",
+    },
+    {
+      title: "Causas externas (aguas arriba)",
+      value: hasJuneAnalysis ? "MRU 95 h · SIN 37 h · CYC 14 h" : "N/A",
+      status: hasJuneAnalysis ? "warning" : "neutral",
+      note: hasJuneAnalysis
+        ? "DOCX junio: causas externas > fallas propias (70 h)."
+        : "Pareto de causas solo documentado para junio.",
     },
     {
       title: "Cumplimiento contractual",
-      value: percent(current.contractualCompliance),
-      status: isNoDataReport ? "neutral" : current.contractualCompliance >= targets.contractualCompliance ? "ok" : "warning",
-      note: "Entrega energetica contractual del periodo.",
+      value:
+        current.availability == null || current.reliability == null
+          ? "N/A"
+          : reliabilityMeetsContract && availabilityMeetsContract
+            ? "Cumple Orden 1"
+            : "No cumple Orden 1",
+      status:
+        current.availability == null || current.reliability == null
+          ? "neutral"
+          : reliabilityMeetsContract && availabilityMeetsContract
+            ? "ok"
+            : "warning",
+      note:
+        current.availability == null || current.reliability == null
+          ? "Sin Disp/Conf sistémica no se evalúa Orden 1."
+          : selectedMonth === "Jun"
+            ? "Costayaco 97.92% vs ≥98%. Vonú 100%. PDF usaba meta operativa 97%."
+            : "Evaluación SISTEMA N Costayaco vs Tabla 13 Orden 1 (≥98%).",
     },
   ] as const;
 
@@ -436,8 +799,17 @@ function App() {
     return sortConfig.direction === "asc" ? "↑" : "↓";
   };
 
-  const reliabilityTrendData = reportData.reliabilityTrend;
-  const causeParetoData = reportData.causePareto;
+  const reliabilityTrendData =
+    activeReport === "gran_tierra"
+      ? GRAN_TIERRA_TREND_FROM_MONTHS
+      : reportData.reliabilityTrend.map((row) => ({
+          month: row.month,
+          availability: row.availability,
+          reliability: row.reliability,
+          mtbfHours: row.mtbfHours,
+          mttrHours: row.mttrHours,
+        }));
+  const causeParetoData = hasJuneAnalysis ? reportData.causePareto : [];
   const generationByAssetData = activeMonthData?.generationByAsset ?? reportData.generationByAsset;
   const operationHoursData = [
     {
@@ -504,7 +876,8 @@ function App() {
     setActivePage(page);
   };
 
-  const formatDeviationValue = (value: number, unit: "pct" | "mwh" | "hours" | "count") => {
+  const formatDeviationValue = (value: number | null, unit: "pct" | "mwh" | "hours" | "count") => {
+    if (value == null) return "N/D";
     if (unit === "pct") return `${(value * 100).toFixed(2)}%`;
     if (unit === "mwh") return `${value.toFixed(1)} MWh`;
     if (unit === "hours") return `${value.toFixed(2)} h`;
@@ -512,11 +885,18 @@ function App() {
   };
 
   const formatDeviationGap = (
-    value: number,
-    target: number,
+    value: number | null,
+    target: number | null,
     unit: "pct" | "mwh" | "hours" | "count",
     higherIsBetter: boolean,
+    status: "cumple" | "no_cumple" | "seguimiento" | "nd",
   ) => {
+    if (status === "nd" || value == null) {
+      return { className: "badge info", text: "N/D" };
+    }
+    if (status === "seguimiento" || target == null) {
+      return { className: "badge info", text: "Seguimiento" };
+    }
     const rawGap = value - target;
     const normalizedGap = higherIsBetter ? rawGap : -rawGap;
     const gapClass = normalizedGap >= 0 ? "badge success" : "badge danger";
@@ -545,6 +925,13 @@ function App() {
     };
   };
 
+  const deviationStatusBadge = (status: "cumple" | "no_cumple" | "seguimiento" | "nd") => {
+    if (status === "cumple") return { className: "badge success", text: "Cumple" };
+    if (status === "no_cumple") return { className: "badge danger", text: "No cumple" };
+    if (status === "seguimiento") return { className: "badge info", text: "Seguimiento" };
+    return { className: "badge warning", text: "N/D" };
+  };
+
   return (
     <div className={`app-shell ${theme}`}>
       <aside className="sidebar">
@@ -562,7 +949,7 @@ function App() {
             >
               {monthOptions.map((month) => (
                 <option key={month} value={month}>
-                  {month}
+                  {granTierraMonthLabel(month as GranTierraMonthKey)}
                 </option>
               ))}
             </select>
@@ -624,251 +1011,226 @@ function App() {
           <>
         {activePage === "resumen" && (
           <>
-            <section className="kpi-grid">
-              <KpiCard
-                title="Disponib. Sist. Costayaco"
-                reference="Disponibilidad sistémica mensual"
-                icon={<Gauge size={18} />}
-                value={percent(current.availability)}
-                delta={(current.availability - previous.availability) * 100}
-                target={percent(targets.availability)}
-                deltaUnit="pp"
-              />
-              <KpiCard
-                title="Confiab. Sist. Costayaco"
-                reference="Confiabilidad sistémica mensual"
-                icon={<ShieldCheck size={18} />}
-                value={percent(current.reliability)}
-                delta={(current.reliability - previous.reliability) * 100}
-                target={percent(targets.reliability)}
-                deltaUnit="pp"
-              />
-              <KpiCard
-                title="Eventos de falla"
-                reference="Fallas imputables a COPOWER (Sistema N Costayaco / PDF)"
-                icon={<Wrench size={18} />}
-                value={String(summary.copowerFailures)}
-                delta={summary.copowerFailures - (previousMonthSummary?.copowerFailures ?? summary.copowerFailures)}
-                target="Meta contractual <= 7"
-                deltaUnit="count"
-              />
-              <KpiCard
-                title="Eventos Totales"
-                reference="Bitacora mensual (filas con PF_contr, PF_cli o Falla_evento)"
-                icon={<Zap size={18} />}
-                value={summary.totalEvents == null ? "N/D" : String(summary.totalEvents)}
-                delta={
-                  summary.totalEvents == null || previousMonthSummary?.totalEvents == null
-                    ? 0
-                    : summary.totalEvents - previousMonthSummary.totalEvents
-                }
-                target={summary.totalEvents == null ? "No reportado" : `Bitacora ${selectedMonth}`}
-                deltaUnit="count"
-                hideDelta={summary.totalEvents == null}
-              />
-              <KpiCard
-                title="MTBF"
-                reference="Tiempo medio entre fallas (Sistema N Costayaco)"
-                icon={<Gauge size={18} />}
-                value={hours(summary.mtbfHours)}
-                delta={summary.mtbfHours - (previousMonthSummary?.mtbfHours ?? summary.mtbfHours)}
-                target="Meta >= 650 h"
-                deltaUnit="hours"
-              />
-              <KpiCard
-                title="MTTR"
-                reference="Tiempo medio de reparacion (Sistema N Costayaco)"
-                icon={<Wrench size={18} />}
-                value={hours(summary.mttrHours)}
-                delta={summary.mttrHours - (previousMonthSummary?.mttrHours ?? summary.mttrHours)}
-                target="Meta <= 4 h"
-                deltaUnit="hours"
-              />
-              <KpiCard
-                title="Energia Total"
-                reference={`CYC Gas ${kwh(summary.energyGasKwh)} | Diesel ${kwh(summary.energyDieselKwh)} | Vonu ${kwh(totalVonu)}`}
-                icon={<Zap size={18} />}
-                value={kwh((current.generationMwh || 0) * 1000)}
-                delta={(current.generationMwh - previous.generationMwh) * 1000}
-                target={kwh(targets.generationMwh * 1000)}
-                deltaUnit="mwh"
-              />
-              <KpiCard
-                title="Acciones / RCA Pend."
-                reference="Acciones vencidas y RCA pendientes"
-                icon={<ClipboardList size={18} />}
-                value={
-                  summary.actionsOverdue == null || summary.rcaPending == null
-                    ? "N/D"
-                    : `${summary.actionsOverdue} / ${summary.rcaPending}`
-                }
-                delta={
-                  summary.actionsOverdue == null ||
-                  summary.rcaPending == null ||
-                  previousMonthSummary?.actionsOverdue == null ||
-                  previousMonthSummary?.rcaPending == null
-                    ? 0
-                    : summary.actionsOverdue +
-                      summary.rcaPending -
-                      (previousMonthSummary.actionsOverdue + previousMonthSummary.rcaPending)
-                }
-                target={
-                  summary.actionsOverdue == null || summary.rcaPending == null
-                    ? "No reportado en PDF"
-                    : "Vencidas / pendientes"
-                }
-                deltaUnit="count"
-                hideDelta={summary.actionsOverdue == null || summary.rcaPending == null}
-              />
-            </section>
+            {selectedMonth !== "Jun" ? (
+              <section className="panel">
+                <article className="card">
+                  <p className="muted">
+                    El tablero ejecutivo gerencial está validado para <strong>junio 2026</strong> (únicos meses con
+                    cifras oficiales reconciliadas: mayo y junio). Seleccione <strong>Jun</strong> en el selector de
+                    mes, o revise abajo el reporte fijo de junio.
+                  </p>
+                </article>
+              </section>
+            ) : null}
+            <ExecutiveResumen />
+          </>
+        )}
 
-            <section className="panel two-col">
+        {activePage === "compromiso" && (
+          <>
+            <section className="panel">
               <article className="card">
-                <h3>Tendencia mensual: Disponibilidad y Confiabilidad</h3>
-                <div className="chart-container">
-                  <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={reliabilityTrendData} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
-                      <XAxis dataKey="month" stroke="var(--text-muted)" />
-                      <YAxis
-                        stroke="var(--text-muted)"
-                        domain={[0.9, 1]}
-                        tickFormatter={(v) => `${(Number(v) * 100).toFixed(0)}%`}
-                        width={48}
-                      />
-                      <Tooltip
-                        formatter={(value, name) => [`${(Number(value) * 100).toFixed(2)}%`, String(name)]}
-                        labelFormatter={(label) => `Mes: ${label}`}
-                      />
-                      <Legend />
-                      <Line type="monotone" dataKey="availability" name="Disponibilidad" stroke="#60a5fa" strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 5 }} />
-                      <Line type="monotone" dataKey="reliability" name="Confiabilidad" stroke="#34d399" strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 5 }} />
-                    </LineChart>
-                  </ResponsiveContainer>
+                <div className="contract-order-head">
+                  <div>
+                    <p className="eyebrow">Orden 1 · SISTEMA N Costayaco</p>
+                    <h3>Scorecard — {monthLabel}</h3>
+                  </div>
                 </div>
-              </article>
-
-              <article className="card">
-                <h3>Tendencia mensual: MTBF y MTTR</h3>
-                <p className="chart-hint">Ejes separados: MTBF (izq.) y MTTR (der.), por diferencia de escala.</p>
-                <div className="chart-container">
-                  <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={reliabilityTrendData} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
-                      <XAxis dataKey="month" stroke="var(--text-muted)" />
-                      <YAxis
-                        yAxisId="mtbf"
-                        stroke="#f59e0b"
-                        tickFormatter={(v) => `${Number(v).toFixed(0)}`}
-                        width={48}
-                        label={{ value: "MTBF (h)", angle: -90, position: "insideLeft", fill: "#f59e0b", fontSize: 11 }}
-                      />
-                      <YAxis
-                        yAxisId="mttr"
-                        orientation="right"
-                        stroke="#ef4444"
-                        tickFormatter={(v) => `${Number(v).toFixed(1)}`}
-                        width={48}
-                        label={{ value: "MTTR (h)", angle: 90, position: "insideRight", fill: "#ef4444", fontSize: 11 }}
-                      />
-                      <Tooltip
-                        formatter={(value, name) => [`${Number(value).toFixed(2)} h`, String(name)]}
-                        labelFormatter={(label) => `Mes: ${label}`}
-                      />
-                      <Legend />
-                      <Line yAxisId="mtbf" type="monotone" dataKey="mtbfHours" name="MTBF (h)" stroke="#f59e0b" strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 5 }} />
-                      <Line yAxisId="mttr" type="monotone" dataKey="mttrHours" name="MTTR (h)" stroke="#ef4444" strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 5 }} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </article>
-            </section>
-
-            <section className="panel two-col">
-              <article className="card">
-                <h3>Pareto de fallas por equipo (malos actores)</h3>
-                <div className="chart-container compact">
-                  <ResponsiveContainer width="100%" height={260}>
-                    <BarChart data={topBadActors}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
-                      <XAxis dataKey="equipment" stroke="var(--text-muted)" />
-                      <YAxis stroke="var(--text-muted)" />
-                      <Tooltip />
-                      <Bar dataKey="frequency" name="Numero de eventos" fill="#f97316" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </article>
-
-              <article className="card">
-                <h3>Pareto de causas (bitacora)</h3>
-                <div className="chart-container compact">
-                  <ResponsiveContainer width="100%" height={260}>
-                    <BarChart data={causeParetoData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
-                      <XAxis dataKey="cause" stroke="var(--text-muted)" />
-                      <YAxis stroke="var(--text-muted)" />
-                      <Tooltip />
-                      <Bar dataKey="count" name="Registros" fill="#a78bfa" />
-                    </BarChart>
-                  </ResponsiveContainer>
+                <div className="contract-score-grid">
+                  {contractualScorecard.map((item) => (
+                    <div key={item.name} className="contract-score-card">
+                      <div className="contract-score-head">
+                        <strong>{item.name}</strong>
+                        {item.meets == null ? (
+                          <span className="badge info">Seguimiento</span>
+                        ) : item.meets ? (
+                          <span className="badge success">Cumple</span>
+                        ) : (
+                          <span className="badge danger">No cumple</span>
+                        )}
+                      </div>
+                      <p className="contract-score-value">{item.valueLabel}</p>
+                      <p className="muted">{item.detail}</p>
+                    </div>
+                  ))}
                 </div>
               </article>
             </section>
 
             <section className="panel">
               <article className="card">
-                <h3>Horas apiladas: operacion, stand-by y fallas</h3>
-                <div className="chart-container compact">
-                  <ResponsiveContainer width="100%" height={260}>
-                    <BarChart data={operationHoursData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
-                      <XAxis dataKey="name" stroke="var(--text-muted)" />
-                      <YAxis stroke="var(--text-muted)" />
-                      <Tooltip />
-                      <Legend />
-                      <Bar stackId="a" dataKey="operacion" name="Operacion" fill="#22c55e" />
-                      <Bar stackId="a" dataKey="standby" name="Stand-by" fill="#60a5fa" />
-                      <Bar stackId="a" dataKey="preventivo" name="Preventivo" fill="#f59e0b" />
-                      <Bar stackId="a" dataKey="fallaCopower" name="Falla COPOWER" fill="#ef4444" />
-                      <Bar stackId="a" dataKey="fallaCliente" name="Falla cliente/externa" fill="#a855f7" />
-                    </BarChart>
-                  </ResponsiveContainer>
+                <div className="contract-order-head">
+                  <div>
+                    <p className="eyebrow">Overview</p>
+                    <h3>Resumen general del marco contractual (las 3 órdenes identificadas)</h3>
+                    <p className="muted">
+                      Para que quede claro por qué solo la Orden 1 alimenta este dashboard, aquí el panorama completo:
+                    </p>
+                  </div>
+                </div>
+                <div className="table-scroll">
+                  <table className="contract-matrix">
+                    <thead>
+                      <tr>
+                        <th>Orden</th>
+                        <th>Objeto</th>
+                        <th>Plazo</th>
+                        <th>Valor estimado</th>
+                        <th>¿Aplica a confiabilidad Costayaco/Vonú?</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {CONTRACT_ORDERS_OVERVIEW.map((row) => (
+                        <tr key={row.order} className={row.tone === "ok" ? "row-sistema" : undefined}>
+                          <td>
+                            <strong>
+                              {row.order} ({row.sourceFile})
+                            </strong>
+                          </td>
+                          <td>{row.object}</td>
+                          <td>{row.term}</td>
+                          <td>{row.estimatedValue}</td>
+                          <td>
+                            <span
+                              className={`badge ${
+                                row.tone === "ok" ? "success" : row.tone === "warn" ? "warning" : "info"
+                              }`}
+                            >
+                              {row.tone === "ok" ? "Sí" : "No"}
+                            </span>
+                            <span className="contract-overview-detail">{row.appliesToReliability}</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="contract-conclusion">{CONTRACT_FRAMEWORK_CONCLUSION}</p>
+              </article>
+            </section>
+
+            <section className="panel">
+              <article className="card">
+                <div className="contract-order-head">
+                  <div>
+                    <p className="eyebrow">Orden 1 — la que aplica</p>
+                    <h3>Indicadores de confiabilidad</h3>
+                  </div>
+                  <span className="badge success">{CONTRACT_CALC_BASE.length} indicadores</span>
+                </div>
+                <div className="table-scroll">
+                  <table className="contract-matrix">
+                    <thead>
+                      <tr>
+                        <th>Indicador</th>
+                        <th>Fórmula</th>
+                        <th>Frecuencia</th>
+                        <th>Meta</th>
+                        <th>Multa si incumple</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {CONTRACT_CALC_BASE.map((row) => (
+                        <tr key={row.indicator}>
+                          <td>
+                            <strong>{row.indicator}</strong>
+                          </td>
+                          <td>{row.formula}</td>
+                          <td>{row.frequency}</td>
+                          <td>{row.threshold}</td>
+                          <td className="contract-watch">{row.consequence}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </article>
             </section>
 
             <section className="panel two-col">
               <article className="card">
-                <h3>Generacion por combustible (gas vs diesel)</h3>
-                <div className="chart-container compact">
-                  <ResponsiveContainer width="100%" height={260}>
-                    <PieChart>
-                      <Pie data={generationSourceData} dataKey="value" nameKey="source" innerRadius={45} outerRadius={85}>
-                        <Cell fill="#22c55e" />
-                        <Cell fill="#f59e0b" />
-                      </Pie>
-                      <Tooltip formatter={(value) => `${Math.round(Number(value)).toLocaleString("es-CO")} kWh`} />
-                      <Legend />
-                    </PieChart>
-                  </ResponsiveContainer>
+                <h3>Bandas de deducción por Confiabilidad (Orden 1)</h3>
+                <p className="muted">
+                  Mes seleccionado: {percentPrecise(current.reliability)}
+                  {activeReliabilityBand
+                    ? ` → banda ${activeReliabilityBand.rangeLabel} (${
+                        activeReliabilityBand.terminationRisk
+                          ? "terminación anticipada"
+                          : `${activeReliabilityBand.deductionPct}%`
+                      })`
+                    : " → N/A"}
+                </p>
+                <div className="table-scroll">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Confiabilidad mensual</th>
+                        <th>Deducción</th>
+                        <th>Mes actual</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {RELIABILITY_DEDUCTION_BANDS.map((band) => {
+                        const active =
+                          current.reliability != null &&
+                          current.reliability >= band.minInclusive &&
+                          current.reliability < band.maxExclusive;
+                        return (
+                          <tr key={band.rangeLabel} className={active ? "row-highlight" : undefined}>
+                            <td>{band.rangeLabel}</td>
+                            <td>{band.terminationRisk ? "Terminación anticipada" : `${band.deductionPct}%`}</td>
+                            <td>
+                              {active ? (
+                                <span className={`badge ${band.deductionPct === 0 ? "success" : "danger"}`}>
+                                  ✓ Aplica
+                                  {band.deductionPct > 0 && !band.terminationRisk
+                                    ? ` (${percentPrecise(current.reliability)})`
+                                    : ""}
+                                </span>
+                              ) : (
+                                <span className="muted">—</span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
               </article>
 
               <article className="card">
-                <h3>Generacion por campo / equipo</h3>
-                <div className="chart-container compact">
-                  <ResponsiveContainer width="100%" height={260}>
-                    <BarChart data={generationByAssetData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
-                      <XAxis dataKey="asset" stroke="var(--text-muted)" />
-                      <YAxis stroke="var(--text-muted)" />
-                      <Tooltip formatter={(value) => `${Math.round(Number(value)).toLocaleString("es-CO")} kWh`} />
-                      <Legend />
-                      <Bar dataKey="gasKwh" name="Gas (kWh)" fill="#22c55e" />
-                      <Bar dataKey="dieselKwh" name="Diesel (kWh)" fill="#f59e0b" />
-                    </BarChart>
-                  </ResponsiveContainer>
+                <h3>Escala de shutdowns O&amp;M (Orden 1)</h3>
+                <p className="muted">
+                  Ideal: 0. Eventos imputables del mes: {summary.copowerFailures}. Pendiente confirmar si equivalen a
+                  “shutdowns de campo” bajo esta definición
+                  {summary.copowerFailures >= 5
+                    ? " — de ser así, superarían el umbral de terminación."
+                    : "."}
+                </p>
+                <div className="table-scroll">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Shutdowns / mes</th>
+                        <th>Deducción</th>
+                        <th>Nota</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {SHUTDOWN_PENALTY_BANDS.map((band) => (
+                        <tr key={band.events}>
+                          <td>{band.events >= 5 ? "≥ 5" : band.events}</td>
+                          <td>{band.terminationRisk ? "Terminación anticipada" : `${band.deductionPct}%`}</td>
+                          <td className="muted">
+                            {band.events >= 5 && summary.copowerFailures >= 5
+                              ? `${summary.copowerFailures} imputables este mes — validar equivalencia`
+                              : ""}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </article>
             </section>
@@ -880,11 +1242,11 @@ function App() {
             <section className="kpi-grid">
               <KpiCard
                 title="Eventos totales"
-                reference={`Bitacora ${selectedMonth}`}
+                reference={`Excel Data Soporte · ${activeMonthData?.label ?? selectedMonth}`}
                 icon={<BarChart3 size={18} />}
                 value={String(eventStats.total)}
                 delta={eventStats.total - previousEventStats.total}
-                target="Registros del mes"
+                target="Filas con PF/falla"
                 deltaUnit="count"
               />
               <KpiCard
@@ -951,7 +1313,7 @@ function App() {
                 <div className="chart-container compact">
                   {eventStats.typeChart.length === 0 ? (
                     <div className="no-data-state">
-                      <p>Sin eventos registrados para {selectedMonth}.</p>
+                      <p>Sin eventos registrados para {monthLabel}.</p>
                     </div>
                   ) : (
                     <ResponsiveContainer width="100%" height={260}>
@@ -995,7 +1357,7 @@ function App() {
               <article className="card">
                 <div className="section-header-row">
                   <div>
-                    <h3>Eventos registrados en {selectedMonth}</h3>
+                    <h3>Eventos registrados en {monthLabel}</h3>
                     <p className="muted">Detalle de la bitacora mensual con filtro por tipo de evento.</p>
                   </div>
                   <div className="event-filters">
@@ -1066,10 +1428,8 @@ function App() {
         {activePage === "maquinas" && (
           <section className="panel">
             <article className="card">
-              <h3>Indicadores por maquina - {activeMonthData?.label ?? selectedMonth}</h3>
-              <p className="muted">
-                Criterio de imputabilidad del PDF: solo cuentan horas/fallas atribuidas a COPOWER (contratista). Las fallas-cliente no afectan disponibilidad ni #fallas contractuales.
-              </p>
+              <h3>Indicadores por maquina - {monthLabel}</h3>
+              <p className="muted">{indicatorsSourceNote}</p>
               <div className="table-scroll">
                 <table>
                   <thead>
@@ -1099,22 +1459,18 @@ function App() {
                           <td>{row.unidad}</td>
                           <td>{row.campo}</td>
                           <td>{row.horasStandBy == null ? "—" : row.horasStandBy}</td>
-                          <td>{row.disponibilidadPct.toFixed(2)}%</td>
-                          <td>{row.confiabilidadPct.toFixed(2)}%</td>
+                          <td>{row.disponibilidadPct == null ? "N/A" : `${row.disponibilidadPct.toFixed(2)}%`}</td>
+                          <td>{row.confiabilidadPct == null ? "N/A" : `${row.confiabilidadPct.toFixed(2)}%`}</td>
                           <td>{row.fallas}</td>
                           <td>{row.mtbfLabel}</td>
-                          <td>{row.mttrHours}</td>
+                          <td>{row.mttrHours == null ? "N/A" : row.mttrHours}</td>
                           <td>
-                            <span className={`badge ${row.riesgoTecnico === "RIESGO MEDIO" ? "warning" : row.riesgoTecnico === "RIESGO ALTO" ? "danger" : "success"}`}>
+                            <span className={`badge ${riesgoBadgeClass(row.riesgoTecnico)}`}>
                               {row.riesgoTecnico}
                             </span>
                           </td>
                           <td>
-                            <span
-                              className={`badge ${
-                                row.cumplimiento === "CUMPLE" ? "success" : row.cumplimiento === "N/A" ? "info" : "danger"
-                              }`}
-                            >
+                            <span className={`badge ${cumplimientoBadgeClass(row.cumplimiento)}`}>
                               {row.cumplimiento}
                             </span>
                           </td>
@@ -1140,7 +1496,7 @@ function App() {
         {activePage === "generacion" && (
           <section className="panel">
             <article className="card">
-              <h3>Generacion por equipo y total mensual - {selectedMonth}</h3>
+              <h3>Generacion por equipo y total mensual - {monthLabel}</h3>
               <p className="muted">Fuente: carpeta data/GTE (archivos de mayo y junio 2026).</p>
               <div className="kpi-grid">
                 <KpiCard title="Total generado" reference="Suma de todos los equipos" icon={<Zap size={18} />} value={kwh(totalGenerationKwh)} delta={0} target="Total general Excel" deltaUnit="mwh" />
@@ -1264,307 +1620,575 @@ function App() {
         )}
 
         {activePage === "desviaciones" && (
-          <section className="panel two-col">
-            <article className="card">
-              <h3>Brechas contra metas</h3>
-              <table>
-                <thead>
-                  <tr>
-                    <th><button className="sort-button" onClick={() => toggleSort("desviaciones", "indicator")}>Indicador {getSortIndicator("desviaciones", "indicator")}</button></th>
-                    <th><button className="sort-button" onClick={() => toggleSort("desviaciones", "value")}>Actual {getSortIndicator("desviaciones", "value")}</button></th>
-                    <th><button className="sort-button" onClick={() => toggleSort("desviaciones", "target")}>Meta {getSortIndicator("desviaciones", "target")}</button></th>
-                    <th>Brecha</th>
-                    <th>Explicacion tecnica</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sortedDeviations.map((d) => {
-                    const gap = formatDeviationGap(d.value, d.target, d.unit, d.higherIsBetter);
-                    return (
-                      <tr key={d.indicator}>
-                        <td>{d.indicator}</td>
-                        <td>{formatDeviationValue(d.value, d.unit)}</td>
-                        <td>{formatDeviationValue(d.target, d.unit)}</td>
-                        <td>
-                          <span className={gap.className}>{gap.text}</span>
-                        </td>
-                        <td>{d.technicalExplanation}</td>
+          <>
+            <section className="kpi-grid">
+              <KpiCard
+                title="Indicadores evaluados"
+                reference={`Periodo ${monthLabel}`}
+                icon={<TrendingUp size={18} />}
+                value={String(deviationStats.total)}
+                delta={0}
+                target={`${deviationStats.missing} en N/D`}
+                deltaUnit="count"
+                hideDelta
+              />
+              <KpiCard
+                title="Cumplen meta"
+                reference="Semáforo vs Orden 1"
+                icon={<CheckCircle2 size={18} />}
+                value={String(deviationStats.meeting)}
+                delta={0}
+                target={`${deviationStats.failing} no cumplen`}
+                deltaUnit="count"
+                hideDelta
+              />
+              <KpiCard
+                title="No cumplen"
+                reference="Disp / Conf / fallas / RCA"
+                icon={<AlertTriangle size={18} />}
+                value={String(deviationStats.failing)}
+                delta={0}
+                target={`${deviationStats.tracking} seguimiento`}
+                deltaUnit="count"
+                hideDelta
+              />
+              <KpiCard
+                title="Deducción Conf."
+                reference="Banda Orden 1 (si aplica)"
+                icon={<Gauge size={18} />}
+                value={
+                  activeReliabilityBand == null
+                    ? "N/D"
+                    : activeReliabilityBand.terminationRisk
+                      ? "Terminación"
+                      : `${activeReliabilityBand.deductionPct}%`
+                }
+                delta={0}
+                target={activeReliabilityBand?.rangeLabel ?? "N/D"}
+                deltaUnit="count"
+                hideDelta
+              />
+            </section>
+
+            <section className="panel">
+              <article className="card">
+                <h3>Brechas vs metas contractuales — {monthLabel}</h3>
+                <p className="muted">
+                  Semáforos calculados en código vs Orden 1. MTBF/MTTR sin umbral fijo (seguimiento). Puntos ciegos =
+                  N/D pendiente de fuente.
+                </p>
+                <div className="table-scroll">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>
+                          <button className="sort-button" onClick={() => toggleSort("desviaciones", "indicator")}>
+                            Indicador {getSortIndicator("desviaciones", "indicator")}
+                          </button>
+                        </th>
+                        <th>
+                          <button className="sort-button" onClick={() => toggleSort("desviaciones", "value")}>
+                            Actual {getSortIndicator("desviaciones", "value")}
+                          </button>
+                        </th>
+                        <th>
+                          <button className="sort-button" onClick={() => toggleSort("desviaciones", "target")}>
+                            Meta {getSortIndicator("desviaciones", "target")}
+                          </button>
+                        </th>
+                        <th>Brecha</th>
+                        <th>
+                          <button className="sort-button" onClick={() => toggleSort("desviaciones", "status")}>
+                            Estado {getSortIndicator("desviaciones", "status")}
+                          </button>
+                        </th>
+                        <th>Fuente</th>
+                        <th>Explicación</th>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </article>
-            <article className="card">
-              <h3>Actual vs meta</h3>
-              <div className="chart-container compact">
-                <ResponsiveContainer width="100%" height={260}>
-                  <BarChart data={complianceChartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
-                    <XAxis dataKey="indicador" stroke="var(--text-muted)" />
-                    <YAxis stroke="var(--text-muted)" />
-                    <Tooltip formatter={(value) => `${Number(value ?? 0)}%`} />
-                    <Legend />
-                    <Bar dataKey="actual" name="Actual (%)" fill="#60a5fa" />
-                    <Bar dataKey="meta" name="Meta (%)" fill="#34d399" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </article>
-          </section>
+                    </thead>
+                    <tbody>
+                      {sortedDeviations.map((d) => {
+                        const gap = formatDeviationGap(d.value, d.target, d.unit, d.higherIsBetter, d.status);
+                        const st = deviationStatusBadge(d.status);
+                        return (
+                          <tr key={d.indicator} className={d.status === "no_cumple" ? "row-highlight" : undefined}>
+                            <td>
+                              <strong>{d.indicator}</strong>
+                            </td>
+                            <td>{formatDeviationValue(d.value, d.unit)}</td>
+                            <td>{d.target == null ? "—" : formatDeviationValue(d.target, d.unit)}</td>
+                            <td>
+                              <span className={gap.className}>{gap.text}</span>
+                            </td>
+                            <td>
+                              <span className={st.className}>{st.text}</span>
+                            </td>
+                            <td className="muted" style={{ fontSize: "0.8rem" }}>
+                              {d.source}
+                            </td>
+                            <td className="detalle-cell">{d.technicalExplanation}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </article>
+            </section>
+
+            <section className="panel two-col">
+              <article className="card">
+                <h3>Actual vs meta (%)</h3>
+                <p className="chart-hint">Solo indicadores % con valor y meta (Disp, Conf, cumplimiento).</p>
+                <div className="chart-container">
+                  <ResponsiveContainer width="100%" height={320}>
+                    <BarChart data={complianceChartData} margin={{ top: 8, right: 8, left: 0, bottom: 48 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
+                      <XAxis
+                        dataKey="indicador"
+                        stroke="var(--text-muted)"
+                        interval={0}
+                        angle={-20}
+                        textAnchor="end"
+                        height={70}
+                        tick={{ fontSize: 11 }}
+                      />
+                      <YAxis
+                        stroke="var(--text-muted)"
+                        domain={[90, 102]}
+                        tickFormatter={(v) => `${v}%`}
+                      />
+                      <Tooltip formatter={(value) => `${Number(value ?? 0).toFixed(2)}%`} />
+                      <Legend />
+                      <Bar dataKey="actual" name="Actual (%)" fill="#2563eb" />
+                      <Bar dataKey="meta" name="Meta (%)" fill="#059669" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </article>
+              <article className="card">
+                <h3>Lectura del periodo</h3>
+                <ul className="insight-list">
+                  {(analysisHighlights.length > 0
+                    ? analysisHighlights
+                    : [
+                        `${monthLabel}: comparación vs metas Orden 1 (≥98% Disp/Conf).`,
+                        "MTBF/MTTR en seguimiento — sin umbral contractual fijo.",
+                        "Eficiencia, PMC, mantenimiento y stock: N/D hasta tener fuente.",
+                      ]
+                  ).map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+                {selectedMonth === "Jun" && activeReliabilityBand ? (
+                  <p className="contract-note" style={{ marginTop: "0.85rem" }}>
+                    Junio: Confiabilidad {percentPrecise(current.reliability)} → banda {activeReliabilityBand.rangeLabel}{" "}
+                    · deducción estimada {activeReliabilityBand.deductionPct}% del pago mensual.
+                  </p>
+                ) : null}
+              </article>
+            </section>
+          </>
         )}
 
         {activePage === "malos_actores" && (
-          <section className="panel two-col">
-            <article className="card">
-              <h3>Equipos de mayor impacto</h3>
-              <table>
-                <thead>
-                  <tr>
-                    <th><button className="sort-button" onClick={() => toggleSort("malosActores", "equipment")}>Equipo {getSortIndicator("malosActores", "equipment")}</button></th>
-                    <th>Sistema</th>
-                    <th>Criticidad</th>
-                    <th><button className="sort-button" onClick={() => toggleSort("malosActores", "frequency")}>Frecuencia {getSortIndicator("malosActores", "frequency")}</button></th>
-                    <th>Causa</th>
-                    <th><button className="sort-button" onClick={() => toggleSort("malosActores", "unavailabilityHours")}>Indisp. (h) {getSortIndicator("malosActores", "unavailabilityHours")}</button></th>
-                    <th><button className="sort-button" onClick={() => toggleSort("malosActores", "generationImpactMwh")}>Afectacion {getSortIndicator("malosActores", "generationImpactMwh")}</button></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {topBadActors.length === 0 ? (
-                    <tr>
-                      <td colSpan={7}>Sin datos de fallas para este reporte.</td>
-                    </tr>
-                  ) : (
-                    sortedBadActors.map((item) => (
-                    <tr key={item.equipment}>
-                      <td>{item.equipment}</td>
-                      <td>{item.system}</td>
-                      <td>
-                        <span
-                          className={`badge ${item.criticality === "Alta" ? "danger" : item.criticality === "Media" ? "warning" : "info"}`}
-                        >
-                          {item.criticality}
-                        </span>
-                      </td>
-                      <td>{item.frequency}</td>
-                      <td>{item.knownCause}</td>
-                      <td>{item.unavailabilityHours}</td>
-                      <td>{mwh(item.generationImpactMwh)}</td>
-                    </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </article>
-            <article className="card">
-              <h3>Afectacion en generacion por equipo</h3>
-              <div className="chart-container">
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={topBadActors}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
-                    <XAxis dataKey="equipment" stroke="var(--text-muted)" />
-                    <YAxis stroke="var(--text-muted)" />
-                    <Tooltip formatter={(value) => `${Math.round(Number(value ?? 0))} MWh`} />
-                    <Bar dataKey="generationImpactMwh" fill="#f97316" name="Perdida MWh" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </article>
-          </section>
+          <>
+            <section className="kpi-grid">
+              <KpiCard title="Focos de impacto" reference={hasJuneAnalysis ? "DOCX junio §4" : "Sin fuente este mes"} icon={<Bug size={18} />} value={hasJuneAnalysis ? String(topBadActors.length) : "N/A"} delta={0} target={hasJuneAnalysis ? "Analisis profundo junio" : "N/A"} deltaUnit="count" hideDelta />
+              <KpiCard title="Horas indisponibilidad" reference="Horas PF documentadas" icon={<Gauge size={18} />} value={hasJuneAnalysis ? hours(topBadActors.reduce((a, b) => a + b.unavailabilityHours, 0)) : "N/A"} delta={0} target={hasJuneAnalysis ? "PF cliente + contractual" : "N/A"} deltaUnit="hours" hideDelta />
+              <KpiCard title="Criticidad alta" reference="Causas externas dominantes" icon={<AlertTriangle size={18} />} value={hasJuneAnalysis ? String(topBadActors.filter((b) => b.criticality === "Alta").length) : "N/A"} delta={0} target={hasJuneAnalysis ? "MRU / SIN" : "N/A"} deltaUnit="count" hideDelta />
+              <KpiCard title="Activo dominante" reference="Recurrencia contractual" icon={<ShieldAlert size={18} />} value={hasJuneAnalysis ? "CPW06" : "N/A"} delta={0} target={hasJuneAnalysis ? "3 fallas · MTBF 222 h" : "N/A"} deltaUnit="count" hideDelta />
+            </section>
+            {!hasJuneAnalysis ? (
+              <section className="panel">
+                <article className="card">
+                  <p className="muted">N/A — el análisis de malos actores / causas externas solo está documentado en el DOCX de junio. No se inventan focos para otros meses.</p>
+                </article>
+              </section>
+            ) : null}
+            <section className="panel two-col">
+              <article className="card">
+                <h3>Equipos / causas de mayor impacto</h3>
+                <p className="muted">Ordenado por horas de indisponibilidad. Incluye causas externas (MRU/SIN/CYC) y activos contractuales.</p>
+                <div className="table-scroll">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th><button className="sort-button" onClick={() => toggleSort("malosActores", "equipment")}>Equipo {getSortIndicator("malosActores", "equipment")}</button></th>
+                        <th>Sistema</th>
+                        <th>Criticidad</th>
+                        <th><button className="sort-button" onClick={() => toggleSort("malosActores", "frequency")}>Frecuencia {getSortIndicator("malosActores", "frequency")}</button></th>
+                        <th>Causa</th>
+                        <th><button className="sort-button" onClick={() => toggleSort("malosActores", "unavailabilityHours")}>Indisp. (h) {getSortIndicator("malosActores", "unavailabilityHours")}</button></th>
+                        <th><button className="sort-button" onClick={() => toggleSort("malosActores", "generationImpactMwh")}>Afectacion {getSortIndicator("malosActores", "generationImpactMwh")}</button></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {topBadActors.length === 0 ? (
+                        <tr><td colSpan={7}>Sin datos de fallas para este reporte.</td></tr>
+                      ) : (
+                        sortedBadActors.map((item) => (
+                          <tr key={item.equipment}>
+                            <td>{item.equipment}</td>
+                            <td>{item.system}</td>
+                            <td><span className={`badge ${item.criticality === "Alta" ? "danger" : item.criticality === "Media" ? "warning" : "info"}`}>{item.criticality}</span></td>
+                            <td>{item.frequency}</td>
+                            <td>{item.knownCause}</td>
+                            <td>{item.unavailabilityHours}</td>
+                            <td>{mwh(item.generationImpactMwh)}</td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </article>
+              <article className="card">
+                <h3>Horas de indisponibilidad por foco</h3>
+                <div className="chart-container">
+                  <ResponsiveContainer width="100%" height={320}>
+                    <BarChart data={topBadActors} layout="vertical" margin={{ left: 28, right: 12 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
+                      <XAxis type="number" stroke="var(--text-muted)" />
+                      <YAxis type="category" dataKey="equipment" width={110} stroke="var(--text-muted)" />
+                      <Tooltip formatter={(value) => `${Number(value)} h`} />
+                      <Bar dataKey="unavailabilityHours" name="Horas" fill="#f97316" radius={[0, 6, 6, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </article>
+            </section>
+          </>
         )}
 
         {activePage === "causas_raiz" && (
-          <section className="panel two-col">
-            <article className="card">
-              <h3>Avance de causas raiz</h3>
-              <div className="chart-container compact">
-                <ResponsiveContainer width="100%" height={260}>
-                  <PieChart>
-                    <Pie data={rcaData} dataKey="value" nameKey="status" innerRadius={50} outerRadius={90}>
-                      {rcaData.map((entry) => (
-                        <Cell key={entry.status} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                    <Legend />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            </article>
-            <article className="card">
-              <h3>Estado detallado RCA</h3>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Estado</th>
-                    <th><button className="sort-button" onClick={() => toggleSort("rca", "value")}>Eventos {getSortIndicator("rca", "value")}</button></th>
-                    <th>Participacion</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sortedRcaSummary.map((row) => (
-                    <tr key={row.status}>
-                      <td>{row.status}</td>
-                      <td>{row.value}</td>
-                      <td>{row.percentage}%</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </article>
-          </section>
+          <>
+            <section className="kpi-grid">
+              <KpiCard
+                title="Casos RCA abiertos"
+                reference="Inventario formal de RCA en fuente GTE"
+                icon={<Search size={18} />}
+                value="N/D"
+                delta={0}
+                target="No reportado en PDF/DOCX"
+                deltaUnit="count"
+                hideDelta
+              />
+              <KpiCard
+                title="RCA recomendado (DOCX)"
+                reference="Analisis Profundo junio · CPW06"
+                icon={<AlertTriangle size={18} />}
+                value="1 foco"
+                delta={0}
+                target="3 eventos (03, 27, 28-jun)"
+                deltaUnit="count"
+                hideDelta
+              />
+              <KpiCard title="Pareto bitacora" reference="183 obs. clasificadas (429 registros)" icon={<BarChart3 size={18} />} value={String(causeParetoByHours.reduce((a, b) => a + b.count, 0))} delta={0} target="Registros con causa asignada" deltaUnit="count" hideDelta />
+              <KpiCard title="Horas PF externas" reference="MRU + SIN + CYC" icon={<AlertTriangle size={18} />} value={hours((causeParetoByHours.find((c) => c.cause.includes("MRU"))?.hoursPfClient ?? 0) + (causeParetoByHours.find((c) => c.cause.includes("SIN"))?.hoursPfClient ?? 0) + (causeParetoByHours.find((c) => c.cause.includes("CYC"))?.hoursPfClient ?? 0))} delta={0} target="> fallas propias (70 h)" deltaUnit="hours" hideDelta />
+            </section>
+            <section className="panel two-col">
+              <article className="card">
+                <h3>Pareto de causas (texto de bitacora)</h3>
+                <p className="muted">Clasificacion del analisis profundo: registros y horas PF-cliente asociadas.</p>
+                <div className="chart-container">
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={causeParetoByHours}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
+                      <XAxis dataKey="cause" stroke="var(--text-muted)" interval={0} angle={-20} textAnchor="end" height={90} />
+                      <YAxis yAxisId="count" stroke="#a78bfa" />
+                      <YAxis yAxisId="hours" orientation="right" stroke="#f59e0b" />
+                      <Tooltip />
+                      <Legend />
+                      <Bar yAxisId="count" dataKey="count" name="Registros" fill="#a78bfa" />
+                      <Bar yAxisId="hours" dataKey="hoursPfClient" name="Horas PF" fill="#f59e0b" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </article>
+              <article className="card">
+                <h3>Estado de RCA priorizados</h3>
+                <p className="muted">
+                  El PDF/Excel de junio no reporta un conteo formal de casos RCA (abiertos / en curso / cerrados).
+                  El DOCX de análisis profundo solo recomienda abrir un análisis de causa raíz para CPW06.
+                </p>
+                {rcaTotal === 0 ? (
+                  <p className="muted" style={{ marginTop: "1rem" }}>
+                    Sin inventario RCA cargado desde fuente oficial → N/D.
+                  </p>
+                ) : (
+                  <>
+                    <div className="chart-container compact">
+                      <ResponsiveContainer width="100%" height={260}>
+                        <PieChart>
+                          <Pie data={rcaData} dataKey="value" nameKey="status" innerRadius={50} outerRadius={90}>
+                            {rcaData.map((entry) => (
+                              <Cell key={entry.status} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                          <Legend />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Estado</th>
+                          <th>Casos</th>
+                          <th>Participacion</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sortedRcaSummary.map((row) => (
+                          <tr key={row.status}>
+                            <td>{row.status}</td>
+                            <td>{row.value}</td>
+                            <td>{row.percentage}%</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </>
+                )}
+              </article>
+            </section>
+            <section className="panel">
+              <article className="card">
+                <h3>Casos RCA del periodo</h3>
+                <p className="muted">
+                  Lo documentado en el DOCX: se requiere análisis de causa raíz específico para CPW06
+                  (3 eventos: intercooler/secuestrante, perturbación red G56/G57, sobrecarga) antes del cierre de julio.
+                  No hay listado oficial de casos RCA con ID/estado en las fuentes de junio.
+                </p>
+                <div className="table-scroll">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Equipo</th>
+                        <th>Modo de falla</th>
+                        <th>Fechas</th>
+                        <th>Prioridad</th>
+                        <th>Estado</th>
+                        <th>Responsable</th>
+                        <th>Hallazgo</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rcaCases.length === 0 ? (
+                        <tr><td colSpan={8}>N/D — sin inventario formal de RCA en PDF/DOCX/Excel de junio.</td></tr>
+                      ) : (
+                        rcaCases.map((row) => (
+                          <tr key={row.id}>
+                            <td>{row.id}</td>
+                            <td>{row.equipment}</td>
+                            <td>{row.failureMode}</td>
+                            <td>{row.eventDates}</td>
+                            <td><span className={`badge ${row.priority === "Alta" ? "danger" : row.priority === "Media" ? "warning" : "info"}`}>{row.priority}</span></td>
+                            <td><span className={`badge ${row.status === "Cerrado" ? "success" : row.status === "En curso" ? "warning" : "info"}`}>{row.status}</span></td>
+                            <td>{row.owner}</td>
+                            <td>{row.finding}</td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </article>
+            </section>
+          </>
         )}
 
         {activePage === "mantenimiento" && (
-          <section className="panel">
-            <article className="card">
-              <h3>Plan de mantenimiento</h3>
-              <p className="muted">
-                Ajustes propuestos a mantenimientos preventivos, predictivos y correctivos con sustento tecnico, historial y criticidad.
-              </p>
-              <div className="editable-grid">
-                {maintenancePlan.length === 0 ? (
-                  <p className="muted">Sin datos de mantenimiento para este reporte.</p>
-                ) : (
-                  maintenancePlan.map((row) => (
-                  <div className="editable-item" key={row.id}>
-                    <div className="row-top">
-                      <strong>{row.id}</strong>
-                      <span className="badge info">{row.type}</span>
-                    </div>
-                    <label>
-                      Sistema
-                      <input value={row.system} onChange={(e) => updateMaintenance(row.id, "system", e.target.value)} />
-                    </label>
-                    <label>
-                      Ajuste propuesto
-                      <textarea value={row.proposal} onChange={(e) => updateMaintenance(row.id, "proposal", e.target.value)} />
-                    </label>
-                    <label>
-                      Sustento tecnico
-                      <textarea value={row.basis} onChange={(e) => updateMaintenance(row.id, "basis", e.target.value)} />
-                    </label>
-                    <label>
-                      Recomendacion fabricante
-                      <textarea
-                        value={row.manufacturerRecommendation}
-                        onChange={(e) => updateMaintenance(row.id, "manufacturerRecommendation", e.target.value)}
-                      />
-                    </label>
-                  </div>
-                  ))
-                )}
-              </div>
-            </article>
-          </section>
+          <>
+            <section className="kpi-grid">
+              <KpiCard title="Planes tecnicos" reference="Tracker formal en fuentes GTE" icon={<Wrench size={18} />} value="N/A" delta={0} target="Sin plan oficial en PDF/DOCX/Excel" deltaUnit="count" hideDelta />
+              <KpiCard title="Correctivos" reference="Sin inventario formal" icon={<AlertTriangle size={18} />} value="N/A" delta={0} target="N/A" deltaUnit="count" hideDelta />
+              <KpiCard title="Predictivos" reference="Sin inventario formal" icon={<TrendingUp size={18} />} value="N/A" delta={0} target="N/A" deltaUnit="count" hideDelta />
+              <KpiCard title="Preventivos" reference="Sin inventario formal" icon={<ShieldCheck size={18} />} value="N/A" delta={0} target="N/A" deltaUnit="count" hideDelta />
+            </section>
+            <section className="panel">
+              <article className="card">
+                <h3>Plan de mantenimiento</h3>
+                <p className="muted">
+                  N/A — no hay un plan de mantenimiento formal con IDs/estados en las fuentes GTE.
+                  El DOCX de junio solo recomienda (texto): RCA CPW06, seguimiento CPW04, indicador aguas arriba MRU/SIN/CYC, criterio JIN-11/12 y monitoreo diesel.
+                </p>
+                <div className="editable-grid">
+                  {maintenancePlan.length === 0 ? (
+                    <p className="muted">Sin filas cargadas (correcto: no inventar un plan).</p>
+                  ) : (
+                    maintenancePlan.map((row) => (
+                      <div className="editable-item" key={row.id}>
+                        <div className="row-top">
+                          <strong>{row.id}</strong>
+                          <span className={`badge ${row.type === "Correctivo" ? "danger" : row.type === "Predictivo" ? "warning" : "info"}`}>{row.type}</span>
+                        </div>
+                        <label>
+                          Sistema
+                          <input value={row.system} onChange={(e) => updateMaintenance(row.id, "system", e.target.value)} />
+                        </label>
+                        <label>
+                          Ajuste propuesto
+                          <textarea value={row.proposal} onChange={(e) => updateMaintenance(row.id, "proposal", e.target.value)} />
+                        </label>
+                        <label>
+                          Sustento tecnico
+                          <textarea value={row.basis} onChange={(e) => updateMaintenance(row.id, "basis", e.target.value)} />
+                        </label>
+                        <label>
+                          Recomendacion / criterio
+                          <textarea value={row.manufacturerRecommendation} onChange={(e) => updateMaintenance(row.id, "manufacturerRecommendation", e.target.value)} />
+                        </label>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </article>
+            </section>
+          </>
         )}
 
         {activePage === "riesgos" && (
-          <section className="panel two-col">
-            <article className="card">
-              <h3>Riesgos y continuidad de servicio</h3>
-              <div className="risk-list">
-                {riskCards.map((risk) => (
-                  <div
-                    className={risk.status === "ok" ? "risk-ok" : risk.status === "warning" ? "risk-item" : "risk-neutral"}
-                    key={risk.title}
-                  >
-                    {risk.status === "ok" ? <CheckCircle2 size={16} /> : risk.status === "warning" ? <AlertTriangle size={16} /> : null}
-                    <div>
-                      <strong>{risk.title}</strong>
-                      <p>{risk.value}</p>
-                      <small>{risk.note}</small>
+          <>
+            <section className="kpi-grid">
+              <KpiCard title="Riesgo medio" reference="Unidades / sistemas" icon={<ShieldAlert size={18} />} value={String(machineRiskStats.medium)} delta={0} target="CPW06 + Sistema N Costayaco" deltaUnit="count" hideDelta />
+              <KpiCard title="Riesgo bajo" reference="Resto del parque evaluado" icon={<ShieldCheck size={18} />} value={String(machineRiskStats.low)} delta={0} target="Incluye Vonu 100%" deltaUnit="count" hideDelta />
+              <KpiCard title="Causa comun" reference="Fechas multi-activo junio" icon={<AlertTriangle size={18} />} value={String(commonCauseEvents.length)} delta={0} target="~1/3 de dias del mes" deltaUnit="count" hideDelta />
+              <KpiCard title="Diesel respaldo" reference="% energia total" icon={<Zap size={18} />} value="2.91%" delta={0} target="119,716 kWh" deltaUnit="count" hideDelta />
+            </section>
+            <section className="panel two-col">
+              <article className="card">
+                <h3>Riesgos y continuidad de servicio</h3>
+                <div className="risk-list">
+                  {riskCards.map((risk) => (
+                    <div className={risk.status === "ok" ? "risk-ok" : risk.status === "warning" ? "risk-item" : "risk-neutral"} key={risk.title}>
+                      {risk.status === "ok" ? <CheckCircle2 size={16} /> : risk.status === "warning" ? <AlertTriangle size={16} /> : null}
+                      <div>
+                        <strong>{risk.title}</strong>
+                        <p>{risk.value}</p>
+                        <small>{risk.note}</small>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </article>
-            <article className="card">
-              <h3>Tendencias de degradacion</h3>
-              <div className="chart-container">
-                <ResponsiveContainer width="100%" height={300}>
-                  <AreaChart data={performanceData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
-                    <XAxis dataKey="month" stroke="var(--text-muted)" />
-                    <YAxis stroke="var(--text-muted)" tickFormatter={(v) => `${Math.round(v * 100)}%`} />
-                    <Tooltip formatter={(value) => percent(Number(value ?? 0))} />
-                    <Legend />
-                    <Area type="monotone" dataKey="reliability" name="Confiabilidad" stroke="#22c55e" fill="#22c55e33" />
-                    <Area type="monotone" dataKey="contractualCompliance" name="Cumplimiento" stroke="#f59e0b" fill="#f59e0b33" />
-                    <Area type="monotone" dataKey="lossesRatio" name="Ratio de perdidas" stroke="#ef4444" fill="#ef444433" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </article>
-          </section>
+                  ))}
+                </div>
+              </article>
+              <article className="card">
+                <h3>Tendencias de desempeno</h3>
+                <div className="chart-container">
+                  <ResponsiveContainer width="100%" height={300}>
+                    <AreaChart data={performanceData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
+                      <XAxis dataKey="month" stroke="var(--text-muted)" />
+                      <YAxis stroke="var(--text-muted)" tickFormatter={(v) => `${Math.round(v * 100)}%`} />
+                      <Tooltip formatter={(value) => percent(Number(value ?? 0))} />
+                      <Legend />
+                      <Area type="monotone" dataKey="reliability" name="Confiabilidad" stroke="#22c55e" fill="#22c55e33" />
+                      <Area type="monotone" dataKey="contractualCompliance" name="Cumplimiento" stroke="#f59e0b" fill="#f59e0b33" />
+                      <Area type="monotone" dataKey="lossesRatio" name="Ratio de perdidas" stroke="#ef4444" fill="#ef444433" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </article>
+            </section>
+            <section className="panel">
+              <article className="card">
+                <h3>Eventos de causa comun (junio)</h3>
+                <p className="muted">Seis fechas con afectacion multi-unidad de origen externo (SIN, MRU, protecciones de red).</p>
+                <div className="table-scroll">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Fecha</th>
+                        <th>Evento sistemico</th>
+                        <th>Sistemas afectados</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {commonCauseEvents.length === 0 ? (
+                        <tr><td colSpan={3}>Sin eventos de causa comun cargados.</td></tr>
+                      ) : (
+                        commonCauseEvents.map((row) => (
+                          <tr key={`${row.date}-${row.description}`}>
+                            <td>{row.date}</td>
+                            <td>{row.description}</td>
+                            <td>{row.systemsAffected}</td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </article>
+            </section>
+          </>
         )}
 
         {activePage === "acciones" && (
-          <section className="panel">
-            <article className="card">
-              <h3>Plan de accion</h3>
-              <div className="action-list">
-                {actionPlan.length === 0 ? (
-                  <p className="muted">Sin plan de accion por falta de datos internos.</p>
-                ) : (
-                  actionPlan.map((action) => (
-                  <div className="action-item" key={action.id}>
-                    <div className="action-header">
-                      <strong>{action.id}</strong>
-                      <span
-                        className={`badge ${action.status === "Completada" ? "success" : action.status === "En curso" ? "warning" : "info"}`}
-                      >
-                        {action.status}
-                      </span>
-                    </div>
-                    <label>
-                      Accion
-                      <input value={action.action} onChange={(e) => updateAction(action.id, "action", e.target.value)} />
-                    </label>
-                    <div className="action-two">
-                      <label>
-                        Responsable
-                        <input value={action.owner} onChange={(e) => updateAction(action.id, "owner", e.target.value)} />
-                      </label>
-                      <label>
-                        Fecha compromiso
-                        <input
-                          type="date"
-                          value={action.dueDate}
-                          onChange={(e) => updateAction(action.id, "dueDate", e.target.value)}
-                        />
-                      </label>
-                    </div>
-                    <label>
-                      Estado
-                      <select
-                        value={action.status}
-                        onChange={(e) => updateAction(action.id, "status", e.target.value as ActionRow["status"])}
-                      >
-                        <option>Pendiente</option>
-                        <option>En curso</option>
-                        <option>Completada</option>
-                      </select>
-                    </label>
-                    <label>
-                      Evidencia
-                      <input value={action.evidence} onChange={(e) => updateAction(action.id, "evidence", e.target.value)} />
-                    </label>
-                    <label>
-                      Resultado esperado
-                      <textarea
-                        value={action.expectedResult}
-                        onChange={(e) => updateAction(action.id, "expectedResult", e.target.value)}
-                      />
-                    </label>
-                  </div>
-                  ))
-                )}
-              </div>
-            </article>
-          </section>
+          <>
+            <section className="kpi-grid">
+              <KpiCard title="Acciones del plan" reference="Tracker formal en fuentes GTE" icon={<ClipboardList size={18} />} value="N/A" delta={0} target="Sin fechas/estados oficiales" deltaUnit="count" hideDelta />
+              <KpiCard title="En curso" reference="No reportado" icon={<Wrench size={18} />} value="N/A" delta={0} target="N/A" deltaUnit="count" hideDelta />
+              <KpiCard title="Pendientes" reference="No reportado" icon={<AlertTriangle size={18} />} value="N/A" delta={0} target="N/A" deltaUnit="count" hideDelta />
+              <KpiCard title="Completadas" reference="No reportado" icon={<CheckCircle2 size={18} />} value="N/A" delta={0} target="N/A" deltaUnit="count" hideDelta />
+            </section>
+            <section className="panel">
+              <article className="card">
+                <h3>Plan de accion</h3>
+                <p className="muted">
+                  N/A — las fuentes no traen un plan de acción con responsables, fechas ni estados.
+                  No se inventan due dates. El DOCX de junio solo recomienda priorizar RCA de CPW06 antes del cierre de julio.
+                </p>
+                <div className="action-list">
+                  {actionPlan.length === 0 ? (
+                    <p className="muted">Sin filas cargadas (correcto: no inventar acciones).</p>
+                  ) : (
+                    actionPlan.map((action) => (
+                      <div className="action-item" key={action.id}>
+                        <div className="action-header">
+                          <strong>{action.id}</strong>
+                          <span className={`badge ${action.status === "Completada" ? "success" : action.status === "En curso" ? "warning" : "info"}`}>{action.status}</span>
+                        </div>
+                        <label>
+                          Accion
+                          <input value={action.action} onChange={(e) => updateAction(action.id, "action", e.target.value)} />
+                        </label>
+                        <div className="action-two">
+                          <label>
+                            Responsable
+                            <input value={action.owner} onChange={(e) => updateAction(action.id, "owner", e.target.value)} />
+                          </label>
+                          <label>
+                            Fecha compromiso
+                            <input type="date" value={action.dueDate} onChange={(e) => updateAction(action.id, "dueDate", e.target.value)} />
+                          </label>
+                        </div>
+                        <label>
+                          Evidencia
+                          <textarea value={action.evidence} onChange={(e) => updateAction(action.id, "evidence", e.target.value)} />
+                        </label>
+                        <label>
+                          Resultado esperado
+                          <textarea value={action.expectedResult} onChange={(e) => updateAction(action.id, "expectedResult", e.target.value)} />
+                        </label>
+                        <label>
+                          Estado
+                          <select value={action.status} onChange={(e) => updateAction(action.id, "status", e.target.value as ActionRow["status"])}>
+                            <option value="Pendiente">Pendiente</option>
+                            <option value="En curso">En curso</option>
+                            <option value="Completada">Completada</option>
+                          </select>
+                        </label>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </article>
+            </section>
+          </>
         )}
+
           </>
         )}
 
@@ -1581,11 +2205,11 @@ function App() {
                 <div>
                   <p><strong>Campo:</strong> {selectedMachine.campo}</p>
                   <p><strong>Horas Stand By:</strong> {selectedMachine.horasStandBy == null ? "—" : selectedMachine.horasStandBy}</p>
-                  <p><strong>Disponibilidad:</strong> {selectedMachine.disponibilidadPct.toFixed(2)}%</p>
-                  <p><strong>Confiabilidad:</strong> {selectedMachine.confiabilidadPct.toFixed(2)}%</p>
+                  <p><strong>Disponibilidad:</strong> {selectedMachine.disponibilidadPct == null ? "N/A" : `${selectedMachine.disponibilidadPct.toFixed(2)}%`}</p>
+                  <p><strong>Confiabilidad:</strong> {selectedMachine.confiabilidadPct == null ? "N/A" : `${selectedMachine.confiabilidadPct.toFixed(2)}%`}</p>
                   <p><strong># Fallas:</strong> {selectedMachine.fallas}</p>
                   <p><strong>MTBF:</strong> {selectedMachine.mtbfLabel}</p>
-                  <p><strong>MTTR:</strong> {selectedMachine.mttrHours} h</p>
+                  <p><strong>MTTR:</strong> {selectedMachine.mttrHours == null ? "N/A" : `${selectedMachine.mttrHours} h`}</p>
                   <p><strong>Riesgo tecnico:</strong> {selectedMachine.riesgoTecnico}</p>
                   <p><strong>Cumplimiento:</strong> {selectedMachine.cumplimiento}</p>
                   {selectedMachine.detalle ? (
