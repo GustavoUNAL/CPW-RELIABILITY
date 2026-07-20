@@ -119,6 +119,22 @@ body.theme-light {
   color: var(--text);
 }
 
+.tree-title-button {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 0.45rem;
+  padding: 0;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+}
+
 .report-label {
   margin: 0.38rem 0 0.2rem;
   font-size: 0.82rem;

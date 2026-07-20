@@ -4,6 +4,7 @@ import {
   BarChart3,
   Bug,
   CheckCircle2,
+  ChevronDown,
   ClipboardList,
   FileText,
   Gauge,
@@ -50,6 +51,7 @@ import {
 } from "./domain/reliability/contracts/gteOrders";
 import type {
   ActionRow,
+  EventRecord,
   MachineIndicatorRow,
   MaintenanceRow,
   PageKey,
@@ -106,6 +108,8 @@ const NAV_ITEMS: NavItem[] = [
 const REPORT_TREE: ReportTree[] = [
   { key: "gran_tierra", label: "Gran Tierra Energy" },
 ];
+const OM_COLOMBIA_URL =
+  "https://copowercomco-my.sharepoint.com/personal/tec_op_copower_com_co/Documents/Forms/All.aspx?RootFolder=%2Fpersonal%2Ftec%5Fop%5Fcopower%5Fcom%5Fco%2FDocuments%2FO%26M%20COLOMBIA&View=%7B181C171F%2DD036%2D4F1F%2DBE86%2D9D8BEC441F3D%7D";
 
 const percent = (value: number | null | undefined) =>
   value == null || Number.isNaN(value) ? "N/A" : `${(value * 100).toFixed(1)}%`;
@@ -136,8 +140,10 @@ function App() {
   const [activePage, setActivePage] = useState<PageKey>("resumen");
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [onlyFailureEvents, setOnlyFailureEvents] = useState(false);
+  const [selectedFailureEvent, setSelectedFailureEvent] = useState<EventRecord | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<GranTierraMonthKey>("Jun");
   const [selectedMachine, setSelectedMachine] = useState<AssessedMachineRow | null>(null);
+  const [isReportTreeCollapsed, setIsReportTreeCollapsed] = useState(false);
   const [tableSorts, setTableSorts] = useState<Record<string, SortConfig>>({
     eventos: { key: "date", direction: "desc" },
     maquinas: { key: "unidad", direction: "asc" },
@@ -204,6 +210,7 @@ function App() {
   const monthIndex = kpiData.findIndex((row) => row.month === selectedMonth);
   const safeIndex = monthIndex >= 0 ? monthIndex : kpiData.length - 1;
   const current = kpiData[safeIndex];
+  const previous = kpiData[Math.max(0, safeIndex - 1)];
   const monthLabel = activeMonthData?.label ?? granTierraMonthLabel(selectedMonth);
   const previousMonthCode = activeReport === "gran_tierra" ? GRAN_TIERRA_MONTH_ORDER[Math.max(0, safeIndex - 1)] : null;
   const indicatorsSourceNote =
@@ -212,17 +219,6 @@ function App() {
       : selectedMonth === "May"
         ? "Fuente: SISTEMA N oficial citado en informe junio; unidades desde Excel Mayo (data/GTE/Mayo). Meta sistema ≥98% Orden 1."
         : `Fuente: Excel Data Soporte (data/GTE). Calculado con PF_contr. Meta sistema ≥98% Orden 1.`;
-  const isNoDataReport =
-    !reportData.source &&
-    kpiData.every(
-      (row) =>
-        row.availability === 0 &&
-        row.reliability === 0 &&
-        row.maintainability === 0 &&
-        row.generationMwh === 0 &&
-        row.operationalLossesMwh === 0 &&
-        row.contractualCompliance === 0,
-    );
 
   const deviations = useMemo(() => {
     type DeviationRow = {
@@ -683,7 +679,6 @@ function App() {
     },
   ] as const;
 
-  const pageTitle = NAV_ITEMS.find((item) => item.key === activePage)?.label ?? "Resumen";
   const previousMonthEventLog =
     activeReport === "gran_tierra" && previousMonthCode
       ? GRAN_TIERRA_MONTHLY_DATA[previousMonthCode].eventLog
@@ -842,6 +837,26 @@ function App() {
     setActivePage(page);
   };
 
+  const getEventActionPlan = (event: EventRecord) => {
+    if (event.responsible === "COPOWER") {
+      return "Ejecutar inspeccion tecnica de la unidad, confirmar modo de falla, implementar correctivo y registrar cierre en RCA.";
+    }
+    if (event.responsible === "GTE") {
+      return "Coordinar mesa tecnica con GTE para eliminar condicion de proceso, validar controles y programar verificacion conjunta.";
+    }
+    return "Escalar al responsable externo, definir ventana de mitigacion y activar plan de contingencia operativa.";
+  };
+
+  const getEventResolution = (event: EventRecord) => {
+    if (event.notes && event.notes.trim().length > 0) {
+      return event.notes;
+    }
+    if (event.eventType === "Falla") {
+      return "Se normalizo la operacion de la unidad despues de la intervencion correctiva reportada en bitacora.";
+    }
+    return "Evento operativo cerrado sin evidencia de falla propia en la unidad.";
+  };
+
   const formatDeviationValue = (value: number | null, unit: "pct" | "mwh" | "hours" | "count") => {
     if (value == null) return "N/D";
     if (unit === "pct") return `${(value * 100).toFixed(2)}%`;
@@ -938,57 +953,100 @@ function App() {
           </div>
         </div>
         <div className="tree-panel">
-          <p className="eyebrow">Datos reportadados por Gran Tierra Energy.</p>
-          {REPORT_TREE.map((report) => (
-            <div key={report.key} className={activeReport === report.key ? "tree-group active" : "tree-group"}>
-              <p className="tree-title">{report.label}</p>
-              <nav className="menu">
-                {NAV_ITEMS.map((item) => {
-                  const isActive = activeReport === report.key && activePage === item.key;
-                  return (
-                    <button
-                      key={`${report.key}-${item.key}`}
-                      className={isActive ? "menu-item active" : "menu-item"}
-                      onClick={() => selectTreeNode(report.key, item.key)}
-                    >
-                      <span>{item.icon}</span>
-                      <span>{item.label}</span>
-                    </button>
-                  );
-                })}
-              </nav>
-            </div>
-          ))}
+          <button className="tree-title-button" onClick={() => setIsReportTreeCollapsed((prev) => !prev)}>
+            <span>{isReportTreeCollapsed ? "▶" : <ChevronDown size={14} />}</span>
+            <span>Datos reportadados por Gran Tierra Energy.</span>
+          </button>
+          {!isReportTreeCollapsed &&
+            REPORT_TREE.map((report) => (
+              <div key={report.key} className={activeReport === report.key ? "tree-group active" : "tree-group"}>
+                <p className="tree-title">{report.label}</p>
+                <nav className="menu">
+                  {NAV_ITEMS.map((item) => {
+                    const isActive = activeReport === report.key && activePage === item.key;
+                    return (
+                      <button
+                        key={`${report.key}-${item.key}`}
+                        className={isActive ? "menu-item active" : "menu-item"}
+                        onClick={() => selectTreeNode(report.key, item.key)}
+                      >
+                        <span>{item.icon}</span>
+                        <span>{item.label}</span>
+                      </button>
+                    );
+                  })}
+                </nav>
+              </div>
+            ))}
+        </div>
+        <div className="tree-panel">
+          <p className="eyebrow">Datos reportado COPOWER</p>
+          <div className={activeReport === "copower_interno" ? "tree-group active" : "tree-group"}>
+            <p className="tree-title">CoPower Interno</p>
+            <nav className="menu">
+              {NAV_ITEMS.map((item) => {
+                const isActive = activeReport === "copower_interno" && activePage === item.key;
+                return (
+                  <button
+                    key={`copower_interno-${item.key}`}
+                    className={isActive ? "menu-item active" : "menu-item"}
+                    onClick={() => selectTreeNode("copower_interno", item.key)}
+                  >
+                    <span>{item.icon}</span>
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+        </div>
+        <div className="tree-panel">
+          <p className="eyebrow">Sources</p>
+          <nav className="menu">
+            <a
+              className="menu-item"
+              href={OM_COLOMBIA_URL}
+              target="_blank"
+              rel="noreferrer"
+              title="Abrir O&M COLOMBIA"
+            >
+              <span><FileText size={16} /></span>
+              <span>O&amp;M COLOMBIA</span>
+            </a>
+          </nav>
         </div>
       </aside>
 
       <main className="main">
-        {isNoDataReport ? (
-          <section className="panel">
-            <article className="card">
-              <h3>{pageTitle}</h3>
-              <div className="no-data-state">
-                <p>No se tiene informacion disponible para CoPower.</p>
-                <p>Este modulo mostrara datos en cuanto se cargue la fuente interna.</p>
-              </div>
-            </article>
-          </section>
-        ) : (
-          <>
         {activePage === "resumen" && (
           <>
-            {selectedMonth !== "Jun" ? (
-              <section className="panel">
-                <article className="card">
-                  <p className="muted">
-                    El tablero ejecutivo gerencial está validado para <strong>junio 2026</strong> (únicos meses con
-                    cifras oficiales reconciliadas: mayo y junio). Seleccione <strong>Jun</strong> en el selector de
-                    mes, o revise abajo el reporte fijo de junio.
-                  </p>
-                </article>
+            {activeReport === "gran_tierra" ? (
+              <>
+                {selectedMonth !== "Jun" ? (
+                  <section className="panel">
+                    <article className="card">
+                      <p className="muted">
+                        El tablero ejecutivo gerencial está validado para <strong>junio 2026</strong> (únicos meses con
+                        cifras oficiales reconciliadas: mayo y junio). Seleccione <strong>Jun</strong> en el selector de
+                        mes, o revise abajo el reporte fijo de junio.
+                      </p>
+                    </article>
+                  </section>
+                ) : null}
+                <ExecutiveResumen />
+              </>
+            ) : (
+              <section className="kpi-grid">
+                <KpiCard title="Disponib. Sist. COPOWER" reference="Sin datos internos cargados" icon={<Gauge size={18} />} value={percent(current.availability)} delta={(current.availability ?? 0) - (previous.availability ?? 0)} target="0.0%" deltaUnit="pp" />
+                <KpiCard title="Confiab. Sist. COPOWER" reference="Sin datos internos cargados" icon={<ShieldCheck size={18} />} value={percent(current.reliability)} delta={(current.reliability ?? 0) - (previous.reliability ?? 0)} target="0.0%" deltaUnit="pp" />
+                <KpiCard title="Eventos de falla" reference="Reporte interno pendiente" icon={<Wrench size={18} />} value={String(summary.copowerFailures)} delta={0} target="0" deltaUnit="count" />
+                <KpiCard title="Eventos Totales" reference="Reporte interno pendiente" icon={<Zap size={18} />} value={String(summary.totalEvents ?? 0)} delta={0} target="0" deltaUnit="count" />
+                <KpiCard title="MTBF" reference="Sin datos internos cargados" icon={<Gauge size={18} />} value={hours(summary.mtbfHours)} delta={0} target="0.00 h" deltaUnit="hours" />
+                <KpiCard title="MTTR" reference="Sin datos internos cargados" icon={<Wrench size={18} />} value={hours(summary.mttrHours)} delta={0} target="0.00 h" deltaUnit="hours" />
+                <KpiCard title="Energia Total" reference="Sin datos internos cargados" icon={<Zap size={18} />} value={kwh((current.generationMwh || 0) * 1000)} delta={0} target="0 kWh" deltaUnit="mwh" />
+                <KpiCard title="Acciones / RCA Pend." reference="Sin datos internos cargados" icon={<ClipboardList size={18} />} value={`${summary.actionsOverdue ?? 0} / ${summary.rcaPending ?? 0}`} delta={0} target="0 / 0" deltaUnit="count" />
               </section>
-            ) : null}
-            <ExecutiveResumen />
+            )}
           </>
         )}
 
@@ -1351,12 +1409,13 @@ function App() {
                         <th><button className="sort-button" onClick={() => toggleSort("eventos", "downtimeHours")}>Horas {getSortIndicator("eventos", "downtimeHours")}</button></th>
                         <th><button className="sort-button" onClick={() => toggleSort("eventos", "responsible")}>Responsable {getSortIndicator("eventos", "responsible")}</button></th>
                         <th><button className="sort-button" onClick={() => toggleSort("eventos", "notes")}>Observaciones {getSortIndicator("eventos", "notes")}</button></th>
+                        <th>Detalle</th>
                       </tr>
                     </thead>
                     <tbody>
                       {filteredEvents.length === 0 ? (
                         <tr>
-                          <td colSpan={7}>Sin eventos para el filtro seleccionado.</td>
+                          <td colSpan={8}>Sin eventos para el filtro seleccionado.</td>
                         </tr>
                       ) : (
                         sortedEvents.map((event) => (
@@ -1384,6 +1443,15 @@ function App() {
                               </span>
                             </td>
                             <td>{event.notes}</td>
+                            <td>
+                              {event.eventType === "Falla" ? (
+                                <button className="open-popup-btn" onClick={() => setSelectedFailureEvent(event)}>
+                                  Ver detalle
+                                </button>
+                              ) : (
+                                <span className="muted">—</span>
+                              )}
+                            </td>
                           </tr>
                         ))
                       )}
@@ -2328,9 +2396,6 @@ function App() {
           </>
         )}
 
-          </>
-        )}
-
         {selectedMachine && (
           <div className="modal-overlay" onClick={() => setSelectedMachine(null)}>
             <div className="modal-card" onClick={(e) => e.stopPropagation()}>
@@ -2373,6 +2438,32 @@ function App() {
                   <p><strong>Horas PF cliente:</strong> {selectedMachineGeneration?.horasPFCli ?? "Sin dato"}</p>
                   <p><strong>Horas calculadas:</strong> {selectedMachineGeneration?.horasCalDia ?? "Sin dato"}</p>
                   <p><strong># Falla evento (Excel):</strong> {selectedMachineGeneration?.fallaEvento ?? "Sin dato"}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {selectedFailureEvent && (
+          <div className="modal-overlay" onClick={() => setSelectedFailureEvent(null)}>
+            <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>Detalle de falla: {selectedFailureEvent.equipment}</h3>
+                <button className="open-popup-btn" onClick={() => setSelectedFailureEvent(null)}>
+                  Cerrar
+                </button>
+              </div>
+              <div className="modal-grid">
+                <div>
+                  <p><strong>Fecha:</strong> {selectedFailureEvent.date}</p>
+                  <p><strong>Tipo:</strong> {selectedFailureEvent.eventType}</p>
+                  <p><strong>Responsable:</strong> {selectedFailureEvent.responsible}</p>
+                  <p><strong>Horas afectadas:</strong> {selectedFailureEvent.downtimeHours.toFixed(1)} h</p>
+                  <p><strong>Causa:</strong> {selectedFailureEvent.cause}</p>
+                </div>
+                <div>
+                  <p><strong>Plan de accion:</strong> {getEventActionPlan(selectedFailureEvent)}</p>
+                  <p><strong>Como se resolvio:</strong> {getEventResolution(selectedFailureEvent)}</p>
                 </div>
               </div>
             </div>
