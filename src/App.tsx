@@ -144,6 +144,7 @@ function App() {
   const [selectedMonth, setSelectedMonth] = useState<GranTierraMonthKey>("Jun");
   const [selectedMachine, setSelectedMachine] = useState<AssessedMachineRow | null>(null);
   const [isReportTreeCollapsed, setIsReportTreeCollapsed] = useState(false);
+  const [isCopowerTreeCollapsed, setIsCopowerTreeCollapsed] = useState(false);
   const [tableSorts, setTableSorts] = useState<Record<string, SortConfig>>({
     eventos: { key: "date", direction: "desc" },
     maquinas: { key: "unidad", direction: "asc" },
@@ -980,25 +981,30 @@ function App() {
             ))}
         </div>
         <div className="tree-panel">
-          <p className="eyebrow">Datos reportado COPOWER</p>
-          <div className={activeReport === "copower_interno" ? "tree-group active" : "tree-group"}>
-            <p className="tree-title">CoPower Interno</p>
-            <nav className="menu">
-              {NAV_ITEMS.map((item) => {
-                const isActive = activeReport === "copower_interno" && activePage === item.key;
-                return (
-                  <button
-                    key={`copower_interno-${item.key}`}
-                    className={isActive ? "menu-item active" : "menu-item"}
-                    onClick={() => selectTreeNode("copower_interno", item.key)}
-                  >
-                    <span>{item.icon}</span>
-                    <span>{item.label}</span>
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
+          <button className="tree-title-button" onClick={() => setIsCopowerTreeCollapsed((prev) => !prev)}>
+            <span>{isCopowerTreeCollapsed ? "▶" : <ChevronDown size={14} />}</span>
+            <span>Datos reportado COPOWER</span>
+          </button>
+          {!isCopowerTreeCollapsed && (
+            <div className={activeReport === "copower_interno" ? "tree-group active" : "tree-group"}>
+              <p className="tree-title">CoPower Interno</p>
+              <nav className="menu">
+                {NAV_ITEMS.map((item) => {
+                  const isActive = activeReport === "copower_interno" && activePage === item.key;
+                  return (
+                    <button
+                      key={`copower_interno-${item.key}`}
+                      className={isActive ? "menu-item active" : "menu-item"}
+                      onClick={() => selectTreeNode("copower_interno", item.key)}
+                    >
+                      <span>{item.icon}</span>
+                      <span>{item.label}</span>
+                    </button>
+                  );
+                })}
+              </nav>
+            </div>
+          )}
         </div>
         <div className="tree-panel">
           <p className="eyebrow">Sources</p>
