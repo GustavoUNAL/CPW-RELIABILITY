@@ -92,17 +92,17 @@ type SortConfig = {
 };
 
 const NAV_ITEMS: NavItem[] = [
-  { key: "resumen", label: "Resumen", icon: <LayoutDashboard size={16} />, description: "Vista ejecutiva" },
-  { key: "compromiso", label: "Compromiso contractual", icon: <FileText size={16} />, description: "Ordenes y metas de contrato" },
-  { key: "generacion", label: "Generacion", icon: <Zap size={16} />, description: "Generacion por equipo y total" },
-  { key: "maquinas", label: "Indicadores por maquina", icon: <Gauge size={16} />, description: "Indicadores por unidad" },
-  { key: "indicadores", label: "Historico de eventos", icon: <BarChart3 size={16} />, description: "Eventos registrados y filtro de fallas" },
-  { key: "riesgos", label: "Riesgos", icon: <ShieldAlert size={16} />, description: "Matriz Prob × Consecuencia" },
-  { key: "desviaciones", label: "Desviaciones", icon: <TrendingUp size={16} />, description: "Brechas vs meta" },
-  { key: "malos_actores", label: "Malos Actores", icon: <Bug size={16} />, description: "Fallas de impacto" },
-  { key: "causas_raiz", label: "Causas Raiz", icon: <Search size={16} />, description: "Estado RCA" },
-  { key: "mantenimiento", label: "Mantenimiento", icon: <Wrench size={16} />, description: "Plan tecnico" },
-  { key: "acciones", label: "Plan de Accion", icon: <ClipboardList size={16} />, description: "Seguimiento" },
+  { key: "resumen", label: "Resumen", icon: <LayoutDashboard size={16} />, description: "Vista general del periodo" },
+  { key: "compromiso", label: "Compromiso contractual", icon: <FileText size={16} />, description: "Órdenes y metas de contrato" },
+  { key: "generacion", label: "Generación", icon: <Zap size={16} />, description: "Generación por equipo y total" },
+  { key: "maquinas", label: "Indicadores por máquina", icon: <Gauge size={16} />, description: "Indicadores por unidad" },
+  { key: "indicadores", label: "Histórico de eventos", icon: <BarChart3 size={16} />, description: "Eventos registrados y filtro de fallas" },
+  { key: "riesgos", label: "Riesgos", icon: <ShieldAlert size={16} />, description: "Matriz Probabilidad × Consecuencia" },
+  { key: "desviaciones", label: "Desviaciones", icon: <TrendingUp size={16} />, description: "Brechas frente a meta" },
+  { key: "malos_actores", label: "Activos críticos", icon: <Bug size={16} />, description: "Unidades y causas de mayor impacto" },
+  { key: "causas_raiz", label: "Causas raíz", icon: <Search size={16} />, description: "Estado de RCA" },
+  { key: "mantenimiento", label: "Mantenimiento", icon: <Wrench size={16} />, description: "Plan técnico" },
+  { key: "acciones", label: "Plan de acción", icon: <ClipboardList size={16} />, description: "Seguimiento de acciones" },
 ];
 
 const REPORT_TREE: ReportTree[] = [
@@ -918,12 +918,13 @@ function App() {
     <div className={`app-shell ${theme}`}>
       <aside className="sidebar">
         <div className="brand">
-          <p className="eyebrow">Confiabilidad Operacional</p>
-          <h1>Parque de Generacion Costayaco</h1>
+          <p className="eyebrow">COPOWER</p>
+          <h1>Indicadores de confiabilidad</h1>
+          <p className="brand-sub">Sistema Costayaco / Vonú</p>
         </div>
         <div className="sidebar-controls">
           <div className="month-picker">
-            <label htmlFor="month-selector">Mes analizado</label>
+            <label htmlFor="month-selector">Periodo</label>
             <select
               id="month-selector"
               value={selectedMonth}
@@ -937,7 +938,7 @@ function App() {
             </select>
           </div>
           <div className="header-theme-switch">
-            <label>Modo de vista</label>
+            <label>Apariencia</label>
             <div className="theme-switch-row">
               <span>Oscuro</span>
               <label className="theme-switch" htmlFor="theme-toggle">
@@ -956,7 +957,7 @@ function App() {
         <div className="tree-panel">
           <button className="tree-title-button" onClick={() => setIsReportTreeCollapsed((prev) => !prev)}>
             <span>{isReportTreeCollapsed ? "▶" : <ChevronDown size={14} />}</span>
-            <span>Datos reportadados por Gran Tierra Energy.</span>
+            <span>Gran Tierra Energy</span>
           </button>
           {!isReportTreeCollapsed &&
             REPORT_TREE.map((report) => (
@@ -970,6 +971,7 @@ function App() {
                         key={`${report.key}-${item.key}`}
                         className={isActive ? "menu-item active" : "menu-item"}
                         onClick={() => selectTreeNode(report.key, item.key)}
+                        title={item.description}
                       >
                         <span>{item.icon}</span>
                         <span>{item.label}</span>
@@ -983,11 +985,11 @@ function App() {
         <div className="tree-panel">
           <button className="tree-title-button" onClick={() => setIsCopowerTreeCollapsed((prev) => !prev)}>
             <span>{isCopowerTreeCollapsed ? "▶" : <ChevronDown size={14} />}</span>
-            <span>Datos reportado COPOWER</span>
+            <span>COPOWER interno</span>
           </button>
           {!isCopowerTreeCollapsed && (
             <div className={activeReport === "copower_interno" ? "tree-group active" : "tree-group"}>
-              <p className="tree-title">CoPower Interno</p>
+              <p className="tree-title">Reporte interno</p>
               <nav className="menu">
                 {NAV_ITEMS.map((item) => {
                   const isActive = activeReport === "copower_interno" && activePage === item.key;
@@ -996,6 +998,7 @@ function App() {
                       key={`copower_interno-${item.key}`}
                       className={isActive ? "menu-item active" : "menu-item"}
                       onClick={() => selectTreeNode("copower_interno", item.key)}
+                      title={item.description}
                     >
                       <span>{item.icon}</span>
                       <span>{item.label}</span>
@@ -1007,7 +1010,7 @@ function App() {
           )}
         </div>
         <div className="tree-panel">
-          <p className="eyebrow">Sources</p>
+          <p className="eyebrow">Documentación</p>
           <nav className="menu">
             <a
               className="menu-item"
@@ -1032,9 +1035,9 @@ function App() {
                   <section className="panel">
                     <article className="card">
                       <p className="muted">
-                        El tablero ejecutivo gerencial está validado para <strong>junio 2026</strong> (únicos meses con
-                        cifras oficiales reconciliadas: mayo y junio). Seleccione <strong>Jun</strong> en el selector de
-                        mes, o revise abajo el reporte fijo de junio.
+                        El resumen oficial reconciliado corresponde a <strong>junio 2026</strong> (mayo y junio con
+                        cifras oficiales). Seleccione <strong>Junio</strong> en el periodo, o consulte a continuación
+                        el informe fijo de junio.
                       </p>
                     </article>
                   </section>
@@ -1095,8 +1098,8 @@ function App() {
               <article className="card">
                 <div className="contract-order-head">
                   <div>
-                    <p className="eyebrow">Overview</p>
-                    <h3>Resumen general del marco contractual (las 3 órdenes identificadas)</h3>
+                    <p className="eyebrow">Marco contractual</p>
+                    <h3>Órdenes de servicio identificadas</h3>
                     <p className="muted">
                       Para que quede claro por qué solo la Orden 1 alimenta este dashboard, aquí el panorama completo:
                     </p>
@@ -1343,7 +1346,7 @@ function App() {
 
             <section className="panel two-col">
               <article className="card">
-                <h3>Distribucion por tipo de evento</h3>
+                <h3>Distribución por tipo de evento</h3>
                 <div className="chart-container compact">
                   {eventStats.typeChart.length === 0 ? (
                     <div className="no-data-state">
@@ -1392,7 +1395,7 @@ function App() {
                 <div className="section-header-row">
                   <div>
                     <h3>Eventos registrados en {monthLabel}</h3>
-                    <p className="muted">Detalle de la bitacora mensual con filtro por tipo de evento.</p>
+                    <p className="muted">Detalle de la bitácora mensual con filtro por tipo de evento.</p>
                   </div>
                   <div className="event-filters">
                     <label className="event-filter-check">
@@ -1472,7 +1475,7 @@ function App() {
         {activePage === "maquinas" && (
           <section className="panel">
             <article className="card">
-              <h3>Indicadores por maquina - {monthLabel}</h3>
+              <h3>Indicadores por máquina — {monthLabel}</h3>
               <p className="muted">{indicatorsSourceNote}</p>
               <MetricGlossary />
               <div className="table-scroll">
@@ -1495,7 +1498,7 @@ function App() {
                           <MetricLabel code="MTTR" showHours /> {getSortIndicator("maquinas", "mttrHours")}
                         </button>
                       </th>
-                      <th><button className="sort-button" onClick={() => toggleSort("maquinas", "riesgoTecnico")}>Riesgo tecnico {getSortIndicator("maquinas", "riesgoTecnico")}</button></th>
+                      <th><button className="sort-button" onClick={() => toggleSort("maquinas", "riesgoTecnico")}>Riesgo técnico {getSortIndicator("maquinas", "riesgoTecnico")}</button></th>
                       <th>Prob.</th>
                       <th>Sev.</th>
                       <th><button className="sort-button" onClick={() => toggleSort("maquinas", "cumplimiento")}>Cumplimiento {getSortIndicator("maquinas", "cumplimiento")}</button></th>
@@ -1553,7 +1556,7 @@ function App() {
         {activePage === "generacion" && (
           <section className="panel">
             <article className="card">
-              <h3>Generacion por equipo y total mensual - {monthLabel}</h3>
+              <h3>Generación por equipo y total mensual — {monthLabel}</h3>
               <p className="muted">Fuente: carpeta data/GTE (archivos de mayo y junio 2026).</p>
               <div className="kpi-grid">
                 <KpiCard title="Total generado" reference="Suma de todos los equipos" icon={<Zap size={18} />} value={kwh(totalGenerationKwh)} delta={0} target="Total general Excel" deltaUnit="mwh" />
@@ -1830,7 +1833,7 @@ function App() {
                 </div>
               </article>
               <article className="card">
-                <h3>Lectura del periodo</h3>
+                <h3>Resumen del periodo</h3>
                 <ul className="insight-list">
                   {(analysisHighlights.length > 0
                     ? analysisHighlights
@@ -1865,7 +1868,7 @@ function App() {
             {!hasJuneAnalysis ? (
               <section className="panel">
                 <article className="card">
-                  <p className="muted">N/A — el análisis de malos actores / causas externas solo está documentado en el DOCX de junio. No se inventan focos para otros meses.</p>
+                  <p className="muted">N/D — el análisis de activos críticos y causas externas solo está documentado en el informe de junio. No se proyectan focos para otros meses.</p>
                 </article>
               </section>
             ) : null}
@@ -1952,7 +1955,7 @@ function App() {
             </section>
             <section className="panel two-col">
               <article className="card">
-                <h3>Pareto de causas (texto de bitacora)</h3>
+                <h3>Pareto de causas (bitácora)</h3>
                 <p className="muted">Clasificacion del analisis profundo: registros y horas PF-cliente asociadas.</p>
                 <div className="chart-container">
                   <ResponsiveContainer width="100%" height={300}>
@@ -2288,7 +2291,7 @@ function App() {
                 </div>
               </article>
               <article className="card">
-                <h3>Tendencias de desempeno</h3>
+                <h3>Tendencias de desempeño</h3>
                 <div className="chart-container">
                   <ResponsiveContainer width="100%" height={300}>
                     <AreaChart data={performanceData}>
@@ -2307,8 +2310,8 @@ function App() {
             </section>
             <section className="panel">
               <article className="card">
-                <h3>Eventos de causa comun (junio)</h3>
-                <p className="muted">Seis fechas con afectacion multi-unidad de origen externo (SIN, MRU, protecciones de red).</p>
+                <h3>Eventos de causa común (junio)</h3>
+                <p className="muted">Seis fechas con afectación multiunidad de origen externo (SIN, MRU, protecciones de red).</p>
                 <div className="table-scroll">
                   <table>
                     <thead>
@@ -2348,7 +2351,7 @@ function App() {
             </section>
             <section className="panel">
               <article className="card">
-                <h3>Plan de accion</h3>
+                <h3>Plan de acción</h3>
                 <p className="muted">
                   N/A — las fuentes no traen un plan de acción con responsables, fechas ni estados.
                   No se inventan due dates. El DOCX de junio solo recomienda priorizar RCA de CPW06 antes del cierre de julio.
@@ -2406,7 +2409,7 @@ function App() {
           <div className="modal-overlay" onClick={() => setSelectedMachine(null)}>
             <div className="modal-card" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
-                <h3>Detalle de maquina: {selectedMachine.unidad}</h3>
+                <h3>Detalle de máquina: {selectedMachine.unidad}</h3>
                 <button className="open-popup-btn" onClick={() => setSelectedMachine(null)}>
                   Cerrar
                 </button>
@@ -2427,7 +2430,7 @@ function App() {
                     {selectedMachine.mttrHours == null ? "N/A" : `${selectedMachine.mttrHours} h`}{" "}
                     <span className="metric-def">{METRIC_DEFS.MTTR.es}</span>
                   </p>
-                  <p><strong>Riesgo tecnico:</strong> {selectedMachine.riesgoTecnico}</p>
+                  <p><strong>Riesgo técnico:</strong> {selectedMachine.riesgoTecnico}</p>
                   <p><strong>Probabilidad:</strong> {riskAxisLabel(selectedMachine.probabilidad)}</p>
                   <p><strong>Severidad:</strong> {riskAxisLabel(selectedMachine.severidad)}</p>
                   <p><strong>Cumplimiento:</strong> {selectedMachine.cumplimiento}</p>

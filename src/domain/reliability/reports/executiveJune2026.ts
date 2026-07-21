@@ -29,7 +29,7 @@ export const EXEC_MAY = {
   mttrHours: 5.32,
 } as const;
 
-/** Junio 2026 — cifras exactas del reporte gerencial. */
+/** Junio 2026 — cifras exactas del informe oficial. */
 export const EXEC_JUN = {
   label: "Junio 2026",
   field: "Sistema Costayaco / Vonú — Cuenca Putumayo Norte",
@@ -157,4 +157,4 @@ export const EXEC_BLIND_SPOTS = [
 ] as const;
 
 export const EXEC_FOOTER =
-  "Fuente: Análisis de Indicadores Copower PUTN Jun 2026 (Gran Tierra) + Data Soporte Cálculo Copower PUTN Junio 2026.xlsx + Orden de Servicio Costayaco (contrato). Cifras validadas — tablero ejecutivo junio 2026.";
+  "Fuente: Análisis de Indicadores Copower PUTN Jun 2026 (Gran Tierra) + Data Soporte Cálculo Copower PUTN Junio 2026.xlsx + Orden de Servicio Costayaco (contrato). Cifras validadas para el periodo junio 2026.";

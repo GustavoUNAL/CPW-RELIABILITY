@@ -129,18 +129,20 @@ export function ExecutiveResumen() {
     <div className="exec-dashboard">
       <header className="exec-header">
         <div>
-          <p className="eyebrow">Tablero ejecutivo · Confiabilidad contractual</p>
-          <h2>{EXEC_JUN.label} — {EXEC_JUN.field}</h2>
-          <p className="muted">COPOWER · Sistema N Costayaco / Vonú · Orden 1 (meta ≥98%)</p>
+          <p className="eyebrow">Indicadores de confiabilidad · Orden 1</p>
+          <h2>
+            {EXEC_JUN.label} — {EXEC_JUN.field}
+          </h2>
+          <p className="muted">COPOWER · Sistema N Costayaco / Vonú · Meta contractual ≥98%</p>
         </div>
-        <span className="badge info">Gerencia</span>
+        <span className="badge info">Periodo oficial</span>
       </header>
 
       {/* 1. Alertas */}
       <section className="panel exec-alerts-panel">
         <article className="card">
-          <p className="eyebrow">1 · Alertas ejecutivas</p>
-          <h3>Lo primero que debe ver gerencia</h3>
+          <p className="eyebrow">1 · Cumplimiento</p>
+          <h3>Alertas del periodo</h3>
           <div className="exec-alert-grid">
             {alerts.map((alert) => (
               <div key={alert.title} className={`exec-alert ${alert.active ? "active" : "idle"}`}>
@@ -148,21 +150,21 @@ export function ExecutiveResumen() {
                   <ShieldAlert size={18} />
                   <strong>{alert.title}</strong>
                   <span className={`badge ${alert.active ? "danger" : "success"}`}>
-                    {alert.active ? "Alerta" : "OK"}
+                    {alert.active ? "Atención" : "Conforme"}
                   </span>
                 </div>
                 <p>{alert.detail}</p>
               </div>
             ))}
           </div>
-          <SourceTag>{EXEC_SOURCES.pdf} · semáforos calculados vs meta Orden 1 ≥98%</SourceTag>
+          <SourceTag>{EXEC_SOURCES.pdf} · evaluación vs meta Orden 1 ≥98%</SourceTag>
         </article>
       </section>
 
       {/* 2. Cumplimiento */}
       <section className="panel">
         <article className="card">
-          <p className="eyebrow">2 · Cumplimiento contractual</p>
+          <p className="eyebrow">2 · Desempeño sistémico</p>
           <h3>Sistema N Costayaco</h3>
           <div className="exec-core-grid">
             <div className={`exec-core ${availMeets ? "ok" : "bad"}`}>
@@ -206,7 +208,7 @@ export function ExecutiveResumen() {
       <section className="panel">
         <article className="card">
           <p className="eyebrow">3 · Frecuencia y severidad</p>
-          <h3>Por qué no se cumplió la meta</h3>
+          <h3>Indicadores de falla del periodo</h3>
           <MetricGlossary />
           <div className="exec-kpi-row">
             <div className="exec-kpi">
@@ -224,7 +226,7 @@ export function ExecutiveResumen() {
               <MetricLabel code="MTBF" />
               <strong>{EXEC_JUN.mtbfHours.toFixed(2)} h</strong>
               <small className="positive">
-                mayo {EXEC_MAY.mtbfHours.toFixed(2)} h · mejora +{mtbfDelta.toFixed(2)} h
+                mayo {EXEC_MAY.mtbfHours.toFixed(2)} h · variación +{mtbfDelta.toFixed(2)} h
               </small>
               <SourceTag>{EXEC_SOURCES.pdf}</SourceTag>
             </div>
@@ -233,7 +235,7 @@ export function ExecutiveResumen() {
               <MetricLabel code="MTTR" />
               <strong>{EXEC_JUN.mttrHours.toFixed(2)} h</strong>
               <small className="positive">
-                mayo {EXEC_MAY.mttrHours.toFixed(2)} h · mejora {mttrDelta.toFixed(2)} h
+                mayo {EXEC_MAY.mttrHours.toFixed(2)} h · variación {mttrDelta.toFixed(2)} h
               </small>
               <SourceTag>{EXEC_SOURCES.pdf}</SourceTag>
             </div>
@@ -242,10 +244,10 @@ export function ExecutiveResumen() {
               <span>Shutdowns de campo</span>
               <strong>{EXEC_JUN.failures} eventos imputables</strong>
               <small>
-                Pendiente de confirmar equivalencia con la definición contractual de shutdown O&amp;M — no se aplica
-                automáticamente la escala 0/10/20/30/40%/terminación
+                Pendiente confirmar equivalencia con la definición contractual de shutdown O&amp;M. No se aplica
+                automáticamente la escala de deducciones hasta dicha validación.
               </small>
-              <SourceTag>Reportado: eventos imputables · Pendiente validar: shutdown O&amp;M</SourceTag>
+              <SourceTag>Reportado: eventos imputables · Pendiente: clasificación shutdown O&amp;M</SourceTag>
             </div>
           </div>
         </article>
@@ -254,8 +256,8 @@ export function ExecutiveResumen() {
       {/* 4. Energía */}
       <section className="panel">
         <article className="card">
-          <p className="eyebrow">4 · Contexto operativo</p>
-          <h3>Energía</h3>
+          <p className="eyebrow">4 · Generación</p>
+          <h3>Energía del periodo</h3>
           <div className="exec-kpi-row">
             <div className="exec-kpi">
               <Zap size={16} />
@@ -275,7 +277,7 @@ export function ExecutiveResumen() {
             <div className="exec-kpi">
               <span>Diésel Costayaco</span>
               <strong>{kwh(EXEC_JUN.energyDieselCostayacoKwh)}</strong>
-              <small>Respaldo — señal indirecta si sube</small>
+              <small>Respaldo operativo</small>
               <SourceTag>{EXEC_SOURCES.excel}</SourceTag>
             </div>
             <div className="exec-kpi">
@@ -290,8 +292,8 @@ export function ExecutiveResumen() {
       {/* 5. Puntos ciegos */}
       <section className="panel">
         <article className="card">
-          <p className="eyebrow">5 · Puntos ciegos</p>
-          <h3>Indicadores contractuales exigidos pero no reportados</h3>
+          <p className="eyebrow">5 · Información pendiente</p>
+          <h3>Indicadores contractuales sin reporte en fuentes del mes</h3>
           <div className="exec-blind-grid">
             {EXEC_BLIND_SPOTS.map((item) => (
               <div key={item.name} className="exec-blind">
@@ -312,7 +314,7 @@ export function ExecutiveResumen() {
       <section className="panel">
         <article className="card">
           <p className="eyebrow">6 · Gestión documental</p>
-          <h3>Respaldo de alertas</h3>
+          <h3>Estado de reportes y RCA</h3>
           <div className="exec-blind-grid">
             <div className="exec-blind risk">
               <div className="exec-alert-head">
@@ -487,14 +489,14 @@ export function ExecutiveResumen() {
           <button type="button" className="exec-collapse-toggle" onClick={() => setUnitsOpen((v) => !v)}>
             {unitsOpen ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
             <div>
-              <p className="eyebrow">8 · Detalle auditable</p>
-              <h3>Tabla por unidad {unitsOpen ? "" : "(plegada)"}</h3>
+              <p className="eyebrow">8 · Detalle por unidad</p>
+              <h3>Indicadores por máquina</h3>
             </div>
           </button>
           {unitsOpen ? (
             <>
               <p className="muted">
-                Consolidado sistémico. CPW06 resaltado. Ordenable por columna.
+                Consolidado sistémico del periodo. Unidades ordenables por columna. CPW06 marcada como unidad de seguimiento.
               </p>
               <div className="table-scroll">
                 <table className="indicators-table exec-unit-table">
@@ -549,7 +551,7 @@ export function ExecutiveResumen() {
                       <tr key={row.unidad} className={row.highlight ? "row-focal" : undefined}>
                         <td>
                           <strong>{row.unidad}</strong>
-                          {row.highlight ? <span className="badge warning">Foco</span> : null}
+                          {row.highlight ? <span className="badge warning">Seguimiento</span> : null}
                         </td>
                         <td>{row.campo}</td>
                         <td>{pctPts(row.disponibilidadPct)}</td>
@@ -575,8 +577,8 @@ export function ExecutiveResumen() {
                   </tbody>
                 </table>
               </div>
-              <h4 className="exec-subhead">Estabilización (no consolidado)</h4>
-              <p className="muted">JIN-11 y JIN-12 · ventana ~19 días · no se mezclan con el Sistema N.</p>
+              <h4 className="exec-subhead">Unidades en estabilización (excluidas del Sistema N)</h4>
+              <p className="muted">JIN-11 y JIN-12 · ventana de evaluación ~19 días · no consolidan en el cálculo sistémico.</p>
               <div className="table-scroll">
                 <table className="indicators-table exec-unit-table">
                   <thead>
@@ -616,7 +618,7 @@ export function ExecutiveResumen() {
             {hoursOpen ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
             <div>
               <p className="eyebrow">9 · Auditoría del cálculo</p>
-              <h3>Trazabilidad de horas {hoursOpen ? "" : "(plegada)"}</h3>
+              <h3>Trazabilidad de horas</h3>
             </div>
           </button>
           {hoursOpen ? (
@@ -652,11 +654,12 @@ export function ExecutiveResumen() {
       <aside className="exec-source-note" aria-label="Fuentes y notas">
         <p>
           <strong>Fuente:</strong> Análisis de Indicadores Copower PUTN Jun 2026 (Gran Tierra) + Data Soporte
-          Cálculo Copower PUTN Junio 2026.xlsx + Orden de Servicio Costayaco (contrato). Cifras validadas — tablero
-          ejecutivo junio 2026.
+          Cálculo Copower PUTN Junio 2026.xlsx + Orden de Servicio Costayaco (contrato). Cifras validadas para el
+          periodo junio 2026.
         </p>
         <p>
-          <strong>Nota:</strong> Orden 3 (CW6187) no se usa en este cálculo (otro alcance / vigencia sin confirmar).
+          <strong>Nota:</strong> Orden 3 (CW6187) no se incorpora en este cálculo (alcance y vigencia pendientes de
+          confirmación).
         </p>
       </aside>
     </div>
