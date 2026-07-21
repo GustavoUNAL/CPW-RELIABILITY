@@ -1,5 +1,5 @@
 import { AlertTriangle, Gauge, ShieldAlert, Wrench, Zap } from "lucide-react";
-import { useMemo, type ReactNode } from "react";
+import { useMemo, Fragment, type ReactNode } from "react";
 import {
   Bar,
   BarChart,
@@ -88,7 +88,7 @@ type IntegRow = {
   cpw: string;
   delta: string;
   deltaRaw: number | null;
-  tone?: "ok" | "warn" | "bad" | "na";
+  group: "contractual" | "operacion" | "cruce";
 };
 
 function buildIntegratedRows(
@@ -97,7 +97,12 @@ function buildIntegratedRows(
 ): IntegRow[] {
   const rows: IntegRow[] = [];
 
-  const pushPct = (label: string, gv: number | null | undefined, cv: number | null | undefined) => {
+  const pushPct = (
+    label: string,
+    gv: number | null | undefined,
+    cv: number | null | undefined,
+    group: IntegRow["group"],
+  ) => {
     const d = diffPct(gv, cv);
     rows.push({
       label,
@@ -105,7 +110,7 @@ function buildIntegratedRows(
       cpw: pct(cv),
       delta: fmtDiffPp(d),
       deltaRaw: d,
-      tone: kpiTone(gv ?? cv),
+      group,
     });
   };
 
@@ -114,32 +119,55 @@ function buildIntegratedRows(
     gv: number | null | undefined,
     cv: number | null | undefined,
     unit: string,
+    group: IntegRow["group"],
     fmt: (v: number | null | undefined) => string = (v) => num(v) + unit,
   ) => {
     const d = diffNum(gv, cv);
     rows.push({
       label,
-      gte: fmt(gv),
-      cpw: fmt(cv),
+      gte: gv == null ? "N/D" : fmt(gv),
+      cpw: cv == null ? "N/D" : fmt(cv),
       delta: fmtDiffNum(d, unit),
       deltaRaw: d,
+      group,
     });
   };
 
-  pushPct("Disponibilidad", gte?.kpi.availability, cpw?.kpi.availability);
-  pushPct("Confiabilidad", gte?.kpi.reliability, cpw?.kpi.reliability);
-  pushNum("Generación", gte?.totalGenerationKwh, cpw?.totalGenerationKwh, " kWh", kwh);
-  pushNum("Fallas imputables", gte?.summary.copowerFailures, cpw?.summary.copowerFailures, "");
-  pushNum("MTBF", gte?.summary.mtbfHours, cpw?.summary.mtbfHours, " h", hours);
-  pushNum("MTTR", gte?.summary.mttrHours, cpw?.summary.mttrHours, " h", hours);
-  pushNum("Horas operación", null, cpw?.summary.hoursOperated, " h", hours);
-  pushNum("Horas stand-by", null, cpw?.summary.hoursStandby, " h", hours);
-  pushNum("Horas preventivo (PP)", null, cpw?.summary.hoursPreventive, " h", hours);
-  pushNum("Horas FS imputable", gte?.summary.hoursFailureCopower, cpw?.summary.hoursFailureCopower, " h", hours);
-  pushNum("Eventos en bitácora", null, cpw?.eventLog.length ?? null, "", (v) => (v == null ? "N/D" : String(v)));
+  pushPct("Disponibilidad sistémica", gte?.kpi.availability, cpw?.kpi.availability, "contractual");
+  pushPct("Confiabilidad sistémica", gte?.kpi.reliability, cpw?.kpi.reliability, "contractual");
+  pushNum("Generación total", gte?.totalGenerationKwh, cpw?.totalGenerationKwh, " kWh", "contractual", kwh);
+  pushNum(
+    "Fallas imputables / registradas",
+    gte?.summary.copowerFailures,
+    cpw?.summary.copowerFailures,
+    "",
+    "contractual",
+  );
+  pushNum("MTBF", gte?.summary.mtbfHours, cpw?.summary.mtbfHours, " h", "contractual", hours);
+  pushNum("MTTR", gte?.summary.mttrHours, cpw?.summary.mttrHours, " h", "contractual", hours);
+
+  pushNum("Horas operación", gte?.summary.hoursOperated, cpw?.summary.hoursOperated, " h", "operacion", hours);
+  pushNum("Horas stand-by", gte?.summary.hoursStandby, cpw?.summary.hoursStandby, " h", "operacion", hours);
+  pushNum("Horas preventivo (PP)", gte?.summary.hoursPreventive, cpw?.summary.hoursPreventive, " h", "operacion", hours);
+  pushNum("Horas FS imputable COPOWER", gte?.summary.hoursFailureCopower, cpw?.summary.hoursFailureCopower, " h", "operacion", hours);
+  pushNum("Horas FS cliente", gte?.summary.hoursFailureClient, cpw?.summary.hoursFailureClient, " h", "operacion", hours);
+  pushNum(
+    "Eventos en bitácora",
+    gte?.eventLog.length ?? null,
+    cpw?.eventLog.length ?? null,
+    "",
+    "operacion",
+    (v) => (v == null ? "N/D" : String(v)),
+  );
 
   return rows;
 }
+
+const ROW_GROUP_LABEL: Record<IntegRow["group"], string> = {
+  contractual: "Indicadores contractuales / sistémicos",
+  operacion: "Horas y bitácora operativa",
+  cruce: "Comparativo cruzado",
+};
 
 type FleetRow = {
   unidad: string;
@@ -223,6 +251,40 @@ function CoreCard({
   );
 }
 
+function DualValueCard({
+  label,
+  gteValue,
+  cpwValue,
+  toneGte,
+  toneCpw,
+}: {
+  label: string;
+  gteValue: string;
+  cpwValue: string;
+  toneGte?: "ok" | "warn" | "bad" | "na";
+  toneCpw?: "ok" | "warn" | "bad" | "na";
+}) {
+  return (
+    <article className="dash-dual-card">
+      <span className="dash-dual-card-label">{label}</span>
+      <div className="dash-dual-values">
+        <div className={`dash-dual-val dash-dual-val--gte${toneGte ? ` ${toneGte}` : ""}`}>
+          <small>
+            <span className="source-badge gte">GTE</span> Informe oficial
+          </small>
+          <strong>{gteValue}</strong>
+        </div>
+        <div className={`dash-dual-val dash-dual-val--cpw${toneCpw ? ` ${toneCpw}` : ""}`}>
+          <small>
+            <span className="source-badge cpw">CPW</span> Reporte diario
+          </small>
+          <strong>{cpwValue}</strong>
+        </div>
+      </div>
+    </article>
+  );
+}
+
 function DashChartPanel({
   title,
   subtitle,
@@ -283,7 +345,7 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
 
   const trendData = useMemo(() => buildTrendSeries(month), [month]);
 
-  const kpiBarData = useMemo(
+  const kpiPctBarData = useMemo(
     () => [
       {
         name: "Disp %",
@@ -295,6 +357,12 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
         gte: gte?.kpi.reliability != null ? gte.kpi.reliability * 100 : null,
         cpw: cpw?.kpi.reliability != null ? cpw.kpi.reliability * 100 : null,
       },
+    ],
+    [gte, cpw],
+  );
+
+  const kpiVolBarData = useMemo(
+    () => [
       {
         name: "Gen MWh",
         gte: gte ? gte.totalGenerationKwh / 1000 : null,
@@ -305,9 +373,33 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
         gte: gte?.summary.copowerFailures ?? null,
         cpw: cpw?.summary.copowerFailures ?? null,
       },
+      {
+        name: "Eventos",
+        gte: gte?.eventLog.length ?? null,
+        cpw: cpw?.eventLog.length ?? null,
+      },
     ],
     [gte, cpw],
   );
+
+  const integByGroup = useMemo(() => {
+    const groups: IntegRow["group"][] = ["contractual", "operacion"];
+    return groups.map((g) => ({
+      key: g,
+      label: ROW_GROUP_LABEL[g],
+      rows: integRows.filter((r) => r.group === g),
+    }));
+  }, [integRows]);
+
+  const hoursGteData = useMemo(() => {
+    if (!gte) return [];
+    return [
+      { estado: "Operación", horas: gte.summary.hoursOperated, fill: COLOR_GTE },
+      { estado: "Stand-by", horas: gte.summary.hoursStandby, fill: "#a5b4fc" },
+      { estado: "Preventivo", horas: gte.summary.hoursPreventive, fill: "#22c55e" },
+      { estado: "FS imputable", horas: gte.summary.hoursFailureCopower, fill: "#ef4444" },
+    ];
+  }, [gte]);
 
   const hoursData = useMemo(() => {
     if (!cpw) return [];
@@ -417,39 +509,45 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
         </div>
       </header>
 
+      <section className="dash-source-strip">
+        <div className="dash-source-strip-item dash-source-strip-item--gte">
+          <span className="source-badge gte">Gran Tierra</span>
+          <p>{gte?.sourceFile ?? "Sin informe cargado para este mes"}</p>
+          <small>Indicadores contractuales · Data Soporte / informe mensual</small>
+        </div>
+        <div className="dash-source-strip-item dash-source-strip-item--cpw">
+          <span className="source-badge cpw">COPOWER</span>
+          <p>{cpw?.sourceFile ?? "Sin reporte diario para este mes"}</p>
+          <small>Operación diaria · Resumen OP + Eventos + Consumos</small>
+        </div>
+      </section>
+
       <section className="dash-integrated-hero">
-        <CoreCard
+        <DualValueCard
           label="Disponibilidad"
-          value={pct(gte?.kpi.availability ?? cpw?.kpi.availability)}
-          hint={
-            gte && cpw
-              ? `GTE ${pct(gte.kpi.availability)} · CPW ${pct(cpw.kpi.availability)}`
-              : gte
-                ? `GTE · meta ≥ 98%`
-                : `CPW · Resumen OP`
-          }
-          tone={kpiTone(gte?.kpi.availability ?? cpw?.kpi.availability)}
+          gteValue={gte ? pct(gte.kpi.availability) : "N/D"}
+          cpwValue={cpw ? pct(cpw.kpi.availability) : "N/D"}
+          toneGte={gte ? kpiTone(gte.kpi.availability) : "na"}
+          toneCpw={cpw ? kpiTone(cpw.kpi.availability) : "na"}
         />
-        <CoreCard
+        <DualValueCard
           label="Confiabilidad"
-          value={pct(gte?.kpi.reliability ?? cpw?.kpi.reliability)}
-          hint={band ? `Deducción ${band.deductionPct}% · ${band.rangeLabel}` : "Meta ≥ 98%"}
-          tone={kpiTone(gte?.kpi.reliability ?? cpw?.kpi.reliability)}
+          gteValue={gte ? pct(gte.kpi.reliability) : "N/D"}
+          cpwValue={cpw ? pct(cpw.kpi.reliability) : "N/D"}
+          toneGte={gte ? kpiTone(gte.kpi.reliability) : "na"}
+          toneCpw={cpw ? kpiTone(cpw.kpi.reliability) : "na"}
         />
-        <CoreCard
+        <DualValueCard
           label="Generación"
-          value={kwh(gte?.totalGenerationKwh ?? cpw?.totalGenerationKwh)}
-          hint={
-            gte && cpw && genDiff != null
-              ? `Δ CPW ${fmtDiffNum(genDiff, " kWh")}`
-              : "Costayaco + Vonú"
-          }
+          gteValue={gte ? kwh(gte.totalGenerationKwh) : "N/D"}
+          cpwValue={cpw ? kwh(cpw.totalGenerationKwh) : "N/D"}
         />
-        <CoreCard
-          label="Fallas imputables"
-          value={String(gte?.summary.copowerFailures ?? cpw?.summary.copowerFailures ?? "N/D")}
-          hint={`MTBF ${hours(gte?.summary.mtbfHours ?? cpw?.summary.mtbfHours)} · MTTR ${hours(gte?.summary.mttrHours ?? cpw?.summary.mttrHours)}`}
-          tone={(gte?.summary.copowerFailures ?? cpw?.summary.copowerFailures ?? 0) > 5 ? "warn" : undefined}
+        <DualValueCard
+          label="Fallas / eventos"
+          gteValue={gte ? `${gte.summary.copowerFailures} imputables` : "N/D"}
+          cpwValue={cpw ? `${cpw.summary.copowerFailures} registro · ${cpw.eventLog.length} bitácora` : "N/D"}
+          toneGte={gte && gte.summary.copowerFailures >= 3 ? "warn" : undefined}
+          toneCpw={cpw && cpw.summary.copowerFailures >= 10 ? "warn" : undefined}
         />
       </section>
 
@@ -480,20 +578,28 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
           </ResponsiveContainer>
         </DashChartPanel>
 
-        <DashChartPanel title="KPI del mes · GTE vs COPOWER" subtitle={monthLabel}>
+        <DashChartPanel title="Disp / Conf del mes (%)" subtitle={monthLabel}>
           <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={kpiBarData} margin={{ top: 8, right: 8, left: 0, bottom: 4 }}>
+            <BarChart data={kpiPctBarData} margin={{ top: 8, right: 8, left: 0, bottom: 4 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
+              <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+              <YAxis domain={[90, 100]} tick={{ fontSize: 10 }} width={36} />
+              <Tooltip formatter={(v) => [`${Number(v).toFixed(2)}%`, ""]} />
+              <Legend wrapperStyle={{ fontSize: 10 }} />
+              <ReferenceLine y={META_PCT} stroke="#ef4444" strokeDasharray="4 4" />
+              <Bar dataKey="gte" name="Gran Tierra" fill={COLOR_GTE} radius={[4, 4, 0, 0]} />
+              <Bar dataKey="cpw" name="COPOWER" fill={COLOR_CPW} radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </DashChartPanel>
+
+        <DashChartPanel title="Generación, fallas y eventos" subtitle="Escalas distintas · leer tabla para Δ exacto">
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={kpiVolBarData} margin={{ top: 8, right: 8, left: 0, bottom: 4 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
               <XAxis dataKey="name" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} width={44} />
-              <Tooltip
-                formatter={(v, name) => {
-                  const n = Number(v);
-                  if (Number.isNaN(n)) return ["N/D", String(name)];
-                  const label = String(name);
-                  return [n.toFixed(2), label];
-                }}
-              />
+              <Tooltip formatter={(v) => [Number(v).toLocaleString("es-CO"), ""]} />
               <Legend wrapperStyle={{ fontSize: 10 }} />
               <Bar dataKey="gte" name="Gran Tierra" fill={COLOR_GTE} radius={[4, 4, 0, 0]} />
               <Bar dataKey="cpw" name="COPOWER" fill={COLOR_CPW} radius={[4, 4, 0, 0]} />
@@ -516,7 +622,7 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
         </DashChartPanel>
 
         {cpw ? (
-          <DashChartPanel title="Horas por estado" subtitle="COPOWER · Resumen OP">
+          <DashChartPanel title="Horas por estado · COPOWER" subtitle="Reporte diario · Resumen OP">
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={hoursData} layout="vertical" margin={{ top: 4, right: 12, left: 4, bottom: 4 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" horizontal={false} />
@@ -525,6 +631,24 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
                 <Tooltip formatter={(v) => [`${Number(v).toFixed(1)} h`, "Horas"]} />
                 <Bar dataKey="horas" radius={[0, 4, 4, 0]}>
                   {hoursData.map((row) => (
+                    <Cell key={row.estado} fill={row.fill} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </DashChartPanel>
+        ) : null}
+
+        {gte ? (
+          <DashChartPanel title="Horas por estado · Gran Tierra" subtitle="Informe mensual · Data Soporte">
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart data={hoursGteData} layout="vertical" margin={{ top: 4, right: 12, left: 4, bottom: 4 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" horizontal={false} />
+                <XAxis type="number" tick={{ fontSize: 10 }} />
+                <YAxis type="category" dataKey="estado" tick={{ fontSize: 10 }} width={88} />
+                <Tooltip formatter={(v) => [`${Number(v).toFixed(1)} h`, "Horas"]} />
+                <Bar dataKey="horas" radius={[0, 4, 4, 0]}>
+                  {hoursGteData.map((row) => (
                     <Cell key={row.estado} fill={row.fill} />
                   ))}
                 </Bar>
@@ -564,21 +688,34 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
               <thead>
                 <tr>
                   <th>Indicador</th>
-                  <th className="col-gte">Gran Tierra</th>
-                  <th className="col-cpw">COPOWER</th>
-                  <th className="col-delta">Δ</th>
+                  <th className="col-gte">
+                    Gran Tierra
+                    <small className="dash-col-sub">Informe oficial</small>
+                  </th>
+                  <th className="col-cpw">
+                    COPOWER
+                    <small className="dash-col-sub">Reporte diario</small>
+                  </th>
+                  <th className="col-delta">Δ CPW − GTE</th>
                 </tr>
               </thead>
               <tbody>
-                {integRows.map((r) => (
-                  <tr key={r.label}>
-                    <td>{r.label}</td>
-                    <td className="col-gte">{r.gte}</td>
-                    <td className="col-cpw">{r.cpw}</td>
-                    <td className={`col-delta ${diffClass(r.deltaRaw, r.label.includes("Falla") ? 0 : 1)}`}>
-                      {r.delta}
-                    </td>
-                  </tr>
+                {integByGroup.map((group) => (
+                  <Fragment key={group.key}>
+                    <tr className="dash-integ-group-row">
+                      <td colSpan={4}>{group.label}</td>
+                    </tr>
+                    {group.rows.map((r) => (
+                      <tr key={r.label}>
+                        <td>{r.label}</td>
+                        <td className="col-gte">{r.gte}</td>
+                        <td className="col-cpw">{r.cpw}</td>
+                        <td className={`col-delta ${diffClass(r.deltaRaw, r.label.includes("Falla") ? 0 : 1)}`}>
+                          {r.delta}
+                        </td>
+                      </tr>
+                    ))}
+                  </Fragment>
                 ))}
               </tbody>
             </table>

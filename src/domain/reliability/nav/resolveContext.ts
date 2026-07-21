@@ -40,6 +40,7 @@ const GTE_LEAVES = new Set([
   "rep-mensual",
   "rep-cliente",
   "an-rca",
+  "dash-operacion-gte",
 ]);
 
 const DUAL_LEAVES = new Set([
@@ -51,8 +52,14 @@ const DUAL_LEAVES = new Set([
   "cq-validacion",
   "cq-faltantes",
   "an-pareto",
+]);
+
+/** Vista única con mes dual — no usar DualCompare lado a lado. */
+export const INTEGRATED_DUAL_LEAVES = new Set([
   "dash-resumen",
   "dash-mto",
+  "cfg-campos-costayaco",
+  "cfg-campos-vonu",
 ]);
 
 function isCopowerLeaf(page: PageKey, leafId: string) {
@@ -69,7 +76,7 @@ function isGteLeaf(page: PageKey, leafId: string) {
   if (page === "confiabilidad" && (leafId.startsWith("kpi-gte-") || leafId === "bd-ind-gte")) return true;
   if (page === "eventos" && (leafId === "bd-ev-gte" || leafId === "an-rca")) return true;
   if (GTE_LEAVES.has(leafId)) return true;
-  if (leafId === "dash-ejecutivo" || leafId === "dash-gerencia") return true;
+  if (leafId === "dash-ejecutivo" || leafId === "dash-gerencia" || leafId === "dash-operacion-gte") return true;
   return false;
 }
 
@@ -88,6 +95,15 @@ export function resolveViewContext(page: PageKey, leafId: string): ViewContext {
       reportLabel: "COPOWER · Generación YTD 2026",
       reportShort: "GEN",
       fixedPeriod: true,
+    };
+  }
+  if (INTEGRATED_DUAL_LEAVES.has(leafId) || page === "campos") {
+    const union = Array.from(new Set([...GRAN_TIERRA_MONTH_ORDER, ...COPOWER_MONTH_ORDER]));
+    return {
+      report: "dual",
+      monthOrder: union,
+      reportLabel: page === "campos" ? "Campo · Costayaco / Vonú" : "Gran Tierra + COPOWER · vista integrada",
+      reportShort: page === "campos" ? "Campo" : "Dual",
     };
   }
   if (isDualLeaf(page, leafId)) {

@@ -25,13 +25,14 @@ export const PROJECT_NAV_TREE: NavModule[] = [
       { id: "dash-ejecutivo", label: "Ejecutivo" },
       { id: "dash-gerencia", label: "Gerencia" },
       { id: "dash-operacion", label: "Operación COPOWER" },
+      { id: "dash-operacion-gte", label: "Operación Gran Tierra" },
       { id: "dash-mto", label: "Mantenimiento" },
     ],
   },
   {
     key: "campos",
     label: "Campos",
-    description: "Activos, parque y desempeño por campo · dual GTE + COPOWER",
+    description: "Activos, parque y desempeño por campo",
     children: [
       { id: "cfg-campos-costayaco", label: "Costayaco" },
       { id: "cfg-campos-vonu", label: "Vonú" },
@@ -51,19 +52,6 @@ export const PROJECT_NAV_TREE: NavModule[] = [
     ],
   },
   {
-    key: "comparacion",
-    label: "Comparación dual",
-    description: "COPOWER vs Gran Tierra · metas contractuales",
-    children: [
-      { id: "cmp-kpi", label: "KPI vs KPI" },
-      { id: "cmp-diff", label: "Diferencias por indicador" },
-      { id: "cmp-tend", label: "Tendencias mensuales" },
-      { id: "cmp-desv", label: "Desviaciones vs meta 98%" },
-      { id: "cmp-sla", label: "Cumplimiento SLA" },
-      { id: "cmp-bench", label: "Benchmark" },
-    ],
-  },
-  {
     key: "eventos",
     label: "Eventos de falla",
     description: "Bitácoras, clasificación e imputables · dual y por fuente",
@@ -75,6 +63,18 @@ export const PROJECT_NAV_TREE: NavModule[] = [
       { id: "proc-clasif", label: "Clasificación imputables" },
       { id: "an-criticos", label: "Equipos críticos" },
       { id: "an-rca", label: "RCA imputables" },
+    ],
+  },
+  {
+    key: "reportes",
+    label: "Reportes",
+    description: "Salidas diarias, mensuales y exportables",
+    children: [
+      { id: "rep-diario", label: "Diario COPOWER" },
+      { id: "rep-mensual", label: "Mensual GTE" },
+      { id: "rep-cliente", label: "Reunión cliente" },
+      { id: "rep-semanal", label: "Semanal" },
+      { id: "rep-export", label: "PDF / Excel" },
     ],
   },
   {
@@ -133,17 +133,6 @@ export const PROJECT_NAV_TREE: NavModule[] = [
     ],
   },
   {
-    key: "analisis",
-    label: "Análisis avanzado",
-    description: "Modelos estadísticos y predicción · pendiente de histórico",
-    children: [
-      { id: "an-riesgo", label: "Matriz de riesgo" },
-      { id: "an-weibull", label: "Weibull" },
-      { id: "an-curvas", label: "Curvas de confiabilidad" },
-      { id: "an-pred", label: "Predicción" },
-    ],
-  },
-  {
     key: "calidad_datos",
     label: "Calidad de datos",
     description: "Integridad, validación y auditoría de fuentes",
@@ -156,15 +145,27 @@ export const PROJECT_NAV_TREE: NavModule[] = [
     ],
   },
   {
-    key: "reportes",
-    label: "Reportes",
-    description: "Salidas diarias, mensuales y exportables",
+    key: "comparacion",
+    label: "Comparación dual",
+    description: "COPOWER vs Gran Tierra · metas contractuales",
     children: [
-      { id: "rep-diario", label: "Diario COPOWER" },
-      { id: "rep-mensual", label: "Mensual GTE" },
-      { id: "rep-cliente", label: "Reunión cliente" },
-      { id: "rep-semanal", label: "Semanal" },
-      { id: "rep-export", label: "PDF / Excel" },
+      { id: "cmp-kpi", label: "KPI vs KPI" },
+      { id: "cmp-diff", label: "Diferencias por indicador" },
+      { id: "cmp-tend", label: "Tendencias mensuales" },
+      { id: "cmp-desv", label: "Desviaciones vs meta 98%" },
+      { id: "cmp-sla", label: "Cumplimiento SLA" },
+      { id: "cmp-bench", label: "Benchmark" },
+    ],
+  },
+  {
+    key: "analisis",
+    label: "Análisis avanzado",
+    description: "Modelos estadísticos y predicción · pendiente de histórico",
+    children: [
+      { id: "an-riesgo", label: "Matriz de riesgo" },
+      { id: "an-weibull", label: "Weibull" },
+      { id: "an-curvas", label: "Curvas de confiabilidad" },
+      { id: "an-pred", label: "Predicción" },
     ],
   },
   {

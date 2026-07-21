@@ -25,8 +25,6 @@ import {
   type FieldProfile,
   type FleetUnit,
 } from "../contracts/fieldAssets";
-import type { ReportKey } from "../types";
-import { CopowerIndicatorsPanel } from "./CopowerIndicatorsPanel";
 import { ScreenShell } from "../ui/ScreenShell";
 
 const CARD_ICONS: Record<AssetCardKind, LucideIcon> = {
@@ -44,6 +42,73 @@ const hours = (v: number | null) =>
 
 function iconForCard(card: AssetCard) {
   return CARD_ICONS[card.kind ?? "gas"];
+}
+
+function pick<T>(primary: T | null | undefined, fallback: T | null | undefined): T | null {
+  if (primary != null) return primary;
+  if (fallback != null) return fallback;
+  return null;
+}
+
+function normId(id: string) {
+  return id.toUpperCase().replace(/[^A-Z0-9]/g, "");
+}
+
+type MergedUnit = {
+  id: string;
+  disp: number | null;
+  conf: number | null;
+  fallas: number;
+  mtbf: string;
+  mttr: number | null;
+  riesgo: string;
+  energiaKwh: number | null;
+};
+
+function mergeFieldUnits(gte: FieldUnitLive[], cpw: FieldUnitLive[]): MergedUnit[] {
+  const map = new Map<string, MergedUnit>();
+
+  for (const u of gte) {
+    map.set(normId(u.id), {
+      id: u.id,
+      disp: u.disp,
+      conf: u.conf,
+      fallas: u.fallas,
+      mtbf: u.mtbf,
+      mttr: u.mttr,
+      riesgo: u.riesgo,
+      energiaKwh: u.energiaKwh,
+    });
+  }
+
+  for (const u of cpw) {
+    const key = normId(u.id);
+    const existing = map.get(key);
+    if (existing) {
+      if (existing.disp == null) existing.disp = u.disp;
+      if (existing.conf == null) existing.conf = u.conf;
+      if (existing.fallas === 0 && u.fallas > 0) existing.fallas = u.fallas;
+      if (!existing.mtbf || existing.mtbf === "N/D") {
+        if (u.mtbf) existing.mtbf = u.mtbf;
+      }
+      if (existing.mttr == null) existing.mttr = u.mttr;
+      if (!existing.riesgo || existing.riesgo === "N/A") existing.riesgo = u.riesgo;
+      if (existing.energiaKwh == null) existing.energiaKwh = u.energiaKwh;
+    } else {
+      map.set(key, {
+        id: u.id,
+        disp: u.disp,
+        conf: u.conf,
+        fallas: u.fallas,
+        mtbf: u.mtbf,
+        mttr: u.mttr,
+        riesgo: u.riesgo,
+        energiaKwh: u.energiaKwh,
+      });
+    }
+  }
+
+  return [...map.values()].sort((a, b) => b.fallas - a.fallas || a.id.localeCompare(b.id));
 }
 
 function FieldHeroBanner({ field }: { field: FieldProfile }) {
@@ -132,108 +197,53 @@ function FleetPanel({ fleet }: { fleet: FleetUnit[] }) {
   );
 }
 
-function LiveUnitTile({ unit }: { unit: FieldUnitLive }) {
+function LiveUnitTile({ unit }: { unit: MergedUnit }) {
   const riskClass =
     unit.riesgo === "RIESGO ALTO"
       ? "field-live-unit--risk-high"
       : unit.riesgo === "RIESGO MEDIO"
         ? "field-live-unit--risk-med"
-        : "";
+        : "field-live-unit--risk-low";
 
   return (
-    <article className={`field-live-unit ${riskClass}`}>
-      <strong>{unit.id}</strong>
-      <span className="field-live-metric">Disp {pct(unit.disp)}</span>
-      <span className="field-live-metric">Conf {pct(unit.conf)}</span>
-      <span className="field-live-fallas">{unit.fallas > 0 ? `${unit.fallas} falla(s)` : "Sin fallas"}</span>
-      {unit.energiaKwh != null ? (
-        <span className="field-live-energy">{Math.round(unit.energiaKwh).toLocaleString("es-CO")} kWh</span>
-      ) : null}
-    </article>
-  );
-}
-
-function OperationalSourcePane({
-  report,
-  data,
-}: {
-  report: ReportKey;
-  data: FieldOperationalData;
-}) {
-  const badge = report === "gran_tierra" ? "gte" : "cpw";
-  const short = report === "gran_tierra" ? "GTE" : "CPW";
-
-  if (!data.available) {
-    return (
-      <article className={`field-op-pane field-op-pane--${badge}`}>
-        <header className="field-op-pane-head">
-          <strong>{data.reportLabel}</strong>
-          <span className={`source-badge ${badge}`}>{short}</span>
-        </header>
-        <p className="field-op-empty">Sin datos para este periodo en esta fuente.</p>
-      </article>
-    );
-  }
-
-  return (
-    <article className={`field-op-pane field-op-pane--${badge}`}>
-      <header className="field-op-pane-head">
-        <div>
-          <strong>{data.reportLabel}</strong>
-          <small>{data.units.length} unidades · {data.sourceFile?.split("/").pop()}</small>
-        </div>
-        <span className={`source-badge ${badge}`}>{short}</span>
+    <article className={`field-live-unit ${riskClass}${unit.fallas >= 3 ? " field-live-unit--alert" : ""}`}>
+      <header className="field-live-unit-head">
+        <strong>{unit.id}</strong>
+        <span
+          className={`badge ${
+            unit.riesgo === "RIESGO ALTO" ? "danger" : unit.riesgo === "RIESGO MEDIO" ? "warn" : "success"
+          }`}
+        >
+          {unit.riesgo.replace("RIESGO ", "")}
+        </span>
       </header>
-
-      <div className="field-op-kpi-grid">
-        <div className="field-op-kpi field-op-kpi--hero">
-          <span>Disponibilidad</span>
-          <strong>{pct(data.disp)}</strong>
+      <div className="field-live-metrics">
+        <div className="field-live-metric">
+          <span>Disp</span>
+          <strong>{pct(unit.disp)}</strong>
         </div>
-        <div className="field-op-kpi field-op-kpi--hero">
-          <span>Confiabilidad</span>
-          <strong>{pct(data.conf)}</strong>
+        <div className="field-live-metric">
+          <span>Conf</span>
+          <strong>{pct(unit.conf)}</strong>
         </div>
-        <div className="field-op-kpi">
-          <span>Generación</span>
-          <strong>{kwh(data.generationKwh)}</strong>
-          {data.gasKwh != null ? (
-            <small>
-              Gas {kwh(data.gasKwh)}
-              {data.dieselKwh ? ` · Diésel ${kwh(data.dieselKwh)}` : ""}
-            </small>
-          ) : null}
-        </div>
-        <div className="field-op-kpi">
+        <div className="field-live-metric field-live-fallas">
           <span>Fallas</span>
-          <strong>{data.fallas}</strong>
-          <small>Suma unidades del campo</small>
-        </div>
-        <div className="field-op-kpi">
-          <span>Horas operación</span>
-          <strong>{hours(data.hoursOp)}</strong>
-        </div>
-        <div className="field-op-kpi">
-          <span>Horas FS</span>
-          <strong>{hours(data.hoursFs)}</strong>
-          <small>PF contr + PF cli</small>
+          <strong>{unit.fallas}</strong>
         </div>
       </div>
-
-      {data.units.length > 0 ? (
-        <div className="field-live-grid">
-          {data.units.map((u) => (
-            <LiveUnitTile key={u.id} unit={u} />
-          ))}
-        </div>
-      ) : (
-        <p className="field-op-empty">Sin unidades registradas para este campo.</p>
-      )}
+      <footer className="field-live-unit-foot">
+        <span>MTBF {unit.mtbf}</span>
+        {unit.energiaKwh != null ? (
+          <span className="field-live-energy">{Math.round(unit.energiaKwh).toLocaleString("es-CO")} kWh</span>
+        ) : (
+          <span className="field-live-energy muted">Sin energía</span>
+        )}
+      </footer>
     </article>
   );
 }
 
-function OperationalDualSection({
+function FieldPerformanceSection({
   fieldKey,
   month,
   monthLabel,
@@ -243,23 +253,126 @@ function OperationalDualSection({
   monthLabel: string;
 }) {
   const gte = getFieldOperational("gran_tierra", month, fieldKey);
+  const cpw = getFieldOperational("copower", month, fieldKey);
+
+  if (!gte.available && !cpw.available) {
+    return (
+      <section className="field-op-section">
+        <div className="field-section-label">
+          <Activity size={15} />
+          <span>Desempeño del campo</span>
+          <span className="field-group-count">{monthLabel}</span>
+        </div>
+        <p className="field-op-empty">Sin indicadores cargados para este campo en el periodo.</p>
+      </section>
+    );
+  }
+
+  const primary: FieldOperationalData = gte.available ? gte : cpw;
+  const secondary: FieldOperationalData | null = gte.available && cpw.available ? cpw : null;
+
+  const disp = pick(gte.available ? gte.disp : null, cpw.available ? cpw.disp : null);
+  const conf = pick(gte.available ? gte.conf : null, cpw.available ? cpw.conf : null);
+  const generationKwh = pick(
+    gte.available ? gte.generationKwh : null,
+    cpw.available ? cpw.generationKwh : null,
+  );
+  const gasKwh = pick(gte.available ? gte.gasKwh : null, cpw.available ? cpw.gasKwh : null);
+  const dieselKwh = pick(gte.available ? gte.dieselKwh : null, cpw.available ? cpw.dieselKwh : null);
+  const fallas = gte.available ? gte.fallas : cpw.fallas;
+  const hoursOp = pick(gte.available ? gte.hoursOp : null, cpw.available ? cpw.hoursOp : null);
+  const hoursFs = pick(gte.available ? gte.hoursFs : null, cpw.available ? cpw.hoursFs : null);
+  const units = mergeFieldUnits(gte.available ? gte.units : [], cpw.available ? cpw.units : []);
 
   return (
     <section className="field-op-section">
       <div className="field-section-label">
         <Activity size={15} />
-        <span>Indicadores COPOWER</span>
+        <span>Desempeño del campo</span>
         <span className="field-group-count">{monthLabel}</span>
       </div>
-      <CopowerIndicatorsPanel month={month} fieldKey={fieldKey} />
 
-      <div className="field-section-label field-section-label--sub">
-        <Gauge size={15} />
-        <span>Comparativo Gran Tierra</span>
-      </div>
-      <div className="field-op-compare-single">
-        <OperationalSourcePane report="gran_tierra" data={gte} />
-      </div>
+      <article className="field-op-pane field-op-pane--field">
+        <header className="field-op-pane-head">
+          <div>
+            <strong>{FIELD_PROFILES[fieldKey].label}</strong>
+            <small>Un solo campo · informe oficial priorizado · operación diaria como complemento</small>
+          </div>
+        </header>
+
+        <div className="field-op-kpi-grid">
+          <div className="field-op-kpi field-op-kpi--hero">
+            <span>Disponibilidad</span>
+            <strong>{pct(disp)}</strong>
+            {secondary && gte.disp != null && cpw.disp != null ? (
+              <small>
+                GTE {pct(gte.disp)} · CPW {pct(cpw.disp)}
+              </small>
+            ) : (
+              <small>Campo · meta ≥ 98%</small>
+            )}
+          </div>
+          <div className="field-op-kpi field-op-kpi--hero">
+            <span>Confiabilidad</span>
+            <strong>{pct(conf)}</strong>
+            {secondary && gte.conf != null && cpw.conf != null ? (
+              <small>
+                GTE {pct(gte.conf)} · CPW {pct(cpw.conf)}
+              </small>
+            ) : (
+              <small>Campo · meta ≥ 98%</small>
+            )}
+          </div>
+          <div className="field-op-kpi">
+            <span>Generación</span>
+            <strong>{kwh(generationKwh)}</strong>
+            {gasKwh != null ? (
+              <small>
+                Gas {kwh(gasKwh)}
+                {dieselKwh ? ` · Diésel ${kwh(dieselKwh)}` : ""}
+              </small>
+            ) : (
+              <small>Energía del periodo</small>
+            )}
+          </div>
+          <div className={`field-op-kpi${fallas >= 3 ? " field-op-kpi--warn" : ""}`}>
+            <span>Fallas</span>
+            <strong>{fallas}</strong>
+            {gte.available && cpw.available && gte.fallas !== cpw.fallas ? (
+              <small>
+                GTE {gte.fallas} · CPW {cpw.fallas}
+              </small>
+            ) : (
+              <small>Unidades del campo</small>
+            )}
+          </div>
+          <div className="field-op-kpi">
+            <span>Horas operación</span>
+            <strong>{hours(hoursOp)}</strong>
+            <small>Suma equipos del campo</small>
+          </div>
+          <div className="field-op-kpi">
+            <span>Horas FS</span>
+            <strong>{hours(hoursFs)}</strong>
+            <small>PF contr + PF cli</small>
+          </div>
+        </div>
+
+        {units.length > 0 ? (
+          <div className="field-live-grid">
+            {units.map((u) => (
+              <LiveUnitTile key={u.id} unit={u} />
+            ))}
+          </div>
+        ) : (
+          <p className="field-op-empty">Sin unidades registradas para este campo.</p>
+        )}
+
+        <p className="field-op-sources muted">
+          Fuentes: {primary.sourceFile?.split("/").pop() ?? "N/D"}
+          {secondary?.sourceFile ? ` · ${secondary.sourceFile.split("/").pop()}` : ""}
+        </p>
+      </article>
     </section>
   );
 }
@@ -288,7 +401,7 @@ function AssetCardView({ card }: { card: AssetCard }) {
         <div className={`field-asset-card-icon field-asset-card-icon--${kind}`}>
           <Icon size={18} />
         </div>
-        <div>
+        <div className="field-asset-card-titles">
           <h4>{card.title}</h4>
           {card.power ? <span className="field-asset-power">{card.power}</span> : null}
         </div>
@@ -349,7 +462,7 @@ function CostayacoFieldView({
     <div className="field-view field-view--costayaco">
       <FieldHeroBanner field={field} />
       {field.fleet ? <FleetPanel fleet={field.fleet} /> : null}
-      <OperationalDualSection fieldKey={fieldKey} month={month} monthLabel={monthLabel} />
+      <FieldPerformanceSection fieldKey={fieldKey} month={month} monthLabel={monthLabel} />
 
       {secondaryStats.length ? (
         <>
@@ -401,7 +514,7 @@ function StandardFieldView({
         <span>Indicadores contractuales</span>
       </div>
       <StatGrid stats={field.stats} />
-      <OperationalDualSection fieldKey={fieldKey} month={month} monthLabel={monthLabel} />
+      <FieldPerformanceSection fieldKey={fieldKey} month={month} monthLabel={monthLabel} />
 
       {field.groups.map((group) => (
         <AssetGroupSection key={group.title} group={group} />
@@ -429,7 +542,7 @@ export function FieldAssetsView({ fieldKey, month, monthLabel }: Props) {
 
       <p className="field-source-note">
         <Cpu size={14} />
-        Activos: data/contratos · Indicadores: Gran Tierra (informe oficial) + COPOWER (reporte diario)
+        Un solo campo · activos de contrato · desempeño consolidado del periodo
       </p>
     </ScreenShell>
   );

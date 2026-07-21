@@ -15,6 +15,7 @@ import { CopowerCompanyView, GteCompanyView } from "./CompanyViews";
 import { FieldAssetsView } from "./FieldAssetsView";
 import { fieldKeyFromLeaf } from "../contracts/fieldAssets";
 import { CopowerResumen } from "./CopowerResumen";
+import { GteResumen } from "./GteResumen";
 import { ExecutiveResumen } from "./ExecutiveResumen";
 import { MeetingBrief } from "./MeetingBrief";
 import { ComparativeAnalysis } from "./ComparativeAnalysis";
@@ -23,7 +24,7 @@ import { MarcoContractual } from "./MarcoContractual";
 import { JUNE_2026_IMPUTABLE_EVENTS } from "./juneImputableEvents";
 import { CONTRACT_CALC_BASE, CONTRACTUAL_KPI_TARGETS } from "../contracts/gteOrders";
 import { assessTechnicalRisk } from "../risk/technicalRisk";
-import { generationSectionFromLeaf, resolveReport, resolveViewContext } from "../nav/resolveContext";
+import { generationSectionFromLeaf, INTEGRATED_DUAL_LEAVES, resolveReport, resolveViewContext } from "../nav/resolveContext";
 import type { PageKey, ReportKey } from "../types";
 import { METRIC_DEFS } from "../ui/metricDefs";
 import { EmptyScreen, ScreenShell } from "../ui/ScreenShell";
@@ -643,6 +644,10 @@ function PlatformBody({
       return <DashboardGerencia month={month} monthLabel={monthLabel} />;
     }
     if (leafId === "dash-operacion") return <CopowerResumen month={cpwMonth} />;
+    if (leafId === "dash-operacion-gte") {
+      const gteMonth = (GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey] ? month : "Jun") as GranTierraMonthKey;
+      return <GteResumen month={gteMonth} />;
+    }
     if (leafId === "dash-mto") {
       return <DashboardMantenimiento month={month} monthLabel={monthLabel} />;
     }
@@ -712,7 +717,7 @@ export function PlatformContent({ page, leafId, month, monthLabel }: Props) {
     }
   }
 
-  if (ctx.report === "dual") {
+  if (ctx.report === "dual" && !INTEGRATED_DUAL_LEAVES.has(leafId) && page !== "campos") {
     return <DualCompare page={page} leafId={leafId} month={month} monthLabel={monthLabel} />;
   }
 
