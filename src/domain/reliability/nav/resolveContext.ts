@@ -32,6 +32,7 @@ const CPW_LEAVES = new Set([
   "dash-operacion",
   "an-repetitivos-copower",
   "an-badactors-copower",
+  "an-interv-copower",
 ]);
 
 const GTE_LEAVES = new Set([
@@ -42,9 +43,11 @@ const GTE_LEAVES = new Set([
   "rep-mensual",
   "rep-cliente",
   "an-rca",
+  "an-rca-gte",
   "dash-operacion-gte",
   "an-repetitivos-gte",
   "an-badactors-gte",
+  "an-interv-gte",
 ]);
 
 const DUAL_LEAVES = new Set([
@@ -62,6 +65,9 @@ const DUAL_LEAVES = new Set([
 export const INTEGRATED_DUAL_LEAVES = new Set([
   "dash-resumen",
   "dash-mto",
+  "mto-dashboard",
+  "mto-optimizacion",
+  "mto-degradacion",
   "cfg-campos-costayaco",
   "cfg-campos-vonu",
 ]);
@@ -75,7 +81,8 @@ function isCopowerLeaf(page: PageKey, leafId: string) {
       leafId === "proc-clasif" ||
       leafId === "an-criticos" ||
       leafId === "an-repetitivos-copower" ||
-      leafId === "an-badactors-copower")
+      leafId === "an-badactors-copower" ||
+      leafId === "an-interv-copower")
   )
     return true;
   if (page === "analisis" && leafId === "an-riesgo") return true;
@@ -89,8 +96,10 @@ function isGteLeaf(page: PageKey, leafId: string) {
     page === "eventos" &&
     (leafId === "bd-ev-gte" ||
       leafId === "an-rca" ||
+      leafId === "an-rca-gte" ||
       leafId === "an-repetitivos-gte" ||
-      leafId === "an-badactors-gte")
+      leafId === "an-badactors-gte" ||
+      leafId === "an-interv-gte")
   )
     return true;
   if (GTE_LEAVES.has(leafId)) return true;

@@ -64,9 +64,21 @@ export const PROJECT_NAV_TREE: NavModule[] = [
       { id: "an-repetitivos-gte", label: "Eventos repetitivos Gran Tierra" },
       { id: "an-badactors-copower", label: "Malos actores COPOWER" },
       { id: "an-badactors-gte", label: "Malos actores Gran Tierra" },
+      { id: "an-interv-copower", label: "Planes de intervención COPOWER" },
+      { id: "an-interv-gte", label: "Planes de intervención Gran Tierra" },
+      { id: "an-rca-gte", label: "Análisis de causa raíz Gran Tierra" },
       { id: "proc-clasif", label: "Clasificación fallas asociadas" },
       { id: "an-criticos", label: "Equipos críticos" },
-      { id: "an-rca", label: "RCA fallas asociadas" },
+    ],
+  },
+  {
+    key: "mantenimiento",
+    label: "Mantenimiento",
+    description: "Optimización de estrategias e indicadores de salud del plan (MSO)",
+    children: [
+      { id: "mto-optimizacion", label: "Optimización de planes" },
+      { id: "mto-degradacion", label: "Tendencias de degradación y riesgos" },
+      { id: "mto-dashboard", label: "Dashboard operativo" },
     ],
   },
   {

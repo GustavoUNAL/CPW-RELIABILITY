@@ -3424,6 +3424,414 @@ tr.row-focal td {
   margin-top: 0.5rem;
 }
 
+.event-insights-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.event-insights-block {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.75rem;
+  background: var(--panel-soft);
+}
+
+.event-insights-block h4 {
+  margin: 0 0 0.45rem;
+  font-size: 0.82rem;
+}
+
+.event-insights-block--wide {
+  grid-column: 1 / -1;
+}
+
+.event-insights-scroll {
+  max-height: 18rem;
+  overflow: auto;
+}
+
+.event-insights-scroll--tall {
+  max-height: 30rem;
+}
+
+.event-insights-scroll--large {
+  max-height: 26rem;
+}
+
+.modal-card--xl {
+  width: min(1100px, 98vw);
+}
+
+.category-modal-table {
+  max-height: 72vh;
+  overflow: auto;
+}
+
+.category-modal-table table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.category-modal-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--panel-soft);
+}
+
+.category-modal-table tbody tr:nth-child(odd) {
+  background: color-mix(in oklab, var(--panel-soft) 70%, transparent);
+}
+
+.iio-panel {
+  border-color: color-mix(in oklab, #ef4444 18%, var(--border));
+}
+
+.iio-formula {
+  margin: 0.35rem 0 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.iio-intro {
+  margin: 0.35rem 0 0.65rem;
+  line-height: 1.45;
+}
+
+.iio-def-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.iio-def-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+  padding: 0.6rem 0.65rem;
+}
+
+.iio-def-card strong {
+  display: block;
+  font-size: 0.8rem;
+}
+
+.iio-def-card p {
+  margin: 0.3rem 0 0.2rem;
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.iio-def-card small {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+.iio-bands {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.65rem;
+}
+
+.iio-band {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.24rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.iio-band.low {
+  background: color-mix(in oklab, #22c55e 18%, var(--panel-soft));
+  color: #166534;
+}
+
+.iio-band.medium {
+  background: color-mix(in oklab, #f59e0b 20%, var(--panel-soft));
+  color: #92400e;
+}
+
+.iio-band.high {
+  background: color-mix(in oklab, #f97316 22%, var(--panel-soft));
+  color: #9a3412;
+}
+
+.iio-band.critical {
+  background: color-mix(in oklab, #ef4444 22%, var(--panel-soft));
+  color: #991b1b;
+}
+
+.intervention-suggest-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.intervention-suggest-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+  padding: 0.6rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.intervention-suggest-card strong {
+  font-size: 0.82rem;
+}
+
+.intervention-suggest-card small {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.intervention-progress {
+  width: 100%;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--panel-soft);
+  overflow: hidden;
+}
+
+.intervention-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #0e6e8c, #3b82f6);
+}
+
+.intervention-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+  margin-top: 0.6rem;
+}
+
+.intervention-grid-2 label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+.intervention-grid-2 textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+
+.intervention-timeline {
+  margin-top: 0.7rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.intervention-timeline span {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.18rem 0.46rem;
+  font-size: 0.68rem;
+  background: var(--panel-soft);
+}
+
+.intervention-modal {
+  max-height: 90vh;
+  overflow: auto;
+}
+
+.mso-chart-grid {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.mso-pie-wrap {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.mso-mix-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+}
+
+.mso-mix-legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.mso-mix-legend span {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.mso-opp-list {
+  list-style: none;
+  margin: 0.4rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.mso-opp-list li {
+  display: grid;
+  grid-template-columns: 4.2rem 1fr auto;
+  gap: 0.45rem;
+  align-items: start;
+  padding: 0.45rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.mso-opp-list strong {
+  font-size: 0.85rem;
+}
+
+.mso-opp-list span {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.mso-opp-list em {
+  font-style: normal;
+  font-size: 0.78rem;
+  color: #ca8a04;
+  white-space: nowrap;
+}
+
+.mso-plan-box {
+  margin: 0.25rem 0 0;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.mso-plan-box--rec {
+  border-color: color-mix(in oklab, #0f766e 45%, var(--border));
+  background: color-mix(in oklab, #0f766e 10%, var(--panel-soft));
+}
+
+.mso-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.positive-text {
+  color: #047857;
+}
+
+.dr-health-ring {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  flex-shrink: 0;
+}
+
+.dr-health-ring-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.dr-health-ring-label strong {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.dr-health-ring-label span {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  text-align: center;
+  max-width: 4.5rem;
+  line-height: 1.15;
+  margin-top: 0.1rem;
+}
+
+.dr-detail-head {
+  display: flex;
+  gap: 0.85rem;
+  align-items: center;
+  margin-top: 0.55rem;
+}
+
+.dr-trend {
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.dr-matrix {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-top: 0.35rem;
+}
+
+.dr-matrix-row {
+  display: grid;
+  grid-template-columns: 1.2rem repeat(5, minmax(0, 1fr));
+  gap: 0.2rem;
+}
+
+.dr-matrix-cell {
+  min-height: 1.85rem;
+  border-radius: 4px;
+  font-size: 0.58rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1e293b;
+  padding: 0.1rem;
+  text-align: center;
+  line-height: 1.1;
+}
+
+.dr-matrix-axis {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dr-matrix-footer .dr-matrix-cell,
+.dr-matrix-footer .dr-matrix-axis {
+  min-height: auto;
+}
+
+@media (max-width: 900px) {
+  .dr-detail-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
 .ev-module {
   gap: 0.85rem;
 }
@@ -3721,6 +4129,23 @@ tr.row-focal td {
 
 @media (max-width: 960px) {
   .gen-chart-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .event-insights-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-card--xl {
+    width: min(96vw, 1100px);
+  }
+
+  .iio-def-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .intervention-suggest-grid,
+  .intervention-grid-2 {
     grid-template-columns: 1fr;
   }
 

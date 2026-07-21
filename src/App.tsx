@@ -11,6 +11,7 @@ import {
   SearchCheck,
   Settings2,
   Sparkles,
+  Wrench,
   Zap,
 } from "lucide-react";
 import { PlatformContent } from "./domain/reliability/reports/PlatformContent";
@@ -33,6 +34,7 @@ const MODULE_ICONS: Record<PageKey, ReactNode> = {
   generacion: <Zap size={16} />,
   comparacion: <GitCompare size={16} />,
   eventos: <AlertTriangle size={16} />,
+  mantenimiento: <Wrench size={16} />,
   confiabilidad: <Gauge size={16} />,
   operacion: <Database size={16} />,
   analisis: <Sparkles size={16} />,

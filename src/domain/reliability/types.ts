@@ -162,6 +162,7 @@ export type PageKey =
   | "generacion"
   | "comparacion"
   | "eventos"
+  | "mantenimiento"
   | "confiabilidad"
   | "operacion"
   | "analisis"

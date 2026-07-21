@@ -10,6 +10,10 @@ import {
 import { CopowerIndicatorsDashboard } from "./CopowerIndicatorsPanel";
 import { FailureEventsView } from "./FailureEventsView";
 import { EventInsightsDashboard } from "./EventInsightsDashboard";
+import { InterventionPlansDashboard } from "./InterventionPlansDashboard";
+import { RcaAnalysisDashboard } from "./RcaAnalysisDashboard";
+import { MaintenanceOptimizationDashboard } from "./MaintenanceOptimizationDashboard";
+import { DegradationRiskDashboard } from "./DegradationRiskDashboard";
 import { DashboardGerencia, DashboardMantenimiento, DashboardOverview } from "./DashboardViews";
 import { GenerationDashboard } from "./GenerationDashboard";
 import { CopowerCompanyView, GteCompanyView } from "./CompanyViews";
@@ -22,7 +26,6 @@ import { MeetingBrief } from "./MeetingBrief";
 import { ComparativeAnalysis } from "./ComparativeAnalysis";
 import { SourceMeetingBrief, SourceMonthCompare } from "./SourcePanels";
 import { MarcoContractual } from "./MarcoContractual";
-import { JUNE_2026_IMPUTABLE_EVENTS } from "./juneImputableEvents";
 import { CONTRACT_CALC_BASE, CONTRACTUAL_KPI_TARGETS } from "../contracts/gteOrders";
 import { assessTechnicalRisk } from "../risk/technicalRisk";
 import { generationSectionFromLeaf, INTEGRATED_DUAL_LEAVES, resolveReport, resolveViewContext } from "../nav/resolveContext";
@@ -345,6 +348,15 @@ function PlatformBody({
     if (leafId === "an-badactors-gte") {
       return <EventInsightsDashboard report="gran_tierra" month={month} monthLabel={monthLabel} mode="badactors" />;
     }
+    if (leafId === "an-interv-copower") {
+      return <InterventionPlansDashboard report="copower" month={month} monthLabel={monthLabel} />;
+    }
+    if (leafId === "an-interv-gte") {
+      return <InterventionPlansDashboard report="gran_tierra" month={month} monthLabel={monthLabel} />;
+    }
+    if (leafId === "an-rca-gte" || leafId === "an-rca") {
+      return <RcaAnalysisDashboard monthLabel={monthLabel} />;
+    }
     if (leafId === "proc-clasif") {
       return (
         <ScreenShell report="copower" headless>
@@ -390,42 +402,19 @@ function PlatformBody({
         </ScreenShell>
       );
     }
-    if (leafId === "an-rca") {
-      if (month === "Jun") {
-        return (
-          <ScreenShell report="gran_tierra" title="RCA de fallas asociadas" subtitle="Junio 2026 · Orden 1">
-            <p className="alert-inline">0/7 RCA — multa 4% facturación si no se entregan reportes.</p>
-            <div className="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Fecha</th>
-                    <th>Unidad</th>
-                    <th>PF_contr</th>
-                    <th>Observación</th>
-                    <th>RCA</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {JUNE_2026_IMPUTABLE_EVENTS.map((e) => (
-                    <tr key={e.id}>
-                      <td>{e.date}</td>
-                      <td>{e.equipment}</td>
-                      <td>{e.hoursPfContr} h</td>
-                      <td className="detalle-cell">{e.observation}</td>
-                      <td>
-                        <span className="badge danger">No</span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </ScreenShell>
-        );
-      }
-      return <EmptyScreen detail="Sin tracker RCA formal en este periodo — pendiente de carga." report="gran_tierra" />;
+  }
+
+  if (page === "mantenimiento") {
+    if (leafId === "mto-optimizacion") {
+      return <MaintenanceOptimizationDashboard monthLabel={monthLabel} />;
     }
+    if (leafId === "mto-degradacion") {
+      return <DegradationRiskDashboard monthLabel={monthLabel} />;
+    }
+    if (leafId === "mto-dashboard") {
+      return <DashboardMantenimiento month={month} monthLabel={monthLabel} />;
+    }
+    return <EmptyScreen detail="Seleccione una opción de Mantenimiento." />;
   }
 
   if (page === "confiabilidad") {
