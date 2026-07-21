@@ -22,6 +22,10 @@ export type AssetCard = {
 
 export type AssetGroup = {
   title: string;
+  /** Subtítulo corto para el encabezado de sección. */
+  subtitle?: string;
+  /** Acento visual de la sección (si no se define, se infiere del primer card). */
+  kind?: AssetCardKind;
   cards: AssetCard[];
   /** hub = columna principal; side = lateral; bottom = ancho completo */
   placement?: "hub" | "side" | "bottom";
@@ -85,7 +89,8 @@ export const FIELD_PROFILES: Record<FieldKey, FieldProfile> = {
     groups: [
       {
         title: "Generación a gas",
-        placement: "hub",
+        subtitle: "Flota principal Jenbacher + Jinan · entrega 13,8 kV",
+        kind: "gas",
         cards: [
           {
             id: "cyc-j420",
@@ -116,7 +121,8 @@ export const FIELD_PROFILES: Record<FieldKey, FieldProfile> = {
       },
       {
         title: "Respaldo diésel",
-        placement: "side",
+        subtitle: "Orden 9000007071 · capacidad de respaldo 2,3 MW",
+        kind: "diesel",
         cards: [
           {
             id: "cyc-c500",
@@ -146,7 +152,8 @@ export const FIELD_PROFILES: Record<FieldKey, FieldProfile> = {
       },
       {
         title: "Potencia y balance",
-        placement: "bottom",
+        subtitle: "Elevación, tableros y sincronismo del centro MT",
+        kind: "power",
         cards: [
           {
             id: "cyc-trf-siemens",
@@ -174,7 +181,8 @@ export const FIELD_PROFILES: Record<FieldKey, FieldProfile> = {
       },
       {
         title: "Infraestructura",
-        placement: "bottom",
+        subtitle: "Sitio, contención y servicio O&M en campo",
+        kind: "infra",
         cards: [
           {
             id: "cyc-geom",
@@ -223,46 +231,70 @@ export const FIELD_PROFILES: Record<FieldKey, FieldProfile> = {
     ],
     groups: [
       {
-        title: "Generación",
+        title: "Generación a gas",
+        subtitle: "Tres Jinan CPW500 · entrega en baja tensión 0,48 kV",
+        kind: "gas",
         cards: [
           {
             id: "von-jinan",
             title: "Jinan CPW500",
-            detail: "Generadores a gas natural / biogás",
+            detail: "Generadores a gas natural / biogás en campo Vonú",
             power: "500 kW c/u",
             count: 3,
+            kind: "gas",
             units: ["JIN-01", "JIN-02", "JIN-03"],
-          },
-          {
-            id: "von-sistema",
-            title: "Bloque 8 MW",
-            detail: "Participación en configuración paralelo Orden 1",
-            power: "Sistema N",
           },
         ],
       },
       {
-        title: "Periféricos e infraestructura",
+        title: "Potencia y balance",
+        subtitle: "Participación sistémica en el bloque 8 MW con Costayaco",
+        kind: "power",
+        cards: [
+          {
+            id: "von-sistema",
+            title: "Bloque 8 MW",
+            detail: "Configuración en paralelo Orden 1 · evaluación sistémica con Costayaco",
+            power: "Sistema N",
+            kind: "power",
+          },
+          {
+            id: "von-entrega",
+            title: "Entrega BT",
+            detail: "Punto de entrega a 0,48 kV en campo Vonú",
+            power: "0,48 kV",
+            kind: "power",
+          },
+        ],
+      },
+      {
+        title: "Infraestructura",
+        subtitle: "Tratamiento de gas, contención y seguridad del sitio",
+        kind: "infra",
         cards: [
           {
             id: "von-scrubber",
             title: "Scrubber",
             detail: "Tratamiento de gas con instrumentación",
+            kind: "infra",
           },
           {
             id: "von-geom",
             title: "Geomembrana",
             detail: "Área de generación Vonú",
+            kind: "infra",
           },
           {
             id: "von-mampara",
             title: "Mampara",
             detail: "Seguridad perimetral del sitio",
+            kind: "infra",
           },
           {
             id: "von-inst",
             title: "Instalación",
             detail: "Puesta en marcha del generador",
+            kind: "infra",
           },
         ],
       },

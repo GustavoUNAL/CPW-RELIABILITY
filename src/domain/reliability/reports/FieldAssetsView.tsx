@@ -532,6 +532,32 @@ function StatGrid({ stats }: { stats: FieldProfile["stats"] }) {
   );
 }
 
+const SECTION_META: Record<
+  AssetCardKind,
+  { label: string; Icon: LucideIcon; blurb: string }
+> = {
+  gas: {
+    label: "Generación a gas",
+    Icon: Zap,
+    blurb: "Activos de generación primaria a gas",
+  },
+  diesel: {
+    label: "Respaldo diésel",
+    Icon: Droplets,
+    blurb: "Capacidad de respaldo y renta diésel",
+  },
+  power: {
+    label: "Potencia y balance",
+    Icon: Activity,
+    blurb: "Elevación, entrega y balance eléctrico",
+  },
+  infra: {
+    label: "Infraestructura",
+    Icon: Factory,
+    blurb: "Sitio, periféricos y soporte O&M",
+  },
+};
+
 function AssetCardView({ card }: { card: AssetCard }) {
   const Icon = iconForCard(card);
   const kind = card.kind ?? "gas";
@@ -566,15 +592,52 @@ function AssetCardView({ card }: { card: AssetCard }) {
   );
 }
 
-function AssetGroupSection({ group, wide }: { group: AssetGroup; wide?: boolean }) {
+function AssetGroupSection({ group, index }: { group: AssetGroup; index: number }) {
+  const kind = group.kind ?? group.cards[0]?.kind ?? "gas";
+  const meta = SECTION_META[kind];
+  const SectionIcon = meta.Icon;
+  const unitCount = group.cards.reduce((n, c) => n + (c.units?.length ?? c.count ?? 0), 0);
+  const powerHints = group.cards.map((c) => c.power).filter(Boolean).slice(0, 3);
+
   return (
-    <section className="field-group">
-      <div className="field-section-label">
-        <Layers size={15} />
-        <span>{group.title}</span>
-        <span className="field-group-count">{group.cards.length} activos</span>
-      </div>
-      <div className={`field-card-grid${wide ? " field-card-grid--wide" : ""}`}>
+    <section className={`field-asset-section field-asset-section--${kind}`} aria-labelledby={`field-sec-${index}`}>
+      <header className="field-asset-section-head">
+        <div className={`field-asset-section-icon field-asset-section-icon--${kind}`}>
+          <SectionIcon size={22} />
+        </div>
+        <div className="field-asset-section-copy">
+          <p className="field-asset-section-kicker">
+            <Layers size={12} />
+            Sección {index + 1} · {meta.blurb}
+          </p>
+          <h3 id={`field-sec-${index}`}>{group.title}</h3>
+          <p className="field-asset-section-sub">
+            {group.subtitle ?? meta.blurb}
+          </p>
+        </div>
+        <div className="field-asset-section-stats">
+          <article>
+            <span>Activos</span>
+            <strong>{group.cards.length}</strong>
+          </article>
+          <article>
+            <span>Unidades / ítems</span>
+            <strong>{unitCount || group.cards.length}</strong>
+          </article>
+        </div>
+      </header>
+
+      {powerHints.length ? (
+        <div className="field-asset-section-chips">
+          {powerHints.map((p) => (
+            <span key={String(p)} className="field-asset-section-chip">
+              {p}
+            </span>
+          ))}
+        </div>
+      ) : null}
+
+      <div className="field-card-grid field-card-grid--featured">
         {group.cards.map((card) => (
           <AssetCardView key={card.id} card={card} />
         ))}
@@ -598,10 +661,6 @@ function FieldPage({
   source: FieldDataSource;
   onSourceChange: (source: FieldDataSource) => void;
 }) {
-  const hubGroups = field.groups.filter((g) => g.placement === "hub");
-  const sideGroups = field.groups.filter((g) => g.placement === "side");
-  const bottomGroups = field.groups.filter((g) => g.placement === "bottom");
-  const plainGroups = field.groups.filter((g) => !g.placement);
   const contractStats = field.stats.slice(3);
 
   return (
@@ -629,30 +688,16 @@ function FieldPage({
         </section>
       ) : null}
 
-      {hubGroups.length || sideGroups.length ? (
-        <div className="field-hub-layout">
-          <div className="field-hub-main">
-            {hubGroups.map((group) => (
-              <AssetGroupSection key={group.title} group={group} wide />
-            ))}
-          </div>
-          {sideGroups.length ? (
-            <aside className="field-hub-side">
-              {sideGroups.map((group) => (
-                <AssetGroupSection key={group.title} group={group} />
-              ))}
-            </aside>
-          ) : null}
+      <div className="field-assets-stack">
+        <div className="field-section-label">
+          <Layers size={15} />
+          <span>Inventario de activos del campo</span>
+          <span className="field-group-count">{field.groups.length} secciones</span>
         </div>
-      ) : null}
-
-      {bottomGroups.map((group) => (
-        <AssetGroupSection key={group.title} group={group} wide />
-      ))}
-
-      {plainGroups.map((group) => (
-        <AssetGroupSection key={group.title} group={group} wide />
-      ))}
+        {field.groups.map((group, index) => (
+          <AssetGroupSection key={group.title} group={group} index={index} />
+        ))}
+      </div>
     </div>
   );
 }
