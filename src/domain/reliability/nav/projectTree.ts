@@ -29,6 +29,8 @@ export const PROJECT_NAV_TREE: NavModule[] = [
       { id: "dash-operacion", label: "Operación COPOWER" },
       { id: "dash-operacion-gte", label: "Operación Gran Tierra" },
       { id: "dash-mto", label: "Mantenimiento" },
+      { id: "bd-historicos-copower", label: "Período actual vs. anterior COPOWER" },
+      { id: "bd-historicos-gte", label: "Período actual vs. anterior Gran Tierra" },
     ],
   },
   {
@@ -57,7 +59,7 @@ export const PROJECT_NAV_TREE: NavModule[] = [
   {
     key: "operacion",
     label: "Operación",
-    description: "Registro diario, desglose de horas y calidad de datos",
+    description: "Registro diario, desglose de horas y datos faltantes",
     children: [
       {
         id: "op-datos",
@@ -74,18 +76,9 @@ export const PROJECT_NAV_TREE: NavModule[] = [
               { id: "proc-mto", label: "Mantenimiento (PP)" },
             ],
           },
-          { id: "bd-historicos", label: "Históricos mensuales" },
         ],
       },
-      {
-        id: "op-calidad",
-        label: "Calidad de datos",
-        children: [
-          { id: "cq-auditoria", label: "Auditoría dual (PDF vs Excel)" },
-          { id: "cq-validacion", label: "Validación cruzada" },
-          { id: "cq-faltantes", label: "Datos faltantes" },
-        ],
-      },
+      { id: "cq-faltantes", label: "Datos faltantes" },
     ],
   },
   {

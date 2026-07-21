@@ -608,6 +608,13 @@ function PlatformBody({
     }
   }
 
+  if (leafId === "bd-historicos-copower" || leafId === "bd-historicos") {
+    return <SourceMonthCompare report="copower" month={month} monthLabel={monthLabel} />;
+  }
+  if (leafId === "bd-historicos-gte") {
+    return <SourceMonthCompare report="gran_tierra" month={month} monthLabel={monthLabel} />;
+  }
+
   if (page === "operacion") {
     if (leafId === "bd-op-copower") return <CopowerResumen month={cpwMonth} />;
     if (leafId === "bd-mto") {
@@ -615,9 +622,6 @@ function PlatformBody({
     }
     if (leafId === "bd-alarmas") {
       return <EmptyScreen detail="Pendiente de fuente de alarmas SCADA / DCS." report={report} />;
-    }
-    if (leafId === "bd-historicos") {
-      return <SourceMonthCompare report={report} month={month} monthLabel={monthLabel} />;
     }
 
     const titles: Record<string, string> = {

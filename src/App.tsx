@@ -8,7 +8,9 @@ import {
   Gauge,
   LayoutDashboard,
   MapPin,
+  Menu,
   Settings2,
+  X,
   Wrench,
   Zap,
 } from "lucide-react";
@@ -17,6 +19,7 @@ import type { PageKey } from "./domain/reliability/types";
 import {
   PROJECT_NAV_TREE,
   PROJECT_TITLE,
+  findLeafLabel,
   firstLeafId,
   type NavNode,
 } from "./domain/reliability/nav/projectTree";
@@ -44,6 +47,7 @@ const OM_COLOMBIA_URL =
 
 const DEFAULT_MODULE = PROJECT_NAV_TREE[0];
 const DEFAULT_LEAF = "dash-resumen";
+const MOBILE_MQ = "(max-width: 900px)";
 
 function App() {
   const [activePage, setActivePage] = useState<PageKey>(DEFAULT_MODULE.key);
@@ -65,6 +69,7 @@ function App() {
   });
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [selectedMonth, setSelectedMonth] = useState<string>("Jun");
+  const [navOpen, setNavOpen] = useState(false);
 
   const viewContext = useMemo(
     () => resolveViewContext(activePage, activeLeafId),
@@ -77,12 +82,40 @@ function App() {
     }
   }, [viewContext, selectedMonth]);
 
+  useEffect(() => {
+    const mq = window.matchMedia(MOBILE_MQ);
+    const onChange = () => {
+      if (!mq.matches) setNavOpen(false);
+    };
+    onChange();
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  useEffect(() => {
+    if (!navOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setNavOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [navOpen]);
+
   const monthLabel = monthOptionLabel(selectedMonth, viewContext);
+  const activeModule = PROJECT_NAV_TREE.find((m) => m.key === activePage);
+  const activeLeafLabel =
+    (activeModule ? findLeafLabel(activeModule.children, activeLeafId) : null) ?? activeLeafId;
 
   const selectLeaf = (page: PageKey, leafId: string) => {
     setActivePage(page);
     setActiveLeafId(leafId);
     setOpenModules((prev) => ({ ...prev, [page]: true }));
+    setNavOpen(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -93,6 +126,7 @@ function App() {
     else {
       setActivePage(page);
       setOpenModules((prev) => ({ ...prev, [page]: true }));
+      setNavOpen(false);
     }
   };
 
@@ -139,9 +173,66 @@ function App() {
     });
 
   return (
-    <div className={`app-shell ${theme}`}>
-      <aside className="sidebar">
-        <div className="brand">
+    <div className={`app-shell ${theme}${navOpen ? " nav-open" : ""}`}>
+      <header className="mobile-topbar">
+        <button
+          type="button"
+          className="mobile-menu-btn"
+          aria-label={navOpen ? "Cerrar menú" : "Abrir menú"}
+          aria-expanded={navOpen}
+          aria-controls="app-sidebar"
+          onClick={() => setNavOpen((v) => !v)}
+        >
+          {navOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
+        <div className="mobile-topbar-copy">
+          <p className="eyebrow">COPOWER</p>
+          <strong>{activeModule?.label ?? "Dashboard"}</strong>
+          <span>{activeLeafLabel}</span>
+        </div>
+        {!viewContext.fixedPeriod ? (
+          <select
+            className="mobile-month-select"
+            aria-label="Periodo"
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(e.target.value)}
+          >
+            {viewContext.monthOrder.map((month) => (
+              <option key={month} value={month}>
+                {monthOptionLabel(month, viewContext)}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <span className="mobile-month-fixed">{monthOptionLabel(selectedMonth, viewContext)}</span>
+        )}
+      </header>
+
+      <button
+        type="button"
+        className={`nav-backdrop${navOpen ? " open" : ""}`}
+        aria-label="Cerrar menú"
+        tabIndex={navOpen ? 0 : -1}
+        onClick={() => setNavOpen(false)}
+      />
+
+      <aside id="app-sidebar" className={`sidebar${navOpen ? " open" : ""}`}>
+        <div className="sidebar-mobile-head">
+          <div className="brand">
+            <p className="eyebrow">COPOWER</p>
+            <h1>Gestión de confiabilidad</h1>
+            <p className="brand-sub">{PROJECT_TITLE}</p>
+          </div>
+          <button
+            type="button"
+            className="mobile-menu-btn sidebar-close-btn"
+            aria-label="Cerrar menú"
+            onClick={() => setNavOpen(false)}
+          >
+            <X size={18} />
+          </button>
+        </div>
+        <div className="brand brand-desktop">
           <p className="eyebrow">COPOWER</p>
           <h1>Gestión de confiabilidad</h1>
           <p className="brand-sub">{PROJECT_TITLE}</p>

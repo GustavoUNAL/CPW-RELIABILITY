@@ -109,16 +109,87 @@ export function SourceMonthCompare({ report, month, monthLabel }: Props) {
 
   const cyc = snap.generationByAsset.find((a) => /costayaco/i.test(a.asset));
   const vonu = snap.generationByAsset.find((a) => /von/i.test(a.asset));
+  const sourceLabel = report === "gran_tierra" ? "Gran Tierra" : "COPOWER";
 
   return (
     <div className="source-compare">
-      <section className="panel">
-        <article className="card">
-          <p className="eyebrow">{report === "gran_tierra" ? "Gran Tierra" : "COPOWER"} · Análisis comparativo</p>
-          <h3>
+      <header className="source-compare-hero">
+        <div>
+          <p className="eyebrow">{sourceLabel} · Período actual vs. anterior</p>
+          <h2>
             {monthLabel}
-            {prevMonth ? ` vs ${prevMonth}` : " (sin mes anterior)"}
-          </h3>
+            {prevMonth ? ` vs ${prevMonth}` : " · sin mes anterior"}
+          </h2>
+          <p className="muted">
+            Indicadores del mes seleccionado y variación frente al período previo de la misma fuente.
+          </p>
+        </div>
+        <span className={`source-badge ${report === "gran_tierra" ? "gte" : "cpw"}`}>
+          {report === "gran_tierra" ? "GTE" : "CPW"}
+        </span>
+      </header>
+
+      <section className="source-compare-kpis" aria-label="Indicadores principales">
+        {rows.map((r) => {
+          const improves =
+            r.delta == null || r.delta === 0 ? null : r.hib ? r.delta > 0 : r.delta < 0;
+          return (
+            <article
+              key={r.label}
+              className={`source-compare-kpi${
+                improves === true ? " source-compare-kpi--up" : improves === false ? " source-compare-kpi--down" : ""
+              }`}
+            >
+              <div className="source-compare-kpi-head">
+                <span>{r.label}</span>
+                <Trend delta={r.delta} higherIsBetter={r.hib} />
+              </div>
+              <strong>{r.curr}</strong>
+              <div className="source-compare-kpi-meta">
+                <small>Anterior {r.prev}</small>
+                <small className={improves === true ? "pos" : improves === false ? "neg" : undefined}>
+                  {r.abs}
+                </small>
+              </div>
+            </article>
+          );
+        })}
+      </section>
+
+      <section className="panel source-compare-block">
+        <article className="card">
+          <div className="source-compare-block-head">
+            <h3>Costayaco vs Vonú</h3>
+            <span className="muted">Energía del período</span>
+          </div>
+          <div className="source-compare-fields">
+            <div className="exec-kpi">
+              <span>Costayaco gas</span>
+              <strong>{kwh(cyc?.gasKwh ?? 0)}</strong>
+              <small>Diésel {kwh(cyc?.dieselKwh ?? 0)}</small>
+            </div>
+            <div className="exec-kpi">
+              <span>Vonú</span>
+              <strong>{kwh((vonu?.gasKwh ?? 0) + (vonu?.dieselKwh ?? 0))}</strong>
+              <small>Campo VONU</small>
+            </div>
+            <div className="exec-kpi">
+              <span>Total</span>
+              <strong>{kwh(snap.totalGenerationKwh)}</strong>
+              <small>
+                KPI fila {kpiRows.find((r) => r.month === month)?.generationMwh?.toFixed(1) ?? "—"} MWh
+              </small>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section className="panel source-compare-block">
+        <article className="card">
+          <div className="source-compare-block-head">
+            <h3>Detalle comparativo</h3>
+            <span className="muted">Actual · anterior · variación</span>
+          </div>
           <div className="table-scroll">
             <table>
               <thead>
@@ -148,9 +219,12 @@ export function SourceMonthCompare({ report, month, monthLabel }: Props) {
         </article>
       </section>
 
-      <section className="panel">
+      <section className="panel source-compare-block">
         <article className="card">
-          <h3>Unidades vs meta {pct(meta)} Conf.</h3>
+          <div className="source-compare-block-head">
+            <h3>Unidades vs meta {pct(meta)} Conf.</h3>
+            <span className="muted">Ordenadas por brecha vs meta</span>
+          </div>
           <div className="table-scroll">
             <table>
               <thead>
@@ -188,31 +262,6 @@ export function SourceMonthCompare({ report, month, monthLabel }: Props) {
                 )}
               </tbody>
             </table>
-          </div>
-        </article>
-      </section>
-
-      <section className="panel">
-        <article className="card">
-          <h3>Costayaco vs Vonú</h3>
-          <div className="exec-kpi-row">
-            <div className="exec-kpi">
-              <span>Costayaco gas</span>
-              <strong>{kwh(cyc?.gasKwh ?? 0)}</strong>
-              <small>Diésel {kwh(cyc?.dieselKwh ?? 0)}</small>
-            </div>
-            <div className="exec-kpi">
-              <span>Vonú</span>
-              <strong>{kwh((vonu?.gasKwh ?? 0) + (vonu?.dieselKwh ?? 0))}</strong>
-              <small>Campo VONU</small>
-            </div>
-            <div className="exec-kpi">
-              <span>Total</span>
-              <strong>{kwh(snap.totalGenerationKwh)}</strong>
-              <small>
-                KPI fila {kpiRows.find((r) => r.month === month)?.generationMwh?.toFixed(1) ?? "—"} MWh
-              </small>
-            </div>
           </div>
         </article>
       </section>
