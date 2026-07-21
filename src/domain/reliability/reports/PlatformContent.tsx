@@ -20,7 +20,7 @@ import { MonthlyReportDashboard } from "./MonthlyReportDashboard";
 import { DashboardMantenimiento, DashboardOverview } from "./DashboardViews";
 import { GenerationDashboard } from "./GenerationDashboard";
 import { CopowerCompanyView, GteCompanyView } from "./CompanyViews";
-import { FieldAssetsView } from "./FieldAssetsView";
+import { FieldAssetsView, FieldsOverviewView } from "./FieldAssetsView";
 import { fieldKeyFromLeaf } from "../contracts/fieldAssets";
 import { CopowerResumen } from "./CopowerResumen";
 import { GteResumen } from "./GteResumen";
@@ -297,13 +297,8 @@ function PlatformBody({
   }
 
   if (leafId.startsWith("cfg-campos-") || leafId === "cfg-campos") {
-    if (leafId === "cfg-campos") {
-      return (
-        <EmptyScreen
-          detail="Seleccione Costayaco o Vonú en Campos."
-          report="dual"
-        />
-      );
+    if (leafId === "cfg-campos" || leafId === "cfg-campos-resumen") {
+      return <FieldsOverviewView month={month} monthLabel={monthLabel} />;
     }
     const fieldKey = fieldKeyFromLeaf(leafId);
     if (fieldKey) {

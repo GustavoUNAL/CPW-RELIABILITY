@@ -198,12 +198,30 @@ function FieldHeroBanner({ field, monthLabel }: { field: FieldProfile; monthLabe
   );
 }
 
+function FleetTrioRow({ label, units, tone }: { label: string; units: FleetUnit[]; tone: "jinan" | "jenbacher" }) {
+  return (
+    <div className={`field-fleet-trio field-fleet-trio--${tone}`}>
+      <div className="field-fleet-trio-label">
+        <strong>{label}</strong>
+        <span>{units.length} máquinas</span>
+      </div>
+      <div className="field-fleet-trio-units">
+        {units.map((u) => (
+          <span key={u.id} className={`field-fleet-trio-chip field-fleet-trio-chip--${tone}`}>
+            {u.id}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function FleetPanel({ fleet, fieldKey }: { fleet: FleetUnit[]; fieldKey: FieldKey }) {
   const jinan = fleet.filter((u) => u.variant === "jinan");
   const jenbacher = fleet.filter((u) => u.variant === "jenbacher");
-  const jinanTrioLabel = jinan.length >= 3 ? jinan.slice(0, 3).map((u) => u.id).join(" · ") : "N/D";
   const jenA = jenbacher.slice(0, 3);
   const jenB = jenbacher.slice(3, 6);
+  const jinanKw = jinan.length * 500;
 
   return (
     <section className="field-fleet-panel">
@@ -219,14 +237,34 @@ function FleetPanel({ fleet, fieldKey }: { fleet: FleetUnit[]; fieldKey: FieldKe
               <span className="field-fleet-family-tag field-fleet-family-tag--jinan">Jinan</span>
               <span>
                 {jinan.length} × CPW500
-                {fieldKey === "vonu" ? " · Vonú" : ""}
+                {fieldKey === "vonu" ? " · Vonú" : " · Costayaco"}
               </span>
             </header>
-            <ul className="field-fleet-ref-list">
-              <li>Referencia: {jinanTrioLabel}</li>
-              <li>Potencia nominal: {(jinan.length * 500).toLocaleString("es-CO")} kW</li>
-              <li>Seguimiento: Disp · Conf · Fallas · MTBF</li>
-            </ul>
+
+            <FleetTrioRow
+              label={fieldKey === "vonu" ? "Trío Vonú" : "Trío de referencia"}
+              units={jinan.slice(0, 3)}
+              tone="jinan"
+            />
+
+            <div className="field-fleet-meta">
+              <article>
+                <span>Potencia nominal del trío</span>
+                <strong>{jinanKw.toLocaleString("es-CO")} kW</strong>
+                <small>500 kW por máquina</small>
+              </article>
+              <article>
+                <span>Seguimiento KPIs</span>
+                <div className="field-fleet-kpi-chips">
+                  <span>Disp</span>
+                  <span>Conf</span>
+                  <span>Fallas</span>
+                  <span>MTBF</span>
+                </div>
+                <small>Indicadores unitarios del mes</small>
+              </article>
+            </div>
+
             <div className="field-fleet-grid">
               {jinan.map((u) => (
                 <article key={u.id} className="field-fleet-unit field-fleet-unit--jinan">
@@ -238,17 +276,37 @@ function FleetPanel({ fleet, fieldKey }: { fleet: FleetUnit[]; fieldKey: FieldKe
             </div>
           </div>
         ) : null}
+
         {jenbacher.length > 0 ? (
           <div className="field-fleet-family field-fleet-family--wide">
             <header>
               <span className="field-fleet-family-tag field-fleet-family-tag--jenbacher">Jenbacher</span>
-              <span>{jenbacher.length} × J420 en operación</span>
+              <span>{jenbacher.length} × J420 · Costayaco</span>
             </header>
-            <ul className="field-fleet-ref-list">
-              <li>Trío A: {jenA.length ? jenA.map((u) => u.id).join(" · ") : "N/D"}</li>
-              {jenB.length ? <li>Trío B: {jenB.map((u) => u.id).join(" · ")}</li> : null}
-              <li>Indicadores por grupo de 3 máquinas</li>
-            </ul>
+
+            <div className="field-fleet-trios">
+              {jenA.length ? <FleetTrioRow label="Trío A" units={jenA} tone="jenbacher" /> : null}
+              {jenB.length ? <FleetTrioRow label="Trío B" units={jenB} tone="jenbacher" /> : null}
+            </div>
+
+            <div className="field-fleet-meta">
+              <article>
+                <span>Agrupación</span>
+                <strong>2 tríos × 3</strong>
+                <small>Lectura de indicadores por grupo de 3 máquinas</small>
+              </article>
+              <article>
+                <span>Seguimiento KPIs</span>
+                <div className="field-fleet-kpi-chips">
+                  <span>Disp</span>
+                  <span>Conf</span>
+                  <span>Fallas</span>
+                  <span>MTBF</span>
+                </div>
+                <small>Por unidad y por trío</small>
+              </article>
+            </div>
+
             <div className="field-fleet-grid field-fleet-grid--jenbacher">
               {jenbacher.map((u) => (
                 <article key={u.id} className="field-fleet-unit field-fleet-unit--jenbacher">
@@ -702,6 +760,156 @@ function FieldPage({
   );
 }
 
+function pickFieldOps(fieldKey: FieldKey, month: string) {
+  const cpw = getFieldOperational("copower", month, fieldKey);
+  const gte = getFieldOperational("gran_tierra", month, fieldKey);
+  return cpw.available ? cpw : gte;
+}
+
+function FieldsOverview({ month, monthLabel }: { month: string; monthLabel: string }) {
+  const keys: FieldKey[] = ["costayaco", "vonu"];
+  const rows = keys.map((key) => {
+    const profile = FIELD_PROFILES[key];
+    const ops = pickFieldOps(key, month);
+    const fleet = profile.fleet ?? [];
+    return {
+      key,
+      profile,
+      ops,
+      units: fleet.length,
+      jinan: fleet.filter((u) => u.variant === "jinan").length,
+      jenbacher: fleet.filter((u) => u.variant === "jenbacher").length,
+      gasCards: profile.groups.filter((g) => g.kind === "gas").reduce((n, g) => n + g.cards.length, 0),
+      dieselCards: profile.groups.filter((g) => g.kind === "diesel").reduce((n, g) => n + g.cards.length, 0),
+    };
+  });
+
+  const totalUnits = rows.reduce((s, r) => s + r.units, 0);
+  const totalFallas = rows.reduce((s, r) => s + r.ops.fallas, 0);
+  const totalGen = rows.reduce((s, r) => s + (r.ops.generationKwh ?? 0), 0);
+  const dispVals = rows.map((r) => r.ops.disp).filter((v): v is number => v != null);
+  const confVals = rows.map((r) => r.ops.conf).filter((v): v is number => v != null);
+  const avgDisp = dispVals.length ? dispVals.reduce((a, b) => a + b, 0) / dispVals.length : null;
+  const avgConf = confVals.length ? confVals.reduce((a, b) => a + b, 0) / confVals.length : null;
+
+  return (
+    <div className="field-overview">
+      <header className="field-overview-hero">
+        <div>
+          <p className="eyebrow">Campos · Bloque Chaza</p>
+          <h2>Resumen Costayaco + Vonú</h2>
+          <p className="muted">
+            Vista consolidada de ambos campos · {monthLabel} · activos contractuales y desempeño del periodo
+          </p>
+        </div>
+        <span className="badge info">2 campos</span>
+      </header>
+
+      <div className="field-overview-kpis">
+        <article>
+          <span>Unidades en flota</span>
+          <strong>{totalUnits}</strong>
+          <small>Costayaco {rows[0].units} · Vonú {rows[1].units}</small>
+        </article>
+        <article>
+          <span>Disponibilidad media</span>
+          <strong>{pct(avgDisp)}</strong>
+          <small>Meta ≥ 98%</small>
+        </article>
+        <article>
+          <span>Confiabilidad media</span>
+          <strong>{pct(avgConf)}</strong>
+          <small>Promedio de ambos campos</small>
+        </article>
+        <article>
+          <span>Generación</span>
+          <strong>{kwh(totalGen || null)}</strong>
+          <small>Suma del periodo</small>
+        </article>
+        <article className={totalFallas >= 3 ? "field-overview-kpi--warn" : undefined}>
+          <span>Fallas</span>
+          <strong>{totalFallas}</strong>
+          <small>Ambos campos</small>
+        </article>
+      </div>
+
+      <div className="field-overview-grid">
+        {rows.map((r) => (
+          <article key={r.key} className={`field-overview-card field-overview-card--${r.key}`}>
+            <header>
+              <div>
+                <span className="field-hero-role">{r.profile.hero?.role ?? "Campo"}</span>
+                <h3>{r.profile.label}</h3>
+                <p>
+                  <MapPin size={13} />
+                  {r.profile.hero?.location ?? "Bloque Chaza"}
+                </p>
+              </div>
+              <span className="badge">{r.units} ud.</span>
+            </header>
+
+            <p className="field-overview-desc">{r.profile.description}</p>
+
+            <div className="field-overview-stat-row">
+              {r.profile.stats.slice(0, 3).map((s) => (
+                <div key={s.label}>
+                  <span>{s.label}</span>
+                  <strong>{s.value}</strong>
+                </div>
+              ))}
+            </div>
+
+            <div className="field-overview-ops">
+              <div>
+                <span>Disp</span>
+                <strong>{pct(r.ops.disp)}</strong>
+              </div>
+              <div>
+                <span>Conf</span>
+                <strong>{pct(r.ops.conf)}</strong>
+              </div>
+              <div>
+                <span>Fallas</span>
+                <strong>{r.ops.fallas}</strong>
+              </div>
+              <div>
+                <span>Generación</span>
+                <strong>{kwh(r.ops.generationKwh)}</strong>
+              </div>
+            </div>
+
+            <div className="field-overview-tags">
+              {r.jinan > 0 ? <span>{r.jinan} Jinan</span> : null}
+              {r.jenbacher > 0 ? <span>{r.jenbacher} Jenbacher</span> : null}
+              {r.dieselCards > 0 ? <span>{r.dieselCards} respaldo diésel</span> : null}
+              <span>{r.profile.groups.length} secciones de activos</span>
+            </div>
+
+            {r.profile.hero?.orders?.length ? (
+              <div className="field-overview-orders">
+                {r.profile.hero.orders.map((o) => (
+                  <span key={o} className="field-order-badge">
+                    <FileText size={12} />
+                    Orden {o}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+          </article>
+        ))}
+      </div>
+
+      <aside className="field-overview-note">
+        <p>
+          <strong>Lectura conjunta:</strong> Costayaco concentra la generación MT (13,8 kV) y el respaldo diésel;
+          Vonú aporta 1,5 MW en BT (0,48 kV) dentro del mismo bloque sistémico de 8 MW. Use las hojas Costayaco / Vonú
+          para el detalle de activos y unidades.
+        </p>
+      </aside>
+    </div>
+  );
+}
+
 type Props = {
   fieldKey: FieldKey;
   month: string;
@@ -727,6 +935,19 @@ export function FieldAssetsView({ fieldKey, month, monthLabel }: Props) {
         <Cpu size={14} />
         Vista por campo · activos contractuales · desempeño consolidado del periodo seleccionado
       </p>
+    </ScreenShell>
+  );
+}
+
+export function FieldsOverviewView({ month, monthLabel }: { month: string; monthLabel: string }) {
+  return (
+    <ScreenShell
+      report="dual"
+      title="Resumen de campos"
+      subtitle={`Costayaco + Vonú · ${monthLabel}`}
+      headless
+    >
+      <FieldsOverview month={month} monthLabel={monthLabel} />
     </ScreenShell>
   );
 }

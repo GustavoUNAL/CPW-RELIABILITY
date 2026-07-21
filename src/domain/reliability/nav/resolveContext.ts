@@ -72,6 +72,7 @@ const GTE_LEAVES = new Set([
 const DUAL_LEAVES = new Set([
   "cfg-campos-costayaco",
   "cfg-campos-vonu",
+  "cfg-campos-resumen",
   "cfg-campos",
   "bd-ev-dual",
   "bd-historicos",
@@ -139,6 +140,7 @@ export const INTEGRATED_DUAL_LEAVES = new Set([
   "cq-auditoria",
   "cfg-campos-costayaco",
   "cfg-campos-vonu",
+  "cfg-campos-resumen",
   "cfg-campos",
   "rep-inf-resumen",
   "rep-inf-desempeno",

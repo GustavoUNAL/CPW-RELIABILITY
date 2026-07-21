@@ -36,6 +36,7 @@ export const PROJECT_NAV_TREE: NavModule[] = [
     label: "Campos",
     description: "Activos y operación por campo",
     children: [
+      { id: "cfg-campos-resumen", label: "Resumen" },
       { id: "cfg-campos-costayaco", label: "Costayaco" },
       { id: "cfg-campos-vonu", label: "Vonú" },
     ],
