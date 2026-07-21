@@ -152,3 +152,92 @@ export function monthlyStackedSeries(data = COPOWER_GENERATION_DASHBOARD) {
     return row;
   });
 }
+
+export type SectionIndicator = {
+  label: string;
+  value: string;
+  hint?: string;
+};
+
+export function monthlySectionIndicators(data = COPOWER_GENERATION_DASHBOARD): SectionIndicator[] {
+  const monthTotals = GENERATION_MONTH_KEYS.map((month, i) => {
+    const total = GENERATION_EQUIPMENT_ORDER.reduce(
+      (s, eq) => s + (data.mensual_equipo[eq]?.[month] ?? 0),
+      0,
+    );
+    return { key: month, label: GENERATION_MONTH_LABELS[i], total };
+  });
+  const ytd = monthTotals.reduce((s, m) => s + m.total, 0);
+  const peak = monthTotals.reduce((best, m) => (m.total > best.total ? m : best), monthTotals[0]);
+  const low = monthTotals.reduce((worst, m) => (m.total < worst.total ? m : worst), monthTotals[0]);
+  const topEq = sortedEquipmentByMwh(data)[0];
+  const topMwh = topEq ? data.equipos[topEq].mwh : 0;
+  const avgMonth = ytd / Math.max(1, monthTotals.length);
+
+  return [
+    { label: "MWh acumulados YTD", value: ytd.toLocaleString("es-CO", { maximumFractionDigits: 0 }), hint: "Suma Ene–Jul" },
+    { label: "Mejor mes", value: `${peak.label}`, hint: `${peak.total.toLocaleString("es-CO", { maximumFractionDigits: 0 })} MWh` },
+    { label: "Mes más bajo", value: `${low.label}`, hint: `${low.total.toLocaleString("es-CO", { maximumFractionDigits: 0 })} MWh` },
+    { label: "Promedio mensual", value: `${avgMonth.toFixed(0)} MWh`, hint: `${monthTotals.length} cortes` },
+    {
+      label: "Equipo líder",
+      value: topEq ?? "N/D",
+      hint: topEq ? `${topMwh.toLocaleString("es-CO", { maximumFractionDigits: 0 })} MWh · ${((100 * topMwh) / ytd).toFixed(1)}% flota` : undefined,
+    },
+    {
+      label: "Equipos activos",
+      value: String(GENERATION_EQUIPMENT_ORDER.length),
+      hint: GENERATION_DASHBOARD_META.equipmentNote,
+    },
+  ];
+}
+
+export function utilizationSectionIndicators(data = COPOWER_GENERATION_DASHBOARD): SectionIndicator[] {
+  const order = GENERATION_EQUIPMENT_ORDER;
+  const rows = order.map((eq) => ({ eq, disp: data.equipos[eq].disp, util: data.equipos[eq].util }));
+  const avgDisp = rows.reduce((s, r) => s + r.disp, 0) / rows.length;
+  const avgUtil = rows.reduce((s, r) => s + r.util, 0) / rows.length;
+  const bestDisp = rows.reduce((b, r) => (r.disp > b.disp ? r : b), rows[0]);
+  const worstDisp = rows.reduce((w, r) => (r.disp < w.disp ? r : w), rows[0]);
+  const below98 = rows.filter((r) => r.disp < 98).length;
+  const bestUtil = rows.reduce((b, r) => (r.util > b.util ? r : b), rows[0]);
+
+  return [
+    { label: "Disp. media flota", value: `${avgDisp.toFixed(1)}%`, hint: "Meta ≥ 98%" },
+    { label: "Util. media flota", value: `${avgUtil.toFixed(1)}%`, hint: "Horas OP / calendario" },
+    { label: "Brecha Disp−Util", value: `${(avgDisp - avgUtil).toFixed(1)} pp`, hint: "Standby / no despacho" },
+    { label: "Mejor disponibilidad", value: bestDisp.eq, hint: `${bestDisp.disp.toFixed(1)}%` },
+    { label: "Menor disponibilidad", value: worstDisp.eq, hint: `${worstDisp.disp.toFixed(1)}%` },
+    {
+      label: "Equipos < 98% Disp",
+      value: String(below98),
+      hint: bestUtil ? `Mayor util: ${bestUtil.eq} (${bestUtil.util.toFixed(1)}%)` : undefined,
+    },
+  ];
+}
+
+export function hoursSectionIndicators(data = COPOWER_GENERATION_DASHBOARD): SectionIndicator[] {
+  const order = GENERATION_EQUIPMENT_ORDER;
+  const sum = (key: keyof GenerationEquipmentRow) =>
+    order.reduce((s, eq) => s + Number(data.equipos[eq][key] ?? 0), 0);
+  const op = sum("op");
+  const sb = sum("sb");
+  const mto = sum("mto");
+  const fs = sum("fs");
+  const pe = sum("pe");
+  const tr = sum("tr");
+  const total = op + sb + mto + fs + pe + tr;
+  const available = op + sb;
+  const mostFs = order
+    .map((eq) => ({ eq, fs: data.equipos[eq].fs }))
+    .sort((a, b) => b.fs - a.fs)[0];
+
+  return [
+    { label: "Horas operación", value: op.toLocaleString("es-CO", { maximumFractionDigits: 0 }), hint: total ? `${((100 * op) / total).toFixed(1)}% del mix` : undefined },
+    { label: "Horas standby", value: sb.toLocaleString("es-CO", { maximumFractionDigits: 0 }), hint: total ? `${((100 * sb) / total).toFixed(1)}% del mix` : undefined },
+    { label: "Disponibles (OP+SB)", value: available.toLocaleString("es-CO", { maximumFractionDigits: 0 }), hint: "Capacidad lista" },
+    { label: "Horas MTO", value: mto.toLocaleString("es-CO", { maximumFractionDigits: 0 }), hint: "Preventivo / programado" },
+    { label: "Horas FS", value: fs.toLocaleString("es-CO", { maximumFractionDigits: 0 }), hint: mostFs ? `Máx: ${mostFs.eq} (${mostFs.fs.toLocaleString("es-CO")} h)` : undefined },
+    { label: "PE + Traslado", value: (pe + tr).toLocaleString("es-CO", { maximumFractionDigits: 0 }), hint: `PE ${pe.toLocaleString("es-CO")} · TR ${tr.toLocaleString("es-CO")}` },
+  ];
+}

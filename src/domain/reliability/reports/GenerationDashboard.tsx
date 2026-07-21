@@ -25,8 +25,12 @@ import {
   dailyFleetStats,
   dailyFleetWindow,
   generationDashboardKpis,
+  hoursSectionIndicators,
+  monthlySectionIndicators,
   monthlyStackedSeries,
   sortedEquipmentByMwh,
+  utilizationSectionIndicators,
+  type SectionIndicator,
 } from "./copowerGenerationDashboard2026";
 
 const SECTION_TITLES: Record<GenerationSection, string> = {
@@ -88,6 +92,20 @@ function ChartPanel({ title, children, wide }: { title: string; children: ReactN
       <h4>{title}</h4>
       <div className="chart-container gen-chart">{children}</div>
     </article>
+  );
+}
+
+function SectionIndicators({ items }: { items: SectionIndicator[] }) {
+  return (
+    <div className="gen-section-indicators">
+      {items.map((item) => (
+        <article key={item.label} className="gen-section-indicator">
+          <span>{item.label}</span>
+          <strong>{item.value}</strong>
+          {item.hint ? <small>{item.hint}</small> : null}
+        </article>
+      ))}
+    </div>
   );
 }
 
@@ -255,8 +273,11 @@ export function GenerationDashboard({ section = "dashboard" }: Props) {
   const kwRows = sorted.map((eq) => ({ equipo: eq, kw: data.equipos[eq].kw_op }));
 
   const showAll = section === "dashboard";
-  const showKpi = showAll || section === "diaria" || section === "utilizacion";
+  const showKpi = showAll || section === "diaria";
   const showNotes = showAll;
+  const monthlyIndicators = useMemo(() => monthlySectionIndicators(data), [data]);
+  const utilIndicators = useMemo(() => utilizationSectionIndicators(data), [data]);
+  const hoursIndicators = useMemo(() => hoursSectionIndicators(data), [data]);
 
   return (
     <div className="gen-dashboard exec-dashboard">
@@ -305,20 +326,23 @@ export function GenerationDashboard({ section = "dashboard" }: Props) {
           ))}
 
         {(showAll || section === "mensual") && (
-          <ChartPanel title="Generación mensual por equipo (MWh)" wide>
-            <ResponsiveContainer width="100%" height={320}>
-              <BarChart data={monthly} margin={{ top: 8, right: 8, left: 0, bottom: 4 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
-                <XAxis dataKey="month" tick={{ fontSize: 10 }} />
-                <YAxis tick={{ fontSize: 10 }} width={44} />
-                <Tooltip formatter={(v) => [`${fmtTooltip(v, "")} MWh`, ""]} />
-                <Legend wrapperStyle={{ fontSize: 10 }} />
-                {GENERATION_EQUIPMENT_ORDER.map((eq, i) => (
-                  <Bar key={eq} dataKey={eq} stackId="m" fill={GENERATION_PALETTE[i % GENERATION_PALETTE.length]} />
-                ))}
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartPanel>
+          <>
+            <ChartPanel title="Generación mensual por equipo (MWh)" wide>
+              <ResponsiveContainer width="100%" height={320}>
+                <BarChart data={monthly} margin={{ top: 8, right: 8, left: 0, bottom: 4 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
+                  <XAxis dataKey="month" tick={{ fontSize: 10 }} />
+                  <YAxis tick={{ fontSize: 10 }} width={44} />
+                  <Tooltip formatter={(v) => [`${fmtTooltip(v, "")} MWh`, ""]} />
+                  <Legend wrapperStyle={{ fontSize: 10 }} />
+                  {GENERATION_EQUIPMENT_ORDER.map((eq, i) => (
+                    <Bar key={eq} dataKey={eq} stackId="m" fill={GENERATION_PALETTE[i % GENERATION_PALETTE.length]} />
+                  ))}
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartPanel>
+            {(section === "mensual" || showAll) && <SectionIndicators items={monthlyIndicators} />}
+          </>
         )}
 
         {(showAll || section === "equipos") && (
@@ -359,39 +383,45 @@ export function GenerationDashboard({ section = "dashboard" }: Props) {
         )}
 
         {(showAll || section === "utilizacion") && (
-          <ChartPanel title="Disponibilidad y utilización (%)" wide={section === "utilizacion"}>
-            <ResponsiveContainer width="100%" height={280}>
-              <BarChart data={dispRows} layout="vertical" margin={{ top: 4, right: 12, left: 4, bottom: 4 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" horizontal={false} />
-                <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10 }} />
-                <YAxis type="category" dataKey="equipo" tick={{ fontSize: 9 }} width={72} />
-                <Tooltip formatter={(v) => [`${fmtTooltip(v, "%")}`, ""]} />
-                <Legend wrapperStyle={{ fontSize: 10 }} />
-                <Bar dataKey="disp" name="Disponibilidad" fill="#0e6e8c" radius={[0, 2, 2, 0]} />
-                <Bar dataKey="util" name="Utilización" fill="#f39c12" radius={[0, 2, 2, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartPanel>
+          <>
+            <ChartPanel title="Disponibilidad y utilización (%)" wide={section === "utilizacion" || showAll}>
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart data={dispRows} layout="vertical" margin={{ top: 4, right: 12, left: 4, bottom: 4 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" horizontal={false} />
+                  <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10 }} />
+                  <YAxis type="category" dataKey="equipo" tick={{ fontSize: 9 }} width={72} />
+                  <Tooltip formatter={(v) => [`${fmtTooltip(v, "%")}`, ""]} />
+                  <Legend wrapperStyle={{ fontSize: 10 }} />
+                  <Bar dataKey="disp" name="Disponibilidad" fill="#0e6e8c" radius={[0, 2, 2, 0]} />
+                  <Bar dataKey="util" name="Utilización" fill="#f39c12" radius={[0, 2, 2, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartPanel>
+            {(section === "utilizacion" || showAll) && <SectionIndicators items={utilIndicators} />}
+          </>
         )}
 
         {(showAll || section === "horas") && (
-          <ChartPanel title="Horas por estado" wide={section === "horas"}>
-            <ResponsiveContainer width="100%" height={280}>
-              <BarChart data={stateRows} layout="vertical" margin={{ top: 4, right: 12, left: 4, bottom: 4 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" horizontal={false} />
-                <XAxis type="number" tick={{ fontSize: 10 }} />
-                <YAxis type="category" dataKey="equipo" tick={{ fontSize: 9 }} width={72} />
-                <Tooltip />
-                <Legend wrapperStyle={{ fontSize: 10 }} />
-                <Bar dataKey="op" name="Operación" stackId="h" fill="#27ae60" />
-                <Bar dataKey="sb" name="Standby" stackId="h" fill="#2980b9" />
-                <Bar dataKey="mto" name="Mantenimiento" stackId="h" fill="#f39c12" />
-                <Bar dataKey="fs" name="Fuera de servicio" stackId="h" fill="#c0392b" />
-                <Bar dataKey="pe" name="PE" stackId="h" fill="#8e44ad" />
-                <Bar dataKey="tr" name="Traslado" stackId="h" fill="#7f8c8d" />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartPanel>
+          <>
+            <ChartPanel title="Horas por estado" wide={section === "horas" || showAll}>
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart data={stateRows} layout="vertical" margin={{ top: 4, right: 12, left: 4, bottom: 4 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" horizontal={false} />
+                  <XAxis type="number" tick={{ fontSize: 10 }} />
+                  <YAxis type="category" dataKey="equipo" tick={{ fontSize: 9 }} width={72} />
+                  <Tooltip />
+                  <Legend wrapperStyle={{ fontSize: 10 }} />
+                  <Bar dataKey="op" name="Operación" stackId="h" fill="#27ae60" />
+                  <Bar dataKey="sb" name="Standby" stackId="h" fill="#2980b9" />
+                  <Bar dataKey="mto" name="Mantenimiento" stackId="h" fill="#f39c12" />
+                  <Bar dataKey="fs" name="Fuera de servicio" stackId="h" fill="#c0392b" />
+                  <Bar dataKey="pe" name="PE" stackId="h" fill="#8e44ad" />
+                  <Bar dataKey="tr" name="Traslado" stackId="h" fill="#7f8c8d" />
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartPanel>
+            {(section === "horas" || showAll) && <SectionIndicators items={hoursIndicators} />}
+          </>
         )}
 
         {(showAll || section === "equipos") && (
