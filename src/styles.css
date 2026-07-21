@@ -2525,19 +2525,20 @@ tr.row-focal td {
 .field-view {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 1rem;
 }
 
-.field-view--costayaco {
-  gap: 0.65rem;
+.field-view--costayaco,
+.field-view--vonu {
+  gap: 1.1rem;
 }
 
 .field-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-  gap: 1.1rem;
-  padding: 1.25rem 1.3rem;
-  border-radius: 16px;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 1.15rem;
+  padding: 1.35rem 1.4rem;
+  border-radius: 18px;
   border: 1px solid color-mix(in oklab, var(--accent) 28%, var(--border));
   background:
     radial-gradient(circle at 100% 0%, color-mix(in oklab, var(--accent) 18%, transparent), transparent 55%),
@@ -2562,13 +2563,125 @@ tr.row-focal td {
   margin-bottom: 0.35rem;
 }
 
+.field-hero-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.field-hero-desc {
+  margin: 0 0 0.85rem;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+  max-width: 38rem;
+}
+
 .field-hero-location {
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  margin: 0 0 0.75rem;
+  margin: 0 0 0.45rem;
   font-size: 0.92rem;
   color: var(--text-muted);
+}
+
+.field-period-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.28rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text-muted);
+}
+
+.field-fleet-layout--single {
+  grid-template-columns: 1fr;
+}
+
+.field-contract-block {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.field-live-block-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0.35rem 0 0.65rem;
+}
+
+.field-live-block-head h4 {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.field-meter {
+  position: relative;
+  height: 0.38rem;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--border) 80%, var(--panel));
+  overflow: hidden;
+  margin-top: 0.35rem;
+}
+
+.field-meter--empty {
+  opacity: 0.45;
+}
+
+.field-meter-fill {
+  height: 100%;
+  border-radius: inherit;
+}
+
+.field-meter-fill--ok {
+  background: #16a34a;
+}
+
+.field-meter-fill--warn {
+  background: #d97706;
+}
+
+.field-meter-fill--bad {
+  background: #dc2626;
+}
+
+.field-meter-mark {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 2px;
+  background: color-mix(in oklab, var(--text) 55%, transparent);
+  transform: translateX(-50%);
+}
+
+.field-live-meters {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0.55rem 0 0.65rem;
+}
+
+.field-live-meter-labels {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.field-live-meter-labels strong {
+  color: var(--text);
+  font-size: 0.78rem;
+}
+
+.field-live-unit--risk-low {
+  border-color: color-mix(in oklab, #16a34a 28%, var(--border));
 }
 
 .field-hero-badges {
@@ -3200,38 +3313,39 @@ tr.row-focal td {
 
 .field-live-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
-  gap: 0.65rem;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 0.75rem;
   margin-top: 0.15rem;
 }
 
 .field-live-unit {
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
-  padding: 0.8rem 0.85rem;
-  border-radius: 12px;
+  gap: 0.45rem;
+  padding: 0.9rem 0.95rem;
+  border-radius: 14px;
   border: 1px solid var(--border);
-  background: var(--panel-soft);
-  min-height: 8.2rem;
+  background: var(--panel);
+  min-height: 11rem;
+  box-shadow: 0 1px 0 color-mix(in oklab, var(--text) 4%, transparent);
 }
 
 .field-live-unit-head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 0.4rem;
 }
 
 .field-live-unit-head strong {
-  font-size: 0.92rem;
+  font-size: 1rem;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
 }
 
 .field-live-metrics {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.35rem;
 }
 
@@ -3408,6 +3522,127 @@ tr.row-focal td {
 
 .gen-chart .recharts-responsive-container {
   min-height: 240px;
+}
+
+.gen-day-filter {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--panel-soft);
+}
+
+.gen-day-filter-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--text-muted);
+}
+
+.gen-day-filter-main label {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.gen-day-filter-main input[type="date"],
+.gen-day-filter-main select {
+  min-width: 11rem;
+  padding: 0.4rem 0.55rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  font-size: 0.85rem;
+}
+
+.gen-day-filter-actions {
+  font-size: 0.8rem;
+}
+
+.gen-day-clear {
+  border: 1px solid color-mix(in oklab, var(--accent) 35%, var(--border));
+  background: color-mix(in oklab, var(--accent) 10%, var(--panel));
+  color: var(--text);
+  border-radius: 8px;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.gen-day-clear:hover {
+  border-color: var(--accent);
+}
+
+.gen-day-detail {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(12rem, 0.9fr) minmax(0, 1.6fr);
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border-radius: 14px;
+  border: 1px solid color-mix(in oklab, #e67e22 35%, var(--border));
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in oklab, #e67e22 14%, transparent), transparent 50%),
+    var(--panel-soft);
+}
+
+.gen-day-detail h3 {
+  margin: 0.15rem 0 0.25rem;
+  font-size: 1.15rem;
+  text-transform: capitalize;
+}
+
+.gen-day-detail-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.gen-day-detail-kpis article {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.65rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+}
+
+.gen-day-detail-kpis span {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.gen-day-detail-kpis strong {
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.gen-day-detail-kpis strong.pos {
+  color: #16a34a;
+}
+
+.gen-day-detail-kpis strong.neg {
+  color: #dc2626;
+}
+
+.gen-day-detail-kpis small {
+  font-size: 0.68rem;
+  color: var(--text-muted);
 }
 
 .gen-table-wrap {
@@ -4896,6 +5131,14 @@ tr.row-focal td {
 @media (max-width: 960px) {
   .gen-chart-grid {
     grid-template-columns: 1fr;
+  }
+
+  .gen-day-detail {
+    grid-template-columns: 1fr;
+  }
+
+  .gen-day-detail-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .event-insights-grid {

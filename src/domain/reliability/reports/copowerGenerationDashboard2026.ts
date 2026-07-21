@@ -99,7 +99,13 @@ export function sortedEquipmentByMwh(data = COPOWER_GENERATION_DASHBOARD) {
   return [...GENERATION_EQUIPMENT_ORDER].sort((a, b) => data.equipos[b].mwh - data.equipos[a].mwh);
 }
 
-export function dailyFleetSeries(data = COPOWER_GENERATION_DASHBOARD) {
+export type DailyFleetPoint = {
+  date: string;
+  label: string;
+  mwh: number;
+};
+
+export function dailyFleetSeries(data = COPOWER_GENERATION_DASHBOARD): DailyFleetPoint[] {
   return Object.entries(data.diario_flota)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([date, mwh]) => ({
@@ -107,6 +113,32 @@ export function dailyFleetSeries(data = COPOWER_GENERATION_DASHBOARD) {
       label: date.slice(5),
       mwh,
     }));
+}
+
+/** Ventana de contexto (±días) alrededor de una fecha para la tendencia diaria. */
+export function dailyFleetWindow(
+  series: DailyFleetPoint[],
+  selectedDate: string,
+  radius = 7,
+): DailyFleetPoint[] {
+  const idx = series.findIndex((d) => d.date === selectedDate);
+  if (idx < 0) return series;
+  return series.slice(Math.max(0, idx - radius), Math.min(series.length, idx + radius + 1));
+}
+
+export function dailyFleetStats(series: DailyFleetPoint[], selectedDate?: string | null) {
+  const avg = series.length ? series.reduce((s, d) => s + d.mwh, 0) / series.length : 0;
+  const selected = selectedDate ? series.find((d) => d.date === selectedDate) : null;
+  const peak = series.reduce(
+    (best, d) => (d.mwh > best.mwh ? d : best),
+    series[0] ?? { date: "", label: "", mwh: 0 },
+  );
+  return {
+    avg,
+    selected,
+    peak,
+    deltaVsAvg: selected ? selected.mwh - avg : null,
+  };
 }
 
 export function monthlyStackedSeries(data = COPOWER_GENERATION_DASHBOARD) {

@@ -1,4 +1,4 @@
-import { useMemo, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import {
   Bar,
   BarChart,
@@ -7,12 +7,14 @@ import {
   Legend,
   Line,
   LineChart,
+  ReferenceDot,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
-import { Zap } from "lucide-react";
+import { CalendarDays, Zap } from "lucide-react";
 import type { GenerationSection } from "../nav/resolveContext";
 import {
   COPOWER_GENERATION_DASHBOARD,
@@ -20,6 +22,8 @@ import {
   GENERATION_EQUIPMENT_ORDER,
   GENERATION_PALETTE,
   dailyFleetSeries,
+  dailyFleetStats,
+  dailyFleetWindow,
   generationDashboardKpis,
   monthlyStackedSeries,
   sortedEquipmentByMwh,
@@ -41,6 +45,17 @@ const fmtTooltip = (v: unknown, suffix = "") => {
   const n = typeof v === "number" ? v : Number(v);
   if (Number.isNaN(n)) return "N/D";
   return suffix ? `${n.toFixed(suffix.includes("%") ? 1 : 2)}${suffix}` : fmt(n, 1);
+};
+
+const fmtDateEs = (iso: string) => {
+  const [y, m, d] = iso.split("-").map(Number);
+  if (!y || !m || !d) return iso;
+  return new Date(y, m - 1, d).toLocaleDateString("es-CO", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 };
 
 function KpiStrip({ compact }: { compact?: boolean }) {
@@ -76,6 +91,147 @@ function ChartPanel({ title, children, wide }: { title: string; children: ReactN
   );
 }
 
+function DailyTrendSection() {
+  const data = COPOWER_GENERATION_DASHBOARD;
+  const daily = useMemo(() => dailyFleetSeries(data), [data]);
+  const minDate = daily[0]?.date ?? "2026-01-01";
+  const maxDate = daily[daily.length - 1]?.date ?? "2026-07-18";
+  const [selectedDay, setSelectedDay] = useState<string>("");
+
+  const stats = useMemo(() => dailyFleetStats(daily, selectedDay || null), [daily, selectedDay]);
+  const chartData = useMemo(
+    () => (selectedDay ? dailyFleetWindow(daily, selectedDay, 10) : daily),
+    [daily, selectedDay],
+  );
+
+  const dayExists = Boolean(selectedDay && stats.selected);
+
+  return (
+    <>
+      <div className="gen-day-filter">
+        <div className="gen-day-filter-main">
+          <CalendarDays size={16} />
+          <label htmlFor="gen-day-picker">
+            Filtrar por día
+            <input
+              id="gen-day-picker"
+              type="date"
+              min={minDate}
+              max={maxDate}
+              value={selectedDay}
+              onChange={(e) => setSelectedDay(e.target.value)}
+            />
+          </label>
+          <select
+            aria-label="Seleccionar día de la serie"
+            value={selectedDay}
+            onChange={(e) => setSelectedDay(e.target.value)}
+          >
+            <option value="">Todo el período ({daily.length} días)</option>
+            {daily.map((d) => (
+              <option key={d.date} value={d.date}>
+                {d.date} · {fmt(d.mwh, 1)} MWh
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="gen-day-filter-actions">
+          {selectedDay ? (
+            <button type="button" className="gen-day-clear" onClick={() => setSelectedDay("")}>
+              Ver todos los días
+            </button>
+          ) : (
+            <span className="muted">Elija una fecha para ver el detalle de un solo día</span>
+          )}
+        </div>
+      </div>
+
+      {dayExists && stats.selected ? (
+        <div className="gen-day-detail">
+          <div>
+            <p className="eyebrow">Día seleccionado</p>
+            <h3>{fmtDateEs(stats.selected.date)}</h3>
+            <p className="muted">Flota Costayaco / Vonú · generación neta del día</p>
+          </div>
+          <div className="gen-day-detail-kpis">
+            <article>
+              <span>MWh del día</span>
+              <strong>{fmt(stats.selected.mwh, 1)}</strong>
+            </article>
+            <article>
+              <span>vs promedio período</span>
+              <strong className={stats.deltaVsAvg != null && stats.deltaVsAvg >= 0 ? "pos" : "neg"}>
+                {stats.deltaVsAvg == null
+                  ? "N/D"
+                  : `${stats.deltaVsAvg >= 0 ? "+" : ""}${stats.deltaVsAvg.toFixed(1)} MWh`}
+              </strong>
+              <small>Promedio {fmt(stats.avg, 1)} MWh/día</small>
+            </article>
+            <article>
+              <span>Pico del período</span>
+              <strong>{fmt(stats.peak.mwh, 1)}</strong>
+              <small>{stats.peak.date}</small>
+            </article>
+            <article>
+              <span>% del promedio</span>
+              <strong>{stats.avg > 0 ? `${((100 * stats.selected.mwh) / stats.avg).toFixed(0)}%` : "N/D"}</strong>
+              <small>100% = media YTD</small>
+            </article>
+          </div>
+        </div>
+      ) : null}
+
+      {!selectedDay || dayExists ? (
+        <ChartPanel
+          title={
+            selectedDay && stats.selected
+              ? `Contexto ±10 días alrededor de ${stats.selected.date}`
+              : "Generación diaria de la flota (MWh/día)"
+          }
+          wide
+        >
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={chartData} margin={{ top: 8, right: 12, left: 0, bottom: 4 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
+              <XAxis dataKey="label" tick={{ fontSize: 10 }} interval="preserveStartEnd" minTickGap={28} />
+              <YAxis
+                tick={{ fontSize: 10 }}
+                width={44}
+                label={{ value: "MWh/día", angle: -90, position: "insideLeft", fontSize: 10 }}
+              />
+              <Tooltip
+                formatter={(v) => [`${fmtTooltip(v)} MWh/día`, "Flota"]}
+                labelFormatter={(l) => `2026-${l}`}
+              />
+              <ReferenceLine
+                y={stats.avg}
+                stroke="#94a3b8"
+                strokeDasharray="4 4"
+                label={{ value: "Prom.", position: "insideTopRight", fontSize: 10, fill: "#94a3b8" }}
+              />
+              <Line type="monotone" dataKey="mwh" stroke="#0e6e8c" strokeWidth={1.6} dot={false} />
+              {stats.selected ? (
+                <ReferenceDot
+                  x={stats.selected.label}
+                  y={stats.selected.mwh}
+                  r={5}
+                  fill="#e67e22"
+                  stroke="#fff"
+                  strokeWidth={2}
+                />
+              ) : null}
+            </LineChart>
+          </ResponsiveContainer>
+        </ChartPanel>
+      ) : (
+        <p className="empty-state">
+          No hay registro de flota para {selectedDay}. Elija una fecha entre {minDate} y {maxDate}.
+        </p>
+      )}
+    </>
+  );
+}
+
 type Props = {
   section?: GenerationSection;
 };
@@ -84,7 +240,6 @@ export function GenerationDashboard({ section = "dashboard" }: Props) {
   const data = COPOWER_GENERATION_DASHBOARD;
   const kpis = useMemo(() => generationDashboardKpis(data), [data]);
   const sorted = useMemo(() => sortedEquipmentByMwh(data), [data]);
-  const daily = useMemo(() => dailyFleetSeries(data), [data]);
   const monthly = useMemo(() => monthlyStackedSeries(data), [data]);
 
   const energyRows = sorted.map((eq) => ({ equipo: eq, mwh: data.equipos[eq].mwh }));
@@ -125,26 +280,29 @@ export function GenerationDashboard({ section = "dashboard" }: Props) {
       {showKpi ? <KpiStrip compact={section !== "dashboard"} /> : null}
 
       <div className="gen-chart-grid">
-        {(showAll || section === "diaria") && (
-          <ChartPanel title="Generación diaria de la flota (MWh/día)" wide>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={daily} margin={{ top: 8, right: 12, left: 0, bottom: 4 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
-                <XAxis dataKey="label" tick={{ fontSize: 10 }} interval="preserveStartEnd" minTickGap={28} />
-                <YAxis
-                  tick={{ fontSize: 10 }}
-                  width={44}
-                  label={{ value: "MWh/día", angle: -90, position: "insideLeft", fontSize: 10 }}
-                />
-                <Tooltip
-                  formatter={(v) => [`${fmtTooltip(v)} MWh/día`, "Flota"]}
-                  labelFormatter={(l) => `2026-${l}`}
-                />
-                <Line type="monotone" dataKey="mwh" stroke="#0e6e8c" strokeWidth={1.6} dot={false} />
-              </LineChart>
-            </ResponsiveContainer>
-          </ChartPanel>
-        )}
+        {(showAll || section === "diaria") &&
+          (section === "diaria" ? (
+            <DailyTrendSection />
+          ) : (
+            <ChartPanel title="Generación diaria de la flota (MWh/día)" wide>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={dailyFleetSeries(data)} margin={{ top: 8, right: 12, left: 0, bottom: 4 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
+                  <XAxis dataKey="label" tick={{ fontSize: 10 }} interval="preserveStartEnd" minTickGap={28} />
+                  <YAxis
+                    tick={{ fontSize: 10 }}
+                    width={44}
+                    label={{ value: "MWh/día", angle: -90, position: "insideLeft", fontSize: 10 }}
+                  />
+                  <Tooltip
+                    formatter={(v) => [`${fmtTooltip(v)} MWh/día`, "Flota"]}
+                    labelFormatter={(l) => `2026-${l}`}
+                  />
+                  <Line type="monotone" dataKey="mwh" stroke="#0e6e8c" strokeWidth={1.6} dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
+            </ChartPanel>
+          ))}
 
         {(showAll || section === "mensual") && (
           <ChartPanel title="Generación mensual por equipo (MWh)" wide>
