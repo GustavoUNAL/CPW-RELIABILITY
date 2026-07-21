@@ -157,19 +157,21 @@ export type EventRecord = {
 };
 
 export type PageKey =
-  | "resumen"
-  | "compromiso"
-  | "indicadores"
-  | "maquinas"
-  | "generacion"
-  | "desviaciones"
-  | "malos_actores"
-  | "causas_raiz"
-  | "mantenimiento"
-  | "riesgos"
-  | "acciones";
+  | "configuracion"
+  | "base_datos"
+  | "calidad_datos"
+  | "procesamiento"
+  | "kpis_copower"
+  | "kpis_gte"
+  | "comparacion"
+  | "analisis"
+  | "dashboard"
+  | "reportes";
 
 export type ReportKey = "gran_tierra" | "copower";
+
+/** Fuente activa en el menú unificado. `ambas` muestra GTE y COPOWER lado a lado. */
+export type SourceMode = ReportKey | "ambas";
 
 export type ReportDataset = {
   title: string;

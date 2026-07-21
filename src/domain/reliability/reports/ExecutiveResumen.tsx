@@ -55,7 +55,12 @@ function SourceTag({ children }: { children: ReactNode }) {
 
 type SortKey = keyof ExecUnitRow | "unidad";
 
-export function ExecutiveResumen() {
+type Props = {
+  /** Panel «1 · Cumplimiento / Alertas del periodo» — oculto en Base de Datos → Indicadores GTE. */
+  showAlerts?: boolean;
+};
+
+export function ExecutiveResumen({ showAlerts = true }: Props) {
   const [unitsOpen, setUnitsOpen] = useState(false);
   const [hoursOpen, setHoursOpen] = useState(false);
   const [sortKey, setSortKey] = useState<SortKey>("unidad");
@@ -139,27 +144,29 @@ export function ExecutiveResumen() {
       </header>
 
       {/* 1. Alertas */}
-      <section className="panel exec-alerts-panel">
-        <article className="card">
-          <p className="eyebrow">1 · Cumplimiento</p>
-          <h3>Alertas del periodo</h3>
-          <div className="exec-alert-grid">
-            {alerts.map((alert) => (
-              <div key={alert.title} className={`exec-alert ${alert.active ? "active" : "idle"}`}>
-                <div className="exec-alert-head">
-                  <ShieldAlert size={18} />
-                  <strong>{alert.title}</strong>
-                  <span className={`badge ${alert.active ? "danger" : "success"}`}>
-                    {alert.active ? "Atención" : "Conforme"}
-                  </span>
+      {showAlerts ? (
+        <section className="panel exec-alerts-panel">
+          <article className="card">
+            <p className="eyebrow">1 · Cumplimiento</p>
+            <h3>Alertas del periodo</h3>
+            <div className="exec-alert-grid">
+              {alerts.map((alert) => (
+                <div key={alert.title} className={`exec-alert ${alert.active ? "active" : "idle"}`}>
+                  <div className="exec-alert-head">
+                    <ShieldAlert size={18} />
+                    <strong>{alert.title}</strong>
+                    <span className={`badge ${alert.active ? "danger" : "success"}`}>
+                      {alert.active ? "Atención" : "Conforme"}
+                    </span>
+                  </div>
+                  <p>{alert.detail}</p>
                 </div>
-                <p>{alert.detail}</p>
-              </div>
-            ))}
-          </div>
-          <SourceTag>{EXEC_SOURCES.pdf} · evaluación vs meta Orden 1 ≥98%</SourceTag>
-        </article>
-      </section>
+              ))}
+            </div>
+            <SourceTag>{EXEC_SOURCES.pdf} · evaluación vs meta Orden 1 ≥98%</SourceTag>
+          </article>
+        </section>
+      ) : null}
 
       {/* 2. Cumplimiento */}
       <section className="panel">
