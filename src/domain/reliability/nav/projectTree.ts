@@ -59,26 +59,9 @@ export const PROJECT_NAV_TREE: NavModule[] = [
   {
     key: "operacion",
     label: "Operación",
-    description: "Registro diario, desglose de horas y datos faltantes",
+    description: "Registro diario y datos operativos COPOWER",
     children: [
-      {
-        id: "op-datos",
-        label: "Operación & datos",
-        children: [
-          { id: "bd-op-copower", label: "Registro diario COPOWER" },
-          {
-            id: "op-horas",
-            label: "Desglose de horas",
-            children: [
-              { id: "proc-op", label: "Operación" },
-              { id: "proc-disp", label: "Disponibles (OP+SB)" },
-              { id: "proc-fs", label: "Fuera de servicio" },
-              { id: "proc-mto", label: "Mantenimiento (PP)" },
-            ],
-          },
-        ],
-      },
-      { id: "cq-faltantes", label: "Datos faltantes" },
+      { id: "bd-op-copower", label: "Registro diario COPOWER" },
     ],
   },
   {

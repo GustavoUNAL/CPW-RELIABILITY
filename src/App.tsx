@@ -56,9 +56,6 @@ function App() {
     [DEFAULT_MODULE.key]: true,
   });
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
-    "op-datos": true,
-    "op-horas": true,
-    "op-calidad": true,
     "conf-kpis": true,
     "conf-copower": true,
     "conf-gte": true,
