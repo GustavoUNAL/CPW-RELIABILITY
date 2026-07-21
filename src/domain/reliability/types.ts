@@ -169,7 +169,7 @@ export type PageKey =
   | "riesgos"
   | "acciones";
 
-export type ReportKey = "gran_tierra" | "copower_interno";
+export type ReportKey = "gran_tierra" | "copower";
 
 export type ReportDataset = {
   title: string;

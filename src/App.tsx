@@ -32,6 +32,7 @@ import {
   YAxis,
 } from "recharts";
 import { ExecutiveResumen } from "./domain/reliability/reports/ExecutiveResumen";
+import { CopowerResumen } from "./domain/reliability/reports/CopowerResumen";
 import { REPORT_DATASETS } from "./domain/reliability/reports";
 import {
   GRAN_TIERRA_KPI_FROM_MONTHS,
@@ -40,6 +41,13 @@ import {
   granTierraMonthLabel,
   type GranTierraMonthKey,
 } from "./domain/reliability/reports/granTierraMonthly";
+import {
+  COPOWER_KPI_FROM_MONTHS,
+  COPOWER_MONTHLY_DATA,
+  COPOWER_MONTH_ORDER,
+  copowerMonthLabel,
+  type CopowerMonthKey,
+} from "./domain/reliability/reports/copowerMonthly";
 import {
   CONTRACTUAL_KPI_TARGETS,
   CONTRACT_CALC_BASE,
@@ -131,17 +139,17 @@ function App() {
   const [activeReport, setActiveReport] = useState<ReportKey>("gran_tierra");
   const [maintenanceByReport, setMaintenanceByReport] = useState<Record<ReportKey, MaintenanceRow[]>>({
     gran_tierra: REPORT_DATASETS.gran_tierra.maintenancePlan,
-    copower_interno: REPORT_DATASETS.copower_interno.maintenancePlan,
+    copower: REPORT_DATASETS.copower.maintenancePlan,
   });
   const [actionsByReport, setActionsByReport] = useState<Record<ReportKey, ActionRow[]>>({
     gran_tierra: REPORT_DATASETS.gran_tierra.actionPlan,
-    copower_interno: REPORT_DATASETS.copower_interno.actionPlan,
+    copower: REPORT_DATASETS.copower.actionPlan,
   });
   const [activePage, setActivePage] = useState<PageKey>("resumen");
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [onlyFailureEvents, setOnlyFailureEvents] = useState(false);
   const [selectedFailureEvent, setSelectedFailureEvent] = useState<EventRecord | null>(null);
-  const [selectedMonth, setSelectedMonth] = useState<GranTierraMonthKey>("Jun");
+  const [selectedMonth, setSelectedMonth] = useState<string>("Jun");
   const [selectedMachine, setSelectedMachine] = useState<AssessedMachineRow | null>(null);
   const [isReportTreeCollapsed, setIsReportTreeCollapsed] = useState(false);
   const [isCopowerTreeCollapsed, setIsCopowerTreeCollapsed] = useState(false);
@@ -158,21 +166,25 @@ function App() {
   useEffect(() => {
     setMaintenanceByReport({
       gran_tierra: REPORT_DATASETS.gran_tierra.maintenancePlan,
-      copower_interno: REPORT_DATASETS.copower_interno.maintenancePlan,
+      copower: REPORT_DATASETS.copower.maintenancePlan,
     });
     setActionsByReport({
       gran_tierra: REPORT_DATASETS.gran_tierra.actionPlan,
-      copower_interno: REPORT_DATASETS.copower_interno.actionPlan,
+      copower: REPORT_DATASETS.copower.actionPlan,
     });
   }, []);
 
   const reportData = REPORT_DATASETS[activeReport];
-  const monthOptions = activeReport === "gran_tierra" ? GRAN_TIERRA_MONTH_ORDER : ["Jun"];
-  const activeMonthData = activeReport === "gran_tierra" ? GRAN_TIERRA_MONTHLY_DATA[selectedMonth] : null;
-  const kpiData = activeReport === "gran_tierra" ? GRAN_TIERRA_KPI_FROM_MONTHS : reportData.kpiData;
+  const monthOptions =
+    activeReport === "gran_tierra" ? GRAN_TIERRA_MONTH_ORDER : COPOWER_MONTH_ORDER;
+  const activeMonthData =
+    activeReport === "gran_tierra"
+      ? GRAN_TIERRA_MONTHLY_DATA[selectedMonth as GranTierraMonthKey]
+      : COPOWER_MONTHLY_DATA[selectedMonth as CopowerMonthKey];
+  const kpiData = activeReport === "gran_tierra" ? GRAN_TIERRA_KPI_FROM_MONTHS : COPOWER_KPI_FROM_MONTHS;
   const targets = reportData.kpiTargets;
   /** Análisis narrativo (DOCX/PDF) solo existe para junio. */
-  const hasJuneAnalysis = selectedMonth === "Jun";
+  const hasJuneAnalysis = activeReport === "gran_tierra" && selectedMonth === "Jun";
   const badActors = hasJuneAnalysis ? reportData.badActors : [];
   const rcaData = reportData.rca;
   const maintenancePlan = maintenanceByReport[activeReport];
@@ -211,11 +223,18 @@ function App() {
   const monthIndex = kpiData.findIndex((row) => row.month === selectedMonth);
   const safeIndex = monthIndex >= 0 ? monthIndex : kpiData.length - 1;
   const current = kpiData[safeIndex];
-  const previous = kpiData[Math.max(0, safeIndex - 1)];
-  const monthLabel = activeMonthData?.label ?? granTierraMonthLabel(selectedMonth);
-  const previousMonthCode = activeReport === "gran_tierra" ? GRAN_TIERRA_MONTH_ORDER[Math.max(0, safeIndex - 1)] : null;
+  const monthLabel =
+    activeReport === "gran_tierra"
+      ? activeMonthData?.label ?? granTierraMonthLabel(selectedMonth as GranTierraMonthKey)
+      : activeMonthData?.label ?? copowerMonthLabel(selectedMonth as CopowerMonthKey);
+  const previousMonthCode =
+    activeReport === "gran_tierra"
+      ? GRAN_TIERRA_MONTH_ORDER[Math.max(0, safeIndex - 1)]
+      : COPOWER_MONTH_ORDER[Math.max(0, safeIndex - 1)];
   const indicatorsSourceNote =
-    selectedMonth === "Jun"
+    activeReport === "copower"
+      ? `Fuente: reporte diario COPOWER (Resumen OP / Eventos / Consumos). Periodo ${monthLabel}.`
+      : selectedMonth === "Jun"
       ? "Fuente: anexo PDF/DOCX junio (data/GTE/Junio). Cumplimiento de sistema vs ≥98% Orden 1."
       : selectedMonth === "May"
         ? "Fuente: SISTEMA N oficial citado en informe junio; unidades desde Excel Mayo (data/GTE/Mayo). Meta sistema ≥98% Orden 1."
@@ -681,8 +700,10 @@ function App() {
   ] as const;
 
   const previousMonthEventLog =
-    activeReport === "gran_tierra" && previousMonthCode
-      ? GRAN_TIERRA_MONTHLY_DATA[previousMonthCode].eventLog
+    previousMonthCode != null
+      ? activeReport === "gran_tierra"
+        ? GRAN_TIERRA_MONTHLY_DATA[previousMonthCode as GranTierraMonthKey].eventLog
+        : COPOWER_MONTHLY_DATA[previousMonthCode as CopowerMonthKey].eventLog
       : [];
   const eventStats = useMemo(() => {
     const byType = {
@@ -928,11 +949,13 @@ function App() {
             <select
               id="month-selector"
               value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value as GranTierraMonthKey)}
+              onChange={(e) => setSelectedMonth(e.target.value)}
             >
               {monthOptions.map((month) => (
                 <option key={month} value={month}>
-                  {granTierraMonthLabel(month as GranTierraMonthKey)}
+                  {activeReport === "gran_tierra"
+                    ? granTierraMonthLabel(month as GranTierraMonthKey)
+                    : copowerMonthLabel(month as CopowerMonthKey)}
                 </option>
               ))}
             </select>
@@ -970,7 +993,12 @@ function App() {
                       <button
                         key={`${report.key}-${item.key}`}
                         className={isActive ? "menu-item active" : "menu-item"}
-                        onClick={() => selectTreeNode(report.key, item.key)}
+                        onClick={() => {
+                          if (!GRAN_TIERRA_MONTH_ORDER.includes(selectedMonth as GranTierraMonthKey)) {
+                            setSelectedMonth("Jun");
+                          }
+                          selectTreeNode(report.key, item.key);
+                        }}
                         title={item.description}
                       >
                         <span>{item.icon}</span>
@@ -985,19 +1013,24 @@ function App() {
         <div className="tree-panel">
           <button className="tree-title-button" onClick={() => setIsCopowerTreeCollapsed((prev) => !prev)}>
             <span>{isCopowerTreeCollapsed ? "▶" : <ChevronDown size={14} />}</span>
-            <span>COPOWER interno</span>
+            <span>COPOWER</span>
           </button>
           {!isCopowerTreeCollapsed && (
-            <div className={activeReport === "copower_interno" ? "tree-group active" : "tree-group"}>
-              <p className="tree-title">Reporte interno</p>
+            <div className={activeReport === "copower" ? "tree-group active" : "tree-group"}>
+              <p className="tree-title">Operación diaria</p>
               <nav className="menu">
                 {NAV_ITEMS.map((item) => {
-                  const isActive = activeReport === "copower_interno" && activePage === item.key;
+                  const isActive = activeReport === "copower" && activePage === item.key;
                   return (
                     <button
-                      key={`copower_interno-${item.key}`}
+                      key={`copower-${item.key}`}
                       className={isActive ? "menu-item active" : "menu-item"}
-                      onClick={() => selectTreeNode("copower_interno", item.key)}
+                      onClick={() => {
+                        if (!COPOWER_MONTH_ORDER.includes(selectedMonth as CopowerMonthKey)) {
+                          setSelectedMonth("Jun");
+                        }
+                        selectTreeNode("copower", item.key);
+                      }}
                       title={item.description}
                     >
                       <span>{item.icon}</span>
@@ -1045,16 +1078,7 @@ function App() {
                 <ExecutiveResumen />
               </>
             ) : (
-              <section className="kpi-grid">
-                <KpiCard title="Disponib. Sist. COPOWER" reference="Sin datos internos cargados" icon={<Gauge size={18} />} value={percent(current.availability)} delta={(current.availability ?? 0) - (previous.availability ?? 0)} target="0.0%" deltaUnit="pp" />
-                <KpiCard title="Confiab. Sist. COPOWER" reference="Sin datos internos cargados" icon={<ShieldCheck size={18} />} value={percent(current.reliability)} delta={(current.reliability ?? 0) - (previous.reliability ?? 0)} target="0.0%" deltaUnit="pp" />
-                <KpiCard title="Eventos de falla" reference="Reporte interno pendiente" icon={<Wrench size={18} />} value={String(summary.copowerFailures)} delta={0} target="0" deltaUnit="count" />
-                <KpiCard title="Eventos Totales" reference="Reporte interno pendiente" icon={<Zap size={18} />} value={String(summary.totalEvents ?? 0)} delta={0} target="0" deltaUnit="count" />
-                <KpiCard title="MTBF" reference="Sin datos internos cargados" icon={<Gauge size={18} />} value={hours(summary.mtbfHours)} delta={0} target="0.00 h" deltaUnit="hours" />
-                <KpiCard title="MTTR" reference="Sin datos internos cargados" icon={<Wrench size={18} />} value={hours(summary.mttrHours)} delta={0} target="0.00 h" deltaUnit="hours" />
-                <KpiCard title="Energia Total" reference="Sin datos internos cargados" icon={<Zap size={18} />} value={kwh((current.generationMwh || 0) * 1000)} delta={0} target="0 kWh" deltaUnit="mwh" />
-                <KpiCard title="Acciones / RCA Pend." reference="Sin datos internos cargados" icon={<ClipboardList size={18} />} value={`${summary.actionsOverdue ?? 0} / ${summary.rcaPending ?? 0}`} delta={0} target="0 / 0" deltaUnit="count" />
-              </section>
+              <CopowerResumen month={selectedMonth as CopowerMonthKey} />
             )}
           </>
         )}
@@ -1557,7 +1581,11 @@ function App() {
           <section className="panel">
             <article className="card">
               <h3>Generación por equipo y total mensual — {monthLabel}</h3>
-              <p className="muted">Fuente: carpeta data/GTE (archivos de mayo y junio 2026).</p>
+              <p className="muted">
+                {activeReport === "copower"
+                  ? "Fuente: reporte diario COPOWER (Resumen OP). Energía por equipo del periodo seleccionado."
+                  : "Fuente: carpeta data/GTE (archivos de mayo y junio 2026)."}
+              </p>
               <div className="kpi-grid">
                 <KpiCard title="Total generado" reference="Suma de todos los equipos" icon={<Zap size={18} />} value={kwh(totalGenerationKwh)} delta={0} target="Total general Excel" deltaUnit="mwh" />
                 <KpiCard
