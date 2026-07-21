@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   AlertTriangle,
+  CalendarRange,
+  ClipboardCheck,
   ClipboardList,
   Database,
   FileText,
@@ -35,6 +37,8 @@ const MODULE_ICONS: Record<PageKey, ReactNode> = {
   comparacion: <GitCompare size={16} />,
   eventos: <AlertTriangle size={16} />,
   mantenimiento: <Wrench size={16} />,
+  acciones: <ClipboardCheck size={16} />,
+  planeacion: <CalendarRange size={16} />,
   confiabilidad: <Gauge size={16} />,
   operacion: <Database size={16} />,
   analisis: <Sparkles size={16} />,

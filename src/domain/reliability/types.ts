@@ -163,6 +163,8 @@ export type PageKey =
   | "comparacion"
   | "eventos"
   | "mantenimiento"
+  | "acciones"
+  | "planeacion"
   | "confiabilidad"
   | "operacion"
   | "analisis"

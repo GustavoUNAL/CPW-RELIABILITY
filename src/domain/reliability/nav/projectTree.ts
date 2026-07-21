@@ -82,6 +82,22 @@ export const PROJECT_NAV_TREE: NavModule[] = [
     ],
   },
   {
+    key: "acciones",
+    label: "Acciones CAPA",
+    description: "Gestor central de acciones correctivas, preventivas y de mejora",
+    children: [
+      { id: "capa-tablero", label: "Seguimiento de acciones" },
+    ],
+  },
+  {
+    key: "planeacion",
+    label: "Planeación operacional",
+    description: "Riesgos, prioridades y plan de acción del próximo período",
+    children: [
+      { id: "op-tablero", label: "Plan del próximo período" },
+    ],
+  },
+  {
     key: "reportes",
     label: "Reportes",
     description: "Salidas diarias, mensuales y exportables",

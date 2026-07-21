@@ -68,6 +68,8 @@ export const INTEGRATED_DUAL_LEAVES = new Set([
   "mto-dashboard",
   "mto-optimizacion",
   "mto-degradacion",
+  "capa-tablero",
+  "op-tablero",
   "cfg-campos-costayaco",
   "cfg-campos-vonu",
 ]);

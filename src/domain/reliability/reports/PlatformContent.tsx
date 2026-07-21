@@ -14,6 +14,8 @@ import { InterventionPlansDashboard } from "./InterventionPlansDashboard";
 import { RcaAnalysisDashboard } from "./RcaAnalysisDashboard";
 import { MaintenanceOptimizationDashboard } from "./MaintenanceOptimizationDashboard";
 import { DegradationRiskDashboard } from "./DegradationRiskDashboard";
+import { ActionTrackingDashboard } from "./ActionTrackingDashboard";
+import { OperationalPlanningDashboard } from "./OperationalPlanningDashboard";
 import { DashboardGerencia, DashboardMantenimiento, DashboardOverview } from "./DashboardViews";
 import { GenerationDashboard } from "./GenerationDashboard";
 import { CopowerCompanyView, GteCompanyView } from "./CompanyViews";
@@ -415,6 +417,20 @@ function PlatformBody({
       return <DashboardMantenimiento month={month} monthLabel={monthLabel} />;
     }
     return <EmptyScreen detail="Seleccione una opción de Mantenimiento." />;
+  }
+
+  if (page === "acciones") {
+    if (leafId === "capa-tablero") {
+      return <ActionTrackingDashboard monthLabel={monthLabel} />;
+    }
+    return <EmptyScreen detail="Seleccione una opción de Acciones CAPA." />;
+  }
+
+  if (page === "planeacion") {
+    if (leafId === "op-tablero") {
+      return <OperationalPlanningDashboard monthLabel={monthLabel} />;
+    }
+    return <EmptyScreen detail="Seleccione una opción de Planeación operacional." />;
   }
 
   if (page === "confiabilidad") {
