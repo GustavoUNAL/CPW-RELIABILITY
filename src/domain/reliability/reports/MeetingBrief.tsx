@@ -41,7 +41,7 @@ export function MeetingBrief({ month, monthLabel }: Props) {
       gap: kpi.reliability == null ? null : (kpi.reliability - meta) * 100,
     },
     {
-      name: "Fallas imputables",
+      name: "Fallas asociadas a COPOWER",
       value: snap.summary.copowerFailures,
       gap: null as number | null,
     },
@@ -110,7 +110,7 @@ export function MeetingBrief({ month, monthLabel }: Props) {
               <small>Meta 4,000,000 kWh</small>
             </div>
             <div className="exec-kpi">
-              <span>Fallas imputables</span>
+              <span>Fallas asociadas a COPOWER</span>
               <strong>{snap.summary.copowerFailures}</strong>
               <small>
                 MTBF {snap.summary.mtbfHours ?? "N/D"} h · MTTR {snap.summary.mttrHours ?? "N/D"} h
@@ -139,7 +139,7 @@ export function MeetingBrief({ month, monthLabel }: Props) {
         <article className="card">
           <h3>3 · Principal activo crítico</h3>
           {!badActor ? (
-            <p className="empty-state">Sin unidades con fallas imputables en el mes.</p>
+            <p className="empty-state">Sin unidades con fallas asociadas a COPOWER en el mes.</p>
           ) : (
             <p>
               <strong>{badActor.unidad}</strong> · {badActor.fallas} falla(s) · MTBF {badActor.mtbfLabel}

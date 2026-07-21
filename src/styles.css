@@ -2545,6 +2545,13 @@ tr.row-focal td {
   margin-bottom: 0.1rem;
 }
 
+.field-hero--vonu {
+  border-color: color-mix(in oklab, var(--accent-2) 34%, var(--border));
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in oklab, var(--accent-2) 18%, transparent), transparent 55%),
+    linear-gradient(135deg, color-mix(in oklab, var(--accent-2) 10%, var(--panel-soft)), var(--panel-soft));
+}
+
 .field-hero-role {
   display: inline-block;
   font-size: 0.68rem;
@@ -2658,6 +2665,23 @@ tr.row-focal td {
   gap: 0.5rem;
   margin-bottom: 0.65rem;
   font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+.field-fleet-ref {
+  margin: 0 0 0.55rem;
+  font-size: 0.7rem;
+  line-height: 1.35;
+  color: var(--text-muted);
+}
+
+.field-fleet-ref-list {
+  margin: 0 0 0.6rem;
+  padding-left: 1rem;
+  display: grid;
+  gap: 0.16rem;
+  font-size: 0.68rem;
+  line-height: 1.35;
   color: var(--text-muted);
 }
 
@@ -3029,6 +3053,41 @@ tr.row-focal td {
   margin: 0.35rem 0 0.15rem;
 }
 
+.field-source-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem;
+  margin-bottom: 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--panel-soft);
+}
+
+.field-source-chip {
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 999px;
+  padding: 0.32rem 0.72rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.field-source-chip:hover {
+  background: color-mix(in oklab, var(--accent) 8%, transparent);
+  color: var(--text);
+}
+
+.field-source-chip--active {
+  background: color-mix(in oklab, var(--accent) 17%, var(--panel));
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--accent) 32%, var(--border));
+}
+
 .field-op-dual {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3092,19 +3151,19 @@ tr.row-focal td {
 
 .field-op-kpi-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.65rem;
 }
 
 .field-op-kpi {
-  padding: 0.8rem 0.85rem;
+  padding: 0.9rem 0.95rem;
   border-radius: 12px;
   border: 1px solid var(--border);
   background: var(--panel-soft);
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
-  min-height: 5.6rem;
+  gap: 0.24rem;
+  min-height: 6.1rem;
 }
 
 .field-op-kpi--hero {
@@ -3141,7 +3200,7 @@ tr.row-focal td {
 
 .field-live-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(11.5rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
   gap: 0.65rem;
   margin-top: 0.15rem;
 }
@@ -3172,7 +3231,7 @@ tr.row-focal td {
 
 .field-live-metrics {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.35rem;
 }
 
@@ -3242,6 +3301,13 @@ tr.row-focal td {
   font-variant-numeric: tabular-nums;
 }
 
+.field-live-spec {
+  margin: 0;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
 @media (max-width: 960px) {
   .field-op-dual {
     grid-template-columns: 1fr;
@@ -3276,6 +3342,13 @@ tr.row-focal td {
   .field-op-kpi-grid,
   .field-live-metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .field-op-kpi-grid,
+  .field-live-metrics {
+    grid-template-columns: 1fr;
   }
 }
 

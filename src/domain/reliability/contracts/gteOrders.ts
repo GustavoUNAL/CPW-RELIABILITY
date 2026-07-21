@@ -181,7 +181,7 @@ export const CONTRACT_CALC_BASE: ContractCalcRow[] = [
     tone: "info",
   },
   {
-    indicator: "N° de Shutdowns/mes (imputables O&M)",
+    indicator: "N° de Shutdowns/mes (asociados a O&M)",
     formula: "Conteo de apagones de campo",
     frequency: "Mensual",
     threshold: "Ideal: 0",

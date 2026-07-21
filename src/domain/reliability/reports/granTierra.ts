@@ -24,10 +24,10 @@ export const granTierraReport: ReportDataset = {
   },
   analysisHighlights: [
     "Fuente oficial de Disp/Conf/MTBF/MTTR: informe junio (PDF/DOCX). Costayaco 97.92%/97.92% — bajo umbral contractual Orden 1 (≥98%). Vonú 100%/100%.",
-    "Misma cantidad de fallas imputables que mayo (7), con mejor severidad: MTBF 711.57 h y MTTR 2.86 h (valores del anexo junio).",
+    "Misma cantidad de fallas asociadas a COPOWER que mayo (7), con mejor severidad: MTBF 711.57 h y MTTR 2.86 h (valores del anexo junio).",
     "La recurrencia se traslada de CPW04 (mayo) a CPW06 (junio, 3 eventos, RIESGO MEDIO, MTBF 222.33 h) según anexo.",
     "MRU, SIN y presión CYC concentran más horas PF-cliente que las fallas propias (DOCX §4).",
-    "Bitácora Excel junio: 38 eventos con PF/falla, 10 Falla_evento, 7 imputables COPOWER; 209 h afectadas (20 contractuales + 189 cliente).",
+    "Bitácora Excel junio: 38 eventos con PF/falla, 10 Falla_evento, 7 asociadas a COPOWER; 209 h afectadas (20 contractuales + 189 cliente).",
   ],
   badActors: [
     {
@@ -193,7 +193,7 @@ export const granTierraReport: ReportDataset = {
       cause: "Intercooler con exceso de residuo",
       downtimeHours: 2,
       responsible: "COPOWER",
-      notes: "Cambio de intercooler; evento imputable a equipo.",
+      notes: "Cambio de intercooler; evento asociado a equipo.",
     },
     {
       date: "2026-06-05",
@@ -283,7 +283,7 @@ export const granTierraReport: ReportDataset = {
     { unidad: "CPW03", campo: "COSTAYACO", horasStandBy: 104, disponibilidadPct: 98.75, confiabilidadPct: 99.31, fallas: 1, mtbfLabel: "607.00", mttrHours: 5, riesgoTecnico: "RIESGO BAJO", cumplimiento: "CUMPLE", detalle: "Evento único, mayor MTTR del grupo de un evento" },
     { unidad: "CPW04", campo: "COSTAYACO", horasStandBy: 12, disponibilidadPct: 100, confiabilidadPct: 100, fallas: 0, mtbfLabel: "Sin Fallas", mttrHours: 0, riesgoTecnico: "RIESGO BAJO", cumplimiento: "CUMPLE", detalle: "Tuvo 1 salida en el Excel (6/23) pero fue imputada al cliente, no cuenta" },
     { unidad: "CPW05", campo: "COSTAYACO", horasStandBy: 13, disponibilidadPct: 98.89, confiabilidadPct: 99.86, fallas: 1, mtbfLabel: "699.00", mttrHours: 1, riesgoTecnico: "RIESGO BAJO", cumplimiento: "CUMPLE", detalle: "Tuvo 2 salidas en el Excel; 1 fue imputada al cliente (6/23) y no cuenta" },
-    { unidad: "CPW06", campo: "COSTAYACO", horasStandBy: 46, disponibilidadPct: 99.03, confiabilidadPct: 99.03, fallas: 3, mtbfLabel: "222.33", mttrHours: 2, riesgoTecnico: "RIESGO MEDIO", cumplimiento: "CUMPLE", detalle: "Activo dominante del mes: 3 fallas imputables (6/03, 6/27, 6/28), todas contractuales" },
+    { unidad: "CPW06", campo: "COSTAYACO", horasStandBy: 46, disponibilidadPct: 99.03, confiabilidadPct: 99.03, fallas: 3, mtbfLabel: "222.33", mttrHours: 2, riesgoTecnico: "RIESGO MEDIO", cumplimiento: "CUMPLE", detalle: "Activo dominante del mes: 3 fallas asociadas a COPOWER (6/03, 6/27, 6/28), todas contractuales" },
     { unidad: "CPW07", campo: "COSTAYACO", horasStandBy: 110, disponibilidadPct: 99.31, confiabilidadPct: 99.31, fallas: 1, mtbfLabel: "605.00", mttrHours: 5, riesgoTecnico: "RIESGO BAJO", cumplimiento: "CUMPLE", detalle: "Evento del 6/27, mismo incidente de red que afectó a CPW06" },
     { unidad: "JIN-10", campo: "COSTAYACO", horasStandBy: 245, disponibilidadPct: 99.44, confiabilidadPct: 100, fallas: 0, mtbfLabel: "Sin Fallas", mttrHours: 0, riesgoTecnico: "RIESGO BAJO", cumplimiento: "CUMPLE", detalle: "Sin eventos correctivos" },
     { unidad: "G101V", campo: "COSTAYACO", horasStandBy: 696, disponibilidadPct: 100, confiabilidadPct: 100, fallas: 0, mtbfLabel: "Sin Fallas", mttrHours: 0, riesgoTecnico: "RIESGO BAJO", cumplimiento: "CUMPLE", detalle: "Unidad diésel, sin eventos" },

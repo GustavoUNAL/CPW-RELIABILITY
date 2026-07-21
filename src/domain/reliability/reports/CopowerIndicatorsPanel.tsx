@@ -170,7 +170,7 @@ export function CopowerIndicatorsPanel({ month, fieldKey }: Props) {
             hint={isField ? "Σ unidades del campo" : "Σ todas las unidades"}
           />
           <KpiCard
-            label="Fallas imputables"
+            label="Fallas asociadas a COPOWER"
             value={data.copowerFailures != null ? String(data.copowerFailures) : "N/D"}
             hint="Sistémico · clasificación COPOWER"
           />

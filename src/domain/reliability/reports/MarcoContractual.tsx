@@ -41,6 +41,8 @@ type Props = {
 
 const pct = (v: number | null | undefined, d = 1) =>
   v == null || Number.isNaN(v) ? "N/A" : `${(v * 100).toFixed(d)}%`;
+const pp = (v: number | null | undefined, d = 2) =>
+  v == null || Number.isNaN(v) ? "N/A" : `${v.toFixed(d)} pp`;
 
 function getSnap(report: "gran_tierra" | "copower", month: string) {
   if (report === "gran_tierra") return GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey] ?? null;
@@ -78,6 +80,81 @@ export function MarcoContractual({ leaf, report, month, monthLabel }: Props) {
   const hasJuneRca = isGte && month === "Jun";
   const band = reliability == null ? null : getReliabilityDeduction(reliability);
   const sourceFile = snap?.sourceFile ?? (isGte ? "data/GTE" : "Reporte diario COPOWER");
+
+  const monthlyMetaRows = [
+    {
+      indicator: "Disponibilidad Operacional",
+      meta: "≥ 98.0%",
+      result: availability == null ? "N/A" : `${(availability * 100).toFixed(2)}%`,
+      delta:
+        availability == null
+          ? "N/A"
+          : pp((availability - CONTRACTUAL_KPI_TARGETS.availability) * 100),
+      status:
+        availability == null
+          ? "Sin dato"
+          : availability >= CONTRACTUAL_KPI_TARGETS.availability
+            ? "Cumple"
+            : "No cumple",
+    },
+    {
+      indicator: "Confiabilidad del Sistema",
+      meta: "≥ 98.0%",
+      result: reliability == null ? "N/A" : `${(reliability * 100).toFixed(2)}%`,
+      delta:
+        reliability == null
+          ? "N/A"
+          : pp((reliability - CONTRACTUAL_KPI_TARGETS.reliability) * 100),
+      status:
+        reliability == null
+          ? "Sin dato"
+          : reliability >= CONTRACTUAL_KPI_TARGETS.reliability
+            ? "Cumple"
+            : "No cumple",
+    },
+    {
+      indicator: "N° de shutdowns/eventos asociados a O&M",
+      meta: "Ideal: 0",
+      result: `${failures}`,
+      delta: failures === 0 ? "0" : `+${failures}`,
+      status: failures === 0 ? "Cumple" : "No cumple",
+    },
+    {
+      indicator: "Eficiencia",
+      meta: "≥ 37%",
+      result: "N/A",
+      delta: "N/A",
+      status: "Sin dato",
+    },
+    {
+      indicator: "Cumplimiento plan de mantenimiento",
+      meta: "100%",
+      result: "N/A",
+      delta: "N/A",
+      status: "Sin dato",
+    },
+    {
+      indicator: "Cumplimiento stock de repuestos",
+      meta: "100%",
+      result: "N/A",
+      delta: "N/A",
+      status: "Sin dato",
+    },
+    {
+      indicator: "Reportes de falla (RCA/informe)",
+      meta: "Obligatorio",
+      result: hasJuneRca ? "No entregados (7 eventos)" : "N/A",
+      delta: hasJuneRca ? "-100%" : "N/A",
+      status: hasJuneRca ? "No cumple" : "Sin dato",
+    },
+    {
+      indicator: "Informes diarios",
+      meta: "Obligatorio",
+      result: "N/A",
+      delta: "N/A",
+      status: "Sin dato",
+    },
+  ];
 
   const scorecard = [
     {
@@ -233,43 +310,95 @@ export function MarcoContractual({ leaf, report, month, monthLabel }: Props) {
           </section>
 
           {isGte ? (
-            <section className="panel">
-              <article className="card">
-                <div className="contract-order-head">
-                  <div>
-                    <p className="eyebrow">Orden 1 — la que aplica</p>
-                    <h3>Indicadores y metas contractuales</h3>
+            <>
+              <section className="panel">
+                <article className="card">
+                  <div className="contract-order-head">
+                    <div>
+                      <p className="eyebrow">Orden 1 — la que aplica</p>
+                      <h3>Indicadores y metas contractuales</h3>
+                    </div>
+                    <span className="badge success">{CONTRACT_CALC_BASE.length} indicadores</span>
                   </div>
-                  <span className="badge success">{CONTRACT_CALC_BASE.length} indicadores</span>
-                </div>
-                <div className="table-scroll">
-                  <table className="contract-matrix">
-                    <thead>
-                      <tr>
-                        <th>Indicador</th>
-                        <th>Fórmula</th>
-                        <th>Frecuencia</th>
-                        <th>Meta</th>
-                        <th>Multa si incumple</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {CONTRACT_CALC_BASE.map((row) => (
-                        <tr key={row.indicator}>
-                          <td>
-                            <strong>{row.indicator}</strong>
-                          </td>
-                          <td>{row.formula}</td>
-                          <td>{row.frequency}</td>
-                          <td>{row.threshold}</td>
-                          <td className="contract-watch">{row.consequence}</td>
+                  <div className="table-scroll">
+                    <table className="contract-matrix">
+                      <thead>
+                        <tr>
+                          <th>Indicador</th>
+                          <th>Fórmula</th>
+                          <th>Frecuencia</th>
+                          <th>Meta</th>
+                          <th>Multa si incumple</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </article>
-            </section>
+                      </thead>
+                      <tbody>
+                        {CONTRACT_CALC_BASE.map((row) => (
+                          <tr key={row.indicator}>
+                            <td>
+                              <strong>{row.indicator}</strong>
+                            </td>
+                            <td>{row.formula}</td>
+                            <td>{row.frequency}</td>
+                            <td>{row.threshold}</td>
+                            <td className="contract-watch">{row.consequence}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </article>
+              </section>
+
+              <section className="panel">
+                <article className="card">
+                  <div className="contract-order-head">
+                    <div>
+                      <p className="eyebrow">Resumen ejecutivo para slide</p>
+                      <h3>Resultados del mes vs meta contractual</h3>
+                      <p className="muted">Periodo: {monthLabel} · Diferencia = Resultado − Meta</p>
+                    </div>
+                  </div>
+                  <div className="table-scroll">
+                    <table className="contract-matrix">
+                      <thead>
+                        <tr>
+                          <th>Indicador</th>
+                          <th>Meta contractual</th>
+                          <th>Resultado del mes</th>
+                          <th>Diferencia vs meta</th>
+                          <th>Estado</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {monthlyMetaRows.map((row) => (
+                          <tr key={row.indicator}>
+                            <td>
+                              <strong>{row.indicator}</strong>
+                            </td>
+                            <td>{row.meta}</td>
+                            <td>{row.result}</td>
+                            <td>{row.delta}</td>
+                            <td>
+                              <span
+                                className={`badge ${
+                                  row.status === "Cumple"
+                                    ? "success"
+                                    : row.status === "No cumple"
+                                      ? "danger"
+                                      : "info"
+                                }`}
+                              >
+                                {row.status}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </article>
+              </section>
+            </>
           ) : (
             <section className="panel">
               <article className="card">
@@ -336,7 +465,7 @@ export function MarcoContractual({ leaf, report, month, monthLabel }: Props) {
           <article className="card">
             <h3>Escala de shutdowns O&amp;M (Orden 1)</h3>
             <p className="muted">
-              Ideal: 0. Fallas imputables del mes ({isGte ? "GTE" : "COPOWER"}): {failures}. Pendiente confirmar
+              Ideal: 0. Fallas asociadas a COPOWER del mes ({isGte ? "GTE" : "COPOWER"}): {failures}. Pendiente confirmar
               equivalencia con “shutdowns de campo”
               {failures >= 5 ? " — de ser así, superarían el umbral de terminación." : "."}
             </p>
@@ -356,7 +485,7 @@ export function MarcoContractual({ leaf, report, month, monthLabel }: Props) {
                       <td>{b.terminationRisk ? "Terminación anticipada" : `${b.deductionPct}%`}</td>
                       <td className="muted">
                         {b.events >= 5 && failures >= 5
-                          ? `${failures} imputables este mes — validar equivalencia`
+                          ? `${failures} asociadas a COPOWER este mes — validar equivalencia`
                           : ""}
                       </td>
                     </tr>

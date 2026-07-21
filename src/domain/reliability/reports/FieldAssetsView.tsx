@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
   Activity,
@@ -27,6 +28,8 @@ import {
 } from "../contracts/fieldAssets";
 import { ScreenShell } from "../ui/ScreenShell";
 
+type FieldDataSource = "auto" | "copower" | "gran_tierra";
+
 const CARD_ICONS: Record<AssetCardKind, LucideIcon> = {
   gas: Zap,
   diesel: Droplets,
@@ -44,12 +47,6 @@ function iconForCard(card: AssetCard) {
   return CARD_ICONS[card.kind ?? "gas"];
 }
 
-function pick<T>(primary: T | null | undefined, fallback: T | null | undefined): T | null {
-  if (primary != null) return primary;
-  if (fallback != null) return fallback;
-  return null;
-}
-
 function normId(id: string) {
   return id.toUpperCase().replace(/[^A-Z0-9]/g, "");
 }
@@ -63,6 +60,11 @@ type MergedUnit = {
   mttr: number | null;
   riesgo: string;
   energiaKwh: number | null;
+};
+
+type UnitDescriptor = {
+  power?: string;
+  characteristic?: string;
 };
 
 function mergeFieldUnits(gte: FieldUnitLive[], cpw: FieldUnitLive[]): MergedUnit[] {
@@ -111,13 +113,39 @@ function mergeFieldUnits(gte: FieldUnitLive[], cpw: FieldUnitLive[]): MergedUnit
   return [...map.values()].sort((a, b) => b.fallas - a.fallas || a.id.localeCompare(b.id));
 }
 
+function buildUnitDescriptors(field: FieldProfile): Map<string, UnitDescriptor> {
+  const descriptors = new Map<string, UnitDescriptor>();
+
+  for (const unit of field.fleet ?? []) {
+    descriptors.set(normId(unit.id), {
+      power: unit.power,
+      characteristic: unit.family,
+    });
+  }
+
+  for (const group of field.groups) {
+    for (const card of group.cards) {
+      for (const unitId of card.units ?? []) {
+        const key = normId(unitId);
+        const existing = descriptors.get(key);
+        descriptors.set(key, {
+          power: existing?.power ?? card.power,
+          characteristic: existing?.characteristic ?? card.title,
+        });
+      }
+    }
+  }
+
+  return descriptors;
+}
+
 function FieldHeroBanner({ field }: { field: FieldProfile }) {
   if (!field.hero) return null;
   const [primary, ...secondary] = field.stats;
   const voltage = field.stats.find((s) => s.label.toLowerCase().includes("tensión"))?.value;
 
   return (
-    <section className="field-hero field-hero--costayaco">
+    <section className={`field-hero field-hero--${field.key}`}>
       <div className="field-hero-copy">
         <span className="field-hero-role">{field.hero.role}</span>
         <p className="field-hero-location">
@@ -155,6 +183,11 @@ function FieldHeroBanner({ field }: { field: FieldProfile }) {
 function FleetPanel({ fleet }: { fleet: FleetUnit[] }) {
   const jinan = fleet.filter((u) => u.variant === "jinan");
   const jenbacher = fleet.filter((u) => u.variant === "jenbacher");
+  const jinanTrioLabel = jinan.length >= 3 ? `${jinan.slice(0, 3).map((u) => u.id).join(" · ")}` : "N/D";
+  const jenA = jenbacher.slice(0, 3);
+  const jenB = jenbacher.slice(3, 6);
+  const jenReferenceA = jenA.length ? `Trío A: ${jenA.map((u) => u.id).join(" · ")}` : "Trío A: N/D";
+  const jenReferenceB = jenB.length ? `Trío B: ${jenB.map((u) => u.id).join(" · ")}` : null;
 
   return (
     <section className="field-fleet-panel">
@@ -169,6 +202,11 @@ function FleetPanel({ fleet }: { fleet: FleetUnit[] }) {
             <span className="field-fleet-family-tag field-fleet-family-tag--jinan">Jinan</span>
             <span>{jinan.length} × CPW500</span>
           </header>
+          <ul className="field-fleet-ref-list">
+            <li>Trío de referencia: {jinanTrioLabel}</li>
+            <li>Potencia nominal del trío: 1.500 kW</li>
+            <li>Indicadores de seguimiento: Disponibilidad, Confiabilidad y Fallas</li>
+          </ul>
           <div className="field-fleet-grid">
             {jinan.map((u) => (
               <article key={u.id} className="field-fleet-unit field-fleet-unit--jinan">
@@ -183,6 +221,11 @@ function FleetPanel({ fleet }: { fleet: FleetUnit[] }) {
             <span className="field-fleet-family-tag field-fleet-family-tag--jenbacher">Jenbacher</span>
             <span>{jenbacher.length} × J420 en operación</span>
           </header>
+          <ul className="field-fleet-ref-list">
+            <li>{jenReferenceA}</li>
+            {jenReferenceB ? <li>{jenReferenceB}</li> : null}
+            <li>Referencia de potencia e indicadores por grupo de 3 máquinas</li>
+          </ul>
           <div className="field-fleet-grid field-fleet-grid--jenbacher">
             {jenbacher.map((u) => (
               <article key={u.id} className="field-fleet-unit field-fleet-unit--jenbacher">
@@ -197,7 +240,7 @@ function FleetPanel({ fleet }: { fleet: FleetUnit[] }) {
   );
 }
 
-function LiveUnitTile({ unit }: { unit: MergedUnit }) {
+function LiveUnitTile({ unit, descriptor }: { unit: MergedUnit; descriptor?: UnitDescriptor }) {
   const riskClass =
     unit.riesgo === "RIESGO ALTO"
       ? "field-live-unit--risk-high"
@@ -239,18 +282,28 @@ function LiveUnitTile({ unit }: { unit: MergedUnit }) {
           <span className="field-live-energy muted">Sin energía</span>
         )}
       </footer>
+      <p className="field-live-spec">
+        {descriptor?.power ? `Potencia: ${descriptor.power}` : "Potencia: N/D"}
+        {descriptor?.characteristic ? ` · Característica: ${descriptor.characteristic}` : ""}
+      </p>
     </article>
   );
 }
 
 function FieldPerformanceSection({
+  field,
   fieldKey,
   month,
   monthLabel,
+  source,
+  onSourceChange,
 }: {
+  field: FieldProfile;
   fieldKey: FieldKey;
   month: string;
   monthLabel: string;
+  source: FieldDataSource;
+  onSourceChange: (source: FieldDataSource) => void;
 }) {
   const gte = getFieldOperational("gran_tierra", month, fieldKey);
   const cpw = getFieldOperational("copower", month, fieldKey);
@@ -263,26 +316,67 @@ function FieldPerformanceSection({
           <span>Desempeño del campo</span>
           <span className="field-group-count">{monthLabel}</span>
         </div>
+      <div className="field-source-switch" role="tablist" aria-label="Fuente de datos del campo">
+        <button
+          type="button"
+          className={`field-source-chip${source === "auto" ? " field-source-chip--active" : ""}`}
+          onClick={() => onSourceChange("auto")}
+        >
+          Auto
+        </button>
+        <button
+          type="button"
+          className={`field-source-chip${source === "copower" ? " field-source-chip--active" : ""}`}
+          onClick={() => onSourceChange("copower")}
+        >
+          COPOWER
+        </button>
+        <button
+          type="button"
+          className={`field-source-chip${source === "gran_tierra" ? " field-source-chip--active" : ""}`}
+          onClick={() => onSourceChange("gran_tierra")}
+        >
+          Gran Tierra
+        </button>
+      </div>
         <p className="field-op-empty">Sin indicadores cargados para este campo en el periodo.</p>
       </section>
     );
   }
 
-  const primary: FieldOperationalData = gte.available ? gte : cpw;
-  const secondary: FieldOperationalData | null = gte.available && cpw.available ? cpw : null;
+  const autoPrimary: FieldOperationalData = cpw.available ? cpw : gte;
+  const selectedPrimary: FieldOperationalData =
+    source === "copower" ? (cpw.available ? cpw : gte) : source === "gran_tierra" ? (gte.available ? gte : cpw) : autoPrimary;
+  const selectedSecondary: FieldOperationalData | null =
+    selectedPrimary.reportLabel === "COPOWER"
+      ? gte.available
+        ? gte
+        : null
+      : cpw.available
+        ? cpw
+        : null;
+  const unitDescriptors = buildUnitDescriptors(field);
 
-  const disp = pick(gte.available ? gte.disp : null, cpw.available ? cpw.disp : null);
-  const conf = pick(gte.available ? gte.conf : null, cpw.available ? cpw.conf : null);
-  const generationKwh = pick(
-    gte.available ? gte.generationKwh : null,
-    cpw.available ? cpw.generationKwh : null,
-  );
-  const gasKwh = pick(gte.available ? gte.gasKwh : null, cpw.available ? cpw.gasKwh : null);
-  const dieselKwh = pick(gte.available ? gte.dieselKwh : null, cpw.available ? cpw.dieselKwh : null);
-  const fallas = gte.available ? gte.fallas : cpw.fallas;
-  const hoursOp = pick(gte.available ? gte.hoursOp : null, cpw.available ? cpw.hoursOp : null);
-  const hoursFs = pick(gte.available ? gte.hoursFs : null, cpw.available ? cpw.hoursFs : null);
-  const units = mergeFieldUnits(gte.available ? gte.units : [], cpw.available ? cpw.units : []);
+  const disp = selectedPrimary.disp;
+  const conf = selectedPrimary.conf;
+  const generationKwh = selectedPrimary.generationKwh;
+  const gasKwh = selectedPrimary.gasKwh;
+  const dieselKwh = selectedPrimary.dieselKwh;
+  const fallas = selectedPrimary.fallas;
+  const hoursOp = selectedPrimary.hoursOp;
+  const hoursFs = selectedPrimary.hoursFs;
+  const units =
+    source === "auto"
+      ? mergeFieldUnits(gte.units, cpw.units)
+      : selectedPrimary.units.length > 0
+        ? mergeFieldUnits([], selectedPrimary.units)
+        : mergeFieldUnits(gte.units, cpw.units);
+  const sourceHint =
+    source === "auto"
+      ? "Fuente automática (COPOWER prioridad, Gran Tierra como referencia)"
+      : selectedPrimary.reportLabel === "COPOWER"
+        ? "Fuente seleccionada: COPOWER"
+        : "Fuente seleccionada: Gran Tierra Energy";
 
   return (
     <section className="field-op-section">
@@ -291,12 +385,35 @@ function FieldPerformanceSection({
         <span>Desempeño del campo</span>
         <span className="field-group-count">{monthLabel}</span>
       </div>
+      <div className="field-source-switch" role="tablist" aria-label="Fuente de datos del campo">
+        <button
+          type="button"
+          className={`field-source-chip${source === "auto" ? " field-source-chip--active" : ""}`}
+          onClick={() => onSourceChange("auto")}
+        >
+          Auto
+        </button>
+        <button
+          type="button"
+          className={`field-source-chip${source === "copower" ? " field-source-chip--active" : ""}`}
+          onClick={() => onSourceChange("copower")}
+        >
+          COPOWER
+        </button>
+        <button
+          type="button"
+          className={`field-source-chip${source === "gran_tierra" ? " field-source-chip--active" : ""}`}
+          onClick={() => onSourceChange("gran_tierra")}
+        >
+          Gran Tierra
+        </button>
+      </div>
 
       <article className="field-op-pane field-op-pane--field">
         <header className="field-op-pane-head">
           <div>
             <strong>{FIELD_PROFILES[fieldKey].label}</strong>
-            <small>Un solo campo · informe oficial priorizado · operación diaria como complemento</small>
+            <small>{sourceHint}</small>
           </div>
         </header>
 
@@ -304,9 +421,11 @@ function FieldPerformanceSection({
           <div className="field-op-kpi field-op-kpi--hero">
             <span>Disponibilidad</span>
             <strong>{pct(disp)}</strong>
-            {secondary && gte.disp != null && cpw.disp != null ? (
+            {selectedSecondary && selectedPrimary.disp != null && selectedSecondary.disp != null ? (
               <small>
-                GTE {pct(gte.disp)} · CPW {pct(cpw.disp)}
+                {selectedPrimary.reportLabel === "COPOWER" ? "CPW" : "GTE"} {pct(selectedPrimary.disp)} ·
+                {" "}
+                {selectedSecondary.reportLabel === "COPOWER" ? "CPW ref" : "GTE ref"} {pct(selectedSecondary.disp)}
               </small>
             ) : (
               <small>Campo · meta ≥ 98%</small>
@@ -315,9 +434,11 @@ function FieldPerformanceSection({
           <div className="field-op-kpi field-op-kpi--hero">
             <span>Confiabilidad</span>
             <strong>{pct(conf)}</strong>
-            {secondary && gte.conf != null && cpw.conf != null ? (
+            {selectedSecondary && selectedPrimary.conf != null && selectedSecondary.conf != null ? (
               <small>
-                GTE {pct(gte.conf)} · CPW {pct(cpw.conf)}
+                {selectedPrimary.reportLabel === "COPOWER" ? "CPW" : "GTE"} {pct(selectedPrimary.conf)} ·
+                {" "}
+                {selectedSecondary.reportLabel === "COPOWER" ? "CPW ref" : "GTE ref"} {pct(selectedSecondary.conf)}
               </small>
             ) : (
               <small>Campo · meta ≥ 98%</small>
@@ -338,9 +459,11 @@ function FieldPerformanceSection({
           <div className={`field-op-kpi${fallas >= 3 ? " field-op-kpi--warn" : ""}`}>
             <span>Fallas</span>
             <strong>{fallas}</strong>
-            {gte.available && cpw.available && gte.fallas !== cpw.fallas ? (
+            {selectedSecondary && selectedPrimary.fallas !== selectedSecondary.fallas ? (
               <small>
-                GTE {gte.fallas} · CPW {cpw.fallas}
+                {selectedPrimary.reportLabel === "COPOWER" ? "CPW" : "GTE"} {selectedPrimary.fallas} ·
+                {" "}
+                {selectedSecondary.reportLabel === "COPOWER" ? "CPW ref" : "GTE ref"} {selectedSecondary.fallas}
               </small>
             ) : (
               <small>Unidades del campo</small>
@@ -361,7 +484,7 @@ function FieldPerformanceSection({
         {units.length > 0 ? (
           <div className="field-live-grid">
             {units.map((u) => (
-              <LiveUnitTile key={u.id} unit={u} />
+              <LiveUnitTile key={u.id} unit={u} descriptor={unitDescriptors.get(normId(u.id))} />
             ))}
           </div>
         ) : (
@@ -369,8 +492,8 @@ function FieldPerformanceSection({
         )}
 
         <p className="field-op-sources muted">
-          Fuentes: {primary.sourceFile?.split("/").pop() ?? "N/D"}
-          {secondary?.sourceFile ? ` · ${secondary.sourceFile.split("/").pop()}` : ""}
+          Fuentes: {selectedPrimary.sourceFile?.split("/").pop() ?? "N/D"}
+          {selectedSecondary?.sourceFile ? ` · ${selectedSecondary.sourceFile.split("/").pop()}` : ""}
         </p>
       </article>
     </section>
@@ -447,11 +570,15 @@ function CostayacoFieldView({
   fieldKey,
   month,
   monthLabel,
+  source,
+  onSourceChange,
 }: {
   field: FieldProfile;
   fieldKey: FieldKey;
   month: string;
   monthLabel: string;
+  source: FieldDataSource;
+  onSourceChange: (source: FieldDataSource) => void;
 }) {
   const hubGroups = field.groups.filter((g) => g.placement === "hub");
   const sideGroups = field.groups.filter((g) => g.placement === "side");
@@ -462,7 +589,14 @@ function CostayacoFieldView({
     <div className="field-view field-view--costayaco">
       <FieldHeroBanner field={field} />
       {field.fleet ? <FleetPanel fleet={field.fleet} /> : null}
-      <FieldPerformanceSection fieldKey={fieldKey} month={month} monthLabel={monthLabel} />
+      <FieldPerformanceSection
+        field={field}
+        fieldKey={fieldKey}
+        month={month}
+        monthLabel={monthLabel}
+        source={source}
+        onSourceChange={onSourceChange}
+      />
 
       {secondaryStats.length ? (
         <>
@@ -501,20 +635,33 @@ function StandardFieldView({
   fieldKey,
   month,
   monthLabel,
+  source,
+  onSourceChange,
 }: {
   field: FieldProfile;
   fieldKey: FieldKey;
   month: string;
   monthLabel: string;
+  source: FieldDataSource;
+  onSourceChange: (source: FieldDataSource) => void;
 }) {
   return (
     <div className="field-view">
+      {field.hero ? <FieldHeroBanner field={field} /> : null}
+      {field.fleet ? <FleetPanel fleet={field.fleet} /> : null}
       <div className="field-section-label">
         <Gauge size={15} />
         <span>Indicadores contractuales</span>
       </div>
       <StatGrid stats={field.stats} />
-      <FieldPerformanceSection fieldKey={fieldKey} month={month} monthLabel={monthLabel} />
+      <FieldPerformanceSection
+        field={field}
+        fieldKey={fieldKey}
+        month={month}
+        monthLabel={monthLabel}
+        source={source}
+        onSourceChange={onSourceChange}
+      />
 
       {field.groups.map((group) => (
         <AssetGroupSection key={group.title} group={group} />
@@ -531,13 +678,28 @@ type Props = {
 
 export function FieldAssetsView({ fieldKey, month, monthLabel }: Props) {
   const field = FIELD_PROFILES[fieldKey];
+  const [fieldSource, setFieldSource] = useState<FieldDataSource>("auto");
 
   return (
     <ScreenShell report="dual" title={field.label} subtitle={`${field.description} · ${monthLabel}`}>
       {field.layout === "hub" ? (
-        <CostayacoFieldView field={field} fieldKey={fieldKey} month={month} monthLabel={monthLabel} />
+        <CostayacoFieldView
+          field={field}
+          fieldKey={fieldKey}
+          month={month}
+          monthLabel={monthLabel}
+          source={fieldSource}
+          onSourceChange={setFieldSource}
+        />
       ) : (
-        <StandardFieldView field={field} fieldKey={fieldKey} month={month} monthLabel={monthLabel} />
+        <StandardFieldView
+          field={field}
+          fieldKey={fieldKey}
+          month={month}
+          monthLabel={monthLabel}
+          source={fieldSource}
+          onSourceChange={setFieldSource}
+        />
       )}
 
       <p className="field-source-note">

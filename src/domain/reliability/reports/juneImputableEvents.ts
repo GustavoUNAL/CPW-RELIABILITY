@@ -1,5 +1,5 @@
 /**
- * 7 eventos imputables COPOWER — junio 2026.
+ * 7 eventos asociados a COPOWER — junio 2026.
  * Fuente: Excel Data Soporte (bitácora) — PF_contr > 0 y Falla_evento ≥ 1.
  * Total PF_contr = 20 h (coincide con anexo oficial).
  */
@@ -110,7 +110,7 @@ export const JUNE_2026_AUDIT_ROWS: AuditRow[] = [
     note: "Cifra oficial del PDF.",
   },
   {
-    indicator: "Fallas imputables COPOWER",
+    indicator: "Fallas asociadas a COPOWER",
     pdfValue: "7",
     excelValue: "7 (Σ Falla_evento con PF_contr > 0)",
     match: true,
@@ -121,7 +121,7 @@ export const JUNE_2026_AUDIT_ROWS: AuditRow[] = [
     pdfValue: "20 h",
     excelValue: "20 h",
     match: true,
-    note: "Suma de las 7 filas imputables.",
+    note: "Suma de las 7 filas asociadas.",
   },
   {
     indicator: "Horas PF_cli",
@@ -145,7 +145,7 @@ export const JUNE_2026_AUDIT_ROWS: AuditRow[] = [
     note: "Publicado en anexo PDF.",
   },
   {
-    indicator: "CPW06 #fallas imputables",
+    indicator: "CPW06 #fallas asociadas",
     pdfValue: "3 (RIESGO MEDIO)",
     excelValue: "3 (06-03, 06-27, 06-28)",
     match: true,

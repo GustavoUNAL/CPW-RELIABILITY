@@ -3161,7 +3161,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "mttrHours": 2,
         "riesgoTecnico": "RIESGO MEDIO",
         "cumplimiento": "CUMPLE",
-        "detalle": "Activo dominante del mes: 3 fallas imputables (6/03, 6/27, 6/28), todas contractuales"
+        "detalle": "Activo dominante del mes: 3 fallas asociadas a COPOWER (6/03, 6/27, 6/28), todas contractuales"
       },
       {
         "unidad": "CPW07",

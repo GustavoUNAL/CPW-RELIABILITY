@@ -9,6 +9,7 @@ import {
 } from "./granTierraMonthly";
 import { CopowerIndicatorsDashboard } from "./CopowerIndicatorsPanel";
 import { FailureEventsView } from "./FailureEventsView";
+import { EventInsightsDashboard } from "./EventInsightsDashboard";
 import { DashboardGerencia, DashboardMantenimiento, DashboardOverview } from "./DashboardViews";
 import { GenerationDashboard } from "./GenerationDashboard";
 import { CopowerCompanyView, GteCompanyView } from "./CompanyViews";
@@ -202,7 +203,7 @@ function KpiFocus({
     fs: {
       label: "Forced / Planned outage",
       value: `${hours(s.hoursFailureCopower)} / ${hours(s.hoursPreventive)}`,
-      note: "PF_contr (forzado imputable) · PP (planificado)",
+      note: "PF_contr (forzado asociado a COPOWER) · PP (planificado)",
     },
   } as const;
   const m = map[metric];
@@ -332,6 +333,18 @@ function PlatformBody({
         </ScreenShell>
       );
     }
+    if (leafId === "an-repetitivos-copower") {
+      return <EventInsightsDashboard report="copower" month={month} monthLabel={monthLabel} mode="repetitivos" />;
+    }
+    if (leafId === "an-repetitivos-gte") {
+      return <EventInsightsDashboard report="gran_tierra" month={month} monthLabel={monthLabel} mode="repetitivos" />;
+    }
+    if (leafId === "an-badactors-copower") {
+      return <EventInsightsDashboard report="copower" month={month} monthLabel={monthLabel} mode="badactors" />;
+    }
+    if (leafId === "an-badactors-gte") {
+      return <EventInsightsDashboard report="gran_tierra" month={month} monthLabel={monthLabel} mode="badactors" />;
+    }
     if (leafId === "proc-clasif") {
       return (
         <ScreenShell report="copower" headless>
@@ -380,7 +393,7 @@ function PlatformBody({
     if (leafId === "an-rca") {
       if (month === "Jun") {
         return (
-          <ScreenShell report="gran_tierra" title="RCA imputables" subtitle="Junio 2026 · Orden 1">
+          <ScreenShell report="gran_tierra" title="RCA de fallas asociadas" subtitle="Junio 2026 · Orden 1">
             <p className="alert-inline">0/7 RCA — multa 4% facturación si no se entregan reportes.</p>
             <div className="table-wrap">
               <table>

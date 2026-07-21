@@ -137,7 +137,7 @@ function buildIntegratedRows(
   pushPct("Confiabilidad sistémica", gte?.kpi.reliability, cpw?.kpi.reliability, "contractual");
   pushNum("Generación total", gte?.totalGenerationKwh, cpw?.totalGenerationKwh, " kWh", "contractual", kwh);
   pushNum(
-    "Fallas imputables / registradas",
+    "Fallas asociadas a COPOWER / registradas",
     gte?.summary.copowerFailures,
     cpw?.summary.copowerFailures,
     "",
@@ -149,7 +149,7 @@ function buildIntegratedRows(
   pushNum("Horas operación", gte?.summary.hoursOperated, cpw?.summary.hoursOperated, " h", "operacion", hours);
   pushNum("Horas stand-by", gte?.summary.hoursStandby, cpw?.summary.hoursStandby, " h", "operacion", hours);
   pushNum("Horas preventivo (PP)", gte?.summary.hoursPreventive, cpw?.summary.hoursPreventive, " h", "operacion", hours);
-  pushNum("Horas FS imputable COPOWER", gte?.summary.hoursFailureCopower, cpw?.summary.hoursFailureCopower, " h", "operacion", hours);
+  pushNum("Horas FS asociadas a COPOWER", gte?.summary.hoursFailureCopower, cpw?.summary.hoursFailureCopower, " h", "operacion", hours);
   pushNum("Horas FS cliente", gte?.summary.hoursFailureClient, cpw?.summary.hoursFailureClient, " h", "operacion", hours);
   pushNum(
     "Eventos en bitácora",
@@ -324,6 +324,20 @@ function buildTrendSeries(month: string) {
       cpwConf: cpwRow?.reliability != null ? cpwRow.reliability * 100 : null,
       gteGen: gteSnap ? gteSnap.totalGenerationKwh / 1000 : null,
       cpwGen: cpwSnap ? cpwSnap.totalGenerationKwh / 1000 : null,
+      gteMtbf: gteSnap?.summary.mtbfHours ?? null,
+      cpwMtbf: cpwSnap?.summary.mtbfHours ?? null,
+      gteMttr: gteSnap?.summary.mttrHours ?? null,
+      cpwMttr: cpwSnap?.summary.mttrHours ?? null,
+      gteOpHours: gteSnap?.summary.hoursOperated ?? null,
+      cpwOpHours: cpwSnap?.summary.hoursOperated ?? null,
+      gteStandbyHours: gteSnap?.summary.hoursStandby ?? null,
+      cpwStandbyHours: cpwSnap?.summary.hoursStandby ?? null,
+      gteMaintHours:
+        gteSnap == null ? null : gteSnap.summary.hoursPreventive + gteSnap.summary.hoursCorrective,
+      cpwMaintHours:
+        cpwSnap == null ? null : cpwSnap.summary.hoursPreventive + cpwSnap.summary.hoursCorrective,
+      gteFsHours: gteSnap?.summary.hoursFailureCopower ?? null,
+      cpwFsHours: cpwSnap?.summary.hoursFailureCopower ?? null,
     };
   });
 }
@@ -397,7 +411,7 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
       { estado: "Operación", horas: gte.summary.hoursOperated, fill: COLOR_GTE },
       { estado: "Stand-by", horas: gte.summary.hoursStandby, fill: "#a5b4fc" },
       { estado: "Preventivo", horas: gte.summary.hoursPreventive, fill: "#22c55e" },
-      { estado: "FS imputable", horas: gte.summary.hoursFailureCopower, fill: "#ef4444" },
+      { estado: "FS asociado", horas: gte.summary.hoursFailureCopower, fill: "#ef4444" },
     ];
   }, [gte]);
 
@@ -408,7 +422,7 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
       { estado: "Stand-by", horas: cpw.summary.hoursStandby, fill: "#38bdf8" },
       { estado: "Preventivo", horas: cpw.summary.hoursPreventive, fill: "#22c55e" },
       {
-        estado: "FS imputable",
+        estado: "FS asociado",
         horas: cpw.summary.hoursFailureCopower,
         fill: "#ef4444",
       },
@@ -465,7 +479,7 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
   if (month === "Jun" && JUNE_2026_IMPUTABLE_EVENTS.length > 0) {
     alerts.push({
       active: true,
-      title: "RCA imputables pendientes",
+      title: "RCA de fallas asociadas pendientes",
       detail: `0/${JUNE_2026_IMPUTABLE_EVENTS.length} entregados · riesgo multa 4% adicional`,
     });
   }
@@ -544,7 +558,7 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
         />
         <DualValueCard
           label="Fallas / eventos"
-          gteValue={gte ? `${gte.summary.copowerFailures} imputables` : "N/D"}
+          gteValue={gte ? `${gte.summary.copowerFailures} asociadas a COPOWER` : "N/D"}
           cpwValue={cpw ? `${cpw.summary.copowerFailures} registro · ${cpw.eventLog.length} bitácora` : "N/D"}
           toneGte={gte && gte.summary.copowerFailures >= 3 ? "warn" : undefined}
           toneCpw={cpw && cpw.summary.copowerFailures >= 10 ? "warn" : undefined}
@@ -617,6 +631,149 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
               <Legend wrapperStyle={{ fontSize: 10 }} />
               <Line type="monotone" dataKey="gteGen" name="GTE" stroke={COLOR_GTE} strokeWidth={2} dot={{ r: 3 }} connectNulls />
               <Line type="monotone" dataKey="cpwGen" name="COPOWER" stroke={COLOR_CPW} strokeWidth={2} dot={{ r: 3 }} connectNulls />
+            </LineChart>
+          </ResponsiveContainer>
+        </DashChartPanel>
+
+        <DashChartPanel
+          title="Tendencia MTBF y MTTR"
+          subtitle="Ene – mes seleccionado · comparación GTE vs COPOWER"
+          wide
+        >
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={trendData} margin={{ top: 8, right: 16, left: 0, bottom: 4 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
+              <XAxis dataKey="month" tick={{ fontSize: 10 }} />
+              <YAxis yAxisId="mtbf" tick={{ fontSize: 10 }} width={42} />
+              <YAxis yAxisId="mttr" orientation="right" tick={{ fontSize: 10 }} width={42} />
+              <Tooltip
+                formatter={(v, name) => [
+                  v == null ? "N/D" : `${Number(v).toFixed(2)} h`,
+                  String(name),
+                ]}
+              />
+              <Legend wrapperStyle={{ fontSize: 10 }} />
+              <Line
+                yAxisId="mtbf"
+                type="monotone"
+                dataKey="gteMtbf"
+                name="MTBF GTE"
+                stroke={COLOR_GTE}
+                strokeWidth={2}
+                dot={{ r: 3 }}
+                connectNulls
+              />
+              <Line
+                yAxisId="mtbf"
+                type="monotone"
+                dataKey="cpwMtbf"
+                name="MTBF CPW"
+                stroke={COLOR_CPW}
+                strokeWidth={2}
+                dot={{ r: 3 }}
+                connectNulls
+              />
+              <Line
+                yAxisId="mttr"
+                type="monotone"
+                dataKey="gteMttr"
+                name="MTTR GTE"
+                stroke={COLOR_GTE}
+                strokeWidth={1.5}
+                strokeDasharray="5 3"
+                dot={{ r: 2 }}
+                connectNulls
+              />
+              <Line
+                yAxisId="mttr"
+                type="monotone"
+                dataKey="cpwMttr"
+                name="MTTR CPW"
+                stroke={COLOR_CPW}
+                strokeWidth={1.5}
+                strokeDasharray="5 3"
+                dot={{ r: 2 }}
+                connectNulls
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </DashChartPanel>
+
+        <DashChartPanel
+          title="Curvas operativas (horas)"
+          subtitle="Operación, stand-by, mantenimiento y FS asociados · GTE vs COPOWER"
+          wide
+        >
+          <ResponsiveContainer width="100%" height={320}>
+            <LineChart data={trendData} margin={{ top: 8, right: 16, left: 0, bottom: 4 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
+              <XAxis dataKey="month" tick={{ fontSize: 10 }} />
+              <YAxis tick={{ fontSize: 10 }} width={48} />
+              <Tooltip
+                formatter={(v, name) => [
+                  v == null ? "N/D" : `${Number(v).toFixed(1)} h`,
+                  String(name),
+                ]}
+              />
+              <Legend wrapperStyle={{ fontSize: 10 }} />
+              <Line type="monotone" dataKey="gteOpHours" name="OP GTE" stroke={COLOR_GTE} strokeWidth={2} dot={{ r: 3 }} connectNulls />
+              <Line type="monotone" dataKey="cpwOpHours" name="OP CPW" stroke={COLOR_CPW} strokeWidth={2} dot={{ r: 3 }} connectNulls />
+              <Line
+                type="monotone"
+                dataKey="gteStandbyHours"
+                name="SB GTE"
+                stroke={COLOR_GTE}
+                strokeWidth={1.5}
+                strokeDasharray="4 3"
+                dot={{ r: 2 }}
+                connectNulls
+              />
+              <Line
+                type="monotone"
+                dataKey="cpwStandbyHours"
+                name="SB CPW"
+                stroke={COLOR_CPW}
+                strokeWidth={1.5}
+                strokeDasharray="4 3"
+                dot={{ r: 2 }}
+                connectNulls
+              />
+              <Line
+                type="monotone"
+                dataKey="gteMaintHours"
+                name="MTO GTE"
+                stroke="#16a34a"
+                strokeWidth={1.5}
+                dot={{ r: 2 }}
+                connectNulls
+              />
+              <Line
+                type="monotone"
+                dataKey="cpwMaintHours"
+                name="MTO CPW"
+                stroke="#22c55e"
+                strokeWidth={1.5}
+                dot={{ r: 2 }}
+                connectNulls
+              />
+              <Line
+                type="monotone"
+                dataKey="gteFsHours"
+                name="FS COPOWER GTE"
+                stroke="#dc2626"
+                strokeWidth={1.5}
+                dot={{ r: 2 }}
+                connectNulls
+              />
+              <Line
+                type="monotone"
+                dataKey="cpwFsHours"
+                name="FS COPOWER CPW"
+                stroke="#ef4444"
+                strokeWidth={1.5}
+                dot={{ r: 2 }}
+                connectNulls
+              />
             </LineChart>
           </ResponsiveContainer>
         </DashChartPanel>
@@ -914,7 +1071,7 @@ export function DashboardGerencia({ month, monthLabel }: MonthProps) {
           ) : (
             <div className="dash-alert active">
               <div className="dash-alert-head">
-                <strong>Reportes RCA imputables</strong>
+                <strong>Reportes RCA de fallas asociadas</strong>
                 <ShieldAlert size={16} />
               </div>
               <p>
@@ -956,7 +1113,7 @@ export function DashboardGerencia({ month, monthLabel }: MonthProps) {
             </div>
             <div className="exec-kpi">
               <Gauge size={16} />
-              <span>Fallas imputables</span>
+              <span>Fallas asociadas a COPOWER</span>
               <strong>{gte.summary.copowerFailures}</strong>
               <small>
                 MTBF {hours(gte.summary.mtbfHours)} · MTTR {hours(gte.summary.mttrHours)}
@@ -1010,7 +1167,7 @@ export function DashboardMantenimiento({ month, monthLabel }: MonthProps) {
             <CoreCard label="Preventivo (PP)" value={hours(cpw.summary.hoursPreventive)} hint="Resumen OP" />
             <CoreCard label="Correctivo / FS" value={hours(cpw.summary.hoursCorrective)} hint="Incluye fallas" />
             <CoreCard
-              label="FS imputable COPOWER"
+              label="FS asociado a COPOWER"
               value={hours(cpw.summary.hoursFailureCopower)}
               hint={`Cliente ${hours(cpw.summary.hoursFailureClient)}`}
               tone={cpw.summary.hoursFailureCopower > 100 ? "warn" : undefined}
@@ -1043,7 +1200,7 @@ export function DashboardMantenimiento({ month, monthLabel }: MonthProps) {
           {gte ? (
             <div className="exec-kpi-row">
               <div className="exec-kpi">
-                <span>Fallas imputables</span>
+                <span>Fallas asociadas a COPOWER</span>
                 <strong>{gte.summary.copowerFailures}</strong>
                 <small>Informe oficial</small>
               </div>

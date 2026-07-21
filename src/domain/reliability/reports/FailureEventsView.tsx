@@ -60,7 +60,7 @@ function EventStatsRow({ events, label }: { events: EnrichedEvent[]; label: stri
       <p className="ev-stats-source">{label}</p>
       <div className="field-stat-grid field-stat-grid--compact">
         <StatCard label="Registros" value={String(s.total)} />
-        <StatCard label="Fallas" value={String(s.failures)} hint={`${contractual} imputables`} />
+        <StatCard label="Fallas" value={String(s.failures)} hint={`${contractual} asociadas a COPOWER`} />
         <StatCard label="Operativos" value={String(s.operativo)} />
         <StatCard label="Horas FS" value={hours(s.downtimeHours)} />
         <StatCard label="PF contr" value={hours(s.pfContrHours)} hint="Notas GTE" />
@@ -158,14 +158,14 @@ function EventDetail({ event, onClose }: { event: EnrichedEvent; onClose: () => 
 
       {imputable ? (
         <section className="ev-detail-section ev-detail-imputable">
-          <h4>Evento imputable verificado (junio)</h4>
+          <h4>Evento asociado a COPOWER verificado (junio)</h4>
           <p>{imputable.observation}</p>
           <small>{imputable.source}</small>
         </section>
       ) : null}
 
       {isContractualFailure(event) ? (
-        <p className="alert-inline">Falla imputable COPOWER / PF_contr &gt; 0</p>
+        <p className="alert-inline">Falla asociada a COPOWER / PF_contr &gt; 0</p>
       ) : null}
     </aside>
   );

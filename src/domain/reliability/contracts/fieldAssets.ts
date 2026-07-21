@@ -203,6 +203,16 @@ export const FIELD_PROFILES: Record<FieldKey, FieldProfile> = {
     label: "Vonú",
     description:
       "Generación a baja tensión en campo Vonú (bloque Chaza). Entrega a 0,48 kV · Orden 9000007071 + participación en bloque 8 MW Orden 1200005030.",
+    hero: {
+      role: "Centro de generación BT",
+      location: "Campo Vonú · Bloque Chaza",
+      orders: ["9000007071", "1200005030"],
+    },
+    fleet: [
+      { id: "JIN-01", family: "Jinan CPW500", power: "500 kW", variant: "jinan" },
+      { id: "JIN-02", family: "Jinan CPW500", power: "500 kW", variant: "jinan" },
+      { id: "JIN-03", family: "Jinan CPW500", power: "500 kW", variant: "jinan" },
+    ],
     stats: [
       { label: "Potencia instalada", value: "1,5 MW", hint: "3 × Jinan CPW500 · 500 kW c/u" },
       { label: "Máquinas en operación", value: "3", hint: "JIN-01, JIN-02, JIN-03" },

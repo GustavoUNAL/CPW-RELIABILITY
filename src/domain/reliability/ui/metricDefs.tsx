@@ -11,6 +11,16 @@ export const METRIC_DEFS = {
     en: "Mean Time To Repair",
     es: "Tiempo medio de reparación",
   },
+  FS_CPW: {
+    code: "FS COPOWER",
+    en: "Forced outage associated to COPOWER",
+    es: "Horas fuera de servicio asociadas a COPOWER",
+  },
+  FS_CLIENTE: {
+    code: "FS Cliente",
+    en: "Forced outage associated to client/external infrastructure",
+    es: "Horas fuera de servicio asociadas a cliente/infraestructura",
+  },
 } as const;
 
 export type MetricCode = keyof typeof METRIC_DEFS;
@@ -41,6 +51,18 @@ export function MetricGlossary() {
       </span>
       <span>
         <strong>MTTR</strong> · {METRIC_DEFS.MTTR.es} ({METRIC_DEFS.MTTR.en})
+      </span>
+      <span className="metric-glossary-sep" aria-hidden>
+        ·
+      </span>
+      <span>
+        <strong>FS COPOWER</strong> · {METRIC_DEFS.FS_CPW.es}
+      </span>
+      <span className="metric-glossary-sep" aria-hidden>
+        ·
+      </span>
+      <span>
+        <strong>FS Cliente</strong> · {METRIC_DEFS.FS_CLIENTE.es}
       </span>
     </p>
   );

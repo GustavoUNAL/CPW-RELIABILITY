@@ -54,15 +54,19 @@ export const PROJECT_NAV_TREE: NavModule[] = [
   {
     key: "eventos",
     label: "Eventos de falla",
-    description: "Bitácoras, clasificación e imputables · dual y por fuente",
+    description: "Bitácoras, clasificación y fallas asociadas · dual y por fuente",
     children: [
       { id: "bd-ev-dual", label: "Comparativo dual" },
       { id: "bd-ev-copower", label: "Bitácora COPOWER" },
       { id: "bd-ev-gte", label: "Bitácora Gran Tierra" },
       { id: "an-pareto", label: "Pareto de fallas" },
-      { id: "proc-clasif", label: "Clasificación imputables" },
+      { id: "an-repetitivos-copower", label: "Eventos repetitivos COPOWER" },
+      { id: "an-repetitivos-gte", label: "Eventos repetitivos Gran Tierra" },
+      { id: "an-badactors-copower", label: "Malos actores COPOWER" },
+      { id: "an-badactors-gte", label: "Malos actores Gran Tierra" },
+      { id: "proc-clasif", label: "Clasificación fallas asociadas" },
       { id: "an-criticos", label: "Equipos críticos" },
-      { id: "an-rca", label: "RCA imputables" },
+      { id: "an-rca", label: "RCA fallas asociadas" },
     ],
   },
   {

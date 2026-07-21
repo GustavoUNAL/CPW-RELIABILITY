@@ -86,7 +86,7 @@ export function ComparativeAnalysis({ month, monthLabel }: Props) {
     pushPct("Confiabilidad", current.reliability, previous?.reliability, true);
     pushNum("MTBF", snap.summary.mtbfHours, prevSnap?.summary.mtbfHours ?? null, true, " h");
     pushNum("MTTR", snap.summary.mttrHours, prevSnap?.summary.mttrHours ?? null, false, " h");
-    pushNum("Fallas imputables", snap.summary.copowerFailures, prevSnap?.summary.copowerFailures ?? null, false, "");
+    pushNum("Fallas asociadas a COPOWER", snap.summary.copowerFailures, prevSnap?.summary.copowerFailures ?? null, false, "");
     pushNum(
       "Generación",
       current.generationMwh * 1000,
@@ -276,7 +276,7 @@ export function ComparativeAnalysis({ month, monthLabel }: Props) {
             <>
               <div className="exec-kpi-row">
                 <div className="exec-kpi pending">
-                  <span>Imputable COPOWER (PF_contr)</span>
+                  <span>Asociada a COPOWER (PF_contr)</span>
                   <strong>{losses.pfContr} h</strong>
                   <small>
                     ≈ {losses.kwhContr == null ? "N/D" : kwh(losses.kwhContr)} estimados
@@ -284,7 +284,7 @@ export function ComparativeAnalysis({ month, monthLabel }: Props) {
                   </small>
                 </div>
                 <div className="exec-kpi">
-                  <span>No imputable (PF_cli)</span>
+                  <span>Asociada a cliente (PF_cli)</span>
                   <strong>{losses.pfCli} h</strong>
                   <small>≈ {losses.kwhCli == null ? "N/D" : kwh(losses.kwhCli)} estimados</small>
                 </div>
@@ -355,7 +355,7 @@ export function ComparativeAnalysis({ month, monthLabel }: Props) {
                   </tbody>
                 </table>
               </div>
-              <p className="source-tag">Referencia de imputables: {JUNE_2026_IMPUTABLE_EVENTS.length} eventos · Σ PF_contr = 20 h</p>
+              <p className="source-tag">Referencia de fallas asociadas: {JUNE_2026_IMPUTABLE_EVENTS.length} eventos · Σ PF_contr = 20 h</p>
             </>
           ) : (
             <p className="muted">Pulse «Validar consolidado» para cruzar las cifras oficiales de junio.</p>

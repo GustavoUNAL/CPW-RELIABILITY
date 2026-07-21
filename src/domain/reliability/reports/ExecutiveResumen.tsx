@@ -220,7 +220,7 @@ export function ExecutiveResumen({ showAlerts = true }: Props) {
           <div className="exec-kpi-row">
             <div className="exec-kpi">
               <Wrench size={16} />
-              <span>Fallas imputables COPOWER</span>
+              <span>Fallas asociadas a COPOWER</span>
               <strong>{EXEC_JUN.failures}</strong>
               <small>
                 vs mayo {EXEC_MAY.failures} ({failuresDelta >= 0 ? "+" : ""}
@@ -249,12 +249,12 @@ export function ExecutiveResumen({ showAlerts = true }: Props) {
             <div className="exec-kpi pending">
               <AlertTriangle size={16} />
               <span>Shutdowns de campo</span>
-              <strong>{EXEC_JUN.failures} eventos imputables</strong>
+              <strong>{EXEC_JUN.failures} eventos asociados a COPOWER</strong>
               <small>
                 Pendiente confirmar equivalencia con la definición contractual de shutdown O&amp;M. No se aplica
                 automáticamente la escala de deducciones hasta dicha validación.
               </small>
-              <SourceTag>Reportado: eventos imputables · Pendiente: clasificación shutdown O&amp;M</SourceTag>
+              <SourceTag>Reportado: eventos asociados · Pendiente: clasificación shutdown O&amp;M</SourceTag>
             </div>
           </div>
         </article>
@@ -644,11 +644,11 @@ export function ExecutiveResumen({ showAlerts = true }: Props) {
                   <strong>{hours(EXEC_JUN.hoursPp)}</strong>
                 </div>
                 <div>
-                  <span>Horas PF_contr (imputable)</span>
+                  <span>Horas PF_contr (asociada a COPOWER)</span>
                   <strong>{hours(EXEC_JUN.hoursPfContr)}</strong>
                 </div>
                 <div>
-                  <span>Horas PF_cli (no imputable)</span>
+                  <span>Horas PF_cli (asociada a cliente)</span>
                   <strong>{hours(EXEC_JUN.hoursPfCli)}</strong>
                 </div>
               </div>
