@@ -1,18 +1,14 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
-  AlertTriangle,
   CalendarRange,
   ClipboardCheck,
   ClipboardList,
   Database,
   FileText,
   Gauge,
-  GitCompare,
   LayoutDashboard,
   MapPin,
-  SearchCheck,
   Settings2,
-  Sparkles,
   Wrench,
   Zap,
 } from "lucide-react";
@@ -34,15 +30,11 @@ const MODULE_ICONS: Record<PageKey, ReactNode> = {
   dashboard: <LayoutDashboard size={16} />,
   campos: <MapPin size={16} />,
   generacion: <Zap size={16} />,
-  comparacion: <GitCompare size={16} />,
-  eventos: <AlertTriangle size={16} />,
-  mantenimiento: <Wrench size={16} />,
-  acciones: <ClipboardCheck size={16} />,
-  planeacion: <CalendarRange size={16} />,
-  confiabilidad: <Gauge size={16} />,
   operacion: <Database size={16} />,
-  analisis: <Sparkles size={16} />,
-  calidad_datos: <SearchCheck size={16} />,
+  confiabilidad: <Gauge size={16} />,
+  gestion_activos: <Wrench size={16} />,
+  gestion_acciones: <ClipboardCheck size={16} />,
+  planeacion: <CalendarRange size={16} />,
   reportes: <ClipboardList size={16} />,
   configuracion: <Settings2 size={16} />,
 };
@@ -60,9 +52,15 @@ function App() {
     [DEFAULT_MODULE.key]: true,
   });
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
+    "op-datos": true,
+    "op-horas": true,
+    "op-calidad": true,
+    "conf-kpis": true,
     "conf-copower": true,
     "conf-gte": true,
-    "op-horas": true,
+    "conf-eventos": true,
+    "conf-worst": true,
+    "conf-comparacion": true,
     "cfg-empresas": true,
   });
   const [theme, setTheme] = useState<"light" | "dark">("light");

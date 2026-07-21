@@ -1,4 +1,4 @@
-import { AlertTriangle, Gauge, ShieldAlert, Wrench, Zap } from "lucide-react";
+import { AlertTriangle, Wrench } from "lucide-react";
 import { useMemo, Fragment, type ReactNode } from "react";
 import {
   Bar,
@@ -29,7 +29,6 @@ import {
   type GranTierraMonthKey,
 } from "./granTierraMonthly";
 import type { MachineIndicatorRow } from "../types";
-import { assessTechnicalRisk } from "../risk/technicalRisk";
 
 const META = CONTRACTUAL_KPI_TARGETS.reliability;
 const META_PCT = META * 100;
@@ -971,162 +970,6 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
         <p>
           <strong>Fuentes:</strong> {gte?.sourceFile ?? "GTE N/D"} · {cpw?.sourceFile ?? "COPOWER N/D"}. GTE =
           base contractual; COPOWER = operación diaria. Δ positivo en % indica valor CPW mayor que GTE.
-        </p>
-      </aside>
-    </div>
-  );
-}
-
-export function DashboardGerencia({ month, monthLabel }: MonthProps) {
-  const gte = GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey] ?? null;
-
-  if (!gte) {
-    return (
-      <div className="dash-module exec-dashboard">
-        <header className="exec-header">
-          <div>
-            <p className="eyebrow">Dashboard · Gerencia</p>
-            <h2>{monthLabel}</h2>
-          </div>
-        </header>
-        <p className="empty-state">Sin informe Gran Tierra para este periodo.</p>
-      </div>
-    );
-  }
-
-  const band =
-    gte.kpi.reliability != null ? getReliabilityDeduction(gte.kpi.reliability) : null;
-  const availGap =
-    gte.kpi.availability != null ? (gte.kpi.availability - META) * 100 : null;
-  const confGap = gte.kpi.reliability != null ? (gte.kpi.reliability - META) * 100 : null;
-  const rcaCount = month === "Jun" ? JUNE_2026_IMPUTABLE_EVENTS.length : null;
-
-  const riskUnits = gte.machineIndicators
-    .filter((m) => m.unidad !== "SISTEMA N")
-    .map((m) => ({
-      ...m,
-      assessed: assessTechnicalRisk({
-        fallas: m.fallas,
-        mtbfLabel: m.mtbfLabel,
-        mttrHours: m.mttrHours,
-        disponibilidadPct: m.disponibilidadPct,
-        skip: m.cumplimiento === "N/A",
-      }),
-    }))
-    .filter((m) => m.assessed.riesgo === "RIESGO MEDIO" || m.assessed.riesgo === "RIESGO ALTO");
-
-  return (
-    <div className="dash-module exec-dashboard">
-      <header className="exec-header dash-hero">
-        <div>
-          <p className="eyebrow">Dashboard · Gerencia</p>
-          <h2>Cumplimiento contractual — {monthLabel}</h2>
-          <p className="muted">Orden 1 · metas 98% · exposición económica y riesgos abiertos</p>
-        </div>
-        <span className="badge warn">GTE</span>
-      </header>
-
-      <section className="panel">
-        <article className="card">
-          <div className="dash-block-head">
-            <div>
-              <p className="eyebrow">1 · Indicadores vs meta</p>
-              <h3>SLA Orden 1</h3>
-            </div>
-            {band ? (
-              <span className={`badge ${band.deductionPct > 0 ? "danger" : "ok"}`}>
-                Deducción {band.deductionPct}%
-              </span>
-            ) : null}
-          </div>
-          <div className="dash-core-grid">
-            <CoreCard
-              label="Disponibilidad"
-              value={pct(gte.kpi.availability)}
-              hint={availGap != null ? `${availGap.toFixed(2)} pp vs 98%` : "Meta ≥ 98%"}
-              tone={kpiTone(gte.kpi.availability)}
-            />
-            <CoreCard
-              label="Confiabilidad"
-              value={pct(gte.kpi.reliability)}
-              hint={confGap != null ? `${confGap.toFixed(2)} pp vs 98%` : "Meta ≥ 98%"}
-              tone={kpiTone(gte.kpi.reliability)}
-            />
-            <CoreCard
-              label="Banda de deducción"
-              value={band?.rangeLabel ?? "N/D"}
-              hint={band ? `${band.deductionPct}% facturación mensual` : undefined}
-              tone={band && band.deductionPct > 0 ? "bad" : "ok"}
-            />
-          </div>
-        </article>
-      </section>
-
-      <section className="panel two-col">
-        <article className="card">
-          <p className="eyebrow">2 · Exposición adicional</p>
-          <h3>RCA y multas</h3>
-          {rcaCount == null ? (
-            <p className="empty-state">Sin tracker RCA cargado para este mes.</p>
-          ) : (
-            <div className="dash-alert active">
-              <div className="dash-alert-head">
-                <strong>Reportes RCA de fallas asociadas</strong>
-                <ShieldAlert size={16} />
-              </div>
-              <p>
-                0/{rcaCount} entregados. Orden 1: multa adicional del <strong>4%</strong> de la facturación
-                mensual si se confirma incumplimiento.
-              </p>
-            </div>
-          )}
-          {gte.summary.actionsOverdue != null && gte.summary.actionsOverdue > 0 ? (
-            <p className="alert-inline">{gte.summary.actionsOverdue} acción(es) de plan vencida(s).</p>
-          ) : null}
-        </article>
-        <article className="card">
-          <p className="eyebrow">3 · Riesgos abiertos</p>
-          <h3>Matriz técnica (propuesta)</h3>
-          {riskUnits.length === 0 ? (
-            <p className="empty-state">Ninguna unidad en riesgo medio/alto.</p>
-          ) : (
-            <ul className="meeting-list">
-              {riskUnits.map((r) => (
-                <li key={r.unidad}>
-                  <strong>{r.unidad}</strong> · {r.fallas} falla(s) · {r.assessed.riesgo.replace("RIESGO ", "")}
-                </li>
-              ))}
-            </ul>
-          )}
-        </article>
-      </section>
-
-      <section className="panel">
-        <article className="card">
-          <p className="eyebrow">4 · Producción</p>
-          <div className="exec-kpi-row">
-            <div className="exec-kpi">
-              <Zap size={16} />
-              <span>Generación del mes</span>
-              <strong>{kwh(gte.totalGenerationKwh)}</strong>
-              <small>Meta contractual 4,000,000 kWh</small>
-            </div>
-            <div className="exec-kpi">
-              <Gauge size={16} />
-              <span>Fallas asociadas a COPOWER</span>
-              <strong>{gte.summary.copowerFailures}</strong>
-              <small>
-                MTBF {hours(gte.summary.mtbfHours)} · MTTR {hours(gte.summary.mttrHours)}
-              </small>
-            </div>
-          </div>
-        </article>
-      </section>
-
-      <aside className="exec-source-note">
-        <p>
-          <strong>Fuente:</strong> {gte.sourceFile}. Vista orientada a gerencia — no incluye detalle operativo
-          COPOWER (ver Operación).
         </p>
       </aside>
     </div>

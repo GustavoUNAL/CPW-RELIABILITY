@@ -24,15 +24,27 @@ const CPW_LEAVES = new Set([
   "cfg-empresas-copower",
   "bd-op-copower",
   "bd-ind-copower",
-  "bd-fallas",
   "bd-ev-copower",
   "proc-clasif",
-  "proc-eventos",
+  "proc-op",
+  "proc-disp",
+  "proc-fs",
+  "proc-mto",
+  "bd-mto",
+  "bd-alarmas",
   "rep-diario",
   "dash-operacion",
   "an-repetitivos-copower",
   "an-badactors-copower",
   "an-interv-copower",
+  "an-criticos",
+  "an-riesgo",
+  "gen-dashboard",
+  "gen-diaria",
+  "gen-mensual",
+  "gen-equipos",
+  "gen-utilizacion",
+  "gen-horas",
 ]);
 
 const GTE_LEAVES = new Set([
@@ -48,17 +60,58 @@ const GTE_LEAVES = new Set([
   "an-repetitivos-gte",
   "an-badactors-gte",
   "an-interv-gte",
+  "mto-optimizacion",
+  "mto-degradacion",
+  "ga-salud",
+  "rep-inf-rca",
+  "rep-inf-interv",
+  "rep-inf-mso",
+  "rep-inf-riesgos",
 ]);
 
 const DUAL_LEAVES = new Set([
   "cfg-campos-costayaco",
   "cfg-campos-vonu",
+  "cfg-campos",
   "bd-ev-dual",
   "bd-historicos",
   "cq-auditoria",
   "cq-validacion",
   "cq-faltantes",
+  "cq-duplicados",
+  "cq-normalizacion",
   "an-pareto",
+  "cmp-kpi",
+  "cmp-diff",
+  "cmp-tend",
+  "cmp-desv",
+  "cmp-sla",
+  "cmp-bench",
+  "capa-tablero",
+  "capa-seguimiento",
+  "capa-evidencias",
+  "capa-efectividad",
+  "op-tablero",
+  "op-riesgos",
+  "op-alertas",
+  "op-prioridades",
+  "op-accion",
+  "op-cronograma",
+  "op-compromisos",
+  "op-recursos",
+  "mto-dashboard",
+  "rep-export",
+  "rep-historico",
+  "rep-inf-resumen",
+  "rep-inf-desempeno",
+  "rep-inf-kpis",
+  "rep-inf-eventos",
+  "rep-inf-pareto",
+  "rep-inf-worst",
+  "rep-inf-capa",
+  "rep-inf-plan",
+  "rep-inf-conclusiones",
+  "rep-inf-export",
 ]);
 
 /** Vista única con mes dual — no usar DualCompare lado a lado. */
@@ -68,56 +121,78 @@ export const INTEGRATED_DUAL_LEAVES = new Set([
   "mto-dashboard",
   "mto-optimizacion",
   "mto-degradacion",
+  "ga-salud",
   "capa-tablero",
+  "capa-seguimiento",
+  "capa-evidencias",
+  "capa-efectividad",
   "op-tablero",
+  "op-riesgos",
+  "op-alertas",
+  "op-prioridades",
+  "op-accion",
+  "op-cronograma",
+  "op-compromisos",
+  "op-recursos",
+  "bd-ev-dual",
+  "an-pareto",
+  "cq-auditoria",
   "cfg-campos-costayaco",
   "cfg-campos-vonu",
+  "cfg-campos",
+  "rep-inf-resumen",
+  "rep-inf-desempeno",
+  "rep-inf-kpis",
+  "rep-inf-eventos",
+  "rep-inf-pareto",
+  "rep-inf-worst",
+  "rep-inf-rca",
+  "rep-inf-interv",
+  "rep-inf-mso",
+  "rep-inf-riesgos",
+  "rep-inf-capa",
+  "rep-inf-plan",
+  "rep-inf-conclusiones",
+  "rep-inf-export",
+]);
+
+const GEN_LEAVES = new Set([
+  "gen-dashboard",
+  "gen-diaria",
+  "gen-mensual",
+  "gen-equipos",
+  "gen-utilizacion",
+  "gen-horas",
+  "rep-inf-desempeno",
 ]);
 
 function isCopowerLeaf(page: PageKey, leafId: string) {
-  if (page === "confiabilidad" && (leafId.startsWith("kpi-cpw-") || leafId === "bd-ind-copower")) return true;
-  if (page === "operacion") return true;
-  if (
-    page === "eventos" &&
-    (leafId === "bd-ev-copower" ||
-      leafId === "proc-clasif" ||
-      leafId === "an-criticos" ||
-      leafId === "an-repetitivos-copower" ||
-      leafId === "an-badactors-copower" ||
-      leafId === "an-interv-copower")
-  )
-    return true;
-  if (page === "analisis" && leafId === "an-riesgo") return true;
+  if (leafId.startsWith("kpi-cpw-") || leafId === "bd-ind-copower") return true;
+  if (GEN_LEAVES.has(leafId)) return true;
   if (CPW_LEAVES.has(leafId)) return true;
+  if (page === "operacion" && (leafId.startsWith("proc-") || leafId.startsWith("bd-op"))) return true;
   return false;
 }
 
-function isGteLeaf(page: PageKey, leafId: string) {
-  if (page === "confiabilidad" && (leafId.startsWith("kpi-gte-") || leafId === "bd-ind-gte")) return true;
-  if (
-    page === "eventos" &&
-    (leafId === "bd-ev-gte" ||
-      leafId === "an-rca" ||
-      leafId === "an-rca-gte" ||
-      leafId === "an-repetitivos-gte" ||
-      leafId === "an-badactors-gte" ||
-      leafId === "an-interv-gte")
-  )
-    return true;
+function isGteLeaf(_page: PageKey, leafId: string) {
+  if (leafId.startsWith("kpi-gte-") || leafId === "bd-ind-gte") return true;
   if (GTE_LEAVES.has(leafId)) return true;
-  if (leafId === "dash-ejecutivo" || leafId === "dash-gerencia" || leafId === "dash-operacion-gte") return true;
+  if (leafId === "dash-operacion-gte") return true;
   return false;
 }
 
 function isDualLeaf(page: PageKey, leafId: string) {
-  if (page === "campos" || page === "comparacion") return true;
-  if (page === "eventos" && (leafId === "bd-ev-dual" || leafId === "an-pareto")) return true;
+  if (page === "gestion_acciones" || page === "planeacion") return true;
+  if (page === "gestion_activos" && (leafId === "mto-dashboard" || leafId.startsWith("capa"))) return true;
+  if (leafId.startsWith("cmp-")) return true;
+  if (leafId.startsWith("cq-")) return true;
+  if (leafId.startsWith("rep-inf-")) return true;
   if (DUAL_LEAVES.has(leafId)) return true;
   return false;
 }
 
 export function resolveViewContext(page: PageKey, leafId: string): ViewContext {
-  if (page === "generacion") {
+  if (GEN_LEAVES.has(leafId) && leafId.startsWith("gen-")) {
     return {
       report: "copower",
       monthOrder: ["YTD2026"],
@@ -126,13 +201,15 @@ export function resolveViewContext(page: PageKey, leafId: string): ViewContext {
       fixedPeriod: true,
     };
   }
-  if (INTEGRATED_DUAL_LEAVES.has(leafId) || page === "campos") {
+  if (INTEGRATED_DUAL_LEAVES.has(leafId) || leafId.startsWith("cfg-campos")) {
     const union = Array.from(new Set([...GRAN_TIERRA_MONTH_ORDER, ...COPOWER_MONTH_ORDER]));
     return {
       report: "dual",
       monthOrder: union,
-      reportLabel: page === "campos" ? "Campo · Costayaco / Vonú" : "Gran Tierra + COPOWER · vista integrada",
-      reportShort: page === "campos" ? "Campo" : "Dual",
+      reportLabel: leafId.startsWith("cfg-campos")
+        ? "Campo · Costayaco / Vonú"
+        : "Gran Tierra + COPOWER · vista integrada",
+      reportShort: leafId.startsWith("cfg-campos") ? "Campo" : "Dual",
     };
   }
   if (isDualLeaf(page, leafId)) {

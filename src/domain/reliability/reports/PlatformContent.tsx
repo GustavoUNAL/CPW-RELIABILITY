@@ -16,7 +16,8 @@ import { MaintenanceOptimizationDashboard } from "./MaintenanceOptimizationDashb
 import { DegradationRiskDashboard } from "./DegradationRiskDashboard";
 import { ActionTrackingDashboard } from "./ActionTrackingDashboard";
 import { OperationalPlanningDashboard } from "./OperationalPlanningDashboard";
-import { DashboardGerencia, DashboardMantenimiento, DashboardOverview } from "./DashboardViews";
+import { MonthlyReportDashboard } from "./MonthlyReportDashboard";
+import { DashboardMantenimiento, DashboardOverview } from "./DashboardViews";
 import { GenerationDashboard } from "./GenerationDashboard";
 import { CopowerCompanyView, GteCompanyView } from "./CompanyViews";
 import { FieldAssetsView } from "./FieldAssetsView";
@@ -186,7 +187,7 @@ function KpiFocus({
 }: {
   report: ReportKey;
   month: string;
-  metric: "disp" | "conf" | "mtbf" | "mttr" | "prod" | "util" | "fs";
+  metric: "disp" | "conf" | "mtbf" | "mttr" | "prod" | "util" | "for" | "pp";
 }) {
   const snap = getSnap(report, month);
   if (!snap) return <EmptyScreen detail="Sin registros para este periodo." report={report} />;
@@ -205,10 +206,15 @@ function KpiFocus({
           : "N/D",
       note: "Estimado OP / (OP+SB+MTO+FS) desde Resumen OP",
     },
-    fs: {
-      label: "Forced / Planned outage",
-      value: `${hours(s.hoursFailureCopower)} / ${hours(s.hoursPreventive)}`,
-      note: "PF_contr (forzado asociado a COPOWER) · PP (planificado)",
+    for: {
+      label: "Forced outage (PF_contr)",
+      value: hours(s.hoursFailureCopower),
+      note: "Horas de falla imputables a COPOWER (PF_contr)",
+    },
+    pp: {
+      label: "Planned outage (PP)",
+      value: hours(s.hoursPreventive),
+      note: "Horas de mantenimiento preventivo programado",
     },
   } as const;
   const m = map[metric];
@@ -282,7 +288,7 @@ function PlatformBody({
   const cpwMonth = (COPOWER_MONTHLY_DATA[month as CopowerMonthKey] ? month : "Jun") as CopowerMonthKey;
   const gteMonthOk = Boolean(GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey]);
 
-  if (page === "generacion") {
+  if (leafId.startsWith("gen-")) {
     return (
       <ScreenShell report="copower" headless>
         <GenerationDashboard section={generationSectionFromLeaf(leafId)} />
@@ -290,7 +296,15 @@ function PlatformBody({
     );
   }
 
-  if (page === "campos") {
+  if (leafId.startsWith("cfg-campos-") || leafId === "cfg-campos") {
+    if (leafId === "cfg-campos") {
+      return (
+        <EmptyScreen
+          detail="Seleccione Costayaco o Vonú en Campos."
+          report="dual"
+        />
+      );
+    }
     const fieldKey = fieldKeyFromLeaf(leafId);
     if (fieldKey) {
       return <FieldAssetsView fieldKey={fieldKey} month={month} monthLabel={monthLabel} />;
@@ -307,9 +321,28 @@ function PlatformBody({
     if (leafId === "cfg-parametros") {
       return <MarcoContractual leaf="sec-1-2" report="gran_tierra" month={month} monthLabel={monthLabel} />;
     }
+    if (leafId === "cfg-equipos" || leafId === "cfg-usuarios" || leafId === "cfg-catalogos") {
+      return (
+        <EmptyScreen
+          detail={`${leafId === "cfg-equipos" ? "Catálogo de equipos" : leafId === "cfg-usuarios" ? "Gestión de usuarios" : "Catálogos"} pendiente de configuración administrativa.`}
+          report="dual"
+        />
+      );
+    }
   }
 
-  if (page === "eventos") {
+  if (
+    leafId.startsWith("bd-ev") ||
+    leafId.startsWith("an-repetitivos") ||
+    leafId.startsWith("an-badactors") ||
+    leafId.startsWith("an-interv") ||
+    leafId === "an-rca-gte" ||
+    leafId === "an-rca" ||
+    leafId === "an-pareto" ||
+    leafId === "proc-clasif" ||
+    leafId === "an-criticos" ||
+    leafId === "bd-fallas"
+  ) {
     if (leafId === "bd-ev-dual" || leafId === "bd-fallas") {
       return (
         <ScreenShell report="dual" headless>
@@ -351,12 +384,33 @@ function PlatformBody({
       return <EventInsightsDashboard report="gran_tierra" month={month} monthLabel={monthLabel} mode="badactors" />;
     }
     if (leafId === "an-interv-copower") {
-      return <InterventionPlansDashboard report="copower" month={month} monthLabel={monthLabel} />;
+      return (
+        <EmptyScreen
+          detail="Planes de intervención COPOWER aún no cargados. Use Planes de intervención Gran Tierra (junio 2026) o cree planes desde malos actores."
+          report="copower"
+        />
+      );
     }
     if (leafId === "an-interv-gte") {
+      if (month !== "Jun") {
+        return (
+          <EmptyScreen
+            detail="Planes de intervención GTE disponibles solo para junio 2026."
+            report="gran_tierra"
+          />
+        );
+      }
       return <InterventionPlansDashboard report="gran_tierra" month={month} monthLabel={monthLabel} />;
     }
     if (leafId === "an-rca-gte" || leafId === "an-rca") {
+      if (month !== "Jun") {
+        return (
+          <EmptyScreen
+            detail="RCA GTE cargados solo para junio 2026 (cierre julio)."
+            report="gran_tierra"
+          />
+        );
+      }
       return <RcaAnalysisDashboard monthLabel={monthLabel} />;
     }
     if (leafId === "proc-clasif") {
@@ -406,31 +460,75 @@ function PlatformBody({
     }
   }
 
-  if (page === "mantenimiento") {
+  if (
+    leafId === "mto-optimizacion" ||
+    leafId === "mto-degradacion" ||
+    leafId === "mto-dashboard" ||
+    leafId === "ga-salud" ||
+    page === "gestion_activos"
+  ) {
     if (leafId === "mto-optimizacion") {
+      if (month !== "Jun") {
+        return (
+          <EmptyScreen
+            detail="Optimización de planes (MSO) disponible solo para junio 2026 · Gran Tierra."
+            report="gran_tierra"
+          />
+        );
+      }
       return <MaintenanceOptimizationDashboard monthLabel={monthLabel} />;
     }
-    if (leafId === "mto-degradacion") {
+    if (leafId === "mto-degradacion" || leafId === "ga-salud") {
+      if (month !== "Jun") {
+        return (
+          <EmptyScreen
+            detail="Salud / tendencias de degradación: use junio 2026 como mes de evaluación (histórico Ene–Jun)."
+            report="gran_tierra"
+          />
+        );
+      }
       return <DegradationRiskDashboard monthLabel={monthLabel} />;
     }
     if (leafId === "mto-dashboard") {
       return <DashboardMantenimiento month={month} monthLabel={monthLabel} />;
     }
-    return <EmptyScreen detail="Seleccione una opción de Mantenimiento." />;
   }
 
-  if (page === "acciones") {
-    if (leafId === "capa-tablero") {
-      return <ActionTrackingDashboard monthLabel={monthLabel} />;
+  if (
+    leafId.startsWith("capa-") ||
+    page === "gestion_acciones"
+  ) {
+    if (month !== "Jun" && month !== "Jul") {
+      return (
+        <EmptyScreen
+          detail="CAPA centralizado con datos de junio–julio 2026. Seleccione Jun o Jul en el selector de mes."
+          report="dual"
+        />
+      );
     }
-    return <EmptyScreen detail="Seleccione una opción de Acciones CAPA." />;
+    return <ActionTrackingDashboard monthLabel={monthLabel} />;
   }
 
-  if (page === "planeacion") {
-    if (leafId === "op-tablero") {
-      return <OperationalPlanningDashboard monthLabel={monthLabel} />;
-    }
-    return <EmptyScreen detail="Seleccione una opción de Planeación operacional." />;
+  if (
+    page === "planeacion" ||
+    leafId === "op-tablero" ||
+    leafId === "op-riesgos" ||
+    leafId === "op-alertas" ||
+    leafId === "op-prioridades" ||
+    leafId === "op-accion" ||
+    leafId === "op-cronograma" ||
+    leafId === "op-compromisos" ||
+    leafId === "op-recursos"
+  ) {
+    return <OperationalPlanningDashboard monthLabel={monthLabel} />;
+  }
+
+  if (leafId.startsWith("rep-inf-")) {
+    return <MonthlyReportDashboard month={month} monthLabel={monthLabel} section={leafId} />;
+  }
+
+  if (leafId === "rep-historico") {
+    return <SourceMonthCompare report="gran_tierra" month={month} monthLabel={monthLabel} />;
   }
 
   if (page === "confiabilidad") {
@@ -447,15 +545,15 @@ function PlatformBody({
         </ScreenShell>
       );
     }
-    const cpwMap: Record<string, "disp" | "conf" | "mtbf" | "mttr" | "prod" | "util" | "fs"> = {
+    const cpwMap: Record<string, "disp" | "conf" | "mtbf" | "mttr" | "prod" | "util" | "for" | "pp"> = {
       "kpi-cpw-disp": "disp",
       "kpi-cpw-conf": "conf",
       "kpi-cpw-mtbf": "mtbf",
       "kpi-cpw-mttr": "mttr",
       "kpi-cpw-prod": "prod",
       "kpi-cpw-util": "util",
-      "kpi-cpw-for": "fs",
-      "kpi-cpw-planned": "fs",
+      "kpi-cpw-for": "for",
+      "kpi-cpw-planned": "pp",
     };
     if (leafId === "kpi-cpw-prod") {
       return (
@@ -574,7 +672,7 @@ function PlatformBody({
     }
   }
 
-  if (page === "calidad_datos") {
+  if (leafId.startsWith("cq-")) {
     if (leafId === "cq-faltantes") {
       return (
         <ScreenShell report={report} title="Datos faltantes / N/D" subtitle={monthLabel}>
@@ -585,81 +683,68 @@ function PlatformBody({
     if (leafId === "cq-validacion") {
       return <SourceMonthCompare report={report} month={month} monthLabel={monthLabel} />;
     }
+    if (leafId === "cq-auditoria") {
+      return month === "Jun" ? (
+        <ComparativeAnalysis month="Jun" monthLabel={monthLabel} />
+      ) : (
+        <EmptyScreen detail="Auditoría PDF vs Excel disponible solo para junio 2026." report="dual" />
+      );
+    }
     return (
       <EmptyScreen
-        detail={`Módulo de calidad pendiente de pipeline formal (sin inventar reglas).`}
-        report={report}
+        detail="Módulo de calidad pendiente de pipeline formal (sin inventar reglas). Disponible a nivel dual GTE + COPOWER."
+        report="dual"
       />
     );
   }
 
-  if (page === "analisis") {
-    if (leafId === "an-weibull" || leafId === "an-curvas" || leafId === "an-pred") {
-      return (
-        <EmptyScreen
-          detail="Pendiente de modelo estadístico (Weibull / curvas / predicción) sobre histórico real."
-          report="copower"
-        />
-      );
-    }
-    if (leafId === "an-riesgo") {
-      const snap = getSnap("copower", month);
-      const rows = (snap?.machineIndicators ?? [])
-        .filter((m) => m.unidad !== "SISTEMA N")
-        .map((m) => ({
-          ...m,
-          assessed: assessTechnicalRisk({
-            fallas: m.fallas,
-            mtbfLabel: m.mtbfLabel,
-            mttrHours: m.mttrHours,
-            disponibilidadPct: m.disponibilidadPct,
-            skip: m.cumplimiento === "N/A",
-          }),
-        }));
-      return (
-        <ScreenShell
-          report="copower"
-          title="Matriz de riesgo técnico"
-          subtitle="Probabilidad × Consecuencia — pendiente validación formal"
-        >
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Unidad</th>
-                  <th>Fallas</th>
-                  <th>Riesgo</th>
+  if (leafId === "an-riesgo") {
+    const snap = getSnap("copower", month);
+    const rows = (snap?.machineIndicators ?? [])
+      .filter((m) => m.unidad !== "SISTEMA N")
+      .map((m) => ({
+        ...m,
+        assessed: assessTechnicalRisk({
+          fallas: m.fallas,
+          mtbfLabel: m.mtbfLabel,
+          mttrHours: m.mttrHours,
+          disponibilidadPct: m.disponibilidadPct,
+          skip: m.cumplimiento === "N/A",
+        }),
+      }));
+    return (
+      <ScreenShell
+        report="copower"
+        title="Matriz de riesgo técnico"
+        subtitle="Probabilidad × Consecuencia — pendiente validación formal"
+      >
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Unidad</th>
+                <th>Fallas</th>
+                <th>Riesgo</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.unidad}>
+                  <td>{r.unidad}</td>
+                  <td>{r.fallas}</td>
+                  <td>{r.assessed.riesgo}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {rows.map((r) => (
-                  <tr key={r.unidad}>
-                    <td>{r.unidad}</td>
-                    <td>{r.fallas}</td>
-                    <td>{r.assessed.riesgo}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </ScreenShell>
-      );
-    }
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </ScreenShell>
+    );
   }
 
   if (page === "dashboard") {
     if (leafId === "dash-resumen") {
       return <DashboardOverview month={month} monthLabel={monthLabel} />;
-    }
-    if (leafId === "dash-ejecutivo") {
-      return month === "Jun" && gteMonthOk ? (
-        <ExecutiveResumen />
-      ) : (
-        <MeetingBrief month={month as GranTierraMonthKey} monthLabel={monthLabel} />
-      );
-    }
-    if (leafId === "dash-gerencia") {
-      return <DashboardGerencia month={month} monthLabel={monthLabel} />;
     }
     if (leafId === "dash-operacion") return <CopowerResumen month={cpwMonth} />;
     if (leafId === "dash-operacion-gte") {
@@ -699,15 +784,7 @@ function PlatformBody({
 export function PlatformContent({ page, leafId, month, monthLabel }: Props) {
   const ctx = resolveViewContext(page, leafId);
 
-  if (page === "calidad_datos" && leafId === "cq-auditoria") {
-    return month === "Jun" ? (
-      <ComparativeAnalysis month="Jun" monthLabel={monthLabel} />
-    ) : (
-      <EmptyScreen detail="Auditoría PDF vs Excel disponible solo para junio 2026." report="dual" />
-    );
-  }
-
-  if (page === "comparacion") {
+  if (leafId.startsWith("cmp-")) {
     if (leafId === "cmp-bench") {
       return <EmptyScreen detail="Sin benchmark externo cargado (solo metas Orden 1 internas)." report="dual" />;
     }
@@ -735,7 +812,11 @@ export function PlatformContent({ page, leafId, month, monthLabel }: Props) {
     }
   }
 
-  if (ctx.report === "dual" && !INTEGRATED_DUAL_LEAVES.has(leafId) && page !== "campos") {
+  if (
+    ctx.report === "dual" &&
+    !INTEGRATED_DUAL_LEAVES.has(leafId) &&
+    !leafId.startsWith("cfg-campos")
+  ) {
     return <DualCompare page={page} leafId={leafId} month={month} monthLabel={monthLabel} />;
   }
 

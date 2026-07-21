@@ -5032,3 +5032,43 @@ tr.row-focal td {
   margin: 0.25rem 0;
   font-size: 1.35rem;
 }
+
+.rep-toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 1rem 0 1.25rem;
+}
+
+.rep-toc a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  background: var(--panel-soft);
+  text-decoration: none;
+  border: 1px solid transparent;
+}
+
+.rep-toc a span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 0.25rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: color-mix(in oklab, var(--accent) 14%, transparent);
+  color: var(--accent);
+}
+
+.rep-toc a.active,
+.rep-toc a:hover {
+  color: var(--text);
+  border-color: color-mix(in oklab, var(--accent) 35%, transparent);
+  background: color-mix(in oklab, var(--accent) 8%, var(--panel-soft));
+}
