@@ -7,7 +7,13 @@ import {
   GRAN_TIERRA_MONTHLY_DATA,
   type GranTierraMonthKey,
 } from "./granTierraMonthly";
+import { CopowerIndicatorsDashboard } from "./CopowerIndicatorsPanel";
+import { FailureEventsView } from "./FailureEventsView";
+import { DashboardGerencia, DashboardMantenimiento, DashboardOverview } from "./DashboardViews";
+import { GenerationDashboard } from "./GenerationDashboard";
 import { CopowerCompanyView, GteCompanyView } from "./CompanyViews";
+import { FieldAssetsView } from "./FieldAssetsView";
+import { fieldKeyFromLeaf } from "../contracts/fieldAssets";
 import { CopowerResumen } from "./CopowerResumen";
 import { ExecutiveResumen } from "./ExecutiveResumen";
 import { MeetingBrief } from "./MeetingBrief";
@@ -17,7 +23,7 @@ import { MarcoContractual } from "./MarcoContractual";
 import { JUNE_2026_IMPUTABLE_EVENTS } from "./juneImputableEvents";
 import { CONTRACT_CALC_BASE, CONTRACTUAL_KPI_TARGETS } from "../contracts/gteOrders";
 import { assessTechnicalRisk } from "../risk/technicalRisk";
-import { resolveReport, resolveViewContext } from "../nav/resolveContext";
+import { generationSectionFromLeaf, resolveReport, resolveViewContext } from "../nav/resolveContext";
 import type { PageKey, ReportKey } from "../types";
 import { METRIC_DEFS } from "../ui/metricDefs";
 import { EmptyScreen, ScreenShell } from "../ui/ScreenShell";
@@ -166,41 +172,6 @@ function HoursPanel({ report, month }: { report: ReportKey; month: string }) {
   );
 }
 
-function EventsTable({ report, month, onlyFailures }: { report: ReportKey; month: string; onlyFailures?: boolean }) {
-  const snap = getSnap(report, month);
-  if (!snap) return <EmptyScreen detail="Sin registros para este periodo." report={report} />;
-  const rows = (onlyFailures ? snap.eventLog.filter((e) => e.eventType === "Falla") : snap.eventLog).slice(0, 40);
-  if (rows.length === 0) return <EmptyScreen detail="Sin eventos en el periodo." report={report} />;
-  return (
-    <div className="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Equipo</th>
-            <th>Tipo</th>
-            <th>Horas</th>
-            <th>Resp.</th>
-            <th>Causa / notas</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((e) => (
-            <tr key={`${e.date}-${e.equipment}-${e.cause}-${e.downtimeHours}`}>
-              <td>{e.date}</td>
-              <td>{e.equipment}</td>
-              <td>{e.eventType}</td>
-              <td>{hours(e.downtimeHours)}</td>
-              <td>{e.responsible}</td>
-              <td className="detalle-cell">{e.notes || e.cause}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
 function KpiFocus({
   report,
   month,
@@ -304,6 +275,21 @@ function PlatformBody({
   const cpwMonth = (COPOWER_MONTHLY_DATA[month as CopowerMonthKey] ? month : "Jun") as CopowerMonthKey;
   const gteMonthOk = Boolean(GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey]);
 
+  if (page === "generacion") {
+    return (
+      <ScreenShell report="copower" headless>
+        <GenerationDashboard section={generationSectionFromLeaf(leafId)} />
+      </ScreenShell>
+    );
+  }
+
+  if (page === "campos") {
+    const fieldKey = fieldKeyFromLeaf(leafId);
+    if (fieldKey) {
+      return <FieldAssetsView fieldKey={fieldKey} month={month} monthLabel={monthLabel} />;
+    }
+  }
+
   if (page === "configuracion") {
     if (leafId === "cfg-empresas-copower") {
       return <CopowerCompanyView />;
@@ -311,246 +297,44 @@ function PlatformBody({
     if (leafId === "cfg-empresas-gte") {
       return <GteCompanyView />;
     }
-    if (leafId === "cfg-campos-costayaco") {
-      return (
-        <ScreenShell report={report} title="Campo Costayaco" subtitle="Unidades e indicadores del periodo">
-          <MachinesTable report={report} month={month} campoFilter="COSTAYACO" />
-        </ScreenShell>
-      );
-    }
-    if (leafId === "cfg-campos-suroriente" || leafId === "cfg-campos-otros") {
-      return <EmptyScreen detail="Pendiente de carga para este campo en las fuentes actuales." report={report} />;
-    }
-    if (leafId === "cfg-equipos-generadores") {
-      return (
-        <ScreenShell report={report} title="Generadores" subtitle="Unidades de generación registradas">
-          <MachinesTable report={report} month={month} unitPrefix={/^(CPW|G\d|JIN)/i} />
-        </ScreenShell>
-      );
-    }
-    if (
-      leafId === "cfg-equipos-motores" ||
-      leafId === "cfg-equipos-alternadores" ||
-      leafId === "cfg-equipos-transformadores" ||
-      leafId === "cfg-equipos-auxiliares"
-    ) {
-      return (
-        <EmptyScreen
-          detail="Sin catálogo tipificado — pendiente de clasificar equipos en la fuente (hoy solo unidades de generación)."
-          report={report}
-        />
-      );
-    }
     if (leafId === "cfg-parametros") {
       return <MarcoContractual leaf="sec-1-2" report="gran_tierra" month={month} monthLabel={monthLabel} />;
     }
   }
 
-  if (page === "base_datos") {
-    if (leafId === "bd-op-copower") return <CopowerResumen month={cpwMonth} />;
-    if (leafId === "bd-ind-gte") {
-      return month === "Jun" && gteMonthOk ? (
-        <ExecutiveResumen showAlerts={false} />
-      ) : (
-        <ScreenShell report="gran_tierra" title="Indicadores Gran Tierra" subtitle={monthLabel}>
-          <HoursPanel report="gran_tierra" month={month} />
-          <MachinesTable report="gran_tierra" month={month} />
+  if (page === "eventos") {
+    if (leafId === "bd-ev-dual" || leafId === "bd-fallas") {
+      return (
+        <ScreenShell report="dual" headless>
+          <FailureEventsView month={month} monthLabel={monthLabel} mode="dual" />
         </ScreenShell>
       );
     }
-    if (leafId === "bd-mto") {
-      return <EmptyScreen detail="Plan MTO / órdenes de trabajo no vienen en PDF/Excel actuales." report={report} />;
-    }
-    if (leafId === "bd-fallas") {
+    if (leafId === "bd-ev-copower" || leafId === "proc-eventos") {
       return (
-        <ScreenShell report="copower" title="Fallas" subtitle="Bitácora de eventos · Resumen OP">
-          <EventsTable report="copower" month={month} onlyFailures />
+        <ScreenShell report="copower" headless>
+          <FailureEventsView month={month} monthLabel={monthLabel} mode="copower" />
         </ScreenShell>
       );
     }
-    if (leafId === "bd-alarmas") {
-      return <EmptyScreen detail="Pendiente de fuente de alarmas SCADA / DCS." report={report} />;
-    }
-    if (leafId === "bd-produccion") {
-      const snap = getSnap("copower", month);
-      if (!snap) return <EmptyScreen detail="Sin registros de producción." report="copower" />;
+    if (leafId === "bd-ev-gte") {
       return (
-        <ScreenShell report="copower" title="Producción" subtitle={monthLabel} sourceFile={snap.sourceFile}>
-          <div className="exec-kpi-row">
-            <div className="exec-kpi">
-              <span>Total</span>
-              <strong>{kwh(snap.totalGenerationKwh)}</strong>
-            </div>
-            <div className="exec-kpi">
-              <span>Gas</span>
-              <strong>{kwh(snap.summary.energyGasKwh)}</strong>
-            </div>
-            <div className="exec-kpi">
-              <span>Diésel</span>
-              <strong>{kwh(snap.summary.energyDieselKwh)}</strong>
-            </div>
-          </div>
-          <MachinesTable report="copower" month={month} />
+        <ScreenShell report="gran_tierra" headless>
+          <FailureEventsView month={month} monthLabel={monthLabel} mode="gte" />
         </ScreenShell>
       );
     }
-    if (leafId === "bd-historicos") {
-      return <SourceMonthCompare report={report} month={month} monthLabel={monthLabel} />;
-    }
-  }
-
-  if (page === "calidad_datos") {
-    if (leafId === "cq-faltantes") {
+    if (leafId === "an-pareto") {
       return (
-        <ScreenShell report={report} title="Datos faltantes / N/D" subtitle={monthLabel}>
-          <MissingDataList report={report} month={month} />
-        </ScreenShell>
-      );
-    }
-    if (leafId === "cq-validacion") {
-      return <SourceMonthCompare report={report} month={month} monthLabel={monthLabel} />;
-    }
-    return (
-      <EmptyScreen
-        detail={`Módulo de calidad pendiente de pipeline formal (sin inventar reglas).`}
-        report={report}
-      />
-    );
-  }
-
-  if (page === "procesamiento") {
-    const titles: Record<string, string> = {
-      "proc-op": "Horas operación",
-      "proc-disp": "Horas disponibles (OP+SB)",
-      "proc-fs": "Horas fuera de servicio",
-      "proc-mto": "Horas mantenimiento (PP)",
-      "proc-eventos": "Eventos del periodo",
-      "proc-clasif": "Clasificación de fallas",
-    };
-    const snap = getSnap("copower", month);
-    if (leafId === "proc-op") {
-      return (
-        <ScreenShell report="copower" title={titles[leafId]} sourceFile={snap?.sourceFile}>
-          <div className="exec-kpi kpi-hero">
-            <span>Horas operación</span>
-            <strong>{hours(snap?.summary.hoursOperated)}</strong>
-          </div>
-        </ScreenShell>
-      );
-    }
-    if (leafId === "proc-disp") {
-      const avail = snap ? snap.summary.hoursOperated + snap.summary.hoursStandby : null;
-      return (
-        <ScreenShell report="copower" title={titles[leafId]} sourceFile={snap?.sourceFile}>
-          <div className="exec-kpi kpi-hero">
-            <span>Disponibles</span>
-            <strong>{hours(avail)}</strong>
-          </div>
-        </ScreenShell>
-      );
-    }
-    if (leafId === "proc-fs") {
-      return (
-        <ScreenShell report="copower" title={titles[leafId]} sourceFile={snap?.sourceFile}>
-          <HoursPanel report="copower" month={month} />
-        </ScreenShell>
-      );
-    }
-    if (leafId === "proc-mto") {
-      return (
-        <ScreenShell report="copower" title={titles[leafId]} sourceFile={snap?.sourceFile}>
-          <div className="exec-kpi kpi-hero">
-            <span>Preventivo</span>
-            <strong>{hours(snap?.summary.hoursPreventive)}</strong>
-          </div>
-        </ScreenShell>
-      );
-    }
-    if (leafId === "proc-eventos") {
-      return (
-        <ScreenShell report="copower" title={titles[leafId]} sourceFile={snap?.sourceFile}>
-          <EventsTable report="copower" month={month} />
+        <ScreenShell report="dual" headless>
+          <FailureEventsView month={month} monthLabel={monthLabel} mode="dual" failuresOnlyDefault />
         </ScreenShell>
       );
     }
     if (leafId === "proc-clasif") {
       return (
-        <ScreenShell report="copower" title={titles[leafId]} subtitle="Imputable COPOWER vs cliente/externo">
-          <EventsTable report="copower" month={month} onlyFailures />
-        </ScreenShell>
-      );
-    }
-  }
-
-  if (page === "kpis_copower") {
-    const map: Record<string, "disp" | "conf" | "mtbf" | "mttr" | "prod" | "util" | "fs"> = {
-      "kpi-cpw-disp": "disp",
-      "kpi-cpw-conf": "conf",
-      "kpi-cpw-mtbf": "mtbf",
-      "kpi-cpw-mttr": "mttr",
-      "kpi-cpw-prod": "prod",
-      "kpi-cpw-util": "util",
-      "kpi-cpw-for": "fs",
-      "kpi-cpw-planned": "fs",
-    };
-    if (leafId === "kpi-cpw-mdt") {
-      return (
-        <EmptyScreen
-          detail="MDT no publicado como KPI separado en las fuentes; use MTTR como aproximación de reparación."
-          report="copower"
-        />
-      );
-    }
-    if (map[leafId]) return <KpiFocus report="copower" month={cpwMonth} metric={map[leafId]} />;
-  }
-
-  if (page === "kpis_gte") {
-    if (leafId === "kpi-gte-todos") {
-      return month === "Jun" ? (
-        <ExecutiveResumen />
-      ) : (
-        <SourceMonthCompare report="gran_tierra" month={month} monthLabel={monthLabel} />
-      );
-    }
-    if (leafId === "kpi-gte-formulas") {
-      return (
-        <ScreenShell report="gran_tierra" title="Fórmulas Orden 1" subtitle="Base de cálculo contractual">
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Indicador</th>
-                  <th>Fórmula</th>
-                  <th>Meta</th>
-                </tr>
-              </thead>
-              <tbody>
-                {CONTRACT_CALC_BASE.map((r) => (
-                  <tr key={r.indicator}>
-                    <td>{r.indicator}</td>
-                    <td>{r.formula}</td>
-                    <td>{r.threshold}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </ScreenShell>
-      );
-    }
-    if (leafId === "kpi-gte-metas") {
-      return <MarcoContractual leaf="sec-1-2" report="gran_tierra" month={month} monthLabel={monthLabel} />;
-    }
-    if (leafId === "kpi-gte-historico") {
-      return <SourceMonthCompare report="gran_tierra" month={month} monthLabel={monthLabel} />;
-    }
-  }
-
-  if (page === "analisis") {
-    if (leafId === "an-pareto") {
-      return (
-        <ScreenShell report="copower" title="Pareto de fallas" subtitle={monthLabel}>
-          <EventsTable report="copower" month={month} onlyFailures />
+        <ScreenShell report="copower" headless>
+          <FailureEventsView month={month} monthLabel={monthLabel} mode="copower" failuresOnlyDefault />
         </ScreenShell>
       );
     }
@@ -628,6 +412,169 @@ function PlatformBody({
       }
       return <EmptyScreen detail="Sin tracker RCA formal en este periodo — pendiente de carga." report="gran_tierra" />;
     }
+  }
+
+  if (page === "confiabilidad") {
+    if (leafId === "bd-ind-copower") {
+      return <CopowerIndicatorsDashboard month={cpwMonth} />;
+    }
+    if (leafId === "bd-ind-gte") {
+      return month === "Jun" && gteMonthOk ? (
+        <ExecutiveResumen showAlerts={false} />
+      ) : (
+        <ScreenShell report="gran_tierra" title="Indicadores Gran Tierra" subtitle={monthLabel}>
+          <HoursPanel report="gran_tierra" month={month} />
+          <MachinesTable report="gran_tierra" month={month} />
+        </ScreenShell>
+      );
+    }
+    const cpwMap: Record<string, "disp" | "conf" | "mtbf" | "mttr" | "prod" | "util" | "fs"> = {
+      "kpi-cpw-disp": "disp",
+      "kpi-cpw-conf": "conf",
+      "kpi-cpw-mtbf": "mtbf",
+      "kpi-cpw-mttr": "mttr",
+      "kpi-cpw-prod": "prod",
+      "kpi-cpw-util": "util",
+      "kpi-cpw-for": "fs",
+      "kpi-cpw-planned": "fs",
+    };
+    if (leafId === "kpi-cpw-prod") {
+      return (
+        <ScreenShell report="copower" headless>
+          <GenerationDashboard section="dashboard" />
+        </ScreenShell>
+      );
+    }
+    if (leafId === "kpi-cpw-mdt") {
+      return (
+        <EmptyScreen
+          detail="MDT no publicado como KPI separado en las fuentes; use MTTR como aproximación de reparación."
+          report="copower"
+        />
+      );
+    }
+    if (cpwMap[leafId]) return <KpiFocus report="copower" month={cpwMonth} metric={cpwMap[leafId]} />;
+
+    if (leafId === "kpi-gte-todos") {
+      return month === "Jun" ? (
+        <ExecutiveResumen />
+      ) : (
+        <SourceMonthCompare report="gran_tierra" month={month} monthLabel={monthLabel} />
+      );
+    }
+    if (leafId === "kpi-gte-formulas") {
+      return (
+        <ScreenShell report="gran_tierra" title="Fórmulas Orden 1" subtitle="Base de cálculo contractual">
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Indicador</th>
+                  <th>Fórmula</th>
+                  <th>Meta</th>
+                </tr>
+              </thead>
+              <tbody>
+                {CONTRACT_CALC_BASE.map((r) => (
+                  <tr key={r.indicator}>
+                    <td>{r.indicator}</td>
+                    <td>{r.formula}</td>
+                    <td>{r.threshold}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </ScreenShell>
+      );
+    }
+    if (leafId === "kpi-gte-metas") {
+      return <MarcoContractual leaf="sec-1-2" report="gran_tierra" month={month} monthLabel={monthLabel} />;
+    }
+    if (leafId === "kpi-gte-historico") {
+      return <SourceMonthCompare report="gran_tierra" month={month} monthLabel={monthLabel} />;
+    }
+  }
+
+  if (page === "operacion") {
+    if (leafId === "bd-op-copower") return <CopowerResumen month={cpwMonth} />;
+    if (leafId === "bd-mto") {
+      return <EmptyScreen detail="Plan MTO / órdenes de trabajo no vienen en PDF/Excel actuales." report={report} />;
+    }
+    if (leafId === "bd-alarmas") {
+      return <EmptyScreen detail="Pendiente de fuente de alarmas SCADA / DCS." report={report} />;
+    }
+    if (leafId === "bd-historicos") {
+      return <SourceMonthCompare report={report} month={month} monthLabel={monthLabel} />;
+    }
+
+    const titles: Record<string, string> = {
+      "proc-op": "Horas operación",
+      "proc-disp": "Horas disponibles (OP+SB)",
+      "proc-fs": "Horas fuera de servicio",
+      "proc-mto": "Horas mantenimiento (PP)",
+    };
+    const snap = getSnap("copower", month);
+    if (leafId === "proc-op") {
+      return (
+        <ScreenShell report="copower" title={titles[leafId]} sourceFile={snap?.sourceFile}>
+          <div className="exec-kpi kpi-hero">
+            <span>Horas operación</span>
+            <strong>{hours(snap?.summary.hoursOperated)}</strong>
+          </div>
+        </ScreenShell>
+      );
+    }
+    if (leafId === "proc-disp") {
+      const avail = snap ? snap.summary.hoursOperated + snap.summary.hoursStandby : null;
+      return (
+        <ScreenShell report="copower" title={titles[leafId]} sourceFile={snap?.sourceFile}>
+          <div className="exec-kpi kpi-hero">
+            <span>Disponibles</span>
+            <strong>{hours(avail)}</strong>
+          </div>
+        </ScreenShell>
+      );
+    }
+    if (leafId === "proc-fs") {
+      return (
+        <ScreenShell report="copower" title={titles[leafId]} sourceFile={snap?.sourceFile}>
+          <HoursPanel report="copower" month={month} />
+        </ScreenShell>
+      );
+    }
+    if (leafId === "proc-mto") {
+      return (
+        <ScreenShell report="copower" title={titles[leafId]} sourceFile={snap?.sourceFile}>
+          <div className="exec-kpi kpi-hero">
+            <span>Preventivo</span>
+            <strong>{hours(snap?.summary.hoursPreventive)}</strong>
+          </div>
+        </ScreenShell>
+      );
+    }
+  }
+
+  if (page === "calidad_datos") {
+    if (leafId === "cq-faltantes") {
+      return (
+        <ScreenShell report={report} title="Datos faltantes / N/D" subtitle={monthLabel}>
+          <MissingDataList report={report} month={month} />
+        </ScreenShell>
+      );
+    }
+    if (leafId === "cq-validacion") {
+      return <SourceMonthCompare report={report} month={month} monthLabel={monthLabel} />;
+    }
+    return (
+      <EmptyScreen
+        detail={`Módulo de calidad pendiente de pipeline formal (sin inventar reglas).`}
+        report={report}
+      />
+    );
+  }
+
+  if (page === "analisis") {
     if (leafId === "an-weibull" || leafId === "an-curvas" || leafId === "an-pred") {
       return (
         <EmptyScreen
@@ -682,24 +629,22 @@ function PlatformBody({
   }
 
   if (page === "dashboard") {
-    if (leafId === "dash-ejecutivo" || leafId === "dash-gerencia") {
-      return month === "Jun" && gteMonthOk ? <ExecutiveResumen /> : <MeetingBrief month={month as GranTierraMonthKey} monthLabel={monthLabel} />;
+    if (leafId === "dash-resumen") {
+      return <DashboardOverview month={month} monthLabel={monthLabel} />;
+    }
+    if (leafId === "dash-ejecutivo") {
+      return month === "Jun" && gteMonthOk ? (
+        <ExecutiveResumen />
+      ) : (
+        <MeetingBrief month={month as GranTierraMonthKey} monthLabel={monthLabel} />
+      );
+    }
+    if (leafId === "dash-gerencia") {
+      return <DashboardGerencia month={month} monthLabel={monthLabel} />;
     }
     if (leafId === "dash-operacion") return <CopowerResumen month={cpwMonth} />;
     if (leafId === "dash-mto") {
-      return (
-        <EmptyScreen
-          detail="Plan/stock N/D; use Configuración → Equipos y Análisis → Críticos con datos del mes."
-          report="copower"
-        />
-      );
-    }
-    if (leafId === "dash-ing") {
-      return (
-        <ScreenShell report="copower" title="Dashboard ingeniería" subtitle={monthLabel}>
-          <MachinesTable report="copower" month={month} />
-        </ScreenShell>
-      );
+      return <DashboardMantenimiento month={month} monthLabel={monthLabel} />;
     }
   }
 

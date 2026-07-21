@@ -16,21 +16,26 @@ export type ViewContext = {
   monthOrder: readonly string[];
   reportLabel: string;
   reportShort: string;
+  /** Periodo fijo — oculta selector de mes en sidebar. */
+  fixedPeriod?: boolean;
 };
 
 const CPW_LEAVES = new Set([
   "cfg-empresas-copower",
   "bd-op-copower",
+  "bd-ind-copower",
   "bd-fallas",
-  "bd-produccion",
+  "bd-ev-copower",
+  "proc-clasif",
+  "proc-eventos",
   "rep-diario",
   "dash-operacion",
-  "dash-ing",
 ]);
 
 const GTE_LEAVES = new Set([
   "cfg-empresas-gte",
   "bd-ind-gte",
+  "bd-ev-gte",
   "cfg-parametros",
   "rep-mensual",
   "rep-cliente",
@@ -39,52 +44,52 @@ const GTE_LEAVES = new Set([
 
 const DUAL_LEAVES = new Set([
   "cfg-campos-costayaco",
+  "cfg-campos-vonu",
+  "bd-ev-dual",
   "bd-historicos",
   "cq-auditoria",
   "cq-validacion",
   "cq-faltantes",
-  "cmp-kpi",
-  "cmp-diff",
-  "cmp-tend",
-  "cmp-desv",
-  "cmp-sla",
-]);
-
-const OWN_HEADER_LEAVES = new Set([
-  "bd-op-copower",
-  "bd-ind-gte",
-  "kpi-gte-todos",
-  "dash-ejecutivo",
-  "dash-operacion",
-  "dash-gerencia",
-  "rep-diario",
-  "rep-mensual",
-  "rep-cliente",
-  "cq-auditoria",
+  "an-pareto",
+  "dash-resumen",
+  "dash-mto",
 ]);
 
 function isCopowerLeaf(page: PageKey, leafId: string) {
-  if (page === "kpis_copower" || leafId.startsWith("kpi-cpw-")) return true;
-  if (page === "procesamiento") return true;
+  if (page === "confiabilidad" && (leafId.startsWith("kpi-cpw-") || leafId === "bd-ind-copower")) return true;
+  if (page === "operacion") return true;
+  if (page === "eventos" && (leafId === "bd-ev-copower" || leafId === "proc-clasif" || leafId === "an-criticos"))
+    return true;
+  if (page === "analisis" && leafId === "an-riesgo") return true;
   if (CPW_LEAVES.has(leafId)) return true;
-  if (leafId === "an-pareto" || leafId === "an-criticos" || leafId === "an-riesgo") return true;
   return false;
 }
 
 function isGteLeaf(page: PageKey, leafId: string) {
-  if (page === "kpis_gte" || leafId.startsWith("kpi-gte-")) return true;
+  if (page === "confiabilidad" && (leafId.startsWith("kpi-gte-") || leafId === "bd-ind-gte")) return true;
+  if (page === "eventos" && (leafId === "bd-ev-gte" || leafId === "an-rca")) return true;
   if (GTE_LEAVES.has(leafId)) return true;
   if (leafId === "dash-ejecutivo" || leafId === "dash-gerencia") return true;
   return false;
 }
 
 function isDualLeaf(page: PageKey, leafId: string) {
-  if (page === "comparacion") return true;
+  if (page === "campos" || page === "comparacion") return true;
+  if (page === "eventos" && (leafId === "bd-ev-dual" || leafId === "an-pareto")) return true;
   if (DUAL_LEAVES.has(leafId)) return true;
   return false;
 }
 
 export function resolveViewContext(page: PageKey, leafId: string): ViewContext {
+  if (page === "generacion") {
+    return {
+      report: "copower",
+      monthOrder: ["YTD2026"],
+      reportLabel: "COPOWER · Generación YTD 2026",
+      reportShort: "GEN",
+      fixedPeriod: true,
+    };
+  }
   if (isDualLeaf(page, leafId)) {
     const union = Array.from(new Set([...GRAN_TIERRA_MONTH_ORDER, ...COPOWER_MONTH_ORDER]));
     return {
@@ -134,6 +139,7 @@ export function monthLabelFor(month: string): string {
 }
 
 export function monthOptionLabel(month: string, ctx: ViewContext): string {
+  if (month === "YTD2026") return "Ene – 18 Jul 2026 (199 días)";
   if (ctx.report === "dual") {
     const gte = GRAN_TIERRA_MONTH_ORDER.includes(month as GranTierraMonthKey)
       ? granTierraMonthLabel(month as GranTierraMonthKey)
@@ -146,11 +152,27 @@ export function monthOptionLabel(month: string, ctx: ViewContext): string {
   return monthLabelFor(month);
 }
 
-export function hasOwnHeader(leafId: string): boolean {
-  return OWN_HEADER_LEAVES.has(leafId);
-}
-
 export function defaultMonth(ctx: ViewContext): string {
+  if (ctx.monthOrder.includes("YTD2026")) return "YTD2026";
   const preferred = ctx.monthOrder.includes("Jun") ? "Jun" : ctx.monthOrder[ctx.monthOrder.length - 1];
   return preferred ?? "Jun";
+}
+
+export type GenerationSection = "dashboard" | "diaria" | "mensual" | "equipos" | "utilizacion" | "horas";
+
+export function generationSectionFromLeaf(leafId: string): GenerationSection {
+  switch (leafId) {
+    case "gen-diaria":
+      return "diaria";
+    case "gen-mensual":
+      return "mensual";
+    case "gen-equipos":
+      return "equipos";
+    case "gen-utilizacion":
+      return "utilizacion";
+    case "gen-horas":
+      return "horas";
+    default:
+      return "dashboard";
+  }
 }

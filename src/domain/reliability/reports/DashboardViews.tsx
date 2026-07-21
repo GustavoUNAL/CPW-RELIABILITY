@@ -1,0 +1,983 @@
+import { AlertTriangle, Gauge, ShieldAlert, Wrench, Zap } from "lucide-react";
+import { useMemo, type ReactNode } from "react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
+  Line,
+  LineChart,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import { CONTRACTUAL_KPI_TARGETS, getReliabilityDeduction } from "../contracts/gteOrders";
+import { JUNE_2026_IMPUTABLE_EVENTS } from "./juneImputableEvents";
+import {
+  COPOWER_KPI_FROM_MONTHS,
+  COPOWER_MONTHLY_DATA,
+  COPOWER_MONTH_ORDER,
+  type CopowerMonthKey,
+} from "./copowerMonthly";
+import {
+  GRAN_TIERRA_KPI_FROM_MONTHS,
+  GRAN_TIERRA_MONTHLY_DATA,
+  GRAN_TIERRA_MONTH_ORDER,
+  type GranTierraMonthKey,
+} from "./granTierraMonthly";
+import type { MachineIndicatorRow } from "../types";
+import { assessTechnicalRisk } from "../risk/technicalRisk";
+
+const META = CONTRACTUAL_KPI_TARGETS.reliability;
+const META_PCT = META * 100;
+const COLOR_GTE = "#818cf8";
+const COLOR_CPW = "#0e6e8c";
+
+const pct = (v: number | null | undefined, d = 2) =>
+  v == null || Number.isNaN(v) ? "N/D" : `${(v * 100).toFixed(d)}%`;
+const kwh = (v: number | null | undefined) =>
+  v == null ? "N/D" : `${Math.round(v).toLocaleString("es-CO")} kWh`;
+const hours = (v: number | null | undefined) =>
+  v == null || Number.isNaN(v) ? "N/D" : `${v.toFixed(1)} h`;
+const num = (v: number | null | undefined, d = 0) =>
+  v == null || Number.isNaN(v) ? "N/D" : d > 0 ? v.toFixed(d) : String(v);
+
+function normUnit(id: string) {
+  return id.toUpperCase().replace(/[^A-Z0-9]/g, "");
+}
+
+function kpiTone(value: number | null | undefined, meta = META) {
+  if (value == null) return "na";
+  if (value >= meta) return "ok";
+  if (value >= meta - 0.02) return "warn";
+  return "bad";
+}
+
+function diffPct(a: number | null | undefined, b: number | null | undefined) {
+  if (a == null || b == null) return null;
+  return (b - a) * 100;
+}
+
+function diffNum(a: number | null | undefined, b: number | null | undefined) {
+  if (a == null || b == null) return null;
+  return b - a;
+}
+
+function fmtDiffPp(d: number | null) {
+  if (d == null) return "—";
+  return `${d >= 0 ? "+" : ""}${d.toFixed(2)} pp`;
+}
+
+function fmtDiffNum(d: number | null, unit = "") {
+  if (d == null) return "—";
+  return `${d >= 0 ? "+" : ""}${Math.abs(d) >= 1000 ? d.toLocaleString("es-CO", { maximumFractionDigits: 0 }) : d.toFixed(1)}${unit}`;
+}
+
+function diffClass(d: number | null, threshold = 0.5) {
+  if (d == null) return "";
+  if (Math.abs(d) <= threshold) return "dash-diff--ok";
+  return "dash-diff--warn";
+}
+
+type IntegRow = {
+  label: string;
+  gte: string;
+  cpw: string;
+  delta: string;
+  deltaRaw: number | null;
+  tone?: "ok" | "warn" | "bad" | "na";
+};
+
+function buildIntegratedRows(
+  gte: (typeof GRAN_TIERRA_MONTHLY_DATA)[GranTierraMonthKey] | null,
+  cpw: (typeof COPOWER_MONTHLY_DATA)[CopowerMonthKey] | null,
+): IntegRow[] {
+  const rows: IntegRow[] = [];
+
+  const pushPct = (label: string, gv: number | null | undefined, cv: number | null | undefined) => {
+    const d = diffPct(gv, cv);
+    rows.push({
+      label,
+      gte: pct(gv),
+      cpw: pct(cv),
+      delta: fmtDiffPp(d),
+      deltaRaw: d,
+      tone: kpiTone(gv ?? cv),
+    });
+  };
+
+  const pushNum = (
+    label: string,
+    gv: number | null | undefined,
+    cv: number | null | undefined,
+    unit: string,
+    fmt: (v: number | null | undefined) => string = (v) => num(v) + unit,
+  ) => {
+    const d = diffNum(gv, cv);
+    rows.push({
+      label,
+      gte: fmt(gv),
+      cpw: fmt(cv),
+      delta: fmtDiffNum(d, unit),
+      deltaRaw: d,
+    });
+  };
+
+  pushPct("Disponibilidad", gte?.kpi.availability, cpw?.kpi.availability);
+  pushPct("Confiabilidad", gte?.kpi.reliability, cpw?.kpi.reliability);
+  pushNum("Generación", gte?.totalGenerationKwh, cpw?.totalGenerationKwh, " kWh", kwh);
+  pushNum("Fallas imputables", gte?.summary.copowerFailures, cpw?.summary.copowerFailures, "");
+  pushNum("MTBF", gte?.summary.mtbfHours, cpw?.summary.mtbfHours, " h", hours);
+  pushNum("MTTR", gte?.summary.mttrHours, cpw?.summary.mttrHours, " h", hours);
+  pushNum("Horas operación", null, cpw?.summary.hoursOperated, " h", hours);
+  pushNum("Horas stand-by", null, cpw?.summary.hoursStandby, " h", hours);
+  pushNum("Horas preventivo (PP)", null, cpw?.summary.hoursPreventive, " h", hours);
+  pushNum("Horas FS imputable", gte?.summary.hoursFailureCopower, cpw?.summary.hoursFailureCopower, " h", hours);
+  pushNum("Eventos en bitácora", null, cpw?.eventLog.length ?? null, "", (v) => (v == null ? "N/D" : String(v)));
+
+  return rows;
+}
+
+type FleetRow = {
+  unidad: string;
+  campo: string;
+  dispGte: number | null;
+  dispCpw: number | null;
+  confGte: number | null;
+  confCpw: number | null;
+  fallasGte: number | null;
+  fallasCpw: number | null;
+};
+
+function mergeFleet(
+  gteUnits: MachineIndicatorRow[],
+  cpwUnits: MachineIndicatorRow[],
+): FleetRow[] {
+  const map = new Map<string, FleetRow>();
+
+  for (const m of gteUnits) {
+    if (m.unidad === "SISTEMA N") continue;
+    const key = normUnit(m.unidad);
+    map.set(key, {
+      unidad: m.unidad,
+      campo: m.campo,
+      dispGte: m.disponibilidadPct,
+      dispCpw: null,
+      confGte: m.confiabilidadPct,
+      confCpw: null,
+      fallasGte: m.fallas,
+      fallasCpw: null,
+    });
+  }
+
+  for (const m of cpwUnits) {
+    if (m.unidad === "SISTEMA N") continue;
+    const key = normUnit(m.unidad);
+    const existing = map.get(key);
+    if (existing) {
+      existing.dispCpw = m.disponibilidadPct;
+      existing.confCpw = m.confiabilidadPct;
+      existing.fallasCpw = m.fallas;
+    } else {
+      map.set(key, {
+        unidad: m.unidad,
+        campo: m.campo,
+        dispGte: null,
+        dispCpw: m.disponibilidadPct,
+        confGte: null,
+        confCpw: m.confiabilidadPct,
+        fallasGte: null,
+        fallasCpw: m.fallas,
+      });
+    }
+  }
+
+  return [...map.values()].sort((a, b) => {
+    const fa = Math.max(a.fallasGte ?? 0, a.fallasCpw ?? 0);
+    const fb = Math.max(b.fallasGte ?? 0, b.fallasCpw ?? 0);
+    if (fb !== fa) return fb - fa;
+    return a.unidad.localeCompare(b.unidad);
+  });
+}
+
+function CoreCard({
+  label,
+  value,
+  hint,
+  tone,
+}: {
+  label: string;
+  value: string;
+  hint?: string;
+  tone?: "ok" | "warn" | "bad" | "na";
+}) {
+  return (
+    <article className={`dash-core-card${tone ? ` ${tone}` : ""}`}>
+      <span>{label}</span>
+      <strong>{value}</strong>
+      {hint ? <small>{hint}</small> : null}
+    </article>
+  );
+}
+
+function DashChartPanel({
+  title,
+  subtitle,
+  wide,
+  children,
+}: {
+  title: string;
+  subtitle?: string;
+  wide?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <article className={`dash-chart-panel${wide ? " dash-chart-panel--wide" : ""}`}>
+      <h4>{title}</h4>
+      {subtitle ? <p className="muted dash-chart-sub">{subtitle}</p> : null}
+      <div className="dash-chart">{children}</div>
+    </article>
+  );
+}
+
+function buildTrendSeries(month: string) {
+  const gteIdx = GRAN_TIERRA_MONTH_ORDER.indexOf(month as GranTierraMonthKey);
+  const cpwIdx = COPOWER_MONTH_ORDER.indexOf(month as CopowerMonthKey);
+  const end = Math.max(gteIdx >= 0 ? gteIdx : 0, cpwIdx >= 0 ? cpwIdx : 0);
+  const months = COPOWER_MONTH_ORDER.slice(0, end + 1);
+
+  return months.map((m) => {
+    const gteRow = GRAN_TIERRA_KPI_FROM_MONTHS.find((r) => r.month === m);
+    const cpwRow = COPOWER_KPI_FROM_MONTHS.find((r) => r.month === m);
+    const gteSnap = GRAN_TIERRA_MONTHLY_DATA[m as GranTierraMonthKey];
+    const cpwSnap = COPOWER_MONTHLY_DATA[m as CopowerMonthKey];
+    return {
+      month: m,
+      gteDisp: gteRow?.availability != null ? gteRow.availability * 100 : null,
+      cpwDisp: cpwRow?.availability != null ? cpwRow.availability * 100 : null,
+      gteConf: gteRow?.reliability != null ? gteRow.reliability * 100 : null,
+      cpwConf: cpwRow?.reliability != null ? cpwRow.reliability * 100 : null,
+      gteGen: gteSnap ? gteSnap.totalGenerationKwh / 1000 : null,
+      cpwGen: cpwSnap ? cpwSnap.totalGenerationKwh / 1000 : null,
+    };
+  });
+}
+
+type MonthProps = { month: string; monthLabel: string };
+
+export function DashboardOverview({ month, monthLabel }: MonthProps) {
+  const gte = GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey] ?? null;
+  const cpw = COPOWER_MONTHLY_DATA[month as CopowerMonthKey] ?? null;
+
+  const band = gte?.kpi.reliability != null ? getReliabilityDeduction(gte.kpi.reliability) : null;
+  const integRows = useMemo(() => buildIntegratedRows(gte, cpw), [gte, cpw]);
+  const fleet = useMemo(
+    () => mergeFleet(gte?.machineIndicators ?? [], cpw?.machineIndicators ?? []),
+    [gte, cpw],
+  );
+
+  const topFailures = fleet.filter((r) => (r.fallasGte ?? 0) + (r.fallasCpw ?? 0) > 0).slice(0, 8);
+
+  const trendData = useMemo(() => buildTrendSeries(month), [month]);
+
+  const kpiBarData = useMemo(
+    () => [
+      {
+        name: "Disp %",
+        gte: gte?.kpi.availability != null ? gte.kpi.availability * 100 : null,
+        cpw: cpw?.kpi.availability != null ? cpw.kpi.availability * 100 : null,
+      },
+      {
+        name: "Conf %",
+        gte: gte?.kpi.reliability != null ? gte.kpi.reliability * 100 : null,
+        cpw: cpw?.kpi.reliability != null ? cpw.kpi.reliability * 100 : null,
+      },
+      {
+        name: "Gen MWh",
+        gte: gte ? gte.totalGenerationKwh / 1000 : null,
+        cpw: cpw ? cpw.totalGenerationKwh / 1000 : null,
+      },
+      {
+        name: "Fallas",
+        gte: gte?.summary.copowerFailures ?? null,
+        cpw: cpw?.summary.copowerFailures ?? null,
+      },
+    ],
+    [gte, cpw],
+  );
+
+  const hoursData = useMemo(() => {
+    if (!cpw) return [];
+    return [
+      { estado: "Operación", horas: cpw.summary.hoursOperated, fill: COLOR_CPW },
+      { estado: "Stand-by", horas: cpw.summary.hoursStandby, fill: "#38bdf8" },
+      { estado: "Preventivo", horas: cpw.summary.hoursPreventive, fill: "#22c55e" },
+      {
+        estado: "FS imputable",
+        horas: cpw.summary.hoursFailureCopower,
+        fill: "#ef4444",
+      },
+    ];
+  }, [cpw]);
+
+  const fleetBarData = useMemo(
+    () =>
+      topFailures.map((r) => ({
+        unidad: r.unidad,
+        gte: r.fallasGte ?? 0,
+        cpw: r.fallasCpw ?? 0,
+      })),
+    [topFailures],
+  );
+
+  const alerts: { active: boolean; title: string; detail: string }[] = [];
+
+  if (gte?.kpi.reliability != null && gte.kpi.reliability < META) {
+    alerts.push({
+      active: true,
+      title: "Confiabilidad contractual bajo 98%",
+      detail: `GTE ${pct(gte.kpi.reliability)} · banda ${band?.rangeLabel} · deducción ${band?.deductionPct}%`,
+    });
+  }
+
+  const dispDiff = diffPct(gte?.kpi.availability, cpw?.kpi.availability);
+  if (dispDiff != null && Math.abs(dispDiff) >= 1) {
+    alerts.push({
+      active: true,
+      title: "Brecha disponibilidad GTE vs COPOWER",
+      detail: `${fmtDiffPp(dispDiff)} entre informe oficial y reporte diario`,
+    });
+  }
+
+  const genDiff = diffNum(gte?.totalGenerationKwh, cpw?.totalGenerationKwh);
+  if (genDiff != null && gte?.totalGenerationKwh && Math.abs(genDiff / gte.totalGenerationKwh) > 0.02) {
+    alerts.push({
+      active: true,
+      title: "Brecha de generación entre fuentes",
+      detail: `GTE ${kwh(gte.totalGenerationKwh)} vs CPW ${kwh(cpw?.totalGenerationKwh)} (${fmtDiffNum(genDiff, " kWh")})`,
+    });
+  }
+
+  const failDiff = diffNum(gte?.summary.copowerFailures, cpw?.summary.copowerFailures);
+  if (failDiff != null && failDiff !== 0) {
+    alerts.push({
+      active: true,
+      title: "Conteo de fallas no coincide",
+      detail: `GTE ${gte?.summary.copowerFailures ?? "N/D"} vs COPOWER ${cpw?.summary.copowerFailures ?? "N/D"}`,
+    });
+  }
+
+  if (month === "Jun" && JUNE_2026_IMPUTABLE_EVENTS.length > 0) {
+    alerts.push({
+      active: true,
+      title: "RCA imputables pendientes",
+      detail: `0/${JUNE_2026_IMPUTABLE_EVENTS.length} entregados · riesgo multa 4% adicional`,
+    });
+  }
+
+  const focal = fleet.find((r) => (r.fallasGte ?? 0) >= 3 || (r.fallasCpw ?? 0) >= 3);
+  if (focal) {
+    alerts.push({
+      active: true,
+      title: "Concentración de fallas",
+      detail: `${focal.unidad}: GTE ${focal.fallasGte ?? 0} · CPW ${focal.fallasCpw ?? 0} falla(s)`,
+    });
+  }
+
+  if (!gte && !cpw) {
+    return (
+      <div className="dash-module exec-dashboard">
+        <header className="exec-header dash-hero">
+          <div>
+            <p className="eyebrow">Dashboard · Resumen general</p>
+            <h2>{monthLabel}</h2>
+          </div>
+        </header>
+        <p className="empty-state">Sin datos GTE ni COPOWER cargados para este periodo.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="dash-module exec-dashboard">
+      <header className="exec-header dash-hero">
+        <div>
+          <p className="eyebrow">Dashboard · Resumen general</p>
+          <h2>{monthLabel}</h2>
+          <p className="muted">
+            Vista integrada · GTE (contractual) y COPOWER (operación diaria) en una sola lectura
+          </p>
+        </div>
+        <div className="dash-source-badges">
+          <span className="source-badge gte">GTE</span>
+          <span className="source-badge cpw">CPW</span>
+        </div>
+      </header>
+
+      <section className="dash-integrated-hero">
+        <CoreCard
+          label="Disponibilidad"
+          value={pct(gte?.kpi.availability ?? cpw?.kpi.availability)}
+          hint={
+            gte && cpw
+              ? `GTE ${pct(gte.kpi.availability)} · CPW ${pct(cpw.kpi.availability)}`
+              : gte
+                ? `GTE · meta ≥ 98%`
+                : `CPW · Resumen OP`
+          }
+          tone={kpiTone(gte?.kpi.availability ?? cpw?.kpi.availability)}
+        />
+        <CoreCard
+          label="Confiabilidad"
+          value={pct(gte?.kpi.reliability ?? cpw?.kpi.reliability)}
+          hint={band ? `Deducción ${band.deductionPct}% · ${band.rangeLabel}` : "Meta ≥ 98%"}
+          tone={kpiTone(gte?.kpi.reliability ?? cpw?.kpi.reliability)}
+        />
+        <CoreCard
+          label="Generación"
+          value={kwh(gte?.totalGenerationKwh ?? cpw?.totalGenerationKwh)}
+          hint={
+            gte && cpw && genDiff != null
+              ? `Δ CPW ${fmtDiffNum(genDiff, " kWh")}`
+              : "Costayaco + Vonú"
+          }
+        />
+        <CoreCard
+          label="Fallas imputables"
+          value={String(gte?.summary.copowerFailures ?? cpw?.summary.copowerFailures ?? "N/D")}
+          hint={`MTBF ${hours(gte?.summary.mtbfHours ?? cpw?.summary.mtbfHours)} · MTTR ${hours(gte?.summary.mttrHours ?? cpw?.summary.mttrHours)}`}
+          tone={(gte?.summary.copowerFailures ?? cpw?.summary.copowerFailures ?? 0) > 5 ? "warn" : undefined}
+        />
+      </section>
+
+      <section className="dash-chart-grid">
+        <DashChartPanel
+          title="Tendencia disponibilidad y confiabilidad"
+          subtitle="Ene – mes seleccionado · línea punteada = meta 98%"
+          wide
+        >
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={trendData} margin={{ top: 8, right: 16, left: 0, bottom: 4 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
+              <XAxis dataKey="month" tick={{ fontSize: 10 }} />
+              <YAxis domain={[90, 100]} tick={{ fontSize: 10 }} width={36} unit="%" />
+              <Tooltip
+                formatter={(v, name) => [
+                  v == null ? "N/D" : `${Number(v).toFixed(2)}%`,
+                  String(name),
+                ]}
+              />
+              <Legend wrapperStyle={{ fontSize: 10 }} />
+              <ReferenceLine y={META_PCT} stroke="#ef4444" strokeDasharray="4 4" label={{ value: "98%", fontSize: 10 }} />
+              <Line type="monotone" dataKey="gteDisp" name="Disp GTE" stroke={COLOR_GTE} strokeWidth={2} dot={{ r: 3 }} connectNulls />
+              <Line type="monotone" dataKey="cpwDisp" name="Disp CPW" stroke={COLOR_CPW} strokeWidth={2} dot={{ r: 3 }} connectNulls />
+              <Line type="monotone" dataKey="gteConf" name="Conf GTE" stroke={COLOR_GTE} strokeWidth={1.5} strokeDasharray="5 3" dot={{ r: 2 }} connectNulls />
+              <Line type="monotone" dataKey="cpwConf" name="Conf CPW" stroke={COLOR_CPW} strokeWidth={1.5} strokeDasharray="5 3" dot={{ r: 2 }} connectNulls />
+            </LineChart>
+          </ResponsiveContainer>
+        </DashChartPanel>
+
+        <DashChartPanel title="KPI del mes · GTE vs COPOWER" subtitle={monthLabel}>
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={kpiBarData} margin={{ top: 8, right: 8, left: 0, bottom: 4 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
+              <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+              <YAxis tick={{ fontSize: 10 }} width={44} />
+              <Tooltip
+                formatter={(v, name) => {
+                  const n = Number(v);
+                  if (Number.isNaN(n)) return ["N/D", String(name)];
+                  const label = String(name);
+                  return [n.toFixed(2), label];
+                }}
+              />
+              <Legend wrapperStyle={{ fontSize: 10 }} />
+              <Bar dataKey="gte" name="Gran Tierra" fill={COLOR_GTE} radius={[4, 4, 0, 0]} />
+              <Bar dataKey="cpw" name="COPOWER" fill={COLOR_CPW} radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </DashChartPanel>
+
+        <DashChartPanel title="Generación acumulada (MWh)" subtitle="Tendencia mensual integrada">
+          <ResponsiveContainer width="100%" height={260}>
+            <LineChart data={trendData} margin={{ top: 8, right: 12, left: 0, bottom: 4 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
+              <XAxis dataKey="month" tick={{ fontSize: 10 }} />
+              <YAxis tick={{ fontSize: 10 }} width={48} />
+              <Tooltip formatter={(v) => [`${Number(v).toFixed(1)} MWh`, ""]} />
+              <Legend wrapperStyle={{ fontSize: 10 }} />
+              <Line type="monotone" dataKey="gteGen" name="GTE" stroke={COLOR_GTE} strokeWidth={2} dot={{ r: 3 }} connectNulls />
+              <Line type="monotone" dataKey="cpwGen" name="COPOWER" stroke={COLOR_CPW} strokeWidth={2} dot={{ r: 3 }} connectNulls />
+            </LineChart>
+          </ResponsiveContainer>
+        </DashChartPanel>
+
+        {cpw ? (
+          <DashChartPanel title="Horas por estado" subtitle="COPOWER · Resumen OP">
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart data={hoursData} layout="vertical" margin={{ top: 4, right: 12, left: 4, bottom: 4 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" horizontal={false} />
+                <XAxis type="number" tick={{ fontSize: 10 }} />
+                <YAxis type="category" dataKey="estado" tick={{ fontSize: 10 }} width={88} />
+                <Tooltip formatter={(v) => [`${Number(v).toFixed(1)} h`, "Horas"]} />
+                <Bar dataKey="horas" radius={[0, 4, 4, 0]}>
+                  {hoursData.map((row) => (
+                    <Cell key={row.estado} fill={row.fill} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </DashChartPanel>
+        ) : null}
+
+        {fleetBarData.length > 0 ? (
+          <DashChartPanel title="Fallas por unidad" subtitle="Top unidades · GTE vs COPOWER" wide>
+            <ResponsiveContainer width="100%" height={280}>
+              <BarChart data={fleetBarData} margin={{ top: 8, right: 8, left: 0, bottom: 4 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
+                <XAxis dataKey="unidad" tick={{ fontSize: 9 }} interval={0} angle={-25} textAnchor="end" height={52} />
+                <YAxis tick={{ fontSize: 10 }} width={32} allowDecimals={false} />
+                <Tooltip />
+                <Legend wrapperStyle={{ fontSize: 10 }} />
+                <Bar dataKey="gte" name="GTE" fill={COLOR_GTE} radius={[4, 4, 0, 0]} />
+                <Bar dataKey="cpw" name="COPOWER" fill={COLOR_CPW} radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </DashChartPanel>
+        ) : null}
+      </section>
+
+      <section className="panel">
+        <article className="card">
+          <div className="dash-block-head">
+            <div>
+              <p className="eyebrow">1 · Indicadores integrados</p>
+              <h3>GTE vs COPOWER · mismo periodo</h3>
+            </div>
+            <span className="muted dash-integ-legend">Δ = COPOWER − GTE</span>
+          </div>
+          <div className="table-wrap">
+            <table className="dash-integ-table">
+              <thead>
+                <tr>
+                  <th>Indicador</th>
+                  <th className="col-gte">Gran Tierra</th>
+                  <th className="col-cpw">COPOWER</th>
+                  <th className="col-delta">Δ</th>
+                </tr>
+              </thead>
+              <tbody>
+                {integRows.map((r) => (
+                  <tr key={r.label}>
+                    <td>{r.label}</td>
+                    <td className="col-gte">{r.gte}</td>
+                    <td className="col-cpw">{r.cpw}</td>
+                    <td className={`col-delta ${diffClass(r.deltaRaw, r.label.includes("Falla") ? 0 : 1)}`}>
+                      {r.delta}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      {alerts.length > 0 ? (
+        <section className="panel">
+          <article className="card">
+            <div className="dash-block-head">
+              <div>
+                <p className="eyebrow">2 · Alertas cruzadas</p>
+                <h3>Señales del cruce de fuentes</h3>
+              </div>
+              <span className="badge warn">{alerts.length} activa(s)</span>
+            </div>
+            <div className="dash-alert-grid">
+              {alerts.map((a) => (
+                <article key={a.title} className="dash-alert active">
+                  <div className="dash-alert-head">
+                    <strong>{a.title}</strong>
+                    <AlertTriangle size={16} />
+                  </div>
+                  <p>{a.detail}</p>
+                </article>
+              ))}
+            </div>
+          </article>
+        </section>
+      ) : null}
+
+      <section className="panel">
+        <article className="card">
+          <div className="dash-block-head">
+            <div>
+              <p className="eyebrow">{alerts.length > 0 ? "3" : "2"} · Flota integrada</p>
+              <h3>Indicadores por unidad · ambas fuentes</h3>
+            </div>
+          </div>
+          {fleet.length === 0 ? (
+            <p className="empty-state">Sin indicadores por unidad en este periodo.</p>
+          ) : (
+            <div className="table-wrap">
+              <table className="dash-integ-table dash-integ-table--fleet">
+                <thead>
+                  <tr>
+                    <th rowSpan={2}>Unidad</th>
+                    <th rowSpan={2}>Campo</th>
+                    <th colSpan={2}>Disp. %</th>
+                    <th colSpan={2}>Conf. %</th>
+                    <th colSpan={2}>Fallas</th>
+                  </tr>
+                  <tr>
+                    <th className="col-gte sub">GTE</th>
+                    <th className="col-cpw sub">CPW</th>
+                    <th className="col-gte sub">GTE</th>
+                    <th className="col-cpw sub">CPW</th>
+                    <th className="col-gte sub">GTE</th>
+                    <th className="col-cpw sub">CPW</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {topFailures.map((r) => (
+                    <tr
+                      key={r.unidad}
+                      className={
+                        (r.fallasGte ?? 0) >= 3 || (r.fallasCpw ?? 0) >= 3 ? "row-repeat" : undefined
+                      }
+                    >
+                      <td>
+                        <strong>{r.unidad}</strong>
+                      </td>
+                      <td>{r.campo}</td>
+                      <td className="col-gte">{r.dispGte == null ? "—" : `${r.dispGte.toFixed(1)}%`}</td>
+                      <td className="col-cpw">{r.dispCpw == null ? "—" : `${r.dispCpw.toFixed(1)}%`}</td>
+                      <td className="col-gte">{r.confGte == null ? "—" : `${r.confGte.toFixed(1)}%`}</td>
+                      <td className="col-cpw">{r.confCpw == null ? "—" : `${r.confCpw.toFixed(1)}%`}</td>
+                      <td className="col-gte">{r.fallasGte ?? "—"}</td>
+                      <td className="col-cpw">{r.fallasCpw ?? "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          {fleet.length > topFailures.length ? (
+            <p className="dash-side-note muted">
+              Mostrando {topFailures.length} unidades con fallas de {fleet.length} en flota.
+            </p>
+          ) : null}
+        </article>
+      </section>
+
+      <aside className="exec-source-note">
+        <p>
+          <strong>Fuentes:</strong> {gte?.sourceFile ?? "GTE N/D"} · {cpw?.sourceFile ?? "COPOWER N/D"}. GTE =
+          base contractual; COPOWER = operación diaria. Δ positivo en % indica valor CPW mayor que GTE.
+        </p>
+      </aside>
+    </div>
+  );
+}
+
+export function DashboardGerencia({ month, monthLabel }: MonthProps) {
+  const gte = GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey] ?? null;
+
+  if (!gte) {
+    return (
+      <div className="dash-module exec-dashboard">
+        <header className="exec-header">
+          <div>
+            <p className="eyebrow">Dashboard · Gerencia</p>
+            <h2>{monthLabel}</h2>
+          </div>
+        </header>
+        <p className="empty-state">Sin informe Gran Tierra para este periodo.</p>
+      </div>
+    );
+  }
+
+  const band =
+    gte.kpi.reliability != null ? getReliabilityDeduction(gte.kpi.reliability) : null;
+  const availGap =
+    gte.kpi.availability != null ? (gte.kpi.availability - META) * 100 : null;
+  const confGap = gte.kpi.reliability != null ? (gte.kpi.reliability - META) * 100 : null;
+  const rcaCount = month === "Jun" ? JUNE_2026_IMPUTABLE_EVENTS.length : null;
+
+  const riskUnits = gte.machineIndicators
+    .filter((m) => m.unidad !== "SISTEMA N")
+    .map((m) => ({
+      ...m,
+      assessed: assessTechnicalRisk({
+        fallas: m.fallas,
+        mtbfLabel: m.mtbfLabel,
+        mttrHours: m.mttrHours,
+        disponibilidadPct: m.disponibilidadPct,
+        skip: m.cumplimiento === "N/A",
+      }),
+    }))
+    .filter((m) => m.assessed.riesgo === "RIESGO MEDIO" || m.assessed.riesgo === "RIESGO ALTO");
+
+  return (
+    <div className="dash-module exec-dashboard">
+      <header className="exec-header dash-hero">
+        <div>
+          <p className="eyebrow">Dashboard · Gerencia</p>
+          <h2>Cumplimiento contractual — {monthLabel}</h2>
+          <p className="muted">Orden 1 · metas 98% · exposición económica y riesgos abiertos</p>
+        </div>
+        <span className="badge warn">GTE</span>
+      </header>
+
+      <section className="panel">
+        <article className="card">
+          <div className="dash-block-head">
+            <div>
+              <p className="eyebrow">1 · Indicadores vs meta</p>
+              <h3>SLA Orden 1</h3>
+            </div>
+            {band ? (
+              <span className={`badge ${band.deductionPct > 0 ? "danger" : "ok"}`}>
+                Deducción {band.deductionPct}%
+              </span>
+            ) : null}
+          </div>
+          <div className="dash-core-grid">
+            <CoreCard
+              label="Disponibilidad"
+              value={pct(gte.kpi.availability)}
+              hint={availGap != null ? `${availGap.toFixed(2)} pp vs 98%` : "Meta ≥ 98%"}
+              tone={kpiTone(gte.kpi.availability)}
+            />
+            <CoreCard
+              label="Confiabilidad"
+              value={pct(gte.kpi.reliability)}
+              hint={confGap != null ? `${confGap.toFixed(2)} pp vs 98%` : "Meta ≥ 98%"}
+              tone={kpiTone(gte.kpi.reliability)}
+            />
+            <CoreCard
+              label="Banda de deducción"
+              value={band?.rangeLabel ?? "N/D"}
+              hint={band ? `${band.deductionPct}% facturación mensual` : undefined}
+              tone={band && band.deductionPct > 0 ? "bad" : "ok"}
+            />
+          </div>
+        </article>
+      </section>
+
+      <section className="panel two-col">
+        <article className="card">
+          <p className="eyebrow">2 · Exposición adicional</p>
+          <h3>RCA y multas</h3>
+          {rcaCount == null ? (
+            <p className="empty-state">Sin tracker RCA cargado para este mes.</p>
+          ) : (
+            <div className="dash-alert active">
+              <div className="dash-alert-head">
+                <strong>Reportes RCA imputables</strong>
+                <ShieldAlert size={16} />
+              </div>
+              <p>
+                0/{rcaCount} entregados. Orden 1: multa adicional del <strong>4%</strong> de la facturación
+                mensual si se confirma incumplimiento.
+              </p>
+            </div>
+          )}
+          {gte.summary.actionsOverdue != null && gte.summary.actionsOverdue > 0 ? (
+            <p className="alert-inline">{gte.summary.actionsOverdue} acción(es) de plan vencida(s).</p>
+          ) : null}
+        </article>
+        <article className="card">
+          <p className="eyebrow">3 · Riesgos abiertos</p>
+          <h3>Matriz técnica (propuesta)</h3>
+          {riskUnits.length === 0 ? (
+            <p className="empty-state">Ninguna unidad en riesgo medio/alto.</p>
+          ) : (
+            <ul className="meeting-list">
+              {riskUnits.map((r) => (
+                <li key={r.unidad}>
+                  <strong>{r.unidad}</strong> · {r.fallas} falla(s) · {r.assessed.riesgo.replace("RIESGO ", "")}
+                </li>
+              ))}
+            </ul>
+          )}
+        </article>
+      </section>
+
+      <section className="panel">
+        <article className="card">
+          <p className="eyebrow">4 · Producción</p>
+          <div className="exec-kpi-row">
+            <div className="exec-kpi">
+              <Zap size={16} />
+              <span>Generación del mes</span>
+              <strong>{kwh(gte.totalGenerationKwh)}</strong>
+              <small>Meta contractual 4,000,000 kWh</small>
+            </div>
+            <div className="exec-kpi">
+              <Gauge size={16} />
+              <span>Fallas imputables</span>
+              <strong>{gte.summary.copowerFailures}</strong>
+              <small>
+                MTBF {hours(gte.summary.mtbfHours)} · MTTR {hours(gte.summary.mttrHours)}
+              </small>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <aside className="exec-source-note">
+        <p>
+          <strong>Fuente:</strong> {gte.sourceFile}. Vista orientada a gerencia — no incluye detalle operativo
+          COPOWER (ver Operación).
+        </p>
+      </aside>
+    </div>
+  );
+}
+
+export function DashboardMantenimiento({ month, monthLabel }: MonthProps) {
+  const gte = GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey] ?? null;
+  const cpwKey = (COPOWER_MONTHLY_DATA[month as CopowerMonthKey] ? month : "Jun") as CopowerMonthKey;
+  const cpw = COPOWER_MONTHLY_DATA[cpwKey];
+
+  const oilTotal = cpw.consumos.reduce((acc, r) => acc + r.adicionAceite + r.cambioAceite, 0);
+  const coolantTotal = cpw.consumos.reduce((acc, r) => acc + r.adicionCoolant, 0);
+
+  const rankedFailures = [...cpw.machineIndicators]
+    .filter((m) => m.unidad !== "SISTEMA N" && m.fallas > 0)
+    .sort((a, b) => b.fallas - a.fallas || (b.mttrHours ?? 0) - (a.mttrHours ?? 0));
+
+  const maintEvents = cpw.eventLog
+    .filter((e) => e.eventType !== "Falla" || e.responsible === "COPOWER")
+    .slice(0, 8);
+
+  return (
+    <div className="dash-module exec-dashboard">
+      <header className="exec-header dash-hero">
+        <div>
+          <p className="eyebrow">Dashboard · Mantenimiento</p>
+          <h2>{monthLabel}</h2>
+          <p className="muted">Horas PP/FS, consumos y priorización por fallas · COPOWER + contexto GTE</p>
+        </div>
+        <Wrench size={22} className="muted" />
+      </header>
+
+      <section className="panel">
+        <article className="card">
+          <p className="eyebrow">1 · Horas por estado (COPOWER)</p>
+          <div className="dash-core-grid">
+            <CoreCard label="Preventivo (PP)" value={hours(cpw.summary.hoursPreventive)} hint="Resumen OP" />
+            <CoreCard label="Correctivo / FS" value={hours(cpw.summary.hoursCorrective)} hint="Incluye fallas" />
+            <CoreCard
+              label="FS imputable COPOWER"
+              value={hours(cpw.summary.hoursFailureCopower)}
+              hint={`Cliente ${hours(cpw.summary.hoursFailureClient)}`}
+              tone={cpw.summary.hoursFailureCopower > 100 ? "warn" : undefined}
+            />
+          </div>
+          {cpwKey !== month ? (
+            <p className="dash-side-note muted">Datos COPOWER de {cpw.label}.</p>
+          ) : null}
+        </article>
+      </section>
+
+      <section className="panel two-col">
+        <article className="card">
+          <p className="eyebrow">2 · Consumos lubricantes</p>
+          <div className="exec-kpi-row">
+            <div className="exec-kpi">
+              <span>Aceite (L)</span>
+              <strong>{oilTotal.toFixed(1)}</strong>
+              <small>Adición + cambio</small>
+            </div>
+            <div className="exec-kpi">
+              <span>Coolant (L)</span>
+              <strong>{coolantTotal.toFixed(1)}</strong>
+              <small>Hoja consumos</small>
+            </div>
+          </div>
+        </article>
+        <article className="card">
+          <p className="eyebrow">GTE · referencia</p>
+          {gte ? (
+            <div className="exec-kpi-row">
+              <div className="exec-kpi">
+                <span>Fallas imputables</span>
+                <strong>{gte.summary.copowerFailures}</strong>
+                <small>Informe oficial</small>
+              </div>
+              <div className="exec-kpi">
+                <span>MTTR</span>
+                <strong>{hours(gte.summary.mttrHours)}</strong>
+                <small>Duración reparación</small>
+              </div>
+            </div>
+          ) : (
+            <p className="empty-state">Sin informe GTE para {monthLabel}.</p>
+          )}
+        </article>
+      </section>
+
+      <section className="panel two-col">
+        <article className="card">
+          <p className="eyebrow">3 · Prioridad por fallas</p>
+          <h3>Ranking unidades</h3>
+          {rankedFailures.length === 0 ? (
+            <p className="empty-state">Sin unidades con fallas en el periodo COPOWER.</p>
+          ) : (
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Unidad</th>
+                    <th>Fallas</th>
+                    <th>MTBF</th>
+                    <th>MTTR</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rankedFailures.slice(0, 6).map((r) => (
+                    <tr key={r.unidad} className={r.fallas >= 3 ? "row-repeat" : undefined}>
+                      <td>{r.unidad}</td>
+                      <td>{r.fallas}</td>
+                      <td>{r.mtbfLabel}</td>
+                      <td>{r.mttrHours ?? "N/D"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </article>
+        <article className="card">
+          <p className="eyebrow">4 · Bitácora reciente</p>
+          <h3>Eventos COPOWER</h3>
+          {maintEvents.length === 0 ? (
+            <p className="empty-state">Sin eventos en bitácora para este mes.</p>
+          ) : (
+            <ul className="meeting-list">
+              {maintEvents.map((e) => (
+                <li key={`${e.date}-${e.equipment}-${e.cause}`}>
+                  <strong>{e.equipment}</strong> · {e.date} · {e.eventType}
+                  <br />
+                  <span className="muted">{e.cause.slice(0, 80)}{e.cause.length > 80 ? "…" : ""}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </article>
+      </section>
+
+      <aside className="exec-source-note">
+        <p>
+          <strong>Fuentes:</strong> {cpw.sourceFile}
+          {gte ? ` · ${gte.sourceFile}` : ""}. Plan MTO formal y stock de repuestos no vienen en fuentes actuales.
+        </p>
+      </aside>
+    </div>
+  );
+}

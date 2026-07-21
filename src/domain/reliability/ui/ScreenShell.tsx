@@ -9,6 +9,8 @@ type Props = {
   sourceFile?: string;
   children: ReactNode;
   className?: string;
+  /** Sin cabecera interna — el hijo aporta su propio título. */
+  headless?: boolean;
 };
 
 const REPORT_BADGE: Record<ReportKey | "dual", { label: string; className: string }> = {
@@ -17,12 +19,12 @@ const REPORT_BADGE: Record<ReportKey | "dual", { label: string; className: strin
   dual: { label: "Comparativo", className: "source-badge dual" },
 };
 
-export function ScreenShell({ title, subtitle, report, sourceFile, children, className }: Props) {
+export function ScreenShell({ title, subtitle, report, sourceFile, children, className, headless }: Props) {
   const badge = REPORT_BADGE[report];
   return (
     <section className={`screen-shell panel ${className ?? ""}`.trim()}>
       <article className="card">
-        {(title || subtitle || sourceFile) && (
+        {!headless && (title || subtitle || sourceFile) ? (
           <header className="screen-shell-head">
             <div>
               {title ? <h3>{title}</h3> : null}
@@ -38,7 +40,7 @@ export function ScreenShell({ title, subtitle, report, sourceFile, children, cla
               ) : null}
             </div>
           </header>
-        )}
+        ) : null}
         {children}
       </article>
     </section>

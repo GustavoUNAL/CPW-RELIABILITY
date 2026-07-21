@@ -1,16 +1,17 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
-  BarChart3,
+  AlertTriangle,
   ClipboardList,
   Database,
   FileText,
   Gauge,
   GitCompare,
   LayoutDashboard,
+  MapPin,
   SearchCheck,
   Settings2,
   Sparkles,
-  Wrench,
+  Zap,
 } from "lucide-react";
 import { PlatformContent } from "./domain/reliability/reports/PlatformContent";
 import type { PageKey } from "./domain/reliability/types";
@@ -18,34 +19,33 @@ import {
   PROJECT_NAV_TREE,
   PROJECT_TITLE,
   firstLeafId,
-  findLeafLabel,
   type NavNode,
 } from "./domain/reliability/nav/projectTree";
 import {
   defaultMonth,
-  hasOwnHeader,
   monthOptionLabel,
   resolveViewContext,
 } from "./domain/reliability/nav/resolveContext";
 
 const MODULE_ICONS: Record<PageKey, ReactNode> = {
-  configuracion: <Settings2 size={16} />,
-  base_datos: <Database size={16} />,
-  calidad_datos: <SearchCheck size={16} />,
-  procesamiento: <Wrench size={16} />,
-  kpis_copower: <Gauge size={16} />,
-  kpis_gte: <BarChart3 size={16} />,
-  comparacion: <GitCompare size={16} />,
-  analisis: <Sparkles size={16} />,
   dashboard: <LayoutDashboard size={16} />,
+  campos: <MapPin size={16} />,
+  generacion: <Zap size={16} />,
+  comparacion: <GitCompare size={16} />,
+  eventos: <AlertTriangle size={16} />,
+  confiabilidad: <Gauge size={16} />,
+  operacion: <Database size={16} />,
+  analisis: <Sparkles size={16} />,
+  calidad_datos: <SearchCheck size={16} />,
   reportes: <ClipboardList size={16} />,
+  configuracion: <Settings2 size={16} />,
 };
 
 const OM_COLOMBIA_URL =
   "https://copowercomco-my.sharepoint.com/personal/tec_op_copower_com_co/Documents/Forms/All.aspx?RootFolder=%2Fpersonal%2Ftec%5Fop%5Fcopower%5Fcom%5Fco%2FDocuments%2FO%26M%20COLOMBIA&View=%7B181C171F%2DD036%2D4F1F%2DBE86%2D9D8BEC441F3D%7D";
 
 const DEFAULT_MODULE = PROJECT_NAV_TREE[0];
-const DEFAULT_LEAF = firstLeafId(DEFAULT_MODULE.children) ?? "cfg-empresas-copower";
+const DEFAULT_LEAF = "dash-resumen";
 
 function App() {
   const [activePage, setActivePage] = useState<PageKey>(DEFAULT_MODULE.key);
@@ -54,9 +54,10 @@ function App() {
     [DEFAULT_MODULE.key]: true,
   });
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
+    "conf-copower": true,
+    "conf-gte": true,
+    "op-horas": true,
     "cfg-empresas": true,
-    "cfg-campos": true,
-    "cfg-equipos": true,
   });
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [selectedMonth, setSelectedMonth] = useState<string>("Jun");
@@ -73,9 +74,6 @@ function App() {
   }, [viewContext, selectedMonth]);
 
   const monthLabel = monthOptionLabel(selectedMonth, viewContext);
-  const activeModule = PROJECT_NAV_TREE.find((m) => m.key === activePage) ?? DEFAULT_MODULE;
-  const leafLabel = findLeafLabel(activeModule.children, activeLeafId) ?? activeLeafId;
-  const showPageHeading = !hasOwnHeader(activeLeafId);
 
   const selectLeaf = (page: PageKey, leafId: string) => {
     setActivePage(page);
@@ -145,20 +143,27 @@ function App() {
           <p className="brand-sub">{PROJECT_TITLE}</p>
         </div>
         <div className="sidebar-controls">
-          <div className="month-picker">
-            <label htmlFor="month-selector">Periodo</label>
-            <select
-              id="month-selector"
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-            >
-              {viewContext.monthOrder.map((month) => (
-                <option key={month} value={month}>
-                  {monthOptionLabel(month, viewContext)}
-                </option>
-              ))}
-            </select>
-          </div>
+          {viewContext.fixedPeriod ? (
+            <div className="month-picker month-picker-fixed">
+              <label>Periodo</label>
+              <p className="month-fixed-label">{monthOptionLabel(selectedMonth, viewContext)}</p>
+            </div>
+          ) : (
+            <div className="month-picker">
+              <label htmlFor="month-selector">Periodo</label>
+              <select
+                id="month-selector"
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+              >
+                {viewContext.monthOrder.map((month) => (
+                  <option key={month} value={month}>
+                    {monthOptionLabel(month, viewContext)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           <div className="header-theme-switch">
             <label>Apariencia</label>
             <div className="theme-switch-row">
@@ -232,23 +237,6 @@ function App() {
       </aside>
 
       <main className={viewContext.report === "dual" ? "main main-dual" : "main"}>
-        {showPageHeading ? (
-          <header className="page-heading">
-            <div className="page-heading-main">
-              <p className="eyebrow">{activeModule.label}</p>
-              <h2>{leafLabel}</h2>
-              <p className="muted">{activeModule.description}</p>
-            </div>
-            <div className="page-heading-meta">
-              <span
-                className={`source-badge ${viewContext.report === "copower" ? "cpw" : viewContext.report === "gran_tierra" ? "gte" : "dual"}`}
-              >
-                {viewContext.reportShort}
-              </span>
-              <span className="page-period">{monthLabel}</span>
-            </div>
-          </header>
-        ) : null}
         <PlatformContent
           page={activePage}
           leafId={activeLeafId}

@@ -157,16 +157,17 @@ export type EventRecord = {
 };
 
 export type PageKey =
-  | "configuracion"
-  | "base_datos"
-  | "calidad_datos"
-  | "procesamiento"
-  | "kpis_copower"
-  | "kpis_gte"
-  | "comparacion"
-  | "analisis"
   | "dashboard"
-  | "reportes";
+  | "campos"
+  | "generacion"
+  | "comparacion"
+  | "eventos"
+  | "confiabilidad"
+  | "operacion"
+  | "analisis"
+  | "calidad_datos"
+  | "reportes"
+  | "configuracion";
 
 export type ReportKey = "gran_tierra" | "copower";
 

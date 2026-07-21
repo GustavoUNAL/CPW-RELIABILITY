@@ -98,10 +98,10 @@ function CompanyIdentity({
 
 export function CopowerCompanyView() {
   return (
-    <ScreenShell report="copower" title="COPOWER LIMITADA" subtitle={COPOWER_PROFILE.role}>
+    <ScreenShell report="copower" headless>
       <CompanyIdentity
         name={COPOWER_PROFILE.legalName}
-        role="Proveedor adjudicado en órdenes Gran Tierra · Putumayo"
+        role={COPOWER_PROFILE.role}
         badge={<span className="source-badge cpw">Operador</span>}
       >
         <div className="company-contact-row">
@@ -120,6 +120,8 @@ export function CopowerCompanyView() {
         </div>
       </CompanyIdentity>
 
+      <p className="muted company-subrole">Proveedor adjudicado · Costayaco y Vonú, Putumayo</p>
+
       <FactGrid facts={COPOWER_PROFILE.facts} />
 
       <ContractTable rows={COPOWER_PROFILE.activeOrders} title="Órdenes activas con Gran Tierra (data/contratos)" />
@@ -135,10 +137,10 @@ export function CopowerCompanyView() {
 
 export function GteCompanyView() {
   return (
-    <ScreenShell report="gran_tierra" title="Gran Tierra Energy" subtitle={GTE_PROFILE.role}>
+    <ScreenShell report="gran_tierra" headless>
       <CompanyIdentity
         name={GTE_PROFILE.legalName}
-        role={`${GTE_PROFILE.area} · Cliente contractual`}
+        role={GTE_PROFILE.role}
         badge={<span className="source-badge gte">Cliente</span>}
       >
         <div className="company-contact-row">
@@ -153,6 +155,8 @@ export function GteCompanyView() {
           </span>
         </div>
       </CompanyIdentity>
+
+      <p className="muted company-subrole">{GTE_PROFILE.area} · Aceptante contractual</p>
 
       <FactGrid facts={GTE_PROFILE.facts} />
 
