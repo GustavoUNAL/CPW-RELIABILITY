@@ -258,12 +258,16 @@ function DualValueCard({
   cpwValue,
   toneGte,
   toneCpw,
+  gteCaption,
+  cpwCaption,
 }: {
   label: string;
   gteValue: string;
   cpwValue: string;
   toneGte?: "ok" | "warn" | "bad" | "na";
   toneCpw?: "ok" | "warn" | "bad" | "na";
+  gteCaption?: string;
+  cpwCaption?: string;
 }) {
   return (
     <article className="dash-dual-card">
@@ -271,13 +275,25 @@ function DualValueCard({
       <div className="dash-dual-values">
         <div className={`dash-dual-val dash-dual-val--gte${toneGte ? ` ${toneGte}` : ""}`}>
           <small>
-            <span className="source-badge gte">GTE</span> Informe oficial
+            {gteCaption ? (
+              gteCaption
+            ) : (
+              <>
+                <span className="source-badge gte">GTE</span> Informe oficial
+              </>
+            )}
           </small>
           <strong>{gteValue}</strong>
         </div>
         <div className={`dash-dual-val dash-dual-val--cpw${toneCpw ? ` ${toneCpw}` : ""}`}>
           <small>
-            <span className="source-badge cpw">CPW</span> Reporte diario
+            {cpwCaption ? (
+              cpwCaption
+            ) : (
+              <>
+                <span className="source-badge cpw">CPW</span> Reporte diario
+              </>
+            )}
           </small>
           <strong>{cpwValue}</strong>
         </div>
@@ -356,6 +372,12 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
     effCampo.general.eficienciaPct == null
       ? "N/D"
       : `${effCampo.general.eficienciaPct.toFixed(1)}%`;
+  const effCyc = effCampo.porCampo.find((c) => c.label === "Costayaco");
+  const effVonu = effCampo.porCampo.find((c) => c.label === "Vonu");
+  const effCycLabel =
+    effCyc?.eficienciaPct == null ? "N/D" : `${effCyc.eficienciaPct.toFixed(1)}%`;
+  const effVonuLabel =
+    effVonu?.eficienciaPct == null ? "N/D" : `${effVonu.eficienciaPct.toFixed(1)}%`;
 
   const band = gte?.kpi.reliability != null ? getReliabilityDeduction(gte.kpi.reliability) : null;
   const integRows = useMemo(() => buildIntegratedRows(gte, cpw), [gte, cpw]);
@@ -574,17 +596,16 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
         />
         <DualValueCard
           label="Eficiencia de campo"
-          gteValue={effPctLabel}
-          cpwValue={effPctLabel}
+          gteValue={effCycLabel}
+          cpwValue={effVonuLabel}
+          gteCaption={`Costayaco · total ${effPctLabel}`}
+          cpwCaption={`Vonú · ${effCampo.yearMonth}`}
         />
       </section>
       <p className="muted" style={{ margin: "0.35rem 0 0.75rem", fontSize: "0.78rem" }}>
-        Eficiencia de campo ({effCampo.yearMonth}
-        {effCampo.porCampo.length
-          ? ` · ${effCampo.porCampo
-              .filter((c) => c.eficienciaPct != null)
-              .map((c) => `${c.label} ${c.eficienciaPct!.toFixed(1)}%`)
-              .join(" · ")}`
+        Eficiencia ({effCampo.yearMonth}
+        {effCampo.general.heatRateFt3Kwh != null
+          ? ` · HR ${effCampo.general.heatRateFt3Kwh.toFixed(2)} ft³/kWh`
           : ""}
         ). {EFICIENCIA_FORMULA}
       </p>

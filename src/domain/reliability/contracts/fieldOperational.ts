@@ -23,6 +23,7 @@ export type FieldUnitLive = {
   mttr: number | null;
   riesgo: string;
   energiaKwh: number | null;
+  horasOperacion: number | null;
 };
 
 export type FieldOperationalData = {
@@ -115,15 +116,19 @@ export function getFieldOperational(
     fallas,
     hoursOp,
     hoursFs,
-    units: unitsRaw.map((u) => ({
-      id: u.unidad,
-      disp: u.disponibilidadPct,
-      conf: u.confiabilidadPct,
-      fallas: u.fallas,
-      mtbf: u.mtbfLabel,
-      mttr: u.mttrHours,
-      riesgo: u.riesgoTecnico,
-      energiaKwh: equipByUnit.get(u.unidad)?.energiaKwh ?? null,
-    })),
+    units: unitsRaw.map((u) => {
+      const gen = equipByUnit.get(u.unidad);
+      return {
+        id: u.unidad,
+        disp: u.disponibilidadPct,
+        conf: u.confiabilidadPct,
+        fallas: u.fallas,
+        mtbf: u.mtbfLabel,
+        mttr: u.mttrHours,
+        riesgo: u.riesgoTecnico,
+        energiaKwh: gen?.energiaKwh ?? null,
+        horasOperacion: gen?.horasOperacion ?? null,
+      };
+    }),
   };
 }

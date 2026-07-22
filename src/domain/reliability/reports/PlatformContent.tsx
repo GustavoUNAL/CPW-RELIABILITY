@@ -23,7 +23,7 @@ import { DashboardMantenimiento, DashboardOverview } from "./DashboardViews";
 import { GenerationDashboard } from "./GenerationDashboard";
 import { CopowerCompanyView, GteCompanyView } from "./CompanyViews";
 import { FieldAssetsView, FieldsOverviewView } from "./FieldAssetsView";
-import { fieldKeyFromLeaf } from "../contracts/fieldAssets";
+import { fieldKeyFromLeaf, fieldSectionFromLeaf } from "../contracts/fieldAssets";
 import { CopowerResumen } from "./CopowerResumen";
 import { GteResumen } from "./GteResumen";
 import { ExecutiveResumen } from "./ExecutiveResumen";
@@ -311,7 +311,14 @@ function PlatformBody({
     }
     const fieldKey = fieldKeyFromLeaf(leafId);
     if (fieldKey) {
-      return <FieldAssetsView fieldKey={fieldKey} month={month} monthLabel={monthLabel} />;
+      return (
+        <FieldAssetsView
+          fieldKey={fieldKey}
+          section={fieldSectionFromLeaf(leafId)}
+          month={month}
+          monthLabel={monthLabel}
+        />
+      );
     }
   }
 
@@ -629,7 +636,6 @@ function PlatformBody({
     leafId === "op-eficiencia" ||
     leafId === "op-resumen-diario" ||
     leafId === "op-eventos" ||
-    leafId === "op-actividades" ||
     leafId === "op-consumos" ||
     leafId === "op-detalle"
   ) {

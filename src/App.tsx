@@ -65,6 +65,11 @@ function App() {
   const [selectedMonth, setSelectedMonth] = useState<string>("Jun");
   const [navOpen, setNavOpen] = useState(false);
 
+  useEffect(() => {
+    document.body.classList.toggle("theme-light", theme === "light");
+    document.body.classList.toggle("theme-dark", theme === "dark");
+  }, [theme]);
+
   const viewContext = useMemo(
     () => resolveViewContext(activePage, activeLeafId),
     [activePage, activeLeafId],

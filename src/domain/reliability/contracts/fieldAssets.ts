@@ -1,4 +1,4 @@
-/** Activos por campo — data/contratos (costayaco.pdf + vonus.pdf). */
+/** Activos por campo — data/contratos (costayaco.pdf + vonus.pdf) + flota operativa. */
 
 export type FieldKey = "costayaco" | "vonu";
 
@@ -31,11 +31,22 @@ export type AssetGroup = {
   placement?: "hub" | "side" | "bottom";
 };
 
+export type FleetVariant = "jenbacher" | "jinan" | "cpw" | "diesel";
+
 export type FleetUnit = {
   id: string;
   family: string;
+  /** Etiqueta corta de potencia nominal (p. ej. "800 kW"). */
   power: string;
-  variant: "jinan" | "jenbacher";
+  kwNominal: number;
+  /** Tensión de generación / bornes. */
+  voltage: string;
+  /** Tensión de entrega al sistema (si difiere). */
+  deliveryVoltage?: string;
+  combustible: "gas" | "diesel";
+  frecuenciaHz: number;
+  factorPotencia: number;
+  variant: FleetVariant;
 };
 
 export type FieldHero = {
@@ -55,6 +66,54 @@ export type FieldProfile = {
   groups: AssetGroup[];
 };
 
+const JEN_BASE = {
+  family: "Respaldo diésel",
+  power: "500 kW",
+  kwNominal: 500,
+  voltage: "480 V",
+  deliveryVoltage: "13,8 kV",
+  combustible: "diesel" as const,
+  frecuenciaHz: 60,
+  factorPotencia: 0.9,
+  variant: "jenbacher" as const,
+};
+
+const CPW_BASE = {
+  family: "CPW gas · MT",
+  power: "800 kW",
+  kwNominal: 800,
+  voltage: "480 V",
+  deliveryVoltage: "13,8 kV",
+  combustible: "gas" as const,
+  frecuenciaHz: 60,
+  factorPotencia: 0.9,
+  variant: "cpw" as const,
+};
+
+const JINAN_CYC = {
+  family: "Jinan gas",
+  power: "450 kW",
+  kwNominal: 450,
+  voltage: "480 V",
+  deliveryVoltage: "13,8 kV",
+  combustible: "gas" as const,
+  frecuenciaHz: 60,
+  factorPotencia: 0.9,
+  variant: "jinan" as const,
+};
+
+const JINAN_VONU = {
+  family: "Jinan CPW500",
+  power: "500 kW",
+  kwNominal: 500,
+  voltage: "480 V",
+  deliveryVoltage: "0,48 kV",
+  combustible: "gas" as const,
+  frecuenciaHz: 60,
+  factorPotencia: 0.9,
+  variant: "jinan" as const,
+};
+
 export const FIELD_PROFILES: Record<FieldKey, FieldProfile> = {
   costayaco: {
     key: "costayaco",
@@ -67,63 +126,73 @@ export const FIELD_PROFILES: Record<FieldKey, FieldProfile> = {
       location: "Bloque Chaza · Putumayo Norte",
       orders: ["1200005030", "9000007071"],
     },
+    /** Orden visual: gas primero (CPW → Jinan) · luego respaldo diésel G10x. */
     fleet: [
-      { id: "CPW01", family: "Jinan CPW500", power: "500 kW", variant: "jinan" },
-      { id: "CPW02", family: "Jinan CPW500", power: "500 kW", variant: "jinan" },
-      { id: "CPW03", family: "Jinan CPW500", power: "500 kW", variant: "jinan" },
-      { id: "G101V", family: "Jenbacher J420", power: "480 V", variant: "jenbacher" },
-      { id: "G102A", family: "Jenbacher J420", power: "480 V", variant: "jenbacher" },
-      { id: "G102E", family: "Jenbacher J420", power: "480 V", variant: "jenbacher" },
-      { id: "G102I", family: "Jenbacher J420", power: "480 V", variant: "jenbacher" },
-      { id: "G102J", family: "Jenbacher J420", power: "480 V", variant: "jenbacher" },
-      { id: "G102K", family: "Jenbacher J420", power: "480 V", variant: "jenbacher" },
+      { id: "CPW01", ...CPW_BASE },
+      { id: "CPW02", ...CPW_BASE },
+      { id: "CPW03", ...CPW_BASE },
+      { id: "CPW04", ...CPW_BASE },
+      { id: "CPW05", ...CPW_BASE },
+      { id: "CPW06", ...CPW_BASE },
+      { id: "CPW07", ...CPW_BASE },
+      { id: "JIN-10", ...JINAN_CYC },
+      { id: "JIN-11", ...JINAN_CYC },
+      { id: "JIN-12", ...JINAN_CYC },
+      { id: "G101V", ...JEN_BASE },
+      { id: "G102A", ...JEN_BASE },
+      { id: "G102E", ...JEN_BASE },
+      { id: "G102I", ...JEN_BASE },
+      { id: "G102J", ...JEN_BASE },
+      { id: "G102K", ...JEN_BASE },
     ],
     stats: [
       { label: "Potencia bloque", value: "8 MW", hint: "Orden 1 · FP 0,9 · reparto de carga" },
-      { label: "Máquinas en operación", value: "9", hint: "CPW01–03 + G101V + G102A/E/I/J/K" },
+      { label: "Máquinas en operación", value: "16", hint: "7 CPW gas · 3 Jinan gas · 6 respaldo diésel" },
       { label: "Tensión de entrega", value: "13,8 kV", hint: "Centro de generación MT" },
-      { label: "Respaldo diésel", value: "2,3 MW", hint: "500 + 1.000 + 800 kW (Orden 2)" },
+      { label: "Respaldo diésel", value: "3 MW", hint: "G101V + G102A/E/I/J/K · 6 × 500 kW (bitácora = diésel)" },
       { label: "Transformadores", value: "7", hint: "6× Siemens 2,5–3 MVA + 1× 2,5 MVA" },
       { label: "Confiabilidad", value: "≥ 98%", hint: "Meta sistémica Orden 1" },
     ],
     groups: [
       {
         title: "Generación a gas",
-        subtitle: "Flota principal Jenbacher + Jinan · entrega 13,8 kV",
+        subtitle: "Flota principal Jinan + CPW · entrega 13,8 kV",
         kind: "gas",
         cards: [
           {
-            id: "cyc-j420",
-            title: "Jenbacher J420",
-            detail: "Generadores operativos y stand-by · 480 V",
-            power: "6 × J420",
-            count: 6,
-            kind: "gas",
-            units: ["G101V", "G102A", "G102E", "G102I", "G102J", "G102K"],
-          },
-          {
-            id: "cyc-j320",
-            title: "Jenbacher J320",
-            detail: "Stand-by / media tensión · 4.160 V / 480 V",
-            power: "Respaldo gas",
-            kind: "gas",
-          },
-          {
             id: "cyc-jinan",
-            title: "Jinan 500 kW",
-            detail: "Generadores compactos a gas",
-            power: "500 kW c/u",
+            title: "Jinan gas",
+            detail: "Generadores a gas · 450 kW · 480 V",
+            power: "450 kW c/u",
             count: 3,
             kind: "gas",
-            units: ["CPW01", "CPW02", "CPW03"],
+            units: ["JIN-10", "JIN-11", "JIN-12"],
+          },
+          {
+            id: "cyc-cpw",
+            title: "CPW gas MT",
+            detail: "Flota principal a gas · 800 kW · elevación 13,8 kV",
+            power: "800 kW c/u",
+            count: 7,
+            kind: "gas",
+            units: ["CPW01", "CPW02", "CPW03", "CPW04", "CPW05", "CPW06", "CPW07"],
           },
         ],
       },
       {
         title: "Respaldo diésel",
-        subtitle: "Orden 9000007071 · capacidad de respaldo 2,3 MW",
+        subtitle: "G101V + G102A/E/I/J/K · bitácora = diésel · + Cummins Orden 2",
         kind: "diesel",
         cards: [
+          {
+            id: "cyc-j420",
+            title: "G101 / G102 diésel",
+            detail: "Respaldo de carga · bitácora operativa las registra como diésel (no gas)",
+            power: "500 kW c/u",
+            count: 6,
+            kind: "diesel",
+            units: ["G101V", "G102A", "G102E", "G102I", "G102J", "G102K"],
+          },
           {
             id: "cyc-c500",
             title: "Cummins C500D6",
@@ -217,9 +286,9 @@ export const FIELD_PROFILES: Record<FieldKey, FieldProfile> = {
       orders: ["9000007071", "1200005030"],
     },
     fleet: [
-      { id: "JIN-01", family: "Jinan CPW500", power: "500 kW", variant: "jinan" },
-      { id: "JIN-02", family: "Jinan CPW500", power: "500 kW", variant: "jinan" },
-      { id: "JIN-03", family: "Jinan CPW500", power: "500 kW", variant: "jinan" },
+      { id: "JIN-01", ...JINAN_VONU },
+      { id: "JIN-02", ...JINAN_VONU },
+      { id: "JIN-03", ...JINAN_VONU },
     ],
     stats: [
       { label: "Potencia instalada", value: "1,5 MW", hint: "3 × Jinan CPW500 · 500 kW c/u" },
@@ -238,7 +307,7 @@ export const FIELD_PROFILES: Record<FieldKey, FieldProfile> = {
           {
             id: "von-jinan",
             title: "Jinan CPW500",
-            detail: "Generadores a gas natural / biogás en campo Vonú",
+            detail: "Generadores a gas natural / biogás en campo Vonú · 480 V",
             power: "500 kW c/u",
             count: 3,
             kind: "gas",
@@ -302,8 +371,33 @@ export const FIELD_PROFILES: Record<FieldKey, FieldProfile> = {
   },
 };
 
+export type FieldSection = "resumen" | "parque" | "desempeno" | "contrato" | "activos";
+
 export function fieldKeyFromLeaf(leafId: string): FieldKey | null {
-  if (leafId === "cfg-campos-costayaco") return "costayaco";
-  if (leafId === "cfg-campos-vonu") return "vonu";
+  if (leafId.startsWith("cfg-campos-costayaco")) return "costayaco";
+  if (leafId.startsWith("cfg-campos-vonu")) return "vonu";
   return null;
+}
+
+export function fieldSectionFromLeaf(leafId: string): FieldSection {
+  if (leafId.endsWith("-parque")) return "parque";
+  if (leafId.endsWith("-desempeno")) return "desempeno";
+  if (leafId.endsWith("-contrato")) return "contrato";
+  if (leafId.endsWith("-activos")) return "activos";
+  return "resumen";
+}
+
+export function fleetVariantRank(variant: FleetVariant): number {
+  switch (variant) {
+    case "cpw":
+      return 0;
+    case "jinan":
+      return 1;
+    case "jenbacher":
+      return 2;
+    case "diesel":
+      return 3;
+    default:
+      return 9;
+  }
 }

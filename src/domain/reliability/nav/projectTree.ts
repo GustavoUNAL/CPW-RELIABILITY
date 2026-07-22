@@ -39,8 +39,28 @@ export const PROJECT_NAV_TREE: NavModule[] = [
     description: "Activos y operación por campo",
     children: [
       { id: "cfg-campos-resumen", label: "Resumen" },
-      { id: "cfg-campos-costayaco", label: "Costayaco" },
-      { id: "cfg-campos-vonu", label: "Vonú" },
+      {
+        id: "cfg-campos-costayaco",
+        label: "Costayaco",
+        children: [
+          { id: "cfg-campos-costayaco-resumen", label: "Resumen" },
+          { id: "cfg-campos-costayaco-parque", label: "Parque" },
+          { id: "cfg-campos-costayaco-desempeno", label: "Desempeño" },
+          { id: "cfg-campos-costayaco-contrato", label: "Contrato" },
+          { id: "cfg-campos-costayaco-activos", label: "Activos" },
+        ],
+      },
+      {
+        id: "cfg-campos-vonu",
+        label: "Vonú",
+        children: [
+          { id: "cfg-campos-vonu-resumen", label: "Resumen" },
+          { id: "cfg-campos-vonu-parque", label: "Parque" },
+          { id: "cfg-campos-vonu-desempeno", label: "Desempeño" },
+          { id: "cfg-campos-vonu-contrato", label: "Contrato" },
+          { id: "cfg-campos-vonu-activos", label: "Activos" },
+        ],
+      },
     ],
   },
   {
@@ -66,7 +86,6 @@ export const PROJECT_NAV_TREE: NavModule[] = [
       { id: "op-eficiencia", label: "Eficiencia" },
       { id: "op-resumen-diario", label: "Resumen diario" },
       { id: "op-eventos", label: "Eventos" },
-      { id: "op-actividades", label: "Actividades" },
       { id: "op-consumos", label: "Consumos" },
     ],
   },

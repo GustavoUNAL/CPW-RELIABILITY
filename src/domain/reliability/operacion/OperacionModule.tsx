@@ -60,8 +60,6 @@ export function operacionSectionFromLeaf(leafId: string): OperacionSection {
       return "resumen";
     case "op-eventos":
       return "eventos";
-    case "op-actividades":
-      return "actividades";
     case "op-consumos":
       return "consumos";
     case "op-eficiencia":

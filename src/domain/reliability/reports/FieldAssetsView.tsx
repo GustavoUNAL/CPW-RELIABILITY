@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
   Activity,
@@ -13,19 +13,34 @@ import {
   Zap,
 } from "lucide-react";
 import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import {
   getFieldOperational,
   type FieldOperationalData,
   type FieldUnitLive,
 } from "../contracts/fieldOperational";
 import {
   FIELD_PROFILES,
+  fleetVariantRank,
   type AssetCard,
   type AssetCardKind,
   type AssetGroup,
   type FieldKey,
   type FieldProfile,
+  type FieldSection,
   type FleetUnit,
+  type FleetVariant,
 } from "../contracts/fieldAssets";
+import { loadOperacionPack } from "../operacion/api";
+import { eficienciaCampoSnapshot } from "../operacion/eficiencia";
 import { ScreenShell } from "../ui/ScreenShell";
 
 type FieldDataSource = "auto" | "copower" | "gran_tierra";
@@ -61,11 +76,19 @@ type MergedUnit = {
   mttr: number | null;
   riesgo: string;
   energiaKwh: number | null;
+  horasOperacion: number | null;
 };
 
 type UnitDescriptor = {
   power?: string;
   characteristic?: string;
+  voltage?: string;
+  deliveryVoltage?: string;
+  kwNominal?: number;
+  combustible?: "gas" | "diesel";
+  frecuenciaHz?: number;
+  factorPotencia?: number;
+  variant?: FleetVariant;
 };
 
 function mergeFieldUnits(gte: FieldUnitLive[], cpw: FieldUnitLive[]): MergedUnit[] {
@@ -81,6 +104,7 @@ function mergeFieldUnits(gte: FieldUnitLive[], cpw: FieldUnitLive[]): MergedUnit
       mttr: u.mttr,
       riesgo: u.riesgo,
       energiaKwh: u.energiaKwh,
+      horasOperacion: u.horasOperacion,
     });
   }
 
@@ -97,6 +121,7 @@ function mergeFieldUnits(gte: FieldUnitLive[], cpw: FieldUnitLive[]): MergedUnit
       if (existing.mttr == null) existing.mttr = u.mttr;
       if (!existing.riesgo || existing.riesgo === "N/A") existing.riesgo = u.riesgo;
       if (existing.energiaKwh == null) existing.energiaKwh = u.energiaKwh;
+      if (existing.horasOperacion == null) existing.horasOperacion = u.horasOperacion;
     } else {
       map.set(key, {
         id: u.id,
@@ -107,11 +132,21 @@ function mergeFieldUnits(gte: FieldUnitLive[], cpw: FieldUnitLive[]): MergedUnit
         mttr: u.mttr,
         riesgo: u.riesgo,
         energiaKwh: u.energiaKwh,
+        horasOperacion: u.horasOperacion,
       });
     }
   }
 
-  return [...map.values()].sort((a, b) => b.fallas - a.fallas || a.id.localeCompare(b.id));
+  return [...map.values()];
+}
+
+function sortUnitsByFleet(units: MergedUnit[], descriptors: Map<string, UnitDescriptor>): MergedUnit[] {
+  return [...units].sort((a, b) => {
+    const va = fleetVariantRank(descriptors.get(normId(a.id))?.variant ?? "diesel");
+    const vb = fleetVariantRank(descriptors.get(normId(b.id))?.variant ?? "diesel");
+    if (va !== vb) return va - vb;
+    return a.id.localeCompare(b.id, undefined, { numeric: true });
+  });
 }
 
 function buildUnitDescriptors(field: FieldProfile): Map<string, UnitDescriptor> {
@@ -121,6 +156,13 @@ function buildUnitDescriptors(field: FieldProfile): Map<string, UnitDescriptor> 
     descriptors.set(normId(unit.id), {
       power: unit.power,
       characteristic: unit.family,
+      voltage: unit.voltage,
+      deliveryVoltage: unit.deliveryVoltage,
+      kwNominal: unit.kwNominal,
+      combustible: unit.combustible,
+      frecuenciaHz: unit.frecuenciaHz,
+      factorPotencia: unit.factorPotencia,
+      variant: unit.variant,
     });
   }
 
@@ -129,15 +171,34 @@ function buildUnitDescriptors(field: FieldProfile): Map<string, UnitDescriptor> 
       for (const unitId of card.units ?? []) {
         const key = normId(unitId);
         const existing = descriptors.get(key);
+        if (existing) continue;
         descriptors.set(key, {
-          power: existing?.power ?? card.power,
-          characteristic: existing?.characteristic ?? card.title,
+          power: card.power,
+          characteristic: card.title,
         });
       }
     }
   }
 
   return descriptors;
+}
+
+function avgKwFromEnergy(energiaKwh: number | null, horas: number | null): number | null {
+  if (energiaKwh == null || horas == null || horas <= 0) return null;
+  return energiaKwh / horas;
+}
+
+function CapacityBar({ delivered, nominal }: { delivered: number | null; nominal: number | null }) {
+  if (nominal == null || nominal <= 0) {
+    return <div className="field-capacity-bar field-capacity-bar--empty" />;
+  }
+  const pctVal = delivered == null ? 0 : Math.max(0, Math.min(100, (delivered / nominal) * 100));
+  const tone = pctVal >= 85 ? "high" : pctVal >= 50 ? "mid" : pctVal > 0 ? "low" : "empty";
+  return (
+    <div className="field-capacity-bar" aria-hidden>
+      <div className={`field-capacity-fill field-capacity-fill--${tone}`} style={{ width: `${pctVal}%` }} />
+    </div>
+  );
 }
 
 function MeterBar({ value, meta = META }: { value: number | null; meta?: number }) {
@@ -198,127 +259,152 @@ function FieldHeroBanner({ field, monthLabel }: { field: FieldProfile; monthLabe
   );
 }
 
-function FleetTrioRow({ label, units, tone }: { label: string; units: FleetUnit[]; tone: "jinan" | "jenbacher" }) {
+function FleetUnitCard({ unit }: { unit: FleetUnit }) {
+  const fuelLabel = unit.combustible === "gas" ? "Gas" : "Diésel";
   return (
-    <div className={`field-fleet-trio field-fleet-trio--${tone}`}>
-      <div className="field-fleet-trio-label">
-        <strong>{label}</strong>
-        <span>{units.length} máquinas</span>
-      </div>
-      <div className="field-fleet-trio-units">
+    <article className={`field-fleet-unit field-fleet-unit--${unit.variant} field-fleet-unit--fuel-${unit.combustible}`}>
+      <header className="field-fleet-unit-head">
+        <div className="field-fleet-unit-title">
+          <strong>{unit.id}</strong>
+          <span className={`field-fuel-chip field-fuel-chip--${unit.combustible}`}>{fuelLabel}</span>
+        </div>
+        <span className="field-fleet-unit-voltage">{unit.voltage}</span>
+      </header>
+      <p className="field-fleet-unit-family">{unit.family}</p>
+      <dl className="field-fleet-unit-specs">
+        <div>
+          <dt>Nominal</dt>
+          <dd>{unit.power}</dd>
+        </div>
+        <div>
+          <dt>Hz / FP</dt>
+          <dd>
+            {unit.frecuenciaHz} / {unit.factorPotencia.toFixed(1)}
+          </dd>
+        </div>
+        {unit.deliveryVoltage ? (
+          <div className="field-fleet-unit-specs--wide">
+            <dt>Entrega sistema</dt>
+            <dd>{unit.deliveryVoltage}</dd>
+          </div>
+        ) : null}
+      </dl>
+    </article>
+  );
+}
+
+function FleetFamilyBlock({
+  tag,
+  tagTone,
+  subtitle,
+  units,
+  first,
+}: {
+  tag: string;
+  tagTone: FleetVariant;
+  subtitle: string;
+  units: FleetUnit[];
+  first?: boolean;
+}) {
+  if (units.length === 0) return null;
+  const kw = units.reduce((s, u) => s + u.kwNominal, 0);
+  return (
+    <div className={`field-fleet-family field-fleet-family--${tagTone}${first ? " field-fleet-family--first" : ""}`}>
+      <header>
+        <div className="field-fleet-family-head">
+          <span className={`field-fleet-family-tag field-fleet-family-tag--${tagTone}`}>{tag}</span>
+          <span className="field-fleet-family-sub">{subtitle}</span>
+        </div>
+        <span className="field-fleet-family-kw">
+          {units.length} und · {kw.toLocaleString("es-CO")} kW
+        </span>
+      </header>
+      <div className={`field-fleet-grid field-fleet-grid--${tagTone}`}>
         {units.map((u) => (
-          <span key={u.id} className={`field-fleet-trio-chip field-fleet-trio-chip--${tone}`}>
-            {u.id}
-          </span>
+          <FleetUnitCard key={u.id} unit={u} />
         ))}
       </div>
     </div>
   );
 }
 
-function FleetPanel({ fleet, fieldKey }: { fleet: FleetUnit[]; fieldKey: FieldKey }) {
+function FleetPanel({
+  fleet,
+  fieldKey,
+  compact = false,
+}: {
+  fleet: FleetUnit[];
+  fieldKey: FieldKey;
+  compact?: boolean;
+}) {
+  const cpw = fleet.filter((u) => u.variant === "cpw");
   const jinan = fleet.filter((u) => u.variant === "jinan");
   const jenbacher = fleet.filter((u) => u.variant === "jenbacher");
-  const jenA = jenbacher.slice(0, 3);
-  const jenB = jenbacher.slice(3, 6);
-  const jinanKw = jinan.length * 500;
+  const diesel = fleet.filter((u) => u.variant === "diesel");
+  const gasUnits = [...cpw, ...jinan];
+  const dieselUnits = [...jenbacher, ...diesel];
+  const kwInstalled = fleet.reduce((s, u) => s + u.kwNominal, 0);
+  const kwGas = gasUnits.reduce((s, u) => s + u.kwNominal, 0);
+  const kwDiesel = dieselUnits.reduce((s, u) => s + u.kwNominal, 0);
 
   return (
-    <section className="field-fleet-panel">
+    <section className={`field-fleet-panel${compact ? " field-fleet-panel--compact" : ""}`}>
       <div className="field-section-label">
         <Shield size={15} />
         <span>Parque operativo · contrato</span>
-        <span className="field-group-count">{fleet.length} unidades</span>
+        <span className="field-group-count">
+          {fleet.length} unidades · {kwInstalled.toLocaleString("es-CO")} kW
+        </span>
       </div>
-      <div className={`field-fleet-layout${jenbacher.length === 0 ? " field-fleet-layout--single" : ""}`}>
-        {jinan.length > 0 ? (
-          <div className="field-fleet-family">
-            <header>
-              <span className="field-fleet-family-tag field-fleet-family-tag--jinan">Jinan</span>
-              <span>
-                {jinan.length} × CPW500
-                {fieldKey === "vonu" ? " · Vonú" : " · Costayaco"}
-              </span>
-            </header>
 
-            <FleetTrioRow
-              label={fieldKey === "vonu" ? "Trío Vonú" : "Trío de referencia"}
-              units={jinan.slice(0, 3)}
-              tone="jinan"
+      <div className="field-fleet-summary">
+        <article className="field-fleet-summary-card field-fleet-summary-card--gas">
+          <span>Generación a gas</span>
+          <strong>{kwGas.toLocaleString("es-CO")} kW</strong>
+          <small>{gasUnits.length} máquinas · flota principal</small>
+        </article>
+        <article className="field-fleet-summary-card field-fleet-summary-card--diesel">
+          <span>Respaldo diésel</span>
+          <strong>{kwDiesel.toLocaleString("es-CO")} kW</strong>
+          <small>{dieselUnits.length} máquinas · contingencia</small>
+        </article>
+      </div>
+
+      {compact ? (
+        <p className="muted field-fleet-compact-note">
+          Detalle por máquina en la hoja Parque · {fieldKey === "vonu" ? "Vonú" : "Costayaco"}
+        </p>
+      ) : (
+        <>
+          <div className="field-fleet-band field-fleet-band--gas">
+            <p className="field-fleet-band-label">Gas · operación principal</p>
+            <FleetFamilyBlock
+              tag="CPW"
+              tagTone="cpw"
+              subtitle={`${cpw.length} × 800 kW · entrega 13,8 kV · ${fieldKey === "vonu" ? "Vonú" : "Costayaco"}`}
+              units={cpw}
+              first
             />
-
-            <div className="field-fleet-meta">
-              <article>
-                <span>Potencia nominal del trío</span>
-                <strong>{jinanKw.toLocaleString("es-CO")} kW</strong>
-                <small>500 kW por máquina</small>
-              </article>
-              <article>
-                <span>Seguimiento KPIs</span>
-                <div className="field-fleet-kpi-chips">
-                  <span>Disp</span>
-                  <span>Conf</span>
-                  <span>Fallas</span>
-                  <span>MTBF</span>
-                </div>
-                <small>Indicadores unitarios del mes</small>
-              </article>
-            </div>
-
-            <div className="field-fleet-grid">
-              {jinan.map((u) => (
-                <article key={u.id} className="field-fleet-unit field-fleet-unit--jinan">
-                  <strong>{u.id}</strong>
-                  <span>{u.power}</span>
-                  <small>{u.family}</small>
-                </article>
-              ))}
-            </div>
+            <FleetFamilyBlock
+              tag="Jinan"
+              tagTone="jinan"
+              subtitle={`${jinan.length} × gas · ${fieldKey === "vonu" ? "Vonú BT 0,48 kV" : "Costayaco 13,8 kV"}`}
+              units={jinan}
+            />
           </div>
-        ) : null}
 
-        {jenbacher.length > 0 ? (
-          <div className="field-fleet-family field-fleet-family--wide">
-            <header>
-              <span className="field-fleet-family-tag field-fleet-family-tag--jenbacher">Jenbacher</span>
-              <span>{jenbacher.length} × J420 · Costayaco</span>
-            </header>
-
-            <div className="field-fleet-trios">
-              {jenA.length ? <FleetTrioRow label="Trío A" units={jenA} tone="jenbacher" /> : null}
-              {jenB.length ? <FleetTrioRow label="Trío B" units={jenB} tone="jenbacher" /> : null}
-            </div>
-
-            <div className="field-fleet-meta">
-              <article>
-                <span>Agrupación</span>
-                <strong>2 tríos × 3</strong>
-                <small>Lectura de indicadores por grupo de 3 máquinas</small>
-              </article>
-              <article>
-                <span>Seguimiento KPIs</span>
-                <div className="field-fleet-kpi-chips">
-                  <span>Disp</span>
-                  <span>Conf</span>
-                  <span>Fallas</span>
-                  <span>MTBF</span>
-                </div>
-                <small>Por unidad y por trío</small>
-              </article>
-            </div>
-
-            <div className="field-fleet-grid field-fleet-grid--jenbacher">
-              {jenbacher.map((u) => (
-                <article key={u.id} className="field-fleet-unit field-fleet-unit--jenbacher">
-                  <strong>{u.id}</strong>
-                  <span>{u.power}</span>
-                  <small>{u.family}</small>
-                </article>
-              ))}
-            </div>
+          <div className="field-fleet-band field-fleet-band--diesel">
+            <p className="field-fleet-band-label">Diésel · respaldo (bitácora operativa)</p>
+            <FleetFamilyBlock
+              tag="G10x"
+              tagTone="jenbacher"
+              subtitle={`${jenbacher.length} × 500 kW · 480 V · respaldo diésel verificado en eventos`}
+              units={jenbacher}
+            />
+            <FleetFamilyBlock tag="Diésel" tagTone="diesel" subtitle="Otros diésel contractuales" units={diesel} />
           </div>
-        ) : null}
-      </div>
+        </>
+      )}
     </section>
   );
 }
@@ -331,6 +417,10 @@ function LiveUnitTile({ unit, descriptor }: { unit: MergedUnit; descriptor?: Uni
         ? "field-live-unit--risk-med"
         : "field-live-unit--risk-low";
 
+  const kwAvg = avgKwFromEnergy(unit.energiaKwh, unit.horasOperacion);
+  const kwNom = descriptor?.kwNominal ?? null;
+  const loadPct = kwAvg != null && kwNom != null && kwNom > 0 ? (kwAvg / kwNom) * 100 : null;
+
   return (
     <article className={`field-live-unit ${riskClass}${unit.fallas >= 3 ? " field-live-unit--alert" : ""}`}>
       <header className="field-live-unit-head">
@@ -338,7 +428,7 @@ function LiveUnitTile({ unit, descriptor }: { unit: MergedUnit; descriptor?: Uni
           <strong>{unit.id}</strong>
           <p className="field-live-spec">
             {descriptor?.characteristic ?? "Unidad de campo"}
-            {descriptor?.power ? ` · ${descriptor.power}` : ""}
+            {descriptor?.variant === "jenbacher" ? " · respaldo diésel" : ""}
           </p>
         </div>
         <span
@@ -349,6 +439,56 @@ function LiveUnitTile({ unit, descriptor }: { unit: MergedUnit; descriptor?: Uni
           {unit.riesgo.replace("RIESGO ", "")}
         </span>
       </header>
+
+      <dl className="field-live-tech">
+        <div>
+          <dt>Tensión</dt>
+          <dd>{descriptor?.voltage ?? "N/D"}</dd>
+        </div>
+        <div>
+          <dt>Nominal</dt>
+          <dd>{descriptor?.power ?? (kwNom != null ? `${kwNom} kW` : "N/D")}</dd>
+        </div>
+        <div>
+          <dt>Combustible</dt>
+          <dd>
+            {descriptor?.combustible === "diesel"
+              ? "Diésel"
+              : descriptor?.combustible === "gas"
+                ? "Gas"
+                : "N/D"}
+          </dd>
+        </div>
+        <div>
+          <dt>Hz / FP</dt>
+          <dd>
+            {descriptor?.frecuenciaHz != null ? `${descriptor.frecuenciaHz}` : "—"}
+            {descriptor?.factorPotencia != null ? ` / ${descriptor.factorPotencia.toFixed(1)}` : ""}
+          </dd>
+        </div>
+        {descriptor?.deliveryVoltage ? (
+          <div className="field-live-tech--wide">
+            <dt>Entrega sistema</dt>
+            <dd>{descriptor.deliveryVoltage}</dd>
+          </div>
+        ) : null}
+      </dl>
+
+      <div className="field-live-capacity">
+        <div className="field-live-capacity-labels">
+          <span>Capacidad entregada vs máxima</span>
+          <strong>
+            {kwAvg != null ? `${Math.round(kwAvg).toLocaleString("es-CO")} kW` : "N/D"}
+            <span className="muted"> / {kwNom != null ? `${kwNom} kW` : "N/D"}</span>
+          </strong>
+        </div>
+        <CapacityBar delivered={kwAvg} nominal={kwNom} />
+        <small>
+          {loadPct != null
+            ? `Factor de carga ${loadPct.toFixed(0)}% · kW medio = energía / horas OP`
+            : "Sin horas de operación para estimar kW medio"}
+        </small>
+      </div>
 
       <div className="field-live-meters">
         <div>
@@ -385,7 +525,8 @@ function LiveUnitTile({ unit, descriptor }: { unit: MergedUnit; descriptor?: Uni
       <footer className="field-live-unit-foot">
         {unit.energiaKwh != null ? (
           <span className="field-live-energy">
-            {Math.round(unit.energiaKwh).toLocaleString("es-CO")} kWh generados
+            {Math.round(unit.energiaKwh).toLocaleString("es-CO")} kWh
+            {unit.horasOperacion != null ? ` · ${hours(unit.horasOperacion)} OP` : ""}
           </span>
         ) : (
           <span className="field-live-energy muted">Sin energía reportada</span>
@@ -469,12 +610,13 @@ function FieldPerformanceSection({
         : null;
   const unitDescriptors = buildUnitDescriptors(field);
 
-  const units =
+  const unitsRaw =
     source === "auto"
       ? mergeFieldUnits(gte.units, cpw.units)
       : selectedPrimary.units.length > 0
         ? mergeFieldUnits([], selectedPrimary.units)
         : mergeFieldUnits(gte.units, cpw.units);
+  const units = sortUnitsByFleet(unitsRaw, unitDescriptors);
 
   const sourceHint =
     source === "auto"
@@ -554,7 +696,7 @@ function FieldPerformanceSection({
 
         <div className="field-live-block-head">
           <h4>Unidades del campo</h4>
-          <span className="muted">{units.length} equipos · ordenados por fallas</span>
+          <span className="muted">{units.length} equipos · gas primero · luego diésel</span>
         </div>
 
         {units.length > 0 ? (
@@ -704,9 +846,202 @@ function AssetGroupSection({ group, index }: { group: AssetGroup; index: number 
   );
 }
 
+function FieldResumenFacts({
+  field,
+  fieldKey,
+  month,
+  monthLabel,
+}: {
+  field: FieldProfile;
+  fieldKey: FieldKey;
+  month: string;
+  monthLabel: string;
+}) {
+  const ops = useMemo(() => {
+    const cpw = getFieldOperational("copower", month, fieldKey);
+    const gte = getFieldOperational("gran_tierra", month, fieldKey);
+    return cpw.available ? cpw : gte;
+  }, [fieldKey, month]);
+
+  const fleet = field.fleet ?? [];
+  const gasFleet = fleet.filter((u) => u.combustible === "gas");
+  const dieselFleet = fleet.filter((u) => u.combustible === "diesel");
+  const kwGas = gasFleet.reduce((s, u) => s + u.kwNominal, 0);
+  const kwDiesel = dieselFleet.reduce((s, u) => s + u.kwNominal, 0);
+  const kwTotal = kwGas + kwDiesel;
+
+  const voltagesGen = [...new Set(fleet.map((u) => u.voltage).filter(Boolean))];
+  const voltagesDel = [...new Set(fleet.map((u) => u.deliveryVoltage).filter(Boolean))];
+  const hz = fleet[0]?.frecuenciaHz ?? 60;
+  const fp = fleet[0]?.factorPotencia ?? 0.9;
+
+  const ranked = useMemo(() => {
+    return [...ops.units]
+      .map((u) => {
+        const desc = fleet.find((f) => normId(f.id) === normId(u.id));
+        const avgKw =
+          u.energiaKwh != null && u.horasOperacion != null && u.horasOperacion > 0
+            ? u.energiaKwh / u.horasOperacion
+            : null;
+        const load =
+          avgKw != null && desc?.kwNominal
+            ? (avgKw / desc.kwNominal) * 100
+            : null;
+        return {
+          id: u.id,
+          energiaKwh: u.energiaKwh ?? 0,
+          horas: u.horasOperacion ?? 0,
+          avgKw,
+          load,
+          nominal: desc?.kwNominal ?? null,
+          voltage: desc?.voltage ?? null,
+          fuel: desc?.combustible ?? null,
+          family: desc?.family ?? null,
+        };
+      })
+      .filter((u) => u.energiaKwh > 0)
+      .sort((a, b) => b.energiaKwh - a.energiaKwh);
+  }, [ops.units, fleet]);
+
+  const top = ranked[0] ?? null;
+  const totalGenKwh = ranked.reduce((s, u) => s + u.energiaKwh, 0);
+  const chartData = ranked.slice(0, 12).map((u) => ({
+    id: u.id,
+    mwh: Number((u.energiaKwh / 1000).toFixed(1)),
+    fuel: u.fuel ?? "gas",
+  }));
+
+  const transformers = field.stats.find((s) => /transformador/i.test(s.label));
+  const blockMw = field.stats.find((s) => /potencia bloque|potencia instalada/i.test(s.label));
+  const gasShare = kwTotal > 0 ? Math.round((kwGas / kwTotal) * 100) : 0;
+
+  const effCampo = useMemo(() => {
+    const pack = loadOperacionPack();
+    return eficienciaCampoSnapshot(pack.resumenDiario, month);
+  }, [month]);
+  const plantaLabel = fieldKey === "vonu" ? "Vonu" : "Costayaco";
+  const effPlanta = effCampo.porCampo.find((c) => c.label === plantaLabel);
+  const effPct =
+    effPlanta?.eficienciaPct ?? effCampo.general.eficienciaPct ?? null;
+  const effHr =
+    effPlanta?.heatRateFt3Kwh ?? effCampo.general.heatRateFt3Kwh ?? null;
+
+  const indicators = [
+    {
+      label: "Tensión gen.",
+      value: voltagesGen.join(" / ") || "N/D",
+      hint: `${hz} Hz · FP ${fp.toFixed(1)}`,
+    },
+    {
+      label: "Tensión entrega",
+      value: voltagesDel.join(" / ") || "N/D",
+      hint: field.hero?.role ?? "Entrega",
+    },
+    {
+      label: "Máquinas",
+      value: String(fleet.length),
+      hint: `${gasFleet.length} gas · ${dieselFleet.length} diésel`,
+    },
+    {
+      label: "Potencia",
+      value: `${kwTotal.toLocaleString("es-CO")} kW`,
+      hint: blockMw ? `Bloque ${blockMw.value}` : `${gasShare}% gas`,
+    },
+    {
+      label: "Eficiencia",
+      value: effPct == null ? "N/D" : `${effPct.toFixed(1)}%`,
+      hint:
+        effHr != null
+          ? `HR ${effHr.toFixed(2)} ft³/kWh · ${effCampo.yearMonth}`
+          : `Gas/energía emparejados · ${effCampo.yearMonth}`,
+    },
+    {
+      label: "Mayor generador",
+      value: top?.id ?? "N/D",
+      hint: top
+        ? `${(top.energiaKwh / 1000).toFixed(1)} MWh · ${top.load?.toFixed(0) ?? "—"}% carga`
+        : "Sin energía",
+    },
+    {
+      label: "Generación mes",
+      value: totalGenKwh > 0 ? `${(totalGenKwh / 1000).toFixed(1)} MWh` : "N/D",
+      hint: transformers
+        ? `${transformers.value} trf.`
+        : fieldKey === "vonu"
+          ? "BT directa"
+          : ops.reportLabel,
+    },
+  ];
+
+  return (
+    <section className="field-tech-brief">
+      <div className="field-section-label field-tech-brief-label">
+        <Cpu size={15} />
+        <span>Resumen técnico · {field.label}</span>
+        <span className="field-group-count">{monthLabel}</span>
+      </div>
+
+      <div className="field-tech-indicators">
+        {indicators.map((item) => (
+          <article key={item.label} className="field-tech-indicator">
+            <span>{item.label}</span>
+            <strong>{item.value}</strong>
+            <small>{item.hint}</small>
+          </article>
+        ))}
+      </div>
+
+      <section className="field-tech-panel field-tech-panel--chart field-tech-panel--primary">
+        <header className="field-tech-chart-head">
+          <div>
+            <h4>Generación por máquina</h4>
+            <p className="muted">MWh · {monthLabel} · gas vs diésel</p>
+          </div>
+          <div className="field-tech-chart-legend">
+            <span>
+              <i style={{ background: "#2bb3a3" }} /> Gas
+            </span>
+            <span>
+              <i style={{ background: "#d4a017" }} /> Diésel
+            </span>
+            {top ? (
+              <span className="field-tech-chart-legend-top">
+                Líder <strong>{top.id}</strong> · {(top.energiaKwh / 1000).toFixed(1)} MWh
+              </span>
+            ) : null}
+          </div>
+        </header>
+        <div className="dash-chart field-tech-chart-main">
+          {chartData.length === 0 ? (
+            <p className="empty-state">Sin datos de energía por unidad en el periodo.</p>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData} margin={{ top: 8, right: 10, left: 0, bottom: 4 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
+                <XAxis dataKey="id" tick={{ fontSize: 11 }} interval={0} angle={-18} textAnchor="end" height={44} />
+                <YAxis tick={{ fontSize: 11 }} width={38} />
+                <Tooltip
+                  formatter={(v) => [`${Number(v).toLocaleString("es-CO")} MWh`, "Energía"]}
+                  labelFormatter={(id) => `Máquina ${id}`}
+                />
+                <Bar dataKey="mwh" name="MWh" radius={[4, 4, 0, 0]}>
+                  {chartData.map((row) => (
+                    <Cell key={row.id} fill={row.fuel === "diesel" ? "#d4a017" : "#2bb3a3"} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+      </section>
+    </section>
+  );
+}
+
 function FieldPage({
   field,
   fieldKey,
+  section,
   month,
   monthLabel,
   source,
@@ -714,48 +1049,80 @@ function FieldPage({
 }: {
   field: FieldProfile;
   fieldKey: FieldKey;
+  section: FieldSection;
   month: string;
   monthLabel: string;
   source: FieldDataSource;
   onSourceChange: (source: FieldDataSource) => void;
 }) {
-  const contractStats = field.stats.slice(3);
+  const showHero = section === "contrato";
+  const showParque = section === "parque";
+  const showDesempeno = section === "desempeno";
+  const showContrato = section === "contrato";
+  const showActivos = section === "activos";
+
+  const sectionTitle =
+    section === "parque"
+      ? "Parque operativo"
+      : section === "desempeno"
+        ? "Desempeño del periodo"
+        : section === "contrato"
+          ? "Marco contractual"
+          : section === "activos"
+            ? "Inventario de activos"
+            : "Resumen del campo";
 
   return (
-    <div className={`field-view field-view--${fieldKey}`}>
-      <FieldHeroBanner field={field} monthLabel={monthLabel} />
+    <div className={`field-view field-view--${fieldKey} field-view--section-${section}`}>
+      {section !== "resumen" ? (
+        <p className="field-section-eyebrow">
+          {field.label} · {sectionTitle}
+        </p>
+      ) : null}
 
-      {field.fleet ? <FleetPanel fleet={field.fleet} fieldKey={fieldKey} /> : null}
+      {showHero ? <FieldHeroBanner field={field} monthLabel={monthLabel} /> : null}
 
-      <FieldPerformanceSection
-        field={field}
-        fieldKey={fieldKey}
-        month={month}
-        monthLabel={monthLabel}
-        source={source}
-        onSourceChange={onSourceChange}
-      />
+      {showParque && field.fleet ? (
+        <FleetPanel fleet={field.fleet} fieldKey={fieldKey} compact={section === "resumen"} />
+      ) : null}
 
-      {contractStats.length ? (
+      {showDesempeno ? (
+        <FieldPerformanceSection
+          field={field}
+          fieldKey={fieldKey}
+          month={month}
+          monthLabel={monthLabel}
+          source={source}
+          onSourceChange={onSourceChange}
+        />
+      ) : null}
+
+      {showContrato ? (
         <section className="field-contract-block">
           <div className="field-section-label">
             <Gauge size={15} />
             <span>Marco contractual del campo</span>
           </div>
-          <StatGrid stats={contractStats} />
+          <StatGrid stats={field.stats} />
         </section>
       ) : null}
 
-      <div className="field-assets-stack">
-        <div className="field-section-label">
-          <Layers size={15} />
-          <span>Inventario de activos del campo</span>
-          <span className="field-group-count">{field.groups.length} secciones</span>
+      {section === "resumen" ? (
+        <FieldResumenFacts field={field} fieldKey={fieldKey} month={month} monthLabel={monthLabel} />
+      ) : null}
+
+      {showActivos ? (
+        <div className="field-assets-stack">
+          <div className="field-section-label">
+            <Layers size={15} />
+            <span>Inventario de activos del campo</span>
+            <span className="field-group-count">{field.groups.length} secciones</span>
+          </div>
+          {field.groups.map((group, index) => (
+            <AssetGroupSection key={group.title} group={group} index={index} />
+          ))}
         </div>
-        {field.groups.map((group, index) => (
-          <AssetGroupSection key={group.title} group={group} index={index} />
-        ))}
-      </div>
+      ) : null}
     </div>
   );
 }
@@ -779,8 +1146,9 @@ function FieldsOverview({ month, monthLabel }: { month: string; monthLabel: stri
       units: fleet.length,
       jinan: fleet.filter((u) => u.variant === "jinan").length,
       jenbacher: fleet.filter((u) => u.variant === "jenbacher").length,
-      gasCards: profile.groups.filter((g) => g.kind === "gas").reduce((n, g) => n + g.cards.length, 0),
+      cpw: fleet.filter((u) => u.variant === "cpw").length,
       dieselCards: profile.groups.filter((g) => g.kind === "diesel").reduce((n, g) => n + g.cards.length, 0),
+      genMwh: ops.generationKwh != null ? Number((ops.generationKwh / 1000).toFixed(1)) : 0,
     };
   });
 
@@ -791,6 +1159,34 @@ function FieldsOverview({ month, monthLabel }: { month: string; monthLabel: stri
   const confVals = rows.map((r) => r.ops.conf).filter((v): v is number => v != null);
   const avgDisp = dispVals.length ? dispVals.reduce((a, b) => a + b, 0) / dispVals.length : null;
   const avgConf = confVals.length ? confVals.reduce((a, b) => a + b, 0) / confVals.length : null;
+
+  const effCampo = useMemo(() => {
+    const pack = loadOperacionPack();
+    return eficienciaCampoSnapshot(pack.resumenDiario, month);
+  }, [month]);
+  const effCyc = effCampo.porCampo.find((c) => c.label === "Costayaco");
+  const effVonu = effCampo.porCampo.find((c) => c.label === "Vonu");
+  const effPctLabel =
+    effCampo.general.eficienciaPct == null
+      ? "N/D"
+      : `${effCampo.general.eficienciaPct.toFixed(1)}%`;
+  const effHint = [effCyc, effVonu]
+    .filter((c): c is NonNullable<typeof c> => c != null && c.eficienciaPct != null)
+    .map((c) => `${c.label === "Costayaco" ? "CYC" : "Vonú"} ${c.eficienciaPct!.toFixed(1)}%`)
+    .join(" · ");
+
+  const unitBars = rows.flatMap((r) =>
+    [...r.ops.units]
+      .filter((u) => (u.energiaKwh ?? 0) > 0)
+      .sort((a, b) => (b.energiaKwh ?? 0) - (a.energiaKwh ?? 0))
+      .slice(0, r.key === "costayaco" ? 7 : 3)
+      .map((u) => ({
+        id: u.id,
+        mwh: Number(((u.energiaKwh ?? 0) / 1000).toFixed(1)),
+        campo: r.key,
+        label: r.profile.label,
+      })),
+  );
 
   return (
     <div className="field-overview">
@@ -805,11 +1201,13 @@ function FieldsOverview({ month, monthLabel }: { month: string; monthLabel: stri
         <span className="badge info">2 campos</span>
       </header>
 
-      <div className="field-overview-kpis">
+      <div className="field-overview-kpis field-overview-kpis--6">
         <article>
           <span>Unidades en flota</span>
           <strong>{totalUnits}</strong>
-          <small>Costayaco {rows[0].units} · Vonú {rows[1].units}</small>
+          <small>
+            Costayaco {rows[0].units} · Vonú {rows[1].units}
+          </small>
         </article>
         <article>
           <span>Disponibilidad media</span>
@@ -822,6 +1220,11 @@ function FieldsOverview({ month, monthLabel }: { month: string; monthLabel: stri
           <small>Promedio de ambos campos</small>
         </article>
         <article>
+          <span>Eficiencia</span>
+          <strong>{effPctLabel}</strong>
+          <small>{effHint || `Campo · ${effCampo.yearMonth}`}</small>
+        </article>
+        <article>
           <span>Generación</span>
           <strong>{kwh(totalGen || null)}</strong>
           <small>Suma del periodo</small>
@@ -832,6 +1235,50 @@ function FieldsOverview({ month, monthLabel }: { month: string; monthLabel: stri
           <small>Ambos campos</small>
         </article>
       </div>
+
+      <section className="field-overview-mini-chart">
+        <header>
+          <div>
+            <h4>Generación por máquina</h4>
+            <p className="muted">
+              MWh · CYC {rows[0].genMwh.toLocaleString("es-CO")} · Vonú {rows[1].genMwh.toLocaleString("es-CO")}
+            </p>
+          </div>
+          <div className="field-tech-chart-legend">
+            <span>
+              <i style={{ background: "#2bb3a3" }} /> Costayaco
+            </span>
+            <span>
+              <i style={{ background: "#3d7ea6" }} /> Vonú
+            </span>
+          </div>
+        </header>
+        <div className="dash-chart field-overview-mini-chart-plot">
+          {unitBars.length === 0 ? (
+            <p className="empty-state">Sin energía unitaria en el periodo.</p>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={unitBars} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
+                <XAxis dataKey="id" tick={{ fontSize: 10 }} interval={0} angle={-16} textAnchor="end" height={36} />
+                <YAxis tick={{ fontSize: 10 }} width={32} />
+                <Tooltip
+                  formatter={(v) => [`${Number(v).toLocaleString("es-CO")} MWh`, "Energía"]}
+                  labelFormatter={(id, payload) => {
+                    const row = payload?.[0]?.payload as { label?: string } | undefined;
+                    return row?.label ? `${row.label} · ${id}` : String(id);
+                  }}
+                />
+                <Bar dataKey="mwh" name="MWh" radius={[3, 3, 0, 0]}>
+                  {unitBars.map((row) => (
+                    <Cell key={`${row.campo}-${row.id}`} fill={row.campo === "vonu" ? "#3d7ea6" : "#2bb3a3"} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+      </section>
 
       <div className="field-overview-grid">
         {rows.map((r) => (
@@ -879,9 +1326,10 @@ function FieldsOverview({ month, monthLabel }: { month: string; monthLabel: stri
             </div>
 
             <div className="field-overview-tags">
-              {r.jinan > 0 ? <span>{r.jinan} Jinan</span> : null}
-              {r.jenbacher > 0 ? <span>{r.jenbacher} Jenbacher</span> : null}
-              {r.dieselCards > 0 ? <span>{r.dieselCards} respaldo diésel</span> : null}
+              {r.cpw > 0 ? <span>{r.cpw} CPW gas</span> : null}
+              {r.jinan > 0 ? <span>{r.jinan} Jinan gas</span> : null}
+              {r.jenbacher > 0 ? <span>{r.jenbacher} respaldo diésel</span> : null}
+              {r.dieselCards > 0 ? <span>{r.dieselCards} grupos diésel</span> : null}
               <span>{r.profile.groups.length} secciones de activos</span>
             </div>
 
@@ -912,29 +1360,48 @@ function FieldsOverview({ month, monthLabel }: { month: string; monthLabel: stri
 
 type Props = {
   fieldKey: FieldKey;
+  section?: FieldSection;
   month: string;
   monthLabel: string;
 };
 
-export function FieldAssetsView({ fieldKey, month, monthLabel }: Props) {
+export function FieldAssetsView({ fieldKey, section = "resumen", month, monthLabel }: Props) {
   const field = FIELD_PROFILES[fieldKey];
   const [fieldSource, setFieldSource] = useState<FieldDataSource>("auto");
+  const sectionLabel =
+    section === "parque"
+      ? "Parque"
+      : section === "desempeno"
+        ? "Desempeño"
+        : section === "contrato"
+          ? "Contrato"
+          : section === "activos"
+            ? "Activos"
+            : "Resumen";
 
   return (
-    <ScreenShell report="dual" title={field.label} subtitle={`${field.description} · ${monthLabel}`} headless>
+    <ScreenShell
+      report="dual"
+      title={`${field.label} · ${sectionLabel}`}
+      subtitle={`${field.description} · ${monthLabel}`}
+      headless
+    >
       <FieldPage
         field={field}
         fieldKey={fieldKey}
+        section={section}
         month={month}
         monthLabel={monthLabel}
         source={fieldSource}
         onSourceChange={setFieldSource}
       />
 
-      <p className="field-source-note">
-        <Cpu size={14} />
-        Vista por campo · activos contractuales · desempeño consolidado del periodo seleccionado
-      </p>
+      {section !== "resumen" ? (
+        <p className="field-source-note">
+          <Cpu size={14} />
+          {field.label} · {sectionLabel} · activos contractuales y operación del periodo
+        </p>
+      ) : null}
     </ScreenShell>
   );
 }

@@ -28,7 +28,6 @@ const CPW_LEAVES = new Set([
   "op-eficiencia",
   "op-resumen-diario",
   "op-eventos",
-  "op-actividades",
   "op-consumos",
   "op-detalle",
   "bd-ind-copower",
@@ -217,7 +216,7 @@ function isDualLeaf(page: PageKey, leafId: string) {
   if (leafId.startsWith("cmp-")) return true;
   if (leafId.startsWith("cq-")) return true;
   if (leafId.startsWith("rep-inf-")) return true;
-  if (DUAL_LEAVES.has(leafId)) return true;
+  if (DUAL_LEAVES.has(leafId) || leafId.startsWith("cfg-campos-")) return true;
   return false;
 }
 
@@ -227,7 +226,6 @@ const OPERACION_LEAVES = new Set([
   "op-eficiencia",
   "op-resumen-diario",
   "op-eventos",
-  "op-actividades",
   "op-consumos",
   "op-detalle",
   "bd-op-copower",
