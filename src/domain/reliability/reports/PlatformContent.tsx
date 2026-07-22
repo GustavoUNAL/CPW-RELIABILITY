@@ -20,6 +20,7 @@ import { ActionTrackingDashboard } from "./ActionTrackingDashboard";
 import { OperationalPlanningDashboard } from "./OperationalPlanningDashboard";
 import { MonthlyReportDashboard } from "./MonthlyReportDashboard";
 import { DashboardMantenimiento, DashboardOverview } from "./DashboardViews";
+import { FuentesCompareResumen } from "./FuentesCompareResumen";
 import { GenerationDashboard } from "./GenerationDashboard";
 import { CopowerCompanyView, GteCompanyView } from "./CompanyViews";
 import { FieldAssetsView, FieldsOverviewView } from "./FieldAssetsView";
@@ -786,18 +787,21 @@ export function PlatformContent({ page, leafId, month, monthLabel }: Props) {
     }
     if (leafId === "cmp-fuentes") {
       return (
-        <DualCompare
-          page={page}
-          leafId={leafId}
-          month={month}
-          monthLabel={monthLabel}
-          body={(r) => (
-            <ScreenShell report={r} headless>
-              <HoursPanel report={r} month={month} />
-              <MachinesTable report={r} month={month} />
-            </ScreenShell>
-          )}
-        />
+        <div className="fuentes-compare-stack">
+          <FuentesCompareResumen month={month} monthLabel={monthLabel} />
+          <DualCompare
+            page={page}
+            leafId={leafId}
+            month={month}
+            monthLabel={monthLabel}
+            body={(r) => (
+              <ScreenShell report={r} headless>
+                <HoursPanel report={r} month={month} />
+                <MachinesTable report={r} month={month} />
+              </ScreenShell>
+            )}
+          />
+        </div>
       );
     }
     if (leafId === "cmp-desv" || leafId === "cmp-sla") {
