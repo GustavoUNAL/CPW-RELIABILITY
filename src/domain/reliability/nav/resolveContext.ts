@@ -23,6 +23,14 @@ export type ViewContext = {
 const CPW_LEAVES = new Set([
   "cfg-empresas-copower",
   "bd-op-copower",
+  "op-dashboard",
+  "op-equipos",
+  "op-eficiencia",
+  "op-resumen-diario",
+  "op-eventos",
+  "op-actividades",
+  "op-consumos",
+  "op-detalle",
   "bd-ind-copower",
   "bd-ev-copower",
   "proc-op",
@@ -213,6 +221,18 @@ function isDualLeaf(page: PageKey, leafId: string) {
   return false;
 }
 
+const OPERACION_LEAVES = new Set([
+  "op-dashboard",
+  "op-equipos",
+  "op-eficiencia",
+  "op-resumen-diario",
+  "op-eventos",
+  "op-actividades",
+  "op-consumos",
+  "op-detalle",
+  "bd-op-copower",
+]);
+
 export function resolveViewContext(page: PageKey, leafId: string): ViewContext {
   if (GEN_LEAVES.has(leafId) && leafId.startsWith("gen-")) {
     return {
@@ -220,6 +240,15 @@ export function resolveViewContext(page: PageKey, leafId: string): ViewContext {
       monthOrder: ["YTD2026"],
       reportLabel: "COPOWER · Generación YTD 2026",
       reportShort: "GEN",
+      fixedPeriod: true,
+    };
+  }
+  if (page === "operacion" || OPERACION_LEAVES.has(leafId)) {
+    return {
+      report: "copower",
+      monthOrder: ["YTD2026"],
+      reportLabel: "Reporte diario · Costayaco / Vonú / Conejo",
+      reportShort: "OP",
       fixedPeriod: true,
     };
   }

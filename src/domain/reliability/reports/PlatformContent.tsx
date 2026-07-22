@@ -11,6 +11,7 @@ import { CopowerIndicatorsDashboard } from "./CopowerIndicatorsPanel";
 import { FailureEventsView } from "./FailureEventsView";
 import { FailureClassificationView } from "./FailureClassificationView";
 import { EventInsightsDashboard } from "./EventInsightsDashboard";
+import { OperacionModule, operacionSectionFromLeaf } from "../operacion/OperacionModule";
 import { InterventionPlansDashboard } from "./InterventionPlansDashboard";
 import { RcaAnalysisDashboard } from "./RcaAnalysisDashboard";
 import { MaintenanceOptimizationDashboard } from "./MaintenanceOptimizationDashboard";
@@ -620,60 +621,25 @@ function PlatformBody({
     return <SourceMonthCompare report="gran_tierra" month={month} monthLabel={monthLabel} />;
   }
 
-  if (page === "operacion") {
-    if (leafId === "bd-op-copower") return <CopowerResumen month={cpwMonth} />;
+  if (
+    page === "operacion" ||
+    leafId === "bd-op-copower" ||
+    leafId === "op-dashboard" ||
+    leafId === "op-equipos" ||
+    leafId === "op-eficiencia" ||
+    leafId === "op-resumen-diario" ||
+    leafId === "op-eventos" ||
+    leafId === "op-actividades" ||
+    leafId === "op-consumos" ||
+    leafId === "op-detalle"
+  ) {
     if (leafId === "bd-mto") {
       return <EmptyScreen detail="Plan MTO / órdenes de trabajo no vienen en PDF/Excel actuales." report={report} />;
     }
     if (leafId === "bd-alarmas") {
       return <EmptyScreen detail="Pendiente de fuente de alarmas SCADA / DCS." report={report} />;
     }
-
-    const titles: Record<string, string> = {
-      "proc-op": "Horas operación",
-      "proc-disp": "Horas disponibles (OP+SB)",
-      "proc-fs": "Horas fuera de servicio",
-      "proc-mto": "Horas mantenimiento (PP)",
-    };
-    const snap = getSnap("copower", month);
-    if (leafId === "proc-op") {
-      return (
-        <ScreenShell report="copower" title={titles[leafId]} sourceFile={snap?.sourceFile}>
-          <div className="exec-kpi kpi-hero">
-            <span>Horas operación</span>
-            <strong>{hours(snap?.summary.hoursOperated)}</strong>
-          </div>
-        </ScreenShell>
-      );
-    }
-    if (leafId === "proc-disp") {
-      const avail = snap ? snap.summary.hoursOperated + snap.summary.hoursStandby : null;
-      return (
-        <ScreenShell report="copower" title={titles[leafId]} sourceFile={snap?.sourceFile}>
-          <div className="exec-kpi kpi-hero">
-            <span>Disponibles</span>
-            <strong>{hours(avail)}</strong>
-          </div>
-        </ScreenShell>
-      );
-    }
-    if (leafId === "proc-fs") {
-      return (
-        <ScreenShell report="copower" title={titles[leafId]} sourceFile={snap?.sourceFile}>
-          <HoursPanel report="copower" month={month} />
-        </ScreenShell>
-      );
-    }
-    if (leafId === "proc-mto") {
-      return (
-        <ScreenShell report="copower" title={titles[leafId]} sourceFile={snap?.sourceFile}>
-          <div className="exec-kpi kpi-hero">
-            <span>Preventivo</span>
-            <strong>{hours(snap?.summary.hoursPreventive)}</strong>
-          </div>
-        </ScreenShell>
-      );
-    }
+    return <OperacionModule section={operacionSectionFromLeaf(leafId)} />;
   }
 
   if (leafId.startsWith("cq-")) {

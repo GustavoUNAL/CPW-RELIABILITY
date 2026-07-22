@@ -59,9 +59,15 @@ export const PROJECT_NAV_TREE: NavModule[] = [
   {
     key: "operacion",
     label: "Operación",
-    description: "Registro diario y datos operativos COPOWER",
+    description: "Dashboard, equipos, eficiencia, resumen OP, eventos y consumos",
     children: [
-      { id: "bd-op-copower", label: "Registro diario COPOWER" },
+      { id: "op-dashboard", label: "Dashboard" },
+      { id: "op-equipos", label: "Equipos" },
+      { id: "op-eficiencia", label: "Eficiencia" },
+      { id: "op-resumen-diario", label: "Resumen diario" },
+      { id: "op-eventos", label: "Eventos" },
+      { id: "op-actividades", label: "Actividades" },
+      { id: "op-consumos", label: "Consumos" },
     ],
   },
   {
