@@ -11,7 +11,7 @@ import {
   TrendingUp,
   Wrench,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -33,6 +33,7 @@ import type { AlertPriority, RiskLevel } from "./operationalAlertsTypes";
 
 type Props = {
   monthLabel: string;
+  focusId?: string;
 };
 
 const MONTHS_ES = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
@@ -104,10 +105,18 @@ const ACTION_STATUS_COLOR: Record<string, string> = {
   "En seguimiento": "#2563eb",
 };
 
-export function OperationalPlanningDashboard({ monthLabel }: Props) {
+export function OperationalPlanningDashboard({ monthLabel, focusId }: Props) {
   const [periodKey, setPeriodKey] = useState(PLANNING_PERIODS[0].key);
   const pack = useMemo(() => buildOperationalPlanForPeriod(periodKey), [periodKey]);
   const kpis = useMemo(() => planKpis(pack), [pack]);
+
+  useEffect(() => {
+    if (!focusId) return;
+    const t = window.setTimeout(() => {
+      document.getElementById(focusId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 80);
+    return () => window.clearTimeout(t);
+  }, [focusId, periodKey]);
 
   const riskDist = useMemo(() => {
     const levels: RiskLevel[] = ["Bajo", "Medio", "Alto", "Crítico"];
@@ -200,7 +209,7 @@ export function OperationalPlanningDashboard({ monthLabel }: Props) {
           </article>
         </section>
 
-        <section className="op-panel op-panel--summary">
+        <section id="op-sec-resumen" className="op-panel op-panel--summary">
           <div className="op-panel-head">
             <h4>Resumen ejecutivo</h4>
             <span className="muted">{pack.reportTitle}</span>
@@ -226,7 +235,7 @@ export function OperationalPlanningDashboard({ monthLabel }: Props) {
           </div>
         </section>
 
-        <div className="op-grid-2">
+        <div id="op-sec-prioridades" className="op-grid-2">
           <section className="op-panel">
             <div className="op-panel-head">
               <h4>Prioridades del mes</h4>
@@ -262,7 +271,7 @@ export function OperationalPlanningDashboard({ monthLabel }: Props) {
             </div>
           </section>
 
-          <section className="op-panel">
+          <section id="op-sec-riesgos" className="op-panel">
             <div className="op-panel-head">
               <h4>Principales riesgos</h4>
               <span className="muted">Top {topRisks.length}</span>
@@ -364,7 +373,7 @@ export function OperationalPlanningDashboard({ monthLabel }: Props) {
           </section>
         </div>
 
-        <section className="op-panel">
+        <section id="op-sec-accion" className="op-panel">
           <div className="op-panel-head">
             <h4>Plan de acción</h4>
             <span className="muted">{actionPlan.length} actividades priorizadas</span>
@@ -409,7 +418,7 @@ export function OperationalPlanningDashboard({ monthLabel }: Props) {
           </div>
         </section>
 
-        <section className="op-panel">
+        <section id="op-sec-cronograma" className="op-panel">
           <div className="op-panel-head">
             <h4>Cronograma semanal</h4>
             <span className="muted">{pack.plan.month} {pack.plan.year}</span>
@@ -469,7 +478,7 @@ export function OperationalPlanningDashboard({ monthLabel }: Props) {
             </div>
           </section>
 
-          <section className="op-panel">
+          <section id="op-sec-compromisos" className="op-panel">
             <div className="op-panel-head">
               <h4>Compromisos con Gran Tierra</h4>
             </div>

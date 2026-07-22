@@ -25,7 +25,6 @@ const CPW_LEAVES = new Set([
   "bd-op-copower",
   "bd-ind-copower",
   "bd-ev-copower",
-  "proc-clasif",
   "proc-op",
   "proc-disp",
   "proc-fs",
@@ -33,12 +32,13 @@ const CPW_LEAVES = new Set([
   "bd-mto",
   "bd-alarmas",
   "bd-historicos-copower",
+  "an-evolucion-copower",
+  "cmp-periodo-copower",
   "rep-diario",
   "dash-operacion",
   "an-repetitivos-copower",
   "an-badactors-copower",
   "an-interv-copower",
-  "an-criticos",
   "an-riesgo",
   "gen-dashboard",
   "gen-diaria",
@@ -53,6 +53,8 @@ const GTE_LEAVES = new Set([
   "bd-ind-gte",
   "bd-ev-gte",
   "bd-historicos-gte",
+  "an-evolucion-gte",
+  "cmp-periodo-gte",
   "cfg-parametros",
   "rep-mensual",
   "rep-cliente",
@@ -83,15 +85,26 @@ const DUAL_LEAVES = new Set([
   "cq-duplicados",
   "cq-normalizacion",
   "an-pareto",
+  "an-tendencias-fallas",
+  "an-repetitivos",
+  "an-badactors",
+  "an-criticos",
+  "an-evolucion",
+  "proc-clasif",
   "cmp-kpi",
   "cmp-diff",
   "cmp-tend",
   "cmp-desv",
   "cmp-sla",
   "cmp-bench",
+  "cmp-periodo",
+  "cmp-fuentes",
   "capa-tablero",
+  "capa-resumen",
+  "capa-acciones",
   "capa-seguimiento",
   "capa-evidencias",
+  "capa-indicadores",
   "capa-efectividad",
   "op-tablero",
   "op-riesgos",
@@ -118,6 +131,7 @@ const DUAL_LEAVES = new Set([
 
 /** Vista única con mes dual — no usar DualCompare lado a lado. */
 export const INTEGRATED_DUAL_LEAVES = new Set([
+  "conf-dashboard",
   "dash-resumen",
   "dash-mto",
   "mto-dashboard",
@@ -125,8 +139,11 @@ export const INTEGRATED_DUAL_LEAVES = new Set([
   "mto-degradacion",
   "ga-salud",
   "capa-tablero",
+  "capa-resumen",
+  "capa-acciones",
   "capa-seguimiento",
   "capa-evidencias",
+  "capa-indicadores",
   "capa-efectividad",
   "op-tablero",
   "op-riesgos",
@@ -136,8 +153,9 @@ export const INTEGRATED_DUAL_LEAVES = new Set([
   "op-cronograma",
   "op-compromisos",
   "op-recursos",
-  "bd-ev-dual",
   "an-pareto",
+  "an-tendencias-fallas",
+  "proc-clasif",
   "cq-auditoria",
   "cfg-campos-costayaco",
   "cfg-campos-vonu",
@@ -187,6 +205,7 @@ function isGteLeaf(_page: PageKey, leafId: string) {
 function isDualLeaf(page: PageKey, leafId: string) {
   if (page === "gestion_acciones" || page === "planeacion") return true;
   if (page === "gestion_activos" && (leafId === "mto-dashboard" || leafId.startsWith("capa"))) return true;
+  if (leafId === "cmp-periodo-copower" || leafId === "cmp-periodo-gte") return false;
   if (leafId.startsWith("cmp-")) return true;
   if (leafId.startsWith("cq-")) return true;
   if (leafId.startsWith("rep-inf-")) return true;
@@ -299,5 +318,47 @@ export function generationSectionFromLeaf(leafId: string): GenerationSection {
       return "horas";
     default:
       return "dashboard";
+  }
+}
+
+/** Ancla de sección CAPA según hoja del menú. */
+export function capaFocusFromLeaf(leafId: string): string | undefined {
+  switch (leafId) {
+    case "capa-resumen":
+    case "capa-tablero":
+      return "capa-sec-resumen";
+    case "capa-acciones":
+      return "capa-sec-acciones";
+    case "capa-seguimiento":
+      return "capa-sec-seguimiento";
+    case "capa-evidencias":
+      return "capa-sec-evidencias";
+    case "capa-indicadores":
+      return "capa-sec-indicadores";
+    case "capa-efectividad":
+      return "capa-sec-efectividad";
+    default:
+      return leafId.startsWith("capa-") ? "capa-sec-resumen" : undefined;
+  }
+}
+
+/** Ancla de sección Planeación según hoja del menú. */
+export function planningFocusFromLeaf(leafId: string): string | undefined {
+  switch (leafId) {
+    case "op-tablero":
+      return "op-sec-resumen";
+    case "op-riesgos":
+    case "op-alertas":
+      return "op-sec-riesgos";
+    case "op-prioridades":
+      return "op-sec-prioridades";
+    case "op-accion":
+      return "op-sec-accion";
+    case "op-cronograma":
+      return "op-sec-cronograma";
+    case "op-compromisos":
+      return "op-sec-compromisos";
+    default:
+      return undefined;
   }
 }

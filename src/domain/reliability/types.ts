@@ -164,9 +164,7 @@ export type PageKey =
   | "confiabilidad"
   | "gestion_activos"
   | "gestion_acciones"
-  | "planeacion"
-  | "reportes"
-  | "configuracion";
+  | "planeacion";
 
 export type ReportKey = "gran_tierra" | "copower";
 

@@ -7,7 +7,7 @@ import {
   Timer,
   Workflow,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -41,6 +41,7 @@ import {
 
 type Props = {
   monthLabel: string;
+  focusId?: string;
 };
 
 const TIMELINE = ["Creada", "Asignada", "En ejecución", "Pendiente de validación", "Cerrada"];
@@ -73,7 +74,15 @@ function ProgressBar({ value }: { value: number }) {
   );
 }
 
-export function ActionTrackingDashboard({ monthLabel }: Props) {
+export function ActionTrackingDashboard({ monthLabel, focusId }: Props) {
+  useEffect(() => {
+    if (!focusId) return;
+    const t = window.setTimeout(() => {
+      document.getElementById(focusId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 80);
+    return () => window.clearTimeout(t);
+  }, [focusId]);
+
   const [actions, setActions] = useState<CorrectiveAction[]>(() => buildGteCapaActions());
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filters, setFilters] = useState({
@@ -226,7 +235,7 @@ export function ActionTrackingDashboard({ monthLabel }: Props) {
           </p>
         )}
 
-        <section className="capa-kpi-block">
+        <section id="capa-sec-resumen" className="capa-kpi-block">
           <div className="capa-kpi-group">
             <p className="capa-kpi-group-label">Volumen</p>
             <div className="capa-kpi-grid capa-kpi-grid--5">
@@ -273,7 +282,7 @@ export function ActionTrackingDashboard({ monthLabel }: Props) {
             </div>
           </div>
 
-          <div className="capa-kpi-group">
+          <div id="capa-sec-efectividad" className="capa-kpi-group">
             <p className="capa-kpi-group-label">Desempeño</p>
             <div className="capa-kpi-grid capa-kpi-grid--3">
               <article className="capa-kpi-card capa-kpi-card--accent">
@@ -307,7 +316,7 @@ export function ActionTrackingDashboard({ monthLabel }: Props) {
           </div>
         </section>
 
-        <div className="capa-filters">
+        <div id="capa-sec-acciones" className="capa-filters">
           <label className="capa-filter-search">
             <span>Buscar</span>
             <input
@@ -408,7 +417,7 @@ export function ActionTrackingDashboard({ monthLabel }: Props) {
           </label>
         </div>
 
-        <div className="capa-chart-grid" style={{ marginTop: "0.9rem" }}>
+        <div id="capa-sec-indicadores" className="capa-chart-grid" style={{ marginTop: "0.9rem" }}>
           <article className="dash-chart-panel">
             <h4>Acciones por estado</h4>
             <div className="dash-chart">
@@ -499,7 +508,8 @@ export function ActionTrackingDashboard({ monthLabel }: Props) {
           </article>
         </div>
 
-        <div className="table-wrap" style={{ marginTop: "0.75rem" }}>
+        <div id="capa-sec-seguimiento" className="table-wrap" style={{ marginTop: "0.75rem" }}>
+          <div id="capa-sec-evidencias" aria-hidden="true" style={{ height: 0, overflow: "hidden" }} />
           <table>
             <thead>
               <tr>

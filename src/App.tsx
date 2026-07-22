@@ -2,14 +2,12 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   CalendarRange,
   ClipboardCheck,
-  ClipboardList,
   Database,
   FileText,
   Gauge,
   LayoutDashboard,
   MapPin,
   Menu,
-  Settings2,
   X,
   Wrench,
   Zap,
@@ -38,8 +36,6 @@ const MODULE_ICONS: Record<PageKey, ReactNode> = {
   gestion_activos: <Wrench size={16} />,
   gestion_acciones: <ClipboardCheck size={16} />,
   planeacion: <CalendarRange size={16} />,
-  reportes: <ClipboardList size={16} />,
-  configuracion: <Settings2 size={16} />,
 };
 
 const OM_COLOMBIA_URL =
@@ -56,13 +52,15 @@ function App() {
     [DEFAULT_MODULE.key]: true,
   });
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
-    "conf-kpis": true,
-    "conf-copower": true,
-    "conf-gte": true,
     "conf-eventos": true,
+    "conf-bitacoras": true,
+    "conf-repetitivos": true,
+    "conf-activos": true,
     "conf-worst": true,
+    "conf-analisis": true,
+    "conf-evolucion": true,
     "conf-comparacion": true,
-    "cfg-empresas": true,
+    "capa-root": true,
   });
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [selectedMonth, setSelectedMonth] = useState<string>("Jun");
