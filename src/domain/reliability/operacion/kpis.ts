@@ -1,4 +1,5 @@
 import { EQUIPO_BY_ID } from "./constants";
+import { gasFt3FromResumen, isPlausibleHeatRate } from "./eficiencia";
 import type {
   DisponibilidadEstado,
   EquipoId,
@@ -82,11 +83,17 @@ export function kpisFromResumen(rows: ResumenDiario[]) {
     rows.length > 0
       ? rows.reduce((s, r) => s + (r.kwPromedioDia ?? 0), 0) / rows.length
       : null;
-  const effSamples = rows
-    .map((r) => r.consumoGasFt3Kwh)
-    .filter((v): v is number => v != null && v > 0);
-  const heatRate =
-    effSamples.length > 0 ? effSamples.reduce((a, b) => a + b, 0) / effSamples.length : null;
+  let gasFt3 = 0;
+  let energiaGasKwh = 0;
+  for (const r of rows) {
+    const gas = gasFt3FromResumen(r);
+    const kwh = r.kwAcumuladoDia ?? 0;
+    if (gas == null || gas <= 0 || kwh <= 0) continue;
+    gasFt3 += gas;
+    energiaGasKwh += kwh;
+  }
+  const heatRateRaw = energiaGasKwh > 0 && gasFt3 > 0 ? gasFt3 / energiaGasKwh : null;
+  const heatRate = isPlausibleHeatRate(heatRateRaw) ? heatRateRaw : null;
 
   const byEquipo = new Map<EquipoId, ResumenDiario[]>();
   for (const r of rows) {
@@ -153,12 +160,22 @@ export function disponibilidadByEquipo(rows: ResumenDiario[]): EquipoPeriodoStat
       const energiaKwh = sorted.reduce((s, r) => s + (r.kwAcumuladoDia ?? 0), 0);
       const kwPromedio =
         sorted.reduce((s, r) => s + (r.kwPromedioDia ?? 0), 0) / Math.max(sorted.length, 1);
-      const gasSamples = sorted
-        .map((r) => r.consumoGasMscfd)
-        .filter((v): v is number => v != null && v > 0);
-      const heatSamples = sorted
-        .map((r) => r.consumoGasFt3Kwh)
-        .filter((v): v is number => v != null && v > 0);
+      let gasFt3 = 0;
+      let energiaGasKwh = 0;
+      let gasDays = 0;
+      let gasMscfdSum = 0;
+      for (const r of sorted) {
+        const gas = gasFt3FromResumen(r);
+        const kwh = r.kwAcumuladoDia ?? 0;
+        if (r.consumoGasMscfd != null && r.consumoGasMscfd > 0) {
+          gasMscfdSum += r.consumoGasMscfd;
+          gasDays += 1;
+        }
+        if (gas == null || gas <= 0 || kwh <= 0) continue;
+        gasFt3 += gas;
+        energiaGasKwh += kwh;
+      }
+      const heatRaw = energiaGasKwh > 0 && gasFt3 > 0 ? gasFt3 / energiaGasKwh : null;
       const last = sorted[sorted.length - 1];
       return {
         equipoId,
@@ -172,10 +189,8 @@ export function disponibilidadByEquipo(rows: ResumenDiario[]): EquipoPeriodoStat
         energiaMwh: energiaKwh / 1000,
         kwPromedio,
         factorCargaPct: factorCarga(kwPromedio, kwNominal),
-        gasMscfd:
-          gasSamples.length > 0 ? gasSamples.reduce((a, b) => a + b, 0) / gasSamples.length : null,
-        heatRateFt3Kwh:
-          heatSamples.length > 0 ? heatSamples.reduce((a, b) => a + b, 0) / heatSamples.length : null,
+        gasMscfd: gasDays > 0 ? gasMscfdSum / gasDays : null,
+        heatRateFt3Kwh: isPlausibleHeatRate(heatRaw) ? heatRaw : null,
         dias: sorted.length,
         estado: dominantEstado(last ?? h),
         fechaUltimo: last?.fecha ?? "",

@@ -14,6 +14,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { loadOperacionPack } from "../operacion/api";
+import { EFICIENCIA_FORMULA, eficienciaCampoSnapshot } from "../operacion/eficiencia";
 import { MetricGlossary, MetricLabel } from "../ui/metricDefs";
 import {
   COPOWER_MONTHLY_DATA,
@@ -75,6 +77,18 @@ export function CopowerResumen({ month }: Props) {
         .map((u) => ({ unidad: u.unidad, fallas: u.fallas })),
     [units],
   );
+  const effCampo = useMemo(() => {
+    const pack = loadOperacionPack();
+    return eficienciaCampoSnapshot(pack.resumenDiario, month);
+  }, [month]);
+  const effPctLabel =
+    effCampo.general.eficienciaPct == null
+      ? "N/D"
+      : `${effCampo.general.eficienciaPct.toFixed(1)}%`;
+  const effCampoDetail = effCampo.porCampo
+    .filter((c) => c.eficienciaPct != null)
+    .map((c) => `${c.label} ${c.eficienciaPct!.toFixed(1)}%`)
+    .join(" · ");
 
   return (
     <div className="exec-dashboard">
@@ -113,7 +127,17 @@ export function CopowerResumen({ month }: Props) {
               <strong>{`${data.summary.copowerFailures} registro · ${data.eventLog.length} bitácora`}</strong>
               <small>COPOWER · Reporte diario</small>
             </div>
+            <div className="exec-kpi">
+              <span>Eficiencia de campo</span>
+              <strong>{effPctLabel}</strong>
+              <small>
+                {effCampoDetail || "Sin gas/energía emparejados"} · {effCampo.yearMonth}
+              </small>
+            </div>
           </div>
+          <p className="muted" style={{ marginTop: "0.65rem", fontSize: "0.78rem" }}>
+            Fórmula: {EFICIENCIA_FORMULA}
+          </p>
         </article>
       </section>
 

@@ -15,6 +15,8 @@ import {
   YAxis,
 } from "recharts";
 import { CONTRACTUAL_KPI_TARGETS } from "../contracts/gteOrders";
+import { loadOperacionPack } from "../operacion/api";
+import { EFICIENCIA_FORMULA, eficienciaCampoSnapshot } from "../operacion/eficiencia";
 import { MetricGlossary, MetricLabel } from "../ui/metricDefs";
 import {
   GRAN_TIERRA_MONTH_ORDER,
@@ -170,6 +172,18 @@ export function GteResumen({ month }: Props) {
         .map((u) => ({ unidad: u.unidad, fallas: u.fallas })),
     [units],
   );
+  const effCampo = useMemo(() => {
+    const pack = loadOperacionPack();
+    return eficienciaCampoSnapshot(pack.resumenDiario, month);
+  }, [month]);
+  const effPctLabel =
+    effCampo.general.eficienciaPct == null
+      ? "N/D"
+      : `${effCampo.general.eficienciaPct.toFixed(1)}%`;
+  const effCampoDetail = effCampo.porCampo
+    .filter((c) => c.eficienciaPct != null)
+    .map((c) => `${c.label} ${c.eficienciaPct!.toFixed(1)}%`)
+    .join(" · ");
 
   return (
     <div className="exec-dashboard">
@@ -206,7 +220,17 @@ export function GteResumen({ month }: Props) {
               <strong>{`${eventSummary.copower} asociadas a COPOWER · ${eventSummary.infrastructure} a la infraestructura del campo`}</strong>
               <small>{`Total ${gteEventLog.length}`}</small>
             </div>
+            <div className="exec-kpi">
+              <span>Eficiencia de campo</span>
+              <strong>{effPctLabel}</strong>
+              <small>
+                {effCampoDetail || "Sin gas/energía emparejados"} · OP diario {effCampo.yearMonth}
+              </small>
+            </div>
           </div>
+          <p className="muted" style={{ marginTop: "0.65rem", fontSize: "0.78rem" }}>
+            Fórmula: {EFICIENCIA_FORMULA}
+          </p>
         </article>
       </section>
 

@@ -6539,3 +6539,25 @@ tr.row-focal td {
   background: color-mix(in oklab, var(--accent) 6%, var(--panel));
 }
 
+
+.op-eff-formula {
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.5rem;
+  background: color-mix(in oklab, var(--accent) 7%, var(--panel));
+  border: 1px solid color-mix(in oklab, var(--border) 80%, transparent);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+.op-eff-formula strong {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.op-eff-formula p {
+  margin: 0;
+  color: var(--text);
+}
+

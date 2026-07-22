@@ -15,6 +15,8 @@ import {
   YAxis,
 } from "recharts";
 import { CONTRACTUAL_KPI_TARGETS, getReliabilityDeduction } from "../contracts/gteOrders";
+import { loadOperacionPack } from "../operacion/api";
+import { EFICIENCIA_FORMULA, eficienciaCampoSnapshot } from "../operacion/eficiencia";
 import { JUNE_2026_IMPUTABLE_EVENTS } from "./juneImputableEvents";
 import {
   COPOWER_KPI_FROM_MONTHS,
@@ -346,6 +348,14 @@ type MonthProps = { month: string; monthLabel: string };
 export function DashboardOverview({ month, monthLabel }: MonthProps) {
   const gte = GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey] ?? null;
   const cpw = COPOWER_MONTHLY_DATA[month as CopowerMonthKey] ?? null;
+  const effCampo = useMemo(() => {
+    const pack = loadOperacionPack();
+    return eficienciaCampoSnapshot(pack.resumenDiario, month);
+  }, [month]);
+  const effPctLabel =
+    effCampo.general.eficienciaPct == null
+      ? "N/D"
+      : `${effCampo.general.eficienciaPct.toFixed(1)}%`;
 
   const band = gte?.kpi.reliability != null ? getReliabilityDeduction(gte.kpi.reliability) : null;
   const integRows = useMemo(() => buildIntegratedRows(gte, cpw), [gte, cpw]);
@@ -562,7 +572,22 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
           toneGte={gte && gte.summary.copowerFailures >= 3 ? "warn" : undefined}
           toneCpw={cpw && cpw.summary.copowerFailures >= 10 ? "warn" : undefined}
         />
+        <DualValueCard
+          label="Eficiencia de campo"
+          gteValue={effPctLabel}
+          cpwValue={effPctLabel}
+        />
       </section>
+      <p className="muted" style={{ margin: "0.35rem 0 0.75rem", fontSize: "0.78rem" }}>
+        Eficiencia de campo ({effCampo.yearMonth}
+        {effCampo.porCampo.length
+          ? ` · ${effCampo.porCampo
+              .filter((c) => c.eficienciaPct != null)
+              .map((c) => `${c.label} ${c.eficienciaPct!.toFixed(1)}%`)
+              .join(" · ")}`
+          : ""}
+        ). {EFICIENCIA_FORMULA}
+      </p>
 
       <section className="dash-chart-grid">
         <DashChartPanel

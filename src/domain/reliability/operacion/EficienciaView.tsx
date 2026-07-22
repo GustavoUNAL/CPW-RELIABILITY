@@ -10,12 +10,16 @@ import {
   YAxis,
 } from "recharts";
 import {
+  EFICIENCIA_FORMULA,
   eficienciaByCampo,
   eficienciaByEquipo,
   eficienciaGeneral,
   eficienciaSerie,
   eficienciaSerieCampoChart,
   GAS_HHV_BTU_SCF,
+  HEAT_RATE_MAX_FT3_KWH,
+  HEAT_RATE_MIN_FT3_KWH,
+  KWH_TO_BTU,
   type EficienciaGrain,
 } from "./eficiencia";
 import { fmtHeatRate, fmtMwh, fmtNum, fmtPct } from "./format";
@@ -59,10 +63,14 @@ export function EficienciaView({ resumen, header }: Props) {
     <div className="panel op-ops">
       <article className="card">
         {header}
-        <p className="muted" style={{ marginBottom: "0.75rem" }}>
-          Eficiencia eléctrica estimada: η% = 3412 / (ft³/kWh × {GAS_HHV_BTU_SCF} BTU/scf) × 100.
-          Heat rate ponderado por energía (gas ÷ kWh), no promedio simple.
-        </p>
+        <div className="op-eff-formula" style={{ marginBottom: "0.85rem" }}>
+          <strong>Fórmula</strong>
+          <p>
+            {EFICIENCIA_FORMULA}. Constantes: {KWH_TO_BTU} BTU/kWh · HHV {GAS_HHV_BTU_SCF} BTU/scf ·
+            HR válido entre {HEAT_RATE_MIN_FT3_KWH}–{HEAT_RATE_MAX_FT3_KWH} ft³/kWh. Días solo con
+            energía (sin gas) no entran al cálculo.
+          </p>
+        </div>
 
         <div className="op-ops-kpi-grid">
           <article className="op-ops-kpi">
