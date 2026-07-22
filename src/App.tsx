@@ -58,7 +58,6 @@ function App() {
     "conf-activos": true,
     "conf-worst": true,
     "conf-analisis": true,
-    "conf-evolucion": true,
     "conf-comparacion": true,
     "capa-root": true,
   });

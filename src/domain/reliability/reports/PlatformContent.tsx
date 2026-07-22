@@ -76,7 +76,7 @@ export function DualCompare({
   body?: (report: ReportKey) => ReactNode;
 }) {
   return (
-    <div className="dual-source-wrap">
+    <div className="dual-source-wrap dual-source-wrap--fit">
       <p className="muted dual-period-label">Comparativo · {monthLabel}</p>
       <div className="dual-source-grid">
         {(["gran_tierra", "copower"] as const).map((report) => (

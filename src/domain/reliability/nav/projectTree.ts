@@ -99,7 +99,6 @@ export const PROJECT_NAV_TREE: NavModule[] = [
         id: "conf-activos",
         label: "Activos críticos",
         children: [
-          { id: "an-criticos", label: "Equipos críticos" },
           {
             id: "conf-worst",
             label: "Malos actores",
@@ -118,15 +117,6 @@ export const PROJECT_NAV_TREE: NavModule[] = [
           { id: "an-rca-gte", label: "RCA" },
           { id: "mto-degradacion", label: "Tendencias y riesgos" },
           { id: "an-riesgo", label: "Matriz de riesgo" },
-          {
-            id: "conf-evolucion",
-            label: "Evolución del desempeño",
-            children: [
-              { id: "an-evolucion-copower", label: "COPOWER" },
-              { id: "an-evolucion-gte", label: "Gran Tierra" },
-              { id: "an-evolucion", label: "Comparativo dual" },
-            ],
-          },
         ],
       },
       {

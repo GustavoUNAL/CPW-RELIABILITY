@@ -218,7 +218,10 @@ body.theme-light {
 
 .dual-source-wrap {
   display: grid;
-  gap: 1rem;
+  gap: 0.85rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .dual-period-label {
@@ -232,8 +235,10 @@ body.theme-light {
 .dual-source-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-  align-items: start;
+  gap: 0.85rem;
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
 }
 
 .dual-pane {
@@ -242,23 +247,132 @@ body.theme-light {
   background: var(--panel);
   overflow: hidden;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .dual-pane-header {
-  padding: 0.75rem 1rem;
+  padding: 0.65rem 0.85rem;
   border-bottom: 1px solid var(--border);
   background: var(--panel-soft);
+  flex-shrink: 0;
 }
 
 .dual-pane-header strong {
   display: block;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .dual-pane-body {
-  padding: 0.85rem;
+  padding: 0.75rem;
   display: grid;
-  gap: 0.75rem;
+  gap: 0.65rem;
+  min-width: 0;
+  overflow-x: hidden;
+  flex: 1;
+}
+
+/* Contenido dentro de paneles duales: indicadores y tablas al ancho disponible */
+.dual-pane-body .panel,
+.dual-pane-body .card {
+  margin: 0;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.dual-pane-body > .panel,
+.dual-pane-body > .source-compare,
+.dual-pane-body > .ev-module,
+.dual-pane-body > .dash-module {
+  min-width: 0;
+}
+
+.dual-pane-body .panel:not(.source-compare-block) {
+  border: none;
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+}
+
+.dual-pane-body .panel:not(.source-compare-block) > .card {
+  border: none;
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+}
+
+.dual-pane-body .source-compare-hero {
+  gap: 0.45rem;
+  margin-bottom: 0.35rem;
+}
+
+.dual-pane-body .source-compare-hero h2 {
+  font-size: 1.05rem;
+  line-height: 1.25;
+}
+
+.dual-pane-body .source-compare-hero > .source-badge {
+  display: none;
+}
+
+.dual-pane-body .source-compare-kpis {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.dual-pane-body .source-compare-kpi {
+  min-height: 0;
+  padding: 0.65rem 0.7rem;
+}
+
+.dual-pane-body .source-compare-kpi strong {
+  font-size: 1.1rem;
+  overflow-wrap: anywhere;
+}
+
+.dual-pane-body .source-compare-fields {
+  grid-template-columns: 1fr;
+}
+
+.dual-pane-body .exec-kpi-row {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+.dual-pane-body .exec-kpi {
+  padding: 0.65rem;
+  min-width: 0;
+}
+
+.dual-pane-body .exec-kpi strong {
+  font-size: 1.1rem;
+  overflow-wrap: anywhere;
+}
+
+.dual-pane-body .table-wrap,
+.dual-pane-body .table-scroll,
+.dual-pane-body .field-op-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+}
+
+.dual-pane-body table {
+  width: 100%;
+}
+
+.dual-pane-body .dash-chart,
+.dual-pane-body .recharts-responsive-container {
+  max-width: 100%;
+}
+
+.dual-pane-body .detalle-cell {
+  max-width: 12rem;
 }
 
 .main-dual {
@@ -278,6 +392,49 @@ body.theme-light {
 @media (max-width: 1100px) {
   .dual-source-grid {
     grid-template-columns: 1fr;
+  }
+
+  .dual-pane-body .source-compare-kpis {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .dual-pane-body .source-compare-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dual-pane-body .exec-kpi-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .dual-source-wrap {
+    gap: 0.7rem;
+  }
+
+  .dual-pane-body {
+    padding: 0.65rem;
+  }
+
+  .dual-pane-body .source-compare-kpis,
+  .dual-pane-body .exec-kpi-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 430px) {
+  .dual-pane-header {
+    padding: 0.55rem 0.65rem;
+  }
+
+  .dual-pane-body .source-compare-kpis,
+  .dual-pane-body .source-compare-fields,
+  .dual-pane-body .exec-kpi-row {
+    grid-template-columns: 1fr;
+  }
+
+  .dual-pane-body .detalle-cell {
+    max-width: 9.5rem;
   }
 }
 
