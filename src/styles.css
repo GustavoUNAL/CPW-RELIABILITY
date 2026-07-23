@@ -1870,6 +1870,53 @@ th .metric-def {
   font-size: 0.72rem;
 }
 
+.dash-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem 1.25rem;
+  margin: 0 0 0.45rem;
+  padding: 0.1rem 0;
+}
+
+.dash-chart-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.dash-chart-legend-item i {
+  display: inline-block;
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.dash-chart .recharts-default-legend {
+  display: flex !important;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem 1.25rem;
+  padding-top: 0.35rem;
+}
+
+.dash-chart .recharts-legend-item {
+  display: inline-flex !important;
+  align-items: center;
+  margin: 0 !important;
+  margin-right: 0 !important;
+}
+
+.dash-chart .recharts-legend-item-text {
+  color: var(--text-muted) !important;
+  margin-left: 0.3rem !important;
+}
+
 .dash-chart .recharts-responsive-container {
   min-height: 240px;
 }

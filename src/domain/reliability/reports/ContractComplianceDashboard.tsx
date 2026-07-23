@@ -22,6 +22,8 @@ import {
   YAxis,
 } from "recharts";
 import { CONTRACTUAL_KPI_TARGETS, getReliabilityDeduction } from "../contracts/gteOrders";
+import { loadOperacionPack } from "../operacion/api";
+import { eficienciaCampoSnapshot } from "../operacion/eficiencia";
 import { MetricLabel } from "../ui/metricDefs";
 import { EXEC_JUN } from "./executiveJune2026";
 import {
@@ -37,6 +39,7 @@ type Props = {
 
 const META = CONTRACTUAL_KPI_TARGETS.reliability;
 const META_PCT = META * 100;
+const META_EFF = CONTRACTUAL_KPI_TARGETS.efficiencyPct;
 const MTBF_REF = 700;
 const MTTR_REF = 3;
 const COLOR_OK = "#16a34a";
@@ -87,6 +90,13 @@ export function ContractComplianceDashboard({ month, monthLabel }: Props) {
   const rcaRequired = month === "Jun" ? EXEC_JUN.rcaRequired : null;
   const rcaDelivered = month === "Jun" ? EXEC_JUN.rcaDelivered : null;
   const events = month === "Jun" ? EXEC_JUN.failures : (snap?.summary.copowerFailures ?? 0);
+  const efficiencyPct = useMemo(() => {
+    try {
+      return eficienciaCampoSnapshot(loadOperacionPack().resumenDiario, month).general.eficienciaPct;
+    } catch {
+      return null;
+    }
+  }, [month]);
 
   const rows: ExecRow[] = useMemo(() => {
     const out: ExecRow[] = [];
@@ -204,38 +214,38 @@ export function ContractComplianceDashboard({ month, monthLabel }: Props) {
       });
     }
 
-    if (rcaRequired == null || rcaDelivered == null) {
+    if (efficiencyPct == null) {
       out.push({
-        indicator: "RCA entregados",
+        indicator: "Eficiencia",
         tone: "na",
         statusLabel: "Sin dato",
         result: "N/D",
         resultNum: null,
-        meta: "100 %",
-        metaNum: 100,
-        observation: "Sin tracker formal de entrega RCA para este periodo.",
-        chartKey: "RCA",
+        meta: `≥ ${META_EFF}%`,
+        metaNum: META_EFF,
+        observation: "Sin dato de gas/energía OP en el periodo.",
+        chartKey: "Eff",
       });
     } else {
-      const pending = rcaDelivered < rcaRequired;
-      const pctDone = (rcaDelivered / rcaRequired) * 100;
+      const ok = efficiencyPct >= META_EFF;
+      const gap = Math.abs(efficiencyPct - META_EFF);
       out.push({
-        indicator: "RCA entregados",
-        tone: pending ? "pending" : "ok",
-        statusLabel: pending ? "Pendiente" : "En objetivo",
-        result: `${rcaDelivered} de ${rcaRequired}`,
-        resultNum: pctDone,
-        meta: "100 %",
-        metaNum: 100,
-        observation: pending
-          ? `${rcaDelivered} de ${rcaRequired} entregados · en proceso de elaboración y entrega.`
-          : "Paquete RCA del periodo entregado.",
-        chartKey: "RCA",
+        indicator: "Eficiencia",
+        tone: ok ? "ok" : "gap",
+        statusLabel: ok ? "En objetivo" : "Por debajo de la meta",
+        result: `${efficiencyPct.toFixed(2)}%`,
+        resultNum: efficiencyPct,
+        meta: `≥ ${META_EFF}%`,
+        metaNum: META_EFF,
+        observation: ok
+          ? `Cumple umbral ≥${META_EFF}% · eficiencia estimada en todo el parque.`
+          : `Brecha de ${gap.toFixed(2)} pp vs meta ≥${META_EFF}% · parque de generación.`,
+        chartKey: "Eff",
       });
     }
 
     return out;
-  }, [availability, reliability, mtbf, mttr, band, rcaRequired, rcaDelivered]);
+  }, [availability, reliability, mtbf, mttr, band, efficiencyPct]);
 
   const countOk = rows.filter((r) => r.tone === "ok").length;
   const countGap = rows.filter((r) => r.tone === "gap").length;
@@ -255,7 +265,7 @@ export function ContractComplianceDashboard({ month, monthLabel }: Props) {
   const compareBarData = useMemo(
     () =>
       rows
-        .filter((r) => r.chartKey === "Disp" || r.chartKey === "Conf" || r.chartKey === "RCA")
+        .filter((r) => r.chartKey === "Disp" || r.chartKey === "Conf" || r.chartKey === "Eff")
         .map((r) => ({
           name: r.chartKey,
           resultado: r.resultNum,
@@ -265,6 +275,9 @@ export function ContractComplianceDashboard({ month, monthLabel }: Props) {
         })),
     [rows],
   );
+
+  const rcaPending =
+    rcaRequired != null && rcaDelivered != null ? Math.max(0, rcaRequired - rcaDelivered) : null;
 
   const maintBarData = useMemo(
     () =>
@@ -309,7 +322,7 @@ export function ContractComplianceDashboard({ month, monthLabel }: Props) {
     },
     {
       action: "Cierre de RCA pendientes",
-      status: countPending > 0 ? "En proceso" : "Implementado",
+      status: rcaPending != null && rcaPending > 0 ? "En proceso" : "Implementado",
       impact: "Cumplimiento documental",
     },
     {
@@ -337,7 +350,7 @@ export function ContractComplianceDashboard({ month, monthLabel }: Props) {
       `La principal oportunidad de mejora se concentra en el cumplimiento de las metas contractuales de ${text}.`,
     );
   }
-  if (countPending > 0) {
+  if (rcaPending != null && rcaPending > 0) {
     conclusionParts.push(
       "Asimismo, requiere atención el cierre oportuno de los análisis de causa raíz (RCA).",
     );
@@ -382,12 +395,13 @@ export function ContractComplianceDashboard({ month, monthLabel }: Props) {
         <div className="dash-source-strip-item dash-source-strip-item--gte">
           <span className="source-badge gte">Gran Tierra</span>
           <p>{snap.sourceFile}</p>
-          <small>Indicadores contractuales · meta Disp/Conf ≥98% · RCA documentales</small>
+          <small>Indicadores contractuales · meta Disp/Conf ≥98% · Eff ≥{META_EFF}%</small>
         </div>
         <div className="dash-source-strip-item">
           <span className="badge info">Semáforo</span>
           <p>
-            {countOk} en objetivo · {countGap} con oportunidad · {countPending} pendiente(s)
+            {countOk} en objetivo · {countGap} con oportunidad
+            {rcaPending != null && rcaPending > 0 ? ` · ${rcaPending} RCA pendiente(s)` : ""}
           </p>
           <small>Deducción potencial: {potentialDeduction} · Eventos: {events}</small>
         </div>
@@ -429,7 +443,13 @@ export function ContractComplianceDashboard({ month, monthLabel }: Props) {
                     String(name),
                   ]}
                 />
-                <Legend wrapperStyle={{ fontSize: 10 }} />
+                <Legend
+                  verticalAlign="bottom"
+                  align="center"
+                  iconType="plainline"
+                  iconSize={14}
+                  wrapperStyle={{ fontSize: 11, paddingTop: 8, width: "100%" }}
+                />
                 <ReferenceLine
                   y={META_PCT}
                   stroke="#ef4444"
@@ -461,21 +481,28 @@ export function ContractComplianceDashboard({ month, monthLabel }: Props) {
         </article>
 
         <article className="dash-chart-panel">
-          <h4>Resultado vs meta (Disp / Conf / RCA)</h4>
+          <h4>Resultado vs meta (Disp / Conf / Eff)</h4>
           <p className="muted dash-chart-sub">% · barra meta de referencia</p>
+          <div className="dash-chart-legend" aria-hidden>
+            <span className="dash-chart-legend-item">
+              <i style={{ background: COLOR_LINE }} /> Resultado
+            </span>
+            <span className="dash-chart-legend-item">
+              <i style={{ background: "#94a3b8" }} /> Meta
+            </span>
+          </div>
           <div className="dash-chart">
-            <ResponsiveContainer width="100%" height={260}>
-              <BarChart data={compareBarData} margin={{ top: 8, right: 8, left: 0, bottom: 4 }}>
+            <ResponsiveContainer width="100%" height={240}>
+              <BarChart data={compareBarData} margin={{ top: 8, right: 12, left: 0, bottom: 8 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
-                <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} width={32} unit="%" />
+                <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+                <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} width={36} unit="%" />
                 <Tooltip
                   formatter={(v, name) => [
                     v == null ? "N/D" : `${Number(v).toFixed(2)}%`,
                     String(name),
                   ]}
                 />
-                <Legend wrapperStyle={{ fontSize: 10 }} />
                 <Bar dataKey="resultado" name="Resultado" radius={[4, 4, 0, 0]}>
                   {compareBarData.map((d) => (
                     <Cell key={d.name} fill={d.fill} />
@@ -490,11 +517,19 @@ export function ContractComplianceDashboard({ month, monthLabel }: Props) {
         <article className="dash-chart-panel">
           <h4>Mantenibilidad (MTBF / MTTR)</h4>
           <p className="muted dash-chart-sub">Horas · referencia interna ≥700 / ≤3.0</p>
+          <div className="dash-chart-legend" aria-hidden>
+            <span className="dash-chart-legend-item">
+              <i style={{ background: COLOR_OK }} /> Resultado
+            </span>
+            <span className="dash-chart-legend-item">
+              <i style={{ background: "#94a3b8" }} /> Referencia
+            </span>
+          </div>
           <div className="dash-chart">
-            <ResponsiveContainer width="100%" height={260}>
-              <BarChart data={maintBarData} margin={{ top: 8, right: 8, left: 0, bottom: 4 }}>
+            <ResponsiveContainer width="100%" height={240}>
+              <BarChart data={maintBarData} margin={{ top: 8, right: 12, left: 0, bottom: 8 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
-                <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                <XAxis dataKey="name" tick={{ fontSize: 11 }} />
                 <YAxis tick={{ fontSize: 10 }} width={40} />
                 <Tooltip
                   formatter={(v, name) => [
@@ -502,7 +537,6 @@ export function ContractComplianceDashboard({ month, monthLabel }: Props) {
                     String(name),
                   ]}
                 />
-                <Legend wrapperStyle={{ fontSize: 10 }} />
                 <Bar dataKey="valor" name="Resultado" radius={[4, 4, 0, 0]}>
                   {maintBarData.map((d) => (
                     <Cell key={d.name} fill={d.fill} />
@@ -597,9 +631,11 @@ export function ContractComplianceDashboard({ month, monthLabel }: Props) {
             </div>
             <div className="exec-kpi">
               <FileSearch size={16} />
-              <span>Pendiente documental</span>
+              <span>RCA entregados</span>
               <strong>
-                {countPending}/{tracked}
+                {rcaRequired != null && rcaDelivered != null
+                  ? `${rcaDelivered}/${rcaRequired}`
+                  : "N/D"}
               </strong>
             </div>
             <div className="exec-kpi">

@@ -233,10 +233,7 @@ export function GteEventCalendarModal({
                 >
                   <span className="ev-cal-day-num">{d.day}</span>
                   {d.events.length > 0 ? (
-                    <span className="ev-cal-day-count">
-                      {d.events.length}
-                      {dayRcaCount > 0 ? <em className="ev-cal-day-rca-mark">R</em> : null}
-                    </span>
+                    <span className="ev-cal-day-count">{d.events.length}</span>
                   ) : (
                     <span className="ev-cal-day-dot" aria-hidden />
                   )}
