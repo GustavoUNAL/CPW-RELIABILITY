@@ -463,7 +463,19 @@ export function GteResumen({ month }: Props) {
                     <td>{u.disponibilidadPct ?? "N/D"}</td>
                     <td>{u.confiabilidadPct ?? "N/D"}</td>
                     <td>{u.fallas}</td>
-                    <td>{u.cumplimiento}</td>
+                    <td>
+                      <span
+                        className={`badge ${
+                          u.cumplimiento === "CUMPLE"
+                            ? "success"
+                            : u.cumplimiento === "NO CUMPLE"
+                              ? "danger"
+                              : "info"
+                        }`}
+                      >
+                        {u.cumplimiento}
+                      </span>
+                    </td>
                   </tr>
                 ))}
               </tbody>

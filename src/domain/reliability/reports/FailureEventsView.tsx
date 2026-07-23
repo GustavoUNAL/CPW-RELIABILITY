@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, Calendar, Clock, Filter, Search, X } from "lucide-react";
 import {
   computeEventStats,
@@ -11,6 +11,7 @@ import {
 import { COPOWER_MONTHLY_DATA, type CopowerMonthKey } from "./copowerMonthly";
 import { GRAN_TIERRA_MONTHLY_DATA, type GranTierraMonthKey } from "./granTierraMonthly";
 import { JUNE_2026_IMPUTABLE_EVENTS } from "./juneImputableEvents";
+import { GteEventCalendarModal } from "./GteEventCalendarModal";
 import type { ReportKey } from "../types";
 
 const hours = (v: number) =>
@@ -265,6 +266,12 @@ export function FailureEventsView({ month, monthLabel, mode = "dual", failuresOn
     failuresOnly: failuresOnlyDefault,
   });
   const [selected, setSelected] = useState<EnrichedEvent | null>(null);
+  const showCalendar = mode === "gte" || mode === "copower";
+  const [calendarOpen, setCalendarOpen] = useState(mode === "gte");
+
+  useEffect(() => {
+    if (mode === "gte") setCalendarOpen(true);
+  }, [mode, month]);
 
   const cpwSnap = getSnap("copower", month);
   const gteSnap = getSnap("gran_tierra", month);
@@ -274,6 +281,8 @@ export function FailureEventsView({ month, monthLabel, mode = "dual", failuresOn
 
   const showCpw = mode === "dual" || mode === "copower";
   const showGte = mode === "dual" || mode === "gte";
+  const calendarEvents = mode === "copower" ? cpwEvents : gteEvents;
+  const calendarSource = mode === "copower" ? "COPOWER" : "Gran Tierra";
 
   return (
     <div className="ev-module exec-dashboard">
@@ -292,7 +301,23 @@ export function FailureEventsView({ month, monthLabel, mode = "dual", failuresOn
                 : "Gran Tierra Energy · Excel Data Soporte / informe mensual"}
           </p>
         </div>
+        {showCalendar ? (
+          <button type="button" className="open-popup-btn" onClick={() => setCalendarOpen(true)}>
+            📅 Semáforo calendario
+          </button>
+        ) : null}
       </header>
+
+      {showCalendar ? (
+        <GteEventCalendarModal
+          open={calendarOpen}
+          onClose={() => setCalendarOpen(false)}
+          month={month}
+          monthLabel={monthLabel}
+          events={calendarEvents}
+          sourceLabel={calendarSource}
+        />
+      ) : null}
 
       {mode === "dual" ? (
         <div className="ev-dual-summary">
