@@ -1,4 +1,4 @@
-import { AlertTriangle, CheckCircle2, FileSearch, ShieldAlert } from "lucide-react";
+import { AlertTriangle, CheckCircle2, FilePlus2, FileSearch, ShieldAlert } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import {
   Bar,
@@ -16,6 +16,9 @@ type Props = {
   monthLabel: string;
   focusRcaId?: string | null;
   onFocusRcaConsumed?: () => void;
+  cases?: RcaCaseDetail[];
+  onCasesChange?: (next: RcaCaseDetail[] | ((prev: RcaCaseDetail[]) => RcaCaseDetail[])) => void;
+  onCreateBlankRca?: () => void;
 };
 
 const PRIORITY_COLOR: Record<RcaPriority, string> = {
@@ -25,8 +28,17 @@ const PRIORITY_COLOR: Record<RcaPriority, string> = {
   Baja: "#22c55e",
 };
 
-export function RcaAnalysisDashboard({ monthLabel, focusRcaId, onFocusRcaConsumed }: Props) {
-  const [cases, setCases] = useState<RcaCaseDetail[]>(() => buildGteJuneRcaCases());
+export function RcaAnalysisDashboard({
+  monthLabel,
+  focusRcaId,
+  onFocusRcaConsumed,
+  cases: casesProp,
+  onCasesChange,
+  onCreateBlankRca,
+}: Props) {
+  const [localCases, setLocalCases] = useState<RcaCaseDetail[]>(() => buildGteJuneRcaCases());
+  const cases = casesProp ?? localCases;
+  const setCases = onCasesChange ?? setLocalCases;
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -44,7 +56,8 @@ export function RcaAnalysisDashboard({ monthLabel, focusRcaId, onFocusRcaConsume
     const closed = cases.filter((c) => c.status === "Cerrado").length;
     const critical = cases.filter((c) => c.priority === "Crítica").length;
     const high = cases.filter((c) => c.priority === "Alta").length;
-    return { total, closed, critical, high, open: total - closed };
+    const pending = cases.filter((c) => c.status !== "Cerrado").length;
+    return { total, closed, critical, high, open: pending };
   }, [cases]);
 
   const chartData = useMemo(
@@ -85,10 +98,18 @@ export function RcaAnalysisDashboard({ monthLabel, focusRcaId, onFocusRcaConsume
         <p className="eyebrow">Análisis de causa raíz</p>
         <div className="screen-shell-head">
           <h3>{monthLabel}</h3>
-          <span className="source-badge gte">GTE</span>
+          <div className="rca-head-actions">
+            <span className="source-badge gte">GTE</span>
+            {onCreateBlankRca ? (
+              <button type="button" className="open-popup-btn" onClick={onCreateBlankRca}>
+                <FilePlus2 size={14} /> Nuevo RCA
+              </button>
+            ) : null}
+          </div>
         </div>
         <p className="muted" style={{ marginTop: "0.35rem" }}>
-          Solo eventos de mayor impacto, recurrencia o criticidad operacional · Junio 2026 (cierre julio).
+          Eventos de mayor impacto / recurrencia, más RCA creados desde bitácora. Los nuevos se guardan en este
+          navegador.
         </p>
 
         <div className="exec-kpi-row" style={{ marginTop: "0.6rem" }}>
@@ -109,8 +130,8 @@ export function RcaAnalysisDashboard({ monthLabel, focusRcaId, onFocusRcaConsume
           </div>
           <div className="exec-kpi">
             <AlertTriangle size={16} />
-            <span>Prioridad alta</span>
-            <strong>{stats.high}</strong>
+            <span>Abiertos</span>
+            <strong>{stats.open}</strong>
           </div>
         </div>
 
@@ -184,7 +205,7 @@ export function RcaAnalysisDashboard({ monthLabel, focusRcaId, onFocusRcaConsume
                   <td>{c.status}</td>
                   <td>{c.category}</td>
                   <td>{c.linkedPlanId ?? "—"}</td>
-                  <td className="detalle-cell">{c.result}</td>
+                  <td className="detalle-cell">{c.result || "—"}</td>
                 </tr>
               ))}
             </tbody>
@@ -213,6 +234,44 @@ export function RcaAnalysisDashboard({ monthLabel, focusRcaId, onFocusRcaConsume
               </div>
 
               <div className="intervention-grid-2" style={{ marginTop: "0.55rem" }}>
+                <div>
+                  <label>Título</label>
+                  <input
+                    value={selected.title}
+                    onChange={(e) => updateCase(selected.id, { title: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label>Etiqueta evento</label>
+                  <input
+                    value={selected.eventLabel}
+                    onChange={(e) => updateCase(selected.id, { eventLabel: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label>Equipo</label>
+                  <input
+                    value={selected.equipment}
+                    onChange={(e) => {
+                      const equipment = e.target.value;
+                      const linkedAssets = equipment
+                        .split(/[,;/|]+/)
+                        .map((s) => s.trim())
+                        .filter(Boolean);
+                      updateCase(selected.id, {
+                        equipment,
+                        linkedAssets: linkedAssets.length ? linkedAssets : [equipment || "Por definir"],
+                      });
+                    }}
+                  />
+                </div>
+                <div>
+                  <label>Categoría</label>
+                  <input
+                    value={selected.category}
+                    onChange={(e) => updateCase(selected.id, { category: e.target.value })}
+                  />
+                </div>
                 <div>
                   <label>Estado</label>
                   <select

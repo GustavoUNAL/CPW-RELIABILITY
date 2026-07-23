@@ -6571,6 +6571,30 @@ tr.row-focal td {
   margin-top: 0.35rem;
 }
 
+.ev-rca-link--create {
+  border-color: color-mix(in oklab, #15803d 40%, var(--border));
+  background: color-mix(in oklab, #15803d 12%, var(--panel));
+  color: #15803d;
+}
+
+.ev-rca-link--create:hover {
+  background: color-mix(in oklab, #15803d 20%, var(--panel));
+}
+
+.ev-rca-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+}
+
+.rca-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .ev-rca-summary {
   display: flex;
   align-items: center;
@@ -7962,12 +7986,37 @@ tr.row-focal td {
 }
 
 .ev-cal-day-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
   font-size: 0.68rem;
   font-weight: 700;
   color: color-mix(in oklab, var(--ev-cal, var(--text)) 80%, var(--text));
   background: color-mix(in oklab, var(--ev-cal, var(--border)) 18%, transparent);
   border-radius: 999px;
   padding: 0.05rem 0.4rem;
+}
+
+.ev-cal-day--rca {
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, #0e6e8c 35%, transparent);
+}
+
+.ev-cal-day-rca-mark {
+  font-style: normal;
+  font-size: 0.58rem;
+  font-weight: 800;
+  color: #0e6e8c;
+  background: color-mix(in oklab, #0e6e8c 16%, var(--panel));
+  border-radius: 999px;
+  padding: 0 0.22rem;
+  line-height: 1.2;
+}
+
+.ev-cal-rca-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.4rem;
 }
 
 .ev-cal-day-dot {

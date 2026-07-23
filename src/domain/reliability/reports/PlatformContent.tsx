@@ -14,6 +14,8 @@ import { EventInsightsDashboard } from "./EventInsightsDashboard";
 import { OperacionModule, operacionSectionFromLeaf } from "../operacion/OperacionModule";
 import { InterventionPlansDashboard } from "./InterventionPlansDashboard";
 import { RcaAnalysisDashboard } from "./RcaAnalysisDashboard";
+import type { RcaCaseDetail } from "./gteJuneRcaCases";
+import type { RcaEventDraft } from "./rcaCaseStore";
 import { MaintenanceOptimizationDashboard } from "./MaintenanceOptimizationDashboard";
 import { DegradationRiskDashboard } from "./DegradationRiskDashboard";
 import { ActionTrackingDashboard } from "./ActionTrackingDashboard";
@@ -54,6 +56,10 @@ type Props = {
   onNavigateToRca?: (rcaId?: string) => void;
   focusRcaId?: string | null;
   onFocusRcaConsumed?: () => void;
+  rcaCases?: RcaCaseDetail[];
+  onRcaCasesChange?: (next: RcaCaseDetail[] | ((prev: RcaCaseDetail[]) => RcaCaseDetail[])) => void;
+  onCreateRcaFromEvent?: (draft: RcaEventDraft) => void;
+  onCreateBlankRca?: () => void;
 };
 
 const pct = (v: number | null | undefined, d = 2) =>
@@ -76,6 +82,10 @@ export function DualCompare({
   onNavigateToRca,
   focusRcaId,
   onFocusRcaConsumed,
+  rcaCases,
+  onRcaCasesChange,
+  onCreateRcaFromEvent,
+  onCreateBlankRca,
 }: {
   page: PageKey;
   leafId: string;
@@ -85,6 +95,10 @@ export function DualCompare({
   onNavigateToRca?: (rcaId?: string) => void;
   focusRcaId?: string | null;
   onFocusRcaConsumed?: () => void;
+  rcaCases?: RcaCaseDetail[];
+  onRcaCasesChange?: (next: RcaCaseDetail[] | ((prev: RcaCaseDetail[]) => RcaCaseDetail[])) => void;
+  onCreateRcaFromEvent?: (draft: RcaEventDraft) => void;
+  onCreateBlankRca?: () => void;
 }) {
   return (
     <div className="dual-source-wrap dual-source-wrap--fit">
@@ -111,6 +125,10 @@ export function DualCompare({
                   onNavigateToRca={onNavigateToRca}
                   focusRcaId={focusRcaId}
                   onFocusRcaConsumed={onFocusRcaConsumed}
+                  rcaCases={rcaCases}
+                  onRcaCasesChange={onRcaCasesChange}
+                  onCreateRcaFromEvent={onCreateRcaFromEvent}
+                  onCreateBlankRca={onCreateBlankRca}
                 />
               )}
             </div>
@@ -315,6 +333,10 @@ function PlatformBody({
   onNavigateToRca,
   focusRcaId,
   onFocusRcaConsumed,
+  rcaCases,
+  onRcaCasesChange,
+  onCreateRcaFromEvent,
+  onCreateBlankRca,
 }: Props & { report: ReportKey }) {
   const cpwMonth = (COPOWER_MONTHLY_DATA[month as CopowerMonthKey] ? month : "Jun") as CopowerMonthKey;
   const gteMonthOk = Boolean(GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey]);
@@ -392,6 +414,8 @@ function PlatformBody({
             monthLabel={monthLabel}
             mode={mode}
             onNavigateToRca={onNavigateToRca}
+            rcaCases={rcaCases}
+            onCreateRcaFromEvent={onCreateRcaFromEvent}
           />
         </ScreenShell>
       );
@@ -404,6 +428,8 @@ function PlatformBody({
             monthLabel={monthLabel}
             mode="dual"
             onNavigateToRca={onNavigateToRca}
+            rcaCases={rcaCases}
+            onCreateRcaFromEvent={onCreateRcaFromEvent}
           />
         </ScreenShell>
       );
@@ -416,6 +442,8 @@ function PlatformBody({
             monthLabel={monthLabel}
             mode="copower"
             onNavigateToRca={onNavigateToRca}
+            rcaCases={rcaCases}
+            onCreateRcaFromEvent={onCreateRcaFromEvent}
           />
         </ScreenShell>
       );
@@ -428,6 +456,8 @@ function PlatformBody({
             monthLabel={monthLabel}
             mode="gte"
             onNavigateToRca={onNavigateToRca}
+            rcaCases={rcaCases}
+            onCreateRcaFromEvent={onCreateRcaFromEvent}
           />
         </ScreenShell>
       );
@@ -441,6 +471,8 @@ function PlatformBody({
             mode="dual"
             failuresOnlyDefault
             onNavigateToRca={onNavigateToRca}
+            rcaCases={rcaCases}
+            onCreateRcaFromEvent={onCreateRcaFromEvent}
           />
         </ScreenShell>
       );
@@ -483,6 +515,9 @@ function PlatformBody({
           monthLabel={month === "Jun" ? monthLabel : `${monthLabel} · RCA junio 2026`}
           focusRcaId={focusRcaId}
           onFocusRcaConsumed={onFocusRcaConsumed}
+          cases={rcaCases}
+          onCasesChange={onRcaCasesChange}
+          onCreateBlankRca={onCreateBlankRca}
         />
       );
     }
@@ -817,6 +852,10 @@ export function PlatformContent({
   onNavigateToRca,
   focusRcaId,
   onFocusRcaConsumed,
+  rcaCases,
+  onRcaCasesChange,
+  onCreateRcaFromEvent,
+  onCreateBlankRca,
 }: Props) {
   const ctx = resolveViewContext(page, leafId);
 
@@ -892,6 +931,10 @@ export function PlatformContent({
         onNavigateToRca={onNavigateToRca}
         focusRcaId={focusRcaId}
         onFocusRcaConsumed={onFocusRcaConsumed}
+        rcaCases={rcaCases}
+        onRcaCasesChange={onRcaCasesChange}
+        onCreateRcaFromEvent={onCreateRcaFromEvent}
+        onCreateBlankRca={onCreateBlankRca}
       />
     );
   }
@@ -907,6 +950,10 @@ export function PlatformContent({
       onNavigateToRca={onNavigateToRca}
       focusRcaId={focusRcaId}
       onFocusRcaConsumed={onFocusRcaConsumed}
+      rcaCases={rcaCases}
+      onRcaCasesChange={onRcaCasesChange}
+      onCreateRcaFromEvent={onCreateRcaFromEvent}
+      onCreateBlankRca={onCreateBlankRca}
     />
   );
 }

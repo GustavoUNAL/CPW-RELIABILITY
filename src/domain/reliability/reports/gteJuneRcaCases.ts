@@ -27,10 +27,14 @@ function normAsset(id: string) {
 }
 
 /** Cruza un evento de bitácora con RCA formales (fecha + equipo / activos vinculados). */
-export function findRcaCasesForEvent(date: string, equipment: string): RcaCaseDetail[] {
+export function findRcaCasesForEvent(
+  date: string,
+  equipment: string,
+  cases: RcaCaseDetail[] = buildGteJuneRcaCases(),
+): RcaCaseDetail[] {
   const eq = normAsset(equipment);
   if (!date || !eq) return [];
-  return buildGteJuneRcaCases().filter((rca) => {
+  return cases.filter((rca) => {
     if (rca.eventDate !== date) return false;
     return rca.linkedAssets.some((asset) => {
       const a = normAsset(asset);

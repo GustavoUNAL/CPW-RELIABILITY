@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { X } from "lucide-react";
+import { ExternalLink, FilePlus2, X } from "lucide-react";
 import type { EnrichedEvent } from "../events/eventLogUtils";
+import { buildGteJuneRcaCases, findRcaCasesForEvent, type RcaCaseDetail } from "./gteJuneRcaCases";
+import type { RcaEventDraft } from "./rcaCaseStore";
 
 export type DayTrafficLevel = "ok" | "warn" | "risk" | "empty";
 
@@ -54,6 +56,11 @@ function levelLabel(level: DayTrafficLevel) {
   return "Sin eventos";
 }
 
+function rcasForEvent(event: EnrichedEvent, cases: RcaCaseDetail[]): RcaCaseDetail[] {
+  if (event.eventType !== "Falla" && event.eventType !== "Causa comun") return [];
+  return findRcaCasesForEvent(event.date, event.equipment, cases);
+}
+
 type Props = {
   open: boolean;
   onClose: () => void;
@@ -62,6 +69,9 @@ type Props = {
   year?: number;
   events: EnrichedEvent[];
   sourceLabel?: string;
+  onNavigateToRca?: (rcaId?: string) => void;
+  rcaCases?: RcaCaseDetail[];
+  onCreateRcaFromEvent?: (draft: RcaEventDraft) => void;
 };
 
 export function GteEventCalendarModal({
@@ -72,8 +82,27 @@ export function GteEventCalendarModal({
   year = 2026,
   events,
   sourceLabel = "Gran Tierra",
+  onNavigateToRca,
+  rcaCases: rcaCasesProp,
+  onCreateRcaFromEvent,
 }: Props) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const rcaCases = rcaCasesProp ?? buildGteJuneRcaCases();
+
+  const openRca = (rcaId?: string) => {
+    onClose();
+    onNavigateToRca?.(rcaId);
+  };
+
+  const createRca = (event: EnrichedEvent) => {
+    onClose();
+    onCreateRcaFromEvent?.({
+      date: event.date,
+      equipment: event.equipment,
+      cause: event.cause,
+      responsible: event.responsible,
+    });
+  };
 
   const { days, leadingBlanks, summary } = useMemo(() => {
     const monthIndex = MONTH_INDEX[month] ?? 5;
@@ -180,18 +209,26 @@ export function GteEventCalendarModal({
             ))}
             {days.map((d) => {
               const active = selectedDate === d.date;
+              const dayRcaCount = d.events.reduce((n, e) => n + rcasForEvent(e, rcaCases).length, 0);
               return (
                 <button
                   key={d.date}
                   type="button"
                   role="gridcell"
-                  className={`ev-cal-day ev-cal-day--${d.level}${active ? " is-active" : ""}`}
+                  className={`ev-cal-day ev-cal-day--${d.level}${active ? " is-active" : ""}${
+                    dayRcaCount > 0 ? " ev-cal-day--rca" : ""
+                  }`}
                   onClick={() => setSelectedDate(d.date)}
-                  title={`${d.date}: ${levelLabel(d.level)} · ${d.events.length} evento(s)`}
+                  title={`${d.date}: ${levelLabel(d.level)} · ${d.events.length} evento(s)${
+                    dayRcaCount > 0 ? ` · ${dayRcaCount} RCA` : ""
+                  }`}
                 >
                   <span className="ev-cal-day-num">{d.day}</span>
                   {d.events.length > 0 ? (
-                    <span className="ev-cal-day-count">{d.events.length}</span>
+                    <span className="ev-cal-day-count">
+                      {d.events.length}
+                      {dayRcaCount > 0 ? <em className="ev-cal-day-rca-mark">R</em> : null}
+                    </span>
                   ) : (
                     <span className="ev-cal-day-dot" aria-hidden />
                   )}
@@ -217,28 +254,57 @@ export function GteEventCalendarModal({
                   <p className="muted">Día sin registros en la bitácora.</p>
                 ) : (
                   <ul className="ev-cal-event-list">
-                    {selected.events.map((e) => (
-                      <li key={e.id}>
-                        <div className="ev-cal-event-top">
-                          <strong>{e.equipment}</strong>
-                          <span
-                            className={
-                              e.eventType === "Falla"
-                                ? "badge danger"
-                                : e.eventType === "Causa comun"
-                                  ? "badge warning"
-                                  : "badge info"
-                            }
-                          >
-                            {e.eventType}
-                          </span>
-                        </div>
-                        <p>{e.cause || "Sin descripción"}</p>
-                        <small>
-                          {e.responsible} · {(e.downtimeHours ?? 0).toFixed(1)} h
-                        </small>
-                      </li>
-                    ))}
+                    {selected.events.map((e) => {
+                      const rcas = rcasForEvent(e, rcaCases);
+                      const canCreate =
+                        Boolean(onCreateRcaFromEvent) &&
+                        (e.eventType === "Falla" || e.eventType === "Causa comun");
+                      return (
+                        <li key={e.id}>
+                          <div className="ev-cal-event-top">
+                            <strong>{e.equipment}</strong>
+                            <span
+                              className={
+                                e.eventType === "Falla"
+                                  ? "badge danger"
+                                  : e.eventType === "Causa comun"
+                                    ? "badge warning"
+                                    : "badge info"
+                              }
+                            >
+                              {e.eventType}
+                            </span>
+                          </div>
+                          <p>{e.cause || "Sin descripción"}</p>
+                          <small>
+                            {e.responsible} · {(e.downtimeHours ?? 0).toFixed(1)} h
+                          </small>
+                          <div className="ev-cal-rca-actions">
+                            {rcas.map((rca) => (
+                              <button
+                                key={rca.id}
+                                type="button"
+                                className="ev-rca-link"
+                                onClick={() => openRca(rca.id)}
+                                disabled={!onNavigateToRca}
+                                title={`${rca.eventLabel} · ${rca.priority} · ${rca.status}`}
+                              >
+                                {rca.id} <ExternalLink size={11} />
+                              </button>
+                            ))}
+                            {canCreate ? (
+                              <button
+                                type="button"
+                                className="ev-rca-link ev-rca-link--create"
+                                onClick={() => createRca(e)}
+                              >
+                                <FilePlus2 size={11} /> Crear RCA
+                              </button>
+                            ) : null}
+                          </div>
+                        </li>
+                      );
+                    })}
                   </ul>
                 )}
               </>

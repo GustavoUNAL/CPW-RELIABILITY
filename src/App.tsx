@@ -13,6 +13,14 @@ import {
   Zap,
 } from "lucide-react";
 import { PlatformContent } from "./domain/reliability/reports/PlatformContent";
+import type { RcaCaseDetail } from "./domain/reliability/reports/gteJuneRcaCases";
+import {
+  createBlankRca,
+  createRcaDraftFromEvent,
+  loadRcaCases,
+  persistRcaCases,
+  type RcaEventDraft,
+} from "./domain/reliability/reports/rcaCaseStore";
 import type { PageKey } from "./domain/reliability/types";
 import {
   PROJECT_NAV_TREE,
@@ -111,6 +119,7 @@ function App() {
     (activeModule ? findLeafLabel(activeModule.children, activeLeafId) : null) ?? activeLeafId;
 
   const [focusRcaId, setFocusRcaId] = useState<string | null>(null);
+  const [rcaCases, setRcaCases] = useState<RcaCaseDetail[]>(() => loadRcaCases());
 
   const selectLeaf = (page: PageKey, leafId: string) => {
     setActivePage(page);
@@ -120,10 +129,38 @@ function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const updateRcaCases = (next: RcaCaseDetail[] | ((prev: RcaCaseDetail[]) => RcaCaseDetail[])) => {
+    setRcaCases((prev) => {
+      const resolved = typeof next === "function" ? next(prev) : next;
+      persistRcaCases(resolved);
+      return resolved;
+    });
+  };
+
   const navigateToRca = (rcaId?: string) => {
     setFocusRcaId(rcaId ?? null);
     setOpenGroups((prev) => ({ ...prev, "conf-analisis": true }));
     selectLeaf("confiabilidad", "an-rca-gte");
+  };
+
+  const createRcaFromEvent = (draft: RcaEventDraft) => {
+    let createdId = "";
+    updateRcaCases((prev) => {
+      const created = createRcaDraftFromEvent({ ...draft, existing: prev });
+      createdId = created.id;
+      return [...prev, created];
+    });
+    navigateToRca(createdId);
+  };
+
+  const createBlankRcaCase = () => {
+    let createdId = "";
+    updateRcaCases((prev) => {
+      const created = createBlankRca(prev);
+      createdId = created.id;
+      return [...prev, created];
+    });
+    navigateToRca(createdId);
   };
 
   const selectModule = (page: PageKey) => {
@@ -347,6 +384,10 @@ function App() {
           onNavigateToRca={navigateToRca}
           focusRcaId={focusRcaId}
           onFocusRcaConsumed={() => setFocusRcaId(null)}
+          rcaCases={rcaCases}
+          onRcaCasesChange={updateRcaCases}
+          onCreateRcaFromEvent={createRcaFromEvent}
+          onCreateBlankRca={createBlankRcaCase}
         />
       </main>
     </div>
