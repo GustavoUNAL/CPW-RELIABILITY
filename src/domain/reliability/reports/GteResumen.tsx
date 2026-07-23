@@ -25,6 +25,7 @@ import {
 } from "./granTierraMonthly";
 
 const META = CONTRACTUAL_KPI_TARGETS.reliability;
+const META_EFF = CONTRACTUAL_KPI_TARGETS.efficiencyPct;
 
 const pct = (ratio: number | null | undefined, digits = 2) =>
   ratio == null || Number.isNaN(ratio) ? "N/D" : `${(ratio * 100).toFixed(digits)}%`;
@@ -176,6 +177,13 @@ export function GteResumen({ month }: Props) {
     const pack = loadOperacionPack();
     return eficienciaCampoSnapshot(pack.resumenDiario, month);
   }, [month]);
+  const prevMonth = monthIdx > 0 ? GRAN_TIERRA_MONTH_ORDER[monthIdx - 1] : null;
+  const prevData = prevMonth ? GRAN_TIERRA_MONTHLY_DATA[prevMonth] : null;
+  const prevEff = useMemo(() => {
+    if (!prevMonth) return null;
+    const pack = loadOperacionPack();
+    return eficienciaCampoSnapshot(pack.resumenDiario, prevMonth);
+  }, [prevMonth]);
   const effPctLabel =
     effCampo.general.eficienciaPct == null
       ? "N/D"
@@ -184,6 +192,54 @@ export function GteResumen({ month }: Props) {
     .filter((c) => c.eficienciaPct != null)
     .map((c) => `${c.label} ${c.eficienciaPct!.toFixed(1)}%`)
     .join(" · ");
+  const effOk =
+    effCampo.general.eficienciaPct != null && effCampo.general.eficienciaPct >= META_EFF;
+
+  const fmtPpDelta = (curr: number | null | undefined, prev: number | null | undefined) => {
+    if (curr == null || prev == null || Number.isNaN(curr) || Number.isNaN(prev)) return null;
+    const pp = (curr - prev) * 100;
+    return {
+      text: `${pp >= 0 ? "+" : ""}${pp.toFixed(2)} pp vs ${prevData?.label ?? "mes ant."}`,
+      improved: pp > 0,
+      flat: Math.abs(pp) < 0.005,
+    };
+  };
+  const fmtEffPpDelta = (curr: number | null | undefined, prev: number | null | undefined) => {
+    if (curr == null || prev == null || Number.isNaN(curr) || Number.isNaN(prev)) return null;
+    const pp = curr - prev;
+    return {
+      text: `${pp >= 0 ? "+" : ""}${pp.toFixed(2)} pp vs ${prevData?.label ?? "mes ant."}`,
+      improved: pp > 0,
+      flat: Math.abs(pp) < 0.005,
+    };
+  };
+  const fmtGenDelta = (currKwh: number, prevKwh: number | null | undefined) => {
+    if (prevKwh == null || Number.isNaN(prevKwh) || prevKwh === 0) return null;
+    const ppEquiv = ((currKwh - prevKwh) / prevKwh) * 100;
+    const mwh = (currKwh - prevKwh) / 1000;
+    return {
+      text: `${mwh >= 0 ? "+" : ""}${mwh.toFixed(1)} MWh (${ppEquiv >= 0 ? "+" : ""}${ppEquiv.toFixed(1)}%) vs ${prevData?.label ?? "mes ant."}`,
+      improved: mwh > 0,
+      flat: Math.abs(mwh) < 0.05,
+    };
+  };
+  const deltaDisp = fmtPpDelta(data.kpi.availability, prevData?.kpi.availability);
+  const deltaConf = fmtPpDelta(data.kpi.reliability, prevData?.kpi.reliability);
+  const deltaEff = fmtEffPpDelta(
+    effCampo.general.eficienciaPct,
+    prevEff?.general.eficienciaPct,
+  );
+  const deltaGen = fmtGenDelta(data.totalGenerationKwh, prevData?.totalGenerationKwh);
+
+  /** Desglose alineado al informe: Costayaco gas + diésel + Vonu. */
+  const genBreakdown = useMemo(() => {
+    const cyc = data.generationByAsset.find((a) => /costayaco/i.test(a.asset));
+    const vonu = data.generationByAsset.find((a) => /von/i.test(a.asset));
+    const cycGas = cyc?.gasKwh ?? data.summary.energyGasKwh;
+    const cycDiesel = cyc?.dieselKwh ?? data.summary.energyDieselKwh;
+    const vonuKwh = (vonu?.gasKwh ?? 0) + (vonu?.dieselKwh ?? 0);
+    return { cycGas, cycDiesel, vonuKwh };
+  }, [data]);
 
   return (
     <div className="exec-dashboard">
@@ -339,24 +395,104 @@ export function GteResumen({ month }: Props) {
         <article className="card">
           <p className="eyebrow">1 · Indicadores sistémicos</p>
           <h3>Cumplimiento contractual</h3>
-          <div className="exec-core-grid">
+          <div className="exec-core-grid exec-core-grid--4">
+            <div className="exec-core">
+              <span>Generación total</span>
+              <strong>{kwh(data.totalGenerationKwh)}</strong>
+              <p>{data.kpi.generationMwh.toFixed(1)} MWh</p>
+              <small>
+                CYC gas {kwh(genBreakdown.cycGas)} · Diésel {kwh(genBreakdown.cycDiesel)}
+                {genBreakdown.vonuKwh > 0 ? ` · Vonú ${kwh(genBreakdown.vonuKwh)}` : ""}
+                {deltaGen ? (
+                  <>
+                    <br />
+                    <span
+                      className={
+                        deltaGen.flat
+                          ? undefined
+                          : deltaGen.improved
+                            ? "delta positive"
+                            : "delta negative"
+                      }
+                    >
+                      {deltaGen.text}
+                    </span>
+                  </>
+                ) : null}
+              </small>
+            </div>
             <div className={`exec-core${availOk ? " ok" : " warn"}`}>
               <span>Disponibilidad</span>
               <strong>{pct(data.kpi.availability)}</strong>
               <p>Meta ≥ {pct(META, 0)}</p>
-              <small>Informe mensual GTE</small>
+              <small>
+                Informe mensual GTE
+                {deltaDisp ? (
+                  <>
+                    <br />
+                    <span
+                      className={
+                        deltaDisp.flat
+                          ? undefined
+                          : deltaDisp.improved
+                            ? "delta positive"
+                            : "delta negative"
+                      }
+                    >
+                      {deltaDisp.text}
+                    </span>
+                  </>
+                ) : null}
+              </small>
             </div>
             <div className={`exec-core${confOk ? " ok" : " warn"}`}>
               <span>Confiabilidad</span>
               <strong>{pct(data.kpi.reliability)}</strong>
               <p>Meta ≥ {pct(META, 0)}</p>
-              <small>Orden 1</small>
+              <small>
+                Orden 1
+                {deltaConf ? (
+                  <>
+                    <br />
+                    <span
+                      className={
+                        deltaConf.flat
+                          ? undefined
+                          : deltaConf.improved
+                            ? "delta positive"
+                            : "delta negative"
+                      }
+                    >
+                      {deltaConf.text}
+                    </span>
+                  </>
+                ) : null}
+              </small>
             </div>
-            <div className="exec-core">
-              <span>Generación total</span>
-              <strong>{kwh(data.totalGenerationKwh)}</strong>
-              <p>{data.kpi.generationMwh.toFixed(1)} MWh</p>
-              <small>Gas {kwh(data.summary.energyGasKwh)} · Diésel {kwh(data.summary.energyDieselKwh)}</small>
+            <div className={`exec-core${effCampo.general.eficienciaPct == null ? "" : effOk ? " ok" : " warn"}`}>
+              <span>Eficiencia estimada</span>
+              <strong>{effPctLabel}</strong>
+              <p>Meta ≥ {META_EFF}% · no viene en el PDF GTE</p>
+              <small>
+                Fuente OP diario {effCampo.yearMonth}
+                {effCampoDetail ? ` · ${effCampoDetail}` : " · sin gas/energía emparejados"}
+                {deltaEff ? (
+                  <>
+                    <br />
+                    <span
+                      className={
+                        deltaEff.flat
+                          ? undefined
+                          : deltaEff.improved
+                            ? "delta positive"
+                            : "delta negative"
+                      }
+                    >
+                      {deltaEff.text}
+                    </span>
+                  </>
+                ) : null}
+              </small>
             </div>
           </div>
         </article>
@@ -372,7 +508,11 @@ export function GteResumen({ month }: Props) {
               <Zap size={16} />
               <span>Horas operación</span>
               <strong>{hours(data.summary.hoursOperated)}</strong>
-              <small>Stand-by {hours(data.summary.hoursStandby)}</small>
+              <small>
+                Stand-by {hours(data.summary.hoursStandby)}
+                <br />
+                Incluye JIN-11/12 (ventana parcial); anexo de unidades puede dar menor SB
+              </small>
             </div>
             <div className="exec-kpi">
               <Wrench size={16} />

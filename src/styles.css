@@ -902,6 +902,12 @@ textarea {
   color: #ef4444;
 }
 
+.exec-core small .delta {
+  margin: 0;
+  font-size: inherit;
+  font-weight: 650;
+}
+
 .chart-container {
   width: 100%;
   height: 320px;
@@ -2398,6 +2404,16 @@ th .metric-def {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.85rem;
   margin-top: 0.5rem;
+}
+
+.exec-core-grid--4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (max-width: 1100px) {
+  .exec-core-grid--4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .exec-core {

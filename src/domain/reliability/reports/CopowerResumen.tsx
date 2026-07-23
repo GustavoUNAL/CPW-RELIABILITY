@@ -14,6 +14,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { CONTRACTUAL_KPI_TARGETS } from "../contracts/gteOrders";
 import { loadOperacionPack } from "../operacion/api";
 import { EFICIENCIA_FORMULA, eficienciaCampoSnapshot } from "../operacion/eficiencia";
 import { MetricGlossary, MetricLabel } from "../ui/metricDefs";
@@ -29,6 +30,7 @@ const pct = (ratio: number | null | undefined, digits = 2) =>
 const kwh = (value: number) => `${Math.round(value).toLocaleString("es-CO")} kWh`;
 const hours = (value: number | null | undefined) =>
   value == null || Number.isNaN(value) ? "N/D" : `${value.toFixed(1)} h`;
+const META_EFF = CONTRACTUAL_KPI_TARGETS.efficiencyPct;
 
 type Props = {
   month: CopowerMonthKey;
@@ -89,6 +91,52 @@ export function CopowerResumen({ month }: Props) {
     .filter((c) => c.eficienciaPct != null)
     .map((c) => `${c.label} ${c.eficienciaPct!.toFixed(1)}%`)
     .join(" · ");
+  const effOk =
+    effCampo.general.eficienciaPct != null && effCampo.general.eficienciaPct >= META_EFF;
+
+  const prevMonth = monthIdx > 0 ? COPOWER_MONTH_ORDER[monthIdx - 1] : null;
+  const prevData = prevMonth ? COPOWER_MONTHLY_DATA[prevMonth] : null;
+  const prevEff = useMemo(() => {
+    if (!prevMonth) return null;
+    const pack = loadOperacionPack();
+    return eficienciaCampoSnapshot(pack.resumenDiario, prevMonth);
+  }, [prevMonth]);
+
+  const fmtPpDelta = (curr: number | null | undefined, prev: number | null | undefined) => {
+    if (curr == null || prev == null || Number.isNaN(curr) || Number.isNaN(prev)) return null;
+    const pp = (curr - prev) * 100;
+    return {
+      text: `${pp >= 0 ? "+" : ""}${pp.toFixed(2)} pp vs ${prevData?.label ?? "mes ant."}`,
+      improved: pp > 0,
+      flat: Math.abs(pp) < 0.005,
+    };
+  };
+  const fmtEffPpDelta = (curr: number | null | undefined, prev: number | null | undefined) => {
+    if (curr == null || prev == null || Number.isNaN(curr) || Number.isNaN(prev)) return null;
+    const pp = curr - prev;
+    return {
+      text: `${pp >= 0 ? "+" : ""}${pp.toFixed(2)} pp vs ${prevData?.label ?? "mes ant."}`,
+      improved: pp > 0,
+      flat: Math.abs(pp) < 0.005,
+    };
+  };
+  const fmtGenDelta = (currKwh: number, prevKwh: number | null | undefined) => {
+    if (prevKwh == null || Number.isNaN(prevKwh) || prevKwh === 0) return null;
+    const pctCh = ((currKwh - prevKwh) / prevKwh) * 100;
+    const mwh = (currKwh - prevKwh) / 1000;
+    return {
+      text: `${mwh >= 0 ? "+" : ""}${mwh.toFixed(1)} MWh (${pctCh >= 0 ? "+" : ""}${pctCh.toFixed(1)}%) vs ${prevData?.label ?? "mes ant."}`,
+      improved: mwh > 0,
+      flat: Math.abs(mwh) < 0.05,
+    };
+  };
+  const deltaDisp = fmtPpDelta(data.kpi.availability, prevData?.kpi.availability);
+  const deltaConf = fmtPpDelta(data.kpi.reliability, prevData?.kpi.reliability);
+  const deltaEff = fmtEffPpDelta(
+    effCampo.general.eficienciaPct,
+    prevEff?.general.eficienciaPct,
+  );
+  const deltaGen = fmtGenDelta(data.totalGenerationKwh, prevData?.totalGenerationKwh);
 
   return (
     <div className="exec-dashboard">
@@ -220,24 +268,98 @@ export function CopowerResumen({ month }: Props) {
         <article className="card">
           <p className="eyebrow">1 · Indicadores sistémicos</p>
           <h3>Cumplimiento operacional</h3>
-          <div className="exec-core-grid">
+          <div className="exec-core-grid exec-core-grid--4">
+            <div className="exec-core">
+              <span>Generación total</span>
+              <strong>{kwh(data.totalGenerationKwh)}</strong>
+              <p>{data.kpi.generationMwh.toFixed(1)} MWh</p>
+              <small>
+                Gas {kwh(data.summary.energyGasKwh)} · Diésel {kwh(data.summary.energyDieselKwh)}
+                {deltaGen ? (
+                  <>
+                    <br />
+                    <span
+                      className={
+                        deltaGen.flat ? undefined : deltaGen.improved ? "delta positive" : "delta negative"
+                      }
+                    >
+                      {deltaGen.text}
+                    </span>
+                  </>
+                ) : null}
+              </small>
+            </div>
             <div className="exec-core ok">
               <span>Disponibilidad</span>
               <strong>{pct(data.kpi.availability)}</strong>
               <p>Meta de referencia ≥ 98%</p>
-              <small>COPOWER · Reporte diario</small>
+              <small>
+                COPOWER · Reporte diario
+                {deltaDisp ? (
+                  <>
+                    <br />
+                    <span
+                      className={
+                        deltaDisp.flat
+                          ? undefined
+                          : deltaDisp.improved
+                            ? "delta positive"
+                            : "delta negative"
+                      }
+                    >
+                      {deltaDisp.text}
+                    </span>
+                  </>
+                ) : null}
+              </small>
             </div>
             <div className="exec-core ok">
               <span>Confiabilidad</span>
               <strong>{pct(data.kpi.reliability)}</strong>
               <p>Meta de referencia ≥ 98%</p>
-              <small>COPOWER · Reporte diario</small>
+              <small>
+                COPOWER · Reporte diario
+                {deltaConf ? (
+                  <>
+                    <br />
+                    <span
+                      className={
+                        deltaConf.flat
+                          ? undefined
+                          : deltaConf.improved
+                            ? "delta positive"
+                            : "delta negative"
+                      }
+                    >
+                      {deltaConf.text}
+                    </span>
+                  </>
+                ) : null}
+              </small>
             </div>
-            <div className="exec-core">
-              <span>Generación total</span>
-              <strong>{kwh(data.totalGenerationKwh)}</strong>
-              <p>{data.kpi.generationMwh.toFixed(1)} MWh</p>
-              <small>Gas {kwh(data.summary.energyGasKwh)} · Diésel {kwh(data.summary.energyDieselKwh)}</small>
+            <div className={`exec-core${effCampo.general.eficienciaPct == null ? "" : effOk ? " ok" : " warn"}`}>
+              <span>Eficiencia estimada</span>
+              <strong>{effPctLabel}</strong>
+              <p>Meta ≥ {META_EFF}%</p>
+              <small>
+                {effCampoDetail || "Sin gas/energía emparejados"} · OP {effCampo.yearMonth}
+                {deltaEff ? (
+                  <>
+                    <br />
+                    <span
+                      className={
+                        deltaEff.flat
+                          ? undefined
+                          : deltaEff.improved
+                            ? "delta positive"
+                            : "delta negative"
+                      }
+                    >
+                      {deltaEff.text}
+                    </span>
+                  </>
+                ) : null}
+              </small>
             </div>
           </div>
         </article>
