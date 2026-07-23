@@ -56,8 +56,16 @@ function levelLabel(level: DayTrafficLevel) {
   return "Sin eventos";
 }
 
+/** Eventos elegibles para abrir un RCA desde el calendario. */
+function isRcaEligibleEvent(event: EnrichedEvent): boolean {
+  if (event.eventType === "Falla" || event.eventType === "Causa comun") return true;
+  if ((event.parsed.fallaEvento ?? 0) > 0) return true;
+  if ((event.parsed.pfContr ?? 0) > 0) return true;
+  return false;
+}
+
 function rcasForEvent(event: EnrichedEvent, cases: RcaCaseDetail[]): RcaCaseDetail[] {
-  if (event.eventType !== "Falla" && event.eventType !== "Causa comun") return [];
+  if (!isRcaEligibleEvent(event)) return [];
   return findRcaCasesForEvent(event.date, event.equipment, cases);
 }
 
@@ -254,11 +262,15 @@ export function GteEventCalendarModal({
                   <p className="muted">Día sin registros en la bitácora.</p>
                 ) : (
                   <ul className="ev-cal-event-list">
-                    {selected.events.map((e) => {
+                    {[...selected.events]
+                      .sort((a, b) => {
+                        const rank = (e: EnrichedEvent) =>
+                          e.eventType === "Falla" ? 0 : e.eventType === "Causa comun" ? 1 : isRcaEligibleEvent(e) ? 2 : 3;
+                        return rank(a) - rank(b) || a.equipment.localeCompare(b.equipment);
+                      })
+                      .map((e) => {
                       const rcas = rcasForEvent(e, rcaCases);
-                      const canCreate =
-                        Boolean(onCreateRcaFromEvent) &&
-                        (e.eventType === "Falla" || e.eventType === "Causa comun");
+                      const canCreate = Boolean(onCreateRcaFromEvent) && isRcaEligibleEvent(e);
                       return (
                         <li key={e.id}>
                           <div className="ev-cal-event-top">
@@ -279,29 +291,31 @@ export function GteEventCalendarModal({
                           <small>
                             {e.responsible} · {(e.downtimeHours ?? 0).toFixed(1)} h
                           </small>
-                          <div className="ev-cal-rca-actions">
-                            {rcas.map((rca) => (
-                              <button
-                                key={rca.id}
-                                type="button"
-                                className="ev-rca-link"
-                                onClick={() => openRca(rca.id)}
-                                disabled={!onNavigateToRca}
-                                title={`${rca.eventLabel} · ${rca.priority} · ${rca.status}`}
-                              >
-                                {rca.id} <ExternalLink size={11} />
-                              </button>
-                            ))}
-                            {canCreate ? (
-                              <button
-                                type="button"
-                                className="ev-rca-link ev-rca-link--create"
-                                onClick={() => createRca(e)}
-                              >
-                                <FilePlus2 size={11} /> Crear RCA
-                              </button>
-                            ) : null}
-                          </div>
+                          {(rcas.length > 0 || canCreate) && (
+                            <div className="ev-cal-rca-actions">
+                              {canCreate ? (
+                                <button
+                                  type="button"
+                                  className="ev-rca-link ev-rca-link--create"
+                                  onClick={() => createRca(e)}
+                                >
+                                  <FilePlus2 size={11} /> {rcas.length > 0 ? "Crear otro RCA" : "Crear RCA"}
+                                </button>
+                              ) : null}
+                              {rcas.map((rca) => (
+                                <button
+                                  key={rca.id}
+                                  type="button"
+                                  className="ev-rca-link"
+                                  onClick={() => openRca(rca.id)}
+                                  disabled={!onNavigateToRca}
+                                  title={`${rca.eventLabel} · ${rca.priority} · ${rca.status}`}
+                                >
+                                  {rca.id} <ExternalLink size={11} />
+                                </button>
+                              ))}
+                            </div>
+                          )}
                         </li>
                       );
                     })}

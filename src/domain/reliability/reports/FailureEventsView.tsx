@@ -88,8 +88,15 @@ function findImputableMatch(event: EnrichedEvent) {
 }
 
 function relatedRcas(event: EnrichedEvent, cases: RcaCaseDetail[]): RcaCaseDetail[] {
-  if (event.eventType !== "Falla" && event.eventType !== "Causa comun") return [];
+  if (!isRcaEligibleEvent(event)) return [];
   return findRcaCasesForEvent(event.date, event.equipment, cases);
+}
+
+function isRcaEligibleEvent(event: EnrichedEvent): boolean {
+  if (event.eventType === "Falla" || event.eventType === "Causa comun") return true;
+  if ((event.parsed.fallaEvento ?? 0) > 0) return true;
+  if ((event.parsed.pfContr ?? 0) > 0) return true;
+  return false;
 }
 
 function eventRcaDraft(event: EnrichedEvent): RcaEventDraft {
@@ -116,7 +123,7 @@ function EventDetail({
 }) {
   const imputable = findImputableMatch(event);
   const rcas = relatedRcas(event, rcaCases);
-  const canCreate = Boolean(onCreateRcaFromEvent) && (event.eventType === "Falla" || event.eventType === "Causa comun");
+  const canCreate = Boolean(onCreateRcaFromEvent) && isRcaEligibleEvent(event);
 
   return (
     <aside className="ev-detail-panel">
@@ -233,7 +240,7 @@ function EventDetail({
             ) : null}
           </div>
         </section>
-      ) : event.eventType === "Falla" || event.eventType === "Causa comun" ? (
+      ) : isRcaEligibleEvent(event) ? (
         <section className="ev-detail-section ev-detail-rca ev-detail-rca--empty">
           <h4>RCA relacionados</h4>
           <p>Sin RCA formal vinculado. Puede crear uno si el evento lo requiere.</p>
@@ -349,7 +356,7 @@ function SourceColumn({
     const ids = new Set<string>();
     let failureHits = 0;
     for (const e of filtered) {
-      if (e.eventType !== "Falla" && e.eventType !== "Causa comun") continue;
+      if (!isRcaEligibleEvent(e)) continue;
       const hits = relatedRcas(e, rcaCases);
       if (hits.length === 0) continue;
       failureHits += 1;
