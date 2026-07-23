@@ -160,7 +160,7 @@ export const JUNE_2026_AUDIT_ROWS: AuditRow[] = [
   },
   {
     indicator: "RCA / reportes de falla entregados",
-    pdfValue: "0 de 7",
+    pdfValue: "2 de 7",
     excelValue: "Sin tracker de entregas en carpeta",
     match: true,
     note: "Ambas fuentes confirman ausencia de RCA formales.",

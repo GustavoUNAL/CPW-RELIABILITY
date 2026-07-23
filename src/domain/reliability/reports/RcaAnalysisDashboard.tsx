@@ -1,4 +1,4 @@
-import { AlertTriangle, CheckCircle2, FilePlus2, FileSearch, ShieldAlert } from "lucide-react";
+import { AlertTriangle, CheckCircle2, ExternalLink, FilePlus2, FileSearch, FileText, ShieldAlert, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import {
   Bar,
@@ -11,6 +11,7 @@ import {
   YAxis,
 } from "recharts";
 import { buildGteJuneRcaCases, type RcaCaseDetail, type RcaPriority } from "./gteJuneRcaCases";
+import { docsForRca, RCA_DELIVERED_COUNT, RCA_DELIVERED_DOCUMENTS } from "./rcaDocuments";
 
 type Props = {
   monthLabel: string;
@@ -40,6 +41,7 @@ export function RcaAnalysisDashboard({
   const cases = casesProp ?? localCases;
   const setCases = onCasesChange ?? setLocalCases;
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (!focusRcaId) return;
@@ -50,6 +52,24 @@ export function RcaAnalysisDashboard({
   }, [focusRcaId, cases, onFocusRcaConsumed]);
 
   const selected = cases.find((c) => c.id === selectedId) ?? null;
+  const selectedDocs = selected
+    ? docsForRca(selected.id).length
+      ? docsForRca(selected.id)
+      : (selected.pdfUrls ?? []).map((url, i) => ({
+          id: `${selected.id}-pdf-${i}`,
+          title: selected.title,
+          eventLabel: selected.eventLabel,
+          eventDate: selected.eventDate,
+          equipment: selected.equipment,
+          linkedRcaId: selected.id,
+          url,
+          fileName: url.split("/").pop() ?? `documento-${i + 1}.pdf`,
+          pages: 0,
+          revision: `Adjunto ${i + 1}`,
+          status: "Entregado" as const,
+          notes: "",
+        }))
+    : [];
 
   const stats = useMemo(() => {
     const total = cases.length;
@@ -57,7 +77,8 @@ export function RcaAnalysisDashboard({
     const critical = cases.filter((c) => c.priority === "Crítica").length;
     const high = cases.filter((c) => c.priority === "Alta").length;
     const pending = cases.filter((c) => c.status !== "Cerrado").length;
-    return { total, closed, critical, high, open: pending };
+    const withPdf = cases.filter((c) => (c.pdfUrls?.length ?? 0) > 0 || docsForRca(c.id).length > 0).length;
+    return { total, closed, critical, high, open: pending, withPdf, deliveredDocs: RCA_DELIVERED_COUNT };
   }, [cases]);
 
   const chartData = useMemo(
@@ -108,8 +129,8 @@ export function RcaAnalysisDashboard({
           </div>
         </div>
         <p className="muted" style={{ marginTop: "0.35rem" }}>
-          Eventos de mayor impacto / recurrencia, más RCA creados desde bitácora. Los nuevos se guardan en este
-          navegador.
+          Eventos de mayor impacto / recurrencia · PDF entregados en <code>data/RCA</code> (también en{" "}
+          <code>/rca</code>). Nuevos casos se guardan en este navegador.
         </p>
 
         <div className="exec-kpi-row" style={{ marginTop: "0.6rem" }}>
@@ -124,6 +145,12 @@ export function RcaAnalysisDashboard({
             <strong>{stats.closed}</strong>
           </div>
           <div className="exec-kpi">
+            <FileText size={16} />
+            <span>PDF entregados</span>
+            <strong>{stats.deliveredDocs}</strong>
+            <small>{stats.withPdf} caso(s) con adjunto</small>
+          </div>
+          <div className="exec-kpi">
             <ShieldAlert size={16} />
             <span>Prioridad crítica</span>
             <strong>{stats.critical}</strong>
@@ -134,6 +161,68 @@ export function RcaAnalysisDashboard({
             <strong>{stats.open}</strong>
           </div>
         </div>
+
+        <section className="panel" style={{ marginTop: "0.75rem" }}>
+          <article className="card">
+            <p className="eyebrow">Documentos formales</p>
+            <h3>RCA PDF entregados a Gran Tierra</h3>
+            <p className="muted" style={{ marginTop: "0.25rem" }}>
+              {RCA_DELIVERED_COUNT} archivo(s) · abra el visor o descargue el PDF.
+            </p>
+            <div className="table-wrap" style={{ marginTop: "0.55rem" }}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Documento</th>
+                    <th>Fecha evento</th>
+                    <th>RCA</th>
+                    <th>Revisión</th>
+                    <th>Páginas</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {RCA_DELIVERED_DOCUMENTS.map((doc) => (
+                    <tr key={doc.id}>
+                      <td>
+                        <strong>{doc.title}</strong>
+                        <div className="muted" style={{ fontSize: "0.72rem", marginTop: "0.15rem" }}>
+                          {doc.fileName}
+                        </div>
+                      </td>
+                      <td>{doc.eventDate}</td>
+                      <td>
+                        <button
+                          type="button"
+                          className="sort-button"
+                          onClick={() => setSelectedId(doc.linkedRcaId)}
+                        >
+                          {doc.linkedRcaId}
+                        </button>
+                      </td>
+                      <td>{doc.revision}</td>
+                      <td>{doc.pages}</td>
+                      <td>
+                        <span className="badge success">{doc.status}</span>
+                      </td>
+                      <td>
+                        <div className="rca-doc-actions">
+                          <button type="button" className="ev-rca-link" onClick={() => setPdfUrl(doc.url)}>
+                            Ver PDF
+                          </button>
+                          <a className="ev-rca-link" href={doc.url} target="_blank" rel="noreferrer">
+                            Abrir <ExternalLink size={11} />
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </article>
+        </section>
 
         <article className="dash-chart-panel" style={{ marginTop: "0.7rem" }}>
           <h4>Criticidad de RCA seleccionados</h4>
@@ -172,11 +261,15 @@ export function RcaAnalysisDashboard({
                 <th>Estado</th>
                 <th>Categoría</th>
                 <th>Plan vinculado</th>
+                <th>PDF</th>
                 <th>Resultado</th>
               </tr>
             </thead>
             <tbody>
-              {cases.map((c) => (
+              {cases.map((c) => {
+                const docs = docsForRca(c.id);
+                const pdfCount = docs.length || (c.pdfUrls?.length ?? 0);
+                return (
                 <tr key={c.id}>
                   <td>
                     <button
@@ -205,9 +298,27 @@ export function RcaAnalysisDashboard({
                   <td>{c.status}</td>
                   <td>{c.category}</td>
                   <td>{c.linkedPlanId ?? "—"}</td>
+                  <td>
+                    {pdfCount > 0 ? (
+                      <button
+                        type="button"
+                        className="ev-rca-link"
+                        onClick={() => {
+                          setSelectedId(c.id);
+                          const first = docs[0]?.url ?? c.pdfUrls?.[0];
+                          if (first) setPdfUrl(first);
+                        }}
+                      >
+                        <FileText size={12} /> {pdfCount}
+                      </button>
+                    ) : (
+                      "—"
+                    )}
+                  </td>
                   <td className="detalle-cell">{c.result || "—"}</td>
                 </tr>
-              ))}
+              );
+              })}
             </tbody>
           </table>
         </div>
@@ -232,6 +343,24 @@ export function RcaAnalysisDashboard({
                 <div className="exec-kpi"><span>Estado</span><strong>{selected.status}</strong></div>
                 <div className="exec-kpi"><span>Plan</span><strong>{selected.linkedPlanId ?? "—"}</strong></div>
               </div>
+
+              {selectedDocs.length > 0 ? (
+                <div className="rca-pdf-block" style={{ marginTop: "0.65rem" }}>
+                  <h4 style={{ margin: "0 0 0.4rem", fontSize: "0.9rem" }}>PDF del RCA</h4>
+                  <div className="rca-doc-actions">
+                    {selectedDocs.map((doc) => (
+                      <button
+                        key={doc.id}
+                        type="button"
+                        className="ev-rca-link"
+                        onClick={() => setPdfUrl(doc.url)}
+                      >
+                        <FileText size={12} /> {doc.revision || doc.fileName}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
 
               <div className="intervention-grid-2" style={{ marginTop: "0.55rem" }}>
                 <div>
@@ -398,6 +527,33 @@ export function RcaAnalysisDashboard({
                   Guardar y cerrar
                 </button>
               </div>
+            </article>
+          </div>
+        ) : null}
+
+        {pdfUrl ? (
+          <div
+            className="modal-overlay rca-pdf-overlay"
+            role="dialog"
+            aria-modal="true"
+            onClick={() => setPdfUrl(null)}
+          >
+            <article className="modal-card modal-card--xl rca-pdf-modal" onClick={(e) => e.stopPropagation()}>
+              <header className="modal-header">
+                <div>
+                  <p className="eyebrow" style={{ margin: 0 }}>Visor PDF</p>
+                  <h3 style={{ margin: "0.15rem 0 0" }}>{pdfUrl.split("/").pop()}</h3>
+                </div>
+                <div className="rca-doc-actions">
+                  <a className="ev-rca-link" href={pdfUrl} target="_blank" rel="noreferrer">
+                    Abrir en pestaña <ExternalLink size={12} />
+                  </a>
+                  <button type="button" className="open-popup-btn" onClick={() => setPdfUrl(null)}>
+                    <X size={16} /> Cerrar
+                  </button>
+                </div>
+              </header>
+              <iframe title="RCA PDF" src={pdfUrl} className="rca-pdf-frame" />
             </article>
           </div>
         ) : null}

@@ -20,6 +20,8 @@ export type RcaCaseDetail = {
   responsible: string;
   company: string;
   closeDate: string | null;
+  /** Rutas públicas a PDF entregados (opcional). */
+  pdfUrls?: string[];
 };
 
 function normAsset(id: string) {
@@ -200,6 +202,52 @@ export function buildGteJuneRcaCases(): RcaCaseDetail[] {
       responsible: "Gran Tierra",
       company: "GTE",
       closeDate: "2026-07-30",
+    },
+    {
+      id: "RCA-030",
+      title: "Shutdown General Costayaco — Vector Shift EEP 34.5 kV",
+      eventLabel: "Vector Shift · falla reconectador EEP",
+      status: "En curso",
+      priority: "Crítica",
+      equipment: "Parque Costayaco",
+      linkedAssets: [
+        "CPW01",
+        "CPW02",
+        "CPW03",
+        "CPW04",
+        "CPW05",
+        "CPW06",
+        "CPW07",
+        "CPW12",
+        "JIN01",
+        "JIN02",
+        "JINAN01",
+        "JINAN02",
+      ],
+      eventDate: "2026-06-22",
+      problem:
+        "Shutdown general del parque de generación a gas en Costayaco por perturbación eléctrica externa (Vector Shift) asociada a falla en reconectador EEP 34.5 kV (circuito Puerto Limón).",
+      immediateCause:
+        "Actuación simultánea de protecciones de sobrecorriente (I>> etapa 2) ante condición severa de la barra.",
+      rootCause:
+        "Perturbación común de red externa (EEP); no se identifica falla interna de los generadores CPW-01/02/03 como causa raíz.",
+      actions: [
+        "Análisis eléctrico de secuencia de disparo (< 2 s).",
+        "Validación de actuación correcta de protecciones.",
+        "Seguimiento SOE turbina pendiente de cierre.",
+        "Entrega de reporte RCA formal a Gran Tierra (Sec. 30).",
+      ],
+      result:
+        "RCA formal entregado (2 PDF). Estado operativo del análisis: ABIERTO — pendiente SOE turbina.",
+      linkedPlanId: "IP-GTE-004",
+      category: "Red eléctrica",
+      responsible: "COPOWER / Eléctrico",
+      company: "COPOWER",
+      closeDate: null,
+      pdfUrls: [
+        "/rca/RCA-Costayaco-2026-06-22-Vector-Shift.pdf",
+        "/rca/RCA-Costayaco-2026-06-22-Vector-Shift-rev1.pdf",
+      ],
     },
   ];
 }

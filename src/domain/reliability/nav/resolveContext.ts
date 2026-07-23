@@ -68,6 +68,7 @@ const GTE_LEAVES = new Set([
   "an-rca",
   "an-rca-gte",
   "dash-operacion-gte",
+  "dash-contrato",
   "an-repetitivos-gte",
   "an-badactors-gte",
   "an-interv-gte",

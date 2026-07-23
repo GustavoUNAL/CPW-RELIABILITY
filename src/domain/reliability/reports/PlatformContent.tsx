@@ -34,6 +34,7 @@ import { MeetingBrief } from "./MeetingBrief";
 import { ComparativeAnalysis } from "./ComparativeAnalysis";
 import { SourceMeetingBrief, SourceMonthCompare } from "./SourcePanels";
 import { MarcoContractual } from "./MarcoContractual";
+import { ContractComplianceDashboard } from "./ContractComplianceDashboard";
 import { CONTRACT_CALC_BASE, CONTRACTUAL_KPI_TARGETS } from "../contracts/gteOrders";
 import { assessTechnicalRisk } from "../risk/technicalRisk";
 import {
@@ -810,6 +811,9 @@ function PlatformBody({
   if (page === "dashboard") {
     if (leafId === "dash-resumen") {
       return <DashboardOverview month={month} monthLabel={monthLabel} />;
+    }
+    if (leafId === "dash-contrato") {
+      return <ContractComplianceDashboard month={month} monthLabel={monthLabel} />;
     }
     if (leafId === "dash-operacion") return <CopowerResumen month={cpwMonth} />;
     if (leafId === "dash-operacion-gte") {

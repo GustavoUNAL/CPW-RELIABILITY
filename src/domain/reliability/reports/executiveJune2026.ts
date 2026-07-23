@@ -49,7 +49,7 @@ export const EXEC_JUN = {
   hoursPp: 28,
   hoursPfContr: 20,
   hoursPfCli: 189,
-  rcaDelivered: 0,
+  rcaDelivered: 2,
   rcaRequired: 7,
   excelFailureRows: 10,
   focalUnit: "CPW06",

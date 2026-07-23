@@ -26,6 +26,7 @@ export const PROJECT_NAV_TREE: NavModule[] = [
     description: "Vistas ejecutivas y operativas por audiencia",
     children: [
       { id: "dash-resumen", label: "Resumen general" },
+      { id: "dash-contrato", label: "Cumplimiento de metas contractuales" },
       { id: "dash-operacion", label: "Operación COPOWER" },
       { id: "dash-operacion-gte", label: "Operación Gran Tierra" },
       { id: "dash-mto", label: "Mantenimiento" },

@@ -8,6 +8,7 @@ import {
   RELIABILITY_DEDUCTION_BANDS,
   SHUTDOWN_PENALTY_BANDS,
 } from "../contracts/gteOrders";
+import { EXEC_JUN } from "./executiveJune2026";
 import { GRAN_TIERRA_MONTHLY_DATA, type GranTierraMonthKey } from "./granTierraMonthly";
 import { COPOWER_MONTHLY_DATA, type CopowerMonthKey } from "./copowerMonthly";
 
@@ -19,8 +20,8 @@ export const MARCO_LEAF_META: Record<MarcoLeaf, { title: string; description: st
     description: "Orden 1, Orden 2 y Orden 3 — alcance y aplicabilidad a confiabilidad",
   },
   "sec-1-2": {
-    title: "Metas contractuales",
-    description: "Scorecard del periodo vs umbrales Orden 1 (Disp/Conf ≥98%, etc.)",
+    title: "Cumplimiento de metas contractuales",
+    description: "Estado del contrato vs Orden 1 · semáforo ejecutivo, acciones y conclusión",
   },
   "sec-1-3": {
     title: "Esquema de multas y bandas",
@@ -32,6 +33,23 @@ export const MARCO_LEAF_META: Record<MarcoLeaf, { title: string; description: st
   },
 };
 
+/** Referencias internas de mantenibilidad (seguimiento; no umbral Orden 1 formal). */
+const INTERNAL_MAINT_TARGETS = {
+  mtbfHoursMin: 700,
+  mttrHoursMax: 3,
+} as const;
+
+type ExecTone = "ok" | "gap" | "pending" | "na";
+
+type ExecIndicatorRow = {
+  indicator: string;
+  tone: ExecTone;
+  statusLabel: string;
+  result: string;
+  meta: string;
+  observation: string;
+};
+
 type Props = {
   leaf: MarcoLeaf;
   report: "gran_tierra" | "copower";
@@ -41,8 +59,10 @@ type Props = {
 
 const pct = (v: number | null | undefined, d = 1) =>
   v == null || Number.isNaN(v) ? "N/A" : `${(v * 100).toFixed(d)}%`;
-const pp = (v: number | null | undefined, d = 2) =>
-  v == null || Number.isNaN(v) ? "N/A" : `${v.toFixed(d)} pp`;
+const pctFixed = (v: number | null | undefined, d = 2) =>
+  v == null || Number.isNaN(v) ? "N/A" : `${(v * 100).toFixed(d)} %`;
+const hoursLabel = (v: number | null | undefined, d = 2) =>
+  v == null || Number.isNaN(v) ? "N/A" : `${v.toFixed(d)} h`;
 
 function getSnap(report: "gran_tierra" | "copower", month: string) {
   if (report === "gran_tierra") return GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey] ?? null;
@@ -69,6 +89,19 @@ function CopowerContractNote() {
   );
 }
 
+function toneClass(tone: ExecTone) {
+  if (tone === "ok") return "contract-tone--ok";
+  if (tone === "gap") return "contract-tone--gap";
+  if (tone === "pending") return "contract-tone--pending";
+  return "contract-tone--na";
+}
+
+function statusBadge(tone: ExecTone, label: string) {
+  const badge =
+    tone === "ok" ? "success" : tone === "gap" ? "warning" : tone === "pending" ? "warning" : "info";
+  return <span className={`badge ${badge} contract-status-badge`}>{label}</span>;
+}
+
 export function MarcoContractual({ leaf, report, month, monthLabel }: Props) {
   const isGte = report === "gran_tierra";
   const snap = getSnap(report, month);
@@ -77,133 +110,206 @@ export function MarcoContractual({ leaf, report, month, monthLabel }: Props) {
   const mtbf = snap?.summary.mtbfHours ?? null;
   const mttr = snap?.summary.mttrHours ?? null;
   const failures = snap?.summary.copowerFailures ?? 0;
-  const hasJuneRca = isGte && month === "Jun";
   const band = reliability == null ? null : getReliabilityDeduction(reliability);
   const sourceFile = snap?.sourceFile ?? (isGte ? "data/GTE" : "Reporte diario COPOWER");
 
-  const monthlyMetaRows = [
+  const rcaRequired = month === "Jun" && isGte ? EXEC_JUN.rcaRequired : null;
+  const rcaDelivered = month === "Jun" && isGte ? EXEC_JUN.rcaDelivered : null;
+  const contractualEvents = month === "Jun" && isGte ? EXEC_JUN.failures : failures;
+
+  const metaAvail = CONTRACTUAL_KPI_TARGETS.availability;
+  const metaConf = CONTRACTUAL_KPI_TARGETS.reliability;
+
+  const execRows: ExecIndicatorRow[] = [
+    (() => {
+      if (availability == null) {
+        return {
+          indicator: "Disponibilidad",
+          tone: "na" as const,
+          statusLabel: "Sin dato",
+          result: "N/A",
+          meta: "98.00 %",
+          observation: "Sin disponibilidad sistémica cargada para el periodo.",
+        };
+      }
+      const gapPp = (availability - metaAvail) * 100;
+      const ok = availability >= metaAvail;
+      return {
+        indicator: "Disponibilidad",
+        tone: ok ? ("ok" as const) : ("gap" as const),
+        statusLabel: ok ? "En objetivo" : "Por debajo de la meta",
+        result: pctFixed(availability, 2),
+        meta: "98.00 %",
+        observation: ok
+          ? "Cumple umbral contractual Orden 1 (≥98%)."
+          : `Brecha de ${Math.abs(gapPp).toFixed(2)} pp.`,
+      };
+    })(),
+    (() => {
+      if (reliability == null) {
+        return {
+          indicator: "Confiabilidad",
+          tone: "na" as const,
+          statusLabel: "Sin dato",
+          result: "N/A",
+          meta: "98.00 %",
+          observation: "Sin confiabilidad sistémica cargada para el periodo.",
+        };
+      }
+      const ok = reliability >= metaConf;
+      return {
+        indicator: "Confiabilidad",
+        tone: ok ? ("ok" as const) : ("gap" as const),
+        statusLabel: ok ? "En objetivo" : "Por debajo de la meta",
+        result: pctFixed(reliability, 2),
+        meta: "98.00 %",
+        observation: ok
+          ? "Cumple umbral contractual Orden 1 (≥98%)."
+          : `Riesgo de deducción contractual${
+              band && band.deductionPct > 0 ? ` estimada ${band.deductionPct}%` : ""
+            } (sujeta a validación).`,
+      };
+    })(),
+    (() => {
+      if (mtbf == null) {
+        return {
+          indicator: "MTBF",
+          tone: "na" as const,
+          statusLabel: "Sin dato",
+          result: "N/A",
+          meta: `≥ ${INTERNAL_MAINT_TARGETS.mtbfHoursMin} h`,
+          observation: `${METRIC_DEFS.MTBF.es}. Referencia interna de seguimiento.`,
+        };
+      }
+      const ok = mtbf >= INTERNAL_MAINT_TARGETS.mtbfHoursMin;
+      return {
+        indicator: "MTBF",
+        tone: ok ? ("ok" as const) : ("gap" as const),
+        statusLabel: ok ? "En objetivo" : "Por debajo de la referencia",
+        result: hoursLabel(mtbf),
+        meta: `≥ ${INTERNAL_MAINT_TARGETS.mtbfHoursMin} h`,
+        observation: ok
+          ? "Dentro de la referencia interna."
+          : `Por debajo de la referencia interna (≥ ${INTERNAL_MAINT_TARGETS.mtbfHoursMin} h).`,
+      };
+    })(),
+    (() => {
+      if (mttr == null) {
+        return {
+          indicator: "MTTR",
+          tone: "na" as const,
+          statusLabel: "Sin dato",
+          result: "N/A",
+          meta: `≤ ${INTERNAL_MAINT_TARGETS.mttrHoursMax.toFixed(1)} h`,
+          observation: `${METRIC_DEFS.MTTR.es}. Referencia interna de seguimiento.`,
+        };
+      }
+      const ok = mttr <= INTERNAL_MAINT_TARGETS.mttrHoursMax;
+      return {
+        indicator: "MTTR",
+        tone: ok ? ("ok" as const) : ("gap" as const),
+        statusLabel: ok ? "En objetivo" : "Por encima de la referencia",
+        result: hoursLabel(mttr),
+        meta: `≤ ${INTERNAL_MAINT_TARGETS.mttrHoursMax.toFixed(1)} h`,
+        observation: ok
+          ? "Recuperación eficiente de equipos."
+          : `Por encima de la referencia interna (≤ ${INTERNAL_MAINT_TARGETS.mttrHoursMax.toFixed(1)} h).`,
+      };
+    })(),
+    (() => {
+      if (rcaRequired == null || rcaDelivered == null) {
+        return {
+          indicator: "RCA entregados",
+          tone: "na" as const,
+          statusLabel: "Sin dato",
+          result: "N/A",
+          meta: "100 %",
+          observation: "Sin tracker formal de entrega RCA para este periodo.",
+        };
+      }
+      const pending = rcaDelivered < rcaRequired;
+      return {
+        indicator: "RCA entregados",
+        tone: pending ? ("pending" as const) : ("ok" as const),
+        statusLabel: pending ? "Pendiente" : "En objetivo",
+        result: `${rcaDelivered} de ${rcaRequired}`,
+        meta: "100 %",
+        observation: pending
+          ? `${rcaDelivered} de ${rcaRequired} entregados · en proceso de elaboración y entrega.`
+          : "Paquete RCA del periodo entregado.",
+      };
+    })(),
+  ];
+
+  const countOk = execRows.filter((r) => r.tone === "ok").length;
+  const countGap = execRows.filter((r) => r.tone === "gap").length;
+  const countPending = execRows.filter((r) => r.tone === "pending").length;
+  const countNa = execRows.filter((r) => r.tone === "na").length;
+  const totalTracked = execRows.length - countNa;
+  const denom = totalTracked > 0 ? totalTracked : execRows.length;
+
+  const potentialDeduction =
+    band && band.deductionPct > 0
+      ? `${band.deductionPct} % (sujeta a validación contractual)`
+      : reliability != null && reliability >= metaConf
+        ? "0 %"
+        : "N/A";
+
+  const improvementActions = [
     {
-      indicator: "Disponibilidad Operacional",
-      meta: "≥ 98.0%",
-      result: availability == null ? "N/A" : `${(availability * 100).toFixed(2)}%`,
-      delta:
-        availability == null
-          ? "N/A"
-          : pp((availability - CONTRACTUAL_KPI_TARGETS.availability) * 100),
+      action: "Análisis de causas repetitivas",
+      status: "En ejecución",
+      impact: "Incrementar MTBF",
+    },
+    {
+      action: "Seguimiento a disponibilidad por unidad",
+      status: "Implementado",
+      impact: "Reducir indisponibilidad",
+    },
+    {
+      action: "Cierre de RCA pendientes",
       status:
-        availability == null
-          ? "Sin dato"
-          : availability >= CONTRACTUAL_KPI_TARGETS.availability
-            ? "Cumple"
-            : "No cumple",
+        countPending > 0 || (rcaDelivered != null && rcaRequired != null && rcaDelivered < rcaRequired)
+          ? "En proceso"
+          : "Implementado",
+      impact: "Cumplimiento documental",
     },
     {
-      indicator: "Confiabilidad del Sistema",
-      meta: "≥ 98.0%",
-      result: reliability == null ? "N/A" : `${(reliability * 100).toFixed(2)}%`,
-      delta:
-        reliability == null
-          ? "N/A"
-          : pp((reliability - CONTRACTUAL_KPI_TARGETS.reliability) * 100),
-      status:
-        reliability == null
-          ? "Sin dato"
-          : reliability >= CONTRACTUAL_KPI_TARGETS.reliability
-            ? "Cumple"
-            : "No cumple",
-    },
-    {
-      indicator: "N° de shutdowns/eventos asociados a O&M",
-      meta: "Ideal: 0",
-      result: `${failures}`,
-      delta: failures === 0 ? "0" : `+${failures}`,
-      status: failures === 0 ? "Cumple" : "No cumple",
-    },
-    {
-      indicator: "Eficiencia",
-      meta: "≥ 37%",
-      result: "N/A",
-      delta: "N/A",
-      status: "Sin dato",
-    },
-    {
-      indicator: "Cumplimiento plan de mantenimiento",
-      meta: "100%",
-      result: "N/A",
-      delta: "N/A",
-      status: "Sin dato",
-    },
-    {
-      indicator: "Cumplimiento stock de repuestos",
-      meta: "100%",
-      result: "N/A",
-      delta: "N/A",
-      status: "Sin dato",
-    },
-    {
-      indicator: "Reportes de falla (RCA/informe)",
-      meta: "Obligatorio",
-      result: hasJuneRca ? "No entregados (7 eventos)" : "N/A",
-      delta: hasJuneRca ? "-100%" : "N/A",
-      status: hasJuneRca ? "No cumple" : "Sin dato",
-    },
-    {
-      indicator: "Informes diarios",
-      meta: "Obligatorio",
-      result: "N/A",
-      delta: "N/A",
-      status: "Sin dato",
+      action: "Seguimiento semanal de indicadores",
+      status: "Implementado",
+      impact: "Detección temprana de desviaciones",
     },
   ];
 
-  const scorecard = [
-    {
-      name: "Disponibilidad",
-      valueLabel: availability == null ? "N/A" : `${(availability * 100).toFixed(1)}% / meta 98.0%`,
-      meets: availability == null ? null : availability >= CONTRACTUAL_KPI_TARGETS.availability,
-      detail:
-        availability == null
-          ? "Sin Disp sistémica este mes"
-          : availability >= CONTRACTUAL_KPI_TARGETS.availability
-            ? "Cumple umbral ≥98%"
-            : `No cumple (brecha ${((CONTRACTUAL_KPI_TARGETS.availability - availability) * 100).toFixed(2)} pp)`,
-    },
-    {
-      name: "Confiabilidad",
-      valueLabel: reliability == null ? "N/A" : `${(reliability * 100).toFixed(1)}% / meta 98.0%`,
-      meets: reliability == null ? null : reliability >= CONTRACTUAL_KPI_TARGETS.reliability,
-      detail:
-        reliability == null
-          ? "Sin Conf sistémica este mes"
-          : reliability >= CONTRACTUAL_KPI_TARGETS.reliability
-            ? "Cumple umbral ≥98%"
-            : `No cumple → deducción estimada ${band?.deductionPct ?? "N/A"}%`,
-    },
-    {
-      name: "MTBF",
-      valueLabel: mtbf == null ? "N/A" : `${mtbf.toFixed(2)} h`,
-      meets: null as boolean | null,
-      detail: `${METRIC_DEFS.MTBF.es}. Solo seguimiento, sin umbral fijo`,
-    },
-    {
-      name: "MTTR",
-      valueLabel: mttr == null ? "N/A" : `${mttr.toFixed(2)} h`,
-      meets: null as boolean | null,
-      detail: `${METRIC_DEFS.MTTR.es}. Solo seguimiento, sin umbral fijo`,
-    },
-    {
-      name: "Reportes de falla / RCA",
-      valueLabel: hasJuneRca
-        ? "No entregados (7 eventos)"
-        : "N/A — sin tracker formal en carpeta del mes",
-      meets: hasJuneRca ? false : null,
-      detail: hasJuneRca
-        ? "Expuesto a multa del 4% adicional (Orden 1) si se confirma la ausencia"
-        : isGte
-          ? "Pendiente evidencia de entregas documentadas"
-          : "RCA contractual se gestiona en fuente Gran Tierra (informe oficial)",
-    },
-  ];
+  const conclusionParts: string[] = [];
+  if (execRows.some((r) => (r.indicator === "MTBF" || r.indicator === "MTTR") && r.tone === "ok")) {
+    conclusionParts.push(
+      "El desempeño operativo del periodo muestra estabilidad en los indicadores de mantenibilidad (MTBF y MTTR).",
+    );
+  }
+  if (countGap > 0) {
+    const gapNames = execRows.filter((r) => r.tone === "gap").map((r) => r.indicator.toLowerCase());
+    const gapText =
+      gapNames.length === 1
+        ? gapNames[0]
+        : gapNames.length === 2
+          ? `${gapNames[0]} y ${gapNames[1]}`
+          : `${gapNames.slice(0, -1).join(", ")} y ${gapNames[gapNames.length - 1]}`;
+    conclusionParts.push(
+      `La principal oportunidad de mejora se concentra en el cumplimiento de las metas contractuales de ${gapText}.`,
+    );
+  }
+  if (countPending > 0) {
+    conclusionParts.push(
+      "Asimismo, requiere atención el cierre oportuno de los análisis de causa raíz (RCA).",
+    );
+  }
+  if (conclusionParts.length === 0) {
+    conclusionParts.push(
+      "El periodo no presenta desviaciones materiales frente a las metas y referencias evaluadas; se mantiene el seguimiento rutinario.",
+    );
+  }
+  const executiveConclusion = conclusionParts.join(" ");
 
   return (
     <div className="marco-screen">
@@ -274,142 +380,210 @@ export function MarcoContractual({ leaf, report, month, monthLabel }: Props) {
       {leaf === "sec-1-2" && snap && (
         <>
           <section className="panel">
-            <article className="card">
+            <article className="card contract-exec-card">
               <div className="contract-order-head">
                 <div>
                   <p className="eyebrow">
-                    {isGte ? "Orden 1 · SISTEMA N Costayaco" : "Referencia operativa vs metas Orden 1"}
+                    {isGte ? "Orden 1 · Sistema Costayaco / Vonú" : "Referencia operativa vs metas Orden 1"}
                   </p>
-                  <h3>Scorecard — {monthLabel}</h3>
+                  <h3>Cumplimiento de metas contractuales</h3>
+                  <p className="muted">Periodo: {monthLabel} · Lectura ejecutiva para Gran Tierra</p>
                   {!isGte ? <CopowerContractNote /> : null}
                 </div>
               </div>
-              <div className="contract-score-grid">
-                {scorecard.map((item) => (
-                  <div key={item.name} className="contract-score-card">
-                    <div className="contract-score-head">
-                      {item.name === "MTBF" || item.name === "MTTR" ? (
-                        <MetricLabel code={item.name} />
-                      ) : (
-                        <strong>{item.name}</strong>
-                      )}
-                      {item.meets == null ? (
-                        <span className="badge info">Seguimiento</span>
-                      ) : item.meets ? (
-                        <span className="badge success">Cumple</span>
-                      ) : (
-                        <span className="badge danger">No cumple</span>
-                      )}
-                    </div>
-                    <p className="contract-score-value">{item.valueLabel}</p>
-                    <p className="muted">{item.detail}</p>
+
+              <div className="contract-semaforo" aria-label="Semáforo general del contrato">
+                <div className={`contract-semaforo-item ${toneClass("ok")}`}>
+                  <span className="contract-semaforo-dot" aria-hidden />
+                  <div>
+                    <strong>En objetivo</strong>
+                    <small>
+                      {countOk} indicador{countOk === 1 ? "" : "es"}
+                    </small>
                   </div>
-                ))}
+                </div>
+                <div className={`contract-semaforo-item ${toneClass("gap")}`}>
+                  <span className="contract-semaforo-dot" aria-hidden />
+                  <div>
+                    <strong>Con oportunidad de mejora</strong>
+                    <small>
+                      {countGap} indicador{countGap === 1 ? "" : "es"}
+                    </small>
+                  </div>
+                </div>
+                <div className={`contract-semaforo-item ${toneClass("pending")}`}>
+                  <span className="contract-semaforo-dot" aria-hidden />
+                  <div>
+                    <strong>Pendiente documental</strong>
+                    <small>
+                      {countPending} indicador{countPending === 1 ? "" : "es"}
+                    </small>
+                  </div>
+                </div>
+              </div>
+
+              <div className="table-scroll" style={{ marginTop: "0.85rem" }}>
+                <table className="contract-matrix contract-exec-table">
+                  <thead>
+                    <tr>
+                      <th>Indicador</th>
+                      <th>Estado</th>
+                      <th>Resultado</th>
+                      <th>Meta / Referencia</th>
+                      <th>Observación</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {execRows.map((row) => (
+                      <tr key={row.indicator} className={toneClass(row.tone)}>
+                        <td>
+                          {row.indicator === "MTBF" || row.indicator === "MTTR" ? (
+                            <MetricLabel code={row.indicator} />
+                          ) : (
+                            <strong>{row.indicator}</strong>
+                          )}
+                        </td>
+                        <td>{statusBadge(row.tone, row.statusLabel)}</td>
+                        <td className="contract-result-cell">{row.result}</td>
+                        <td>{row.meta}</td>
+                        <td className="contract-watch">{row.observation}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </article>
           </section>
 
-          {isGte ? (
-            <>
-              <section className="panel">
-                <article className="card">
-                  <div className="contract-order-head">
-                    <div>
-                      <p className="eyebrow">Orden 1 — la que aplica</p>
-                      <h3>Indicadores y metas contractuales</h3>
-                    </div>
-                    <span className="badge success">{CONTRACT_CALC_BASE.length} indicadores</span>
-                  </div>
-                  <div className="table-scroll">
-                    <table className="contract-matrix">
-                      <thead>
-                        <tr>
-                          <th>Indicador</th>
-                          <th>Fórmula</th>
-                          <th>Frecuencia</th>
-                          <th>Meta</th>
-                          <th>Multa si incumple</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {CONTRACT_CALC_BASE.map((row) => (
-                          <tr key={row.indicator}>
-                            <td>
-                              <strong>{row.indicator}</strong>
-                            </td>
-                            <td>{row.formula}</td>
-                            <td>{row.frequency}</td>
-                            <td>{row.threshold}</td>
-                            <td className="contract-watch">{row.consequence}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </article>
-              </section>
+          <section className="panel">
+            <article className="card">
+              <div className="contract-order-head">
+                <div>
+                  <p className="eyebrow">Resumen del periodo</p>
+                  <h3>Estado general del contrato</h3>
+                </div>
+              </div>
+              <ul className="contract-exec-summary">
+                <li>
+                  <strong>Indicadores en objetivo:</strong> {countOk}/{denom}
+                </li>
+                <li>
+                  <strong>Indicadores con brecha respecto a la meta:</strong> {countGap}/{denom}
+                </li>
+                <li>
+                  <strong>Indicadores pendientes de cierre documental:</strong> {countPending}/{denom}
+                </li>
+                <li>
+                  <strong>Eventos registrados:</strong> {contractualEvents}
+                </li>
+                <li>
+                  <strong>RCA pendientes:</strong>{" "}
+                  {rcaRequired != null && rcaDelivered != null
+                    ? Math.max(0, rcaRequired - rcaDelivered)
+                    : "N/A"}
+                </li>
+                <li>
+                  <strong>Deducción potencial identificada:</strong> {potentialDeduction}
+                </li>
+              </ul>
+            </article>
+          </section>
 
-              <section className="panel">
-                <article className="card">
-                  <div className="contract-order-head">
-                    <div>
-                      <p className="eyebrow">Resumen ejecutivo para slide</p>
-                      <h3>Resultados del mes vs meta contractual</h3>
-                      <p className="muted">Periodo: {monthLabel} · Diferencia = Resultado − Meta</p>
-                    </div>
-                  </div>
-                  <div className="table-scroll">
-                    <table className="contract-matrix">
-                      <thead>
-                        <tr>
-                          <th>Indicador</th>
-                          <th>Meta contractual</th>
-                          <th>Resultado del mes</th>
-                          <th>Diferencia vs meta</th>
-                          <th>Estado</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {monthlyMetaRows.map((row) => (
-                          <tr key={row.indicator}>
-                            <td>
-                              <strong>{row.indicator}</strong>
-                            </td>
-                            <td>{row.meta}</td>
-                            <td>{row.result}</td>
-                            <td>{row.delta}</td>
-                            <td>
-                              <span
-                                className={`badge ${
-                                  row.status === "Cumple"
-                                    ? "success"
-                                    : row.status === "No cumple"
-                                      ? "danger"
-                                      : "info"
-                                }`}
-                              >
-                                {row.status}
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </article>
-              </section>
-            </>
-          ) : (
+          <section className="panel">
+            <article className="card">
+              <div className="contract-order-head">
+                <div>
+                  <p className="eyebrow">Gestión activa</p>
+                  <h3>Acciones de mejora en ejecución</h3>
+                  <p className="muted">
+                    No solo se reportan indicadores: hay seguimiento para cerrar brechas y obligaciones
+                    documentales.
+                  </p>
+                </div>
+              </div>
+              <div className="table-scroll">
+                <table className="contract-matrix">
+                  <thead>
+                    <tr>
+                      <th>Acción</th>
+                      <th>Estado</th>
+                      <th>Impacto esperado</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {improvementActions.map((a) => (
+                      <tr key={a.action}>
+                        <td>
+                          <strong>{a.action}</strong>
+                        </td>
+                        <td>
+                          <span
+                            className={`badge ${
+                              a.status === "Implementado"
+                                ? "success"
+                                : a.status === "En ejecución"
+                                  ? "info"
+                                  : "warning"
+                            }`}
+                          >
+                            {a.status}
+                          </span>
+                        </td>
+                        <td>{a.impact}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </article>
+          </section>
+
+          <section className="panel">
+            <article className="card contract-exec-close">
+              <p className="eyebrow">Conclusión</p>
+              <p className="contract-exec-conclusion">{executiveConclusion}</p>
+            </article>
+          </section>
+
+          {isGte ? (
             <section className="panel">
               <article className="card">
-                <h3>Tabla de metas Orden 1</h3>
-                <p className="empty-state">
-                  La tabla formal de indicadores/fórmulas/multas está en Gran Tierra. El scorecard de arriba usa
-                  KPIs COPOWER del periodo vs umbrales de referencia (≥98%).
-                </p>
+                <div className="contract-order-head">
+                  <div>
+                    <p className="eyebrow">Anexo · Orden 1</p>
+                    <h3>Indicadores y metas contractuales (base normativa)</h3>
+                  </div>
+                  <span className="badge info">{CONTRACT_CALC_BASE.length} indicadores</span>
+                </div>
+                <div className="table-scroll">
+                  <table className="contract-matrix">
+                    <thead>
+                      <tr>
+                        <th>Indicador</th>
+                        <th>Fórmula</th>
+                        <th>Frecuencia</th>
+                        <th>Meta</th>
+                        <th>Multa si incumple</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {CONTRACT_CALC_BASE.map((row) => (
+                        <tr key={row.indicator}>
+                          <td>
+                            <strong>{row.indicator}</strong>
+                          </td>
+                          <td>{row.formula}</td>
+                          <td>{row.frequency}</td>
+                          <td>{row.threshold}</td>
+                          <td className="contract-watch">{row.consequence}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </article>
             </section>
-          )}
+          ) : null}
         </>
       )}
 

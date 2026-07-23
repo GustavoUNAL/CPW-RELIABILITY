@@ -18,7 +18,14 @@ export function loadRcaCases(): RcaCaseDetail[] {
     if (!Array.isArray(stored)) return seed;
     const byId = new Map(seed.map((c) => [c.id, c]));
     for (const c of stored) {
-      if (c?.id) byId.set(c.id, c);
+      if (!c?.id) continue;
+      const base = byId.get(c.id);
+      // Conserva PDF del seed si el guardado local no trae adjuntos.
+      byId.set(c.id, {
+        ...base,
+        ...c,
+        pdfUrls: c.pdfUrls?.length ? c.pdfUrls : base?.pdfUrls,
+      });
     }
     return [...byId.values()].sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
   } catch {

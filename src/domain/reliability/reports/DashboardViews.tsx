@@ -511,7 +511,7 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
     alerts.push({
       active: true,
       title: "RCA de fallas asociadas pendientes",
-      detail: `0/${JUNE_2026_IMPUTABLE_EVENTS.length} entregados · riesgo multa 4% adicional`,
+      detail: `2/${JUNE_2026_IMPUTABLE_EVENTS.length} entregados · restan ${JUNE_2026_IMPUTABLE_EVENTS.length - 2} · riesgo multa 4% adicional`,
     });
   }
 
