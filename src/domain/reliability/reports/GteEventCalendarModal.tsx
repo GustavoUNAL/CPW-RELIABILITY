@@ -4,7 +4,7 @@ import type { EnrichedEvent } from "../events/eventLogUtils";
 import { buildGteJuneRcaCases, findRcaCasesForEvent, type RcaCaseDetail } from "./gteJuneRcaCases";
 import type { RcaEventDraft } from "./rcaCaseStore";
 
-export type DayTrafficLevel = "ok" | "warn" | "risk" | "empty";
+export type DayTrafficLevel = "ok" | "warn" | "risk";
 
 export type DayBucket = {
   date: string;
@@ -43,7 +43,8 @@ function isoDate(year: number, monthIndex: number, day: number) {
 }
 
 function dayLevel(events: EnrichedEvent[]): DayTrafficLevel {
-  if (events.length === 0) return "empty";
+  // Sin eventos = día operativo (verde): no hubo fallas ni incidencias registradas.
+  if (events.length === 0) return "ok";
   if (events.some((e) => e.eventType === "Falla")) return "risk";
   if (events.some((e) => e.eventType === "Causa comun" || (e.downtimeHours ?? 0) > 0)) return "warn";
   return "ok";
@@ -52,8 +53,7 @@ function dayLevel(events: EnrichedEvent[]): DayTrafficLevel {
 function levelLabel(level: DayTrafficLevel) {
   if (level === "risk") return "Falla";
   if (level === "warn") return "Atención";
-  if (level === "ok") return "Operativo";
-  return "Sin eventos";
+  return "Operativo";
 }
 
 /** Eventos elegibles para abrir un RCA desde el calendario. */
@@ -69,9 +69,102 @@ function rcasForEvent(event: EnrichedEvent, cases: RcaCaseDetail[]): RcaCaseDeta
   return findRcaCasesForEvent(event.date, event.equipment, cases);
 }
 
+function DayDetailBody({
+  selected,
+  rcaCases,
+  onCreateRcaFromEvent,
+  onOpenRca,
+  onCreateRca,
+  canNavigateRca,
+}: {
+  selected: DayBucket;
+  rcaCases: RcaCaseDetail[];
+  onCreateRcaFromEvent?: (draft: RcaEventDraft) => void;
+  onOpenRca: (rcaId?: string) => void;
+  onCreateRca: (event: EnrichedEvent) => void;
+  canNavigateRca: boolean;
+}) {
+  return (
+    <>
+      <h4>
+        {selected.date}
+        <span className={`ev-cal-chip ev-cal-chip--${selected.level}`}>{levelLabel(selected.level)}</span>
+      </h4>
+      <p className="muted">
+        {selected.events.length} evento(s) · {selected.failures} falla(s) · {selected.downtimeHours.toFixed(1)} h
+      </p>
+      {selected.events.length === 0 ? (
+        <p className="muted">Día operativo · sin registros en la bitácora.</p>
+      ) : (
+        <ul className="ev-cal-event-list">
+          {[...selected.events]
+            .sort((a, b) => {
+              const rank = (e: EnrichedEvent) =>
+                e.eventType === "Falla" ? 0 : e.eventType === "Causa comun" ? 1 : isRcaEligibleEvent(e) ? 2 : 3;
+              return rank(a) - rank(b) || a.equipment.localeCompare(b.equipment);
+            })
+            .map((e) => {
+              const rcas = rcasForEvent(e, rcaCases);
+              const canCreate = Boolean(onCreateRcaFromEvent) && isRcaEligibleEvent(e);
+              return (
+                <li key={e.id}>
+                  <div className="ev-cal-event-top">
+                    <strong>{e.equipment}</strong>
+                    <span
+                      className={
+                        e.eventType === "Falla"
+                          ? "badge danger"
+                          : e.eventType === "Causa comun"
+                            ? "badge warning"
+                            : "badge info"
+                      }
+                    >
+                      {e.eventType}
+                    </span>
+                  </div>
+                  <p>{e.cause || "Sin descripción"}</p>
+                  <small>
+                    {e.responsible} · {(e.downtimeHours ?? 0).toFixed(1)} h
+                  </small>
+                  {(rcas.length > 0 || canCreate) && (
+                    <div className="ev-cal-rca-actions">
+                      {canCreate ? (
+                        <button
+                          type="button"
+                          className="ev-rca-link ev-rca-link--create"
+                          onClick={() => onCreateRca(e)}
+                        >
+                          <FilePlus2 size={11} /> {rcas.length > 0 ? "Crear otro RCA" : "Crear RCA"}
+                        </button>
+                      ) : null}
+                      {rcas.map((rca) => (
+                        <button
+                          key={rca.id}
+                          type="button"
+                          className="ev-rca-link"
+                          onClick={() => onOpenRca(rca.id)}
+                          disabled={!canNavigateRca}
+                          title={`${rca.eventLabel} · ${rca.priority} · ${rca.status}`}
+                        >
+                          {rca.id} <ExternalLink size={11} />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </li>
+              );
+            })}
+        </ul>
+      )}
+    </>
+  );
+}
+
 type Props = {
-  open: boolean;
-  onClose: () => void;
+  /** `inline` = panel embebido junto a indicadores; `modal` = overlay. */
+  variant?: "modal" | "inline";
+  open?: boolean;
+  onClose?: () => void;
   month: string;
   monthLabel: string;
   year?: number;
@@ -83,7 +176,8 @@ type Props = {
 };
 
 export function GteEventCalendarModal({
-  open,
+  variant = "modal",
+  open = true,
   onClose,
   month,
   monthLabel,
@@ -94,16 +188,21 @@ export function GteEventCalendarModal({
   rcaCases: rcaCasesProp,
   onCreateRcaFromEvent,
 }: Props) {
+  const inline = variant === "inline";
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const rcaCases = rcaCasesProp ?? buildGteJuneRcaCases();
 
+  const closeDayPopup = () => setSelectedDate(null);
+
   const openRca = (rcaId?: string) => {
-    onClose();
+    closeDayPopup();
+    onClose?.();
     onNavigateToRca?.(rcaId);
   };
 
   const createRca = (event: EnrichedEvent) => {
-    onClose();
+    closeDayPopup();
+    onClose?.();
     onCreateRcaFromEvent?.({
       date: event.date,
       equipment: event.equipment,
@@ -130,7 +229,6 @@ export function GteEventCalendarModal({
     let risk = 0;
     let warn = 0;
     let ok = 0;
-    let empty = 0;
 
     for (let d = 1; d <= daysInMonth; d += 1) {
       const date = isoDate(year, monthIndex, d);
@@ -138,8 +236,7 @@ export function GteEventCalendarModal({
       const level = dayLevel(dayEvents);
       if (level === "risk") risk += 1;
       else if (level === "warn") warn += 1;
-      else if (level === "ok") ok += 1;
-      else empty += 1;
+      else ok += 1;
 
       built.push({
         date,
@@ -156,12 +253,12 @@ export function GteEventCalendarModal({
     return {
       days: built,
       leadingBlanks: leading,
-      summary: { risk, warn, ok, empty, totalEvents: events.length },
+      summary: { risk, warn, ok, totalEvents: events.length },
     };
   }, [events, month, year]);
 
   useEffect(() => {
-    if (!open) return;
+    if (inline || !open || !onClose) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
@@ -172,159 +269,150 @@ export function GteEventCalendarModal({
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prev;
     };
-  }, [open, onClose]);
+  }, [inline, open, onClose]);
 
   useEffect(() => {
-    if (!open) setSelectedDate(null);
-  }, [open, month]);
+    if (!selectedDate) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeDayPopup();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [selectedDate]);
 
-  if (!open) return null;
+  useEffect(() => {
+    setSelectedDate(null);
+  }, [month]);
+
+  if (!inline && !open) return null;
 
   const selected = days.find((d) => d.date === selectedDate) ?? null;
 
-  return (
-    <div className="modal-overlay ev-cal-overlay" role="dialog" aria-modal="true" onClick={onClose}>
-      <article className="modal-card modal-card--xl ev-cal-modal" onClick={(e) => e.stopPropagation()}>
-        <header className="modal-header">
-          <div>
-            <p className="eyebrow">Semáforo de eventos · {sourceLabel}</p>
-            <h3>📅 Calendario · {monthLabel} {year}</h3>
+  const dayPopup =
+    selected != null ? (
+      <div
+        className="modal-overlay ev-cal-day-overlay"
+        role="dialog"
+        aria-modal="true"
+        aria-label={`Detalle del día ${selected.date}`}
+        onClick={closeDayPopup}
+      >
+        <article className="modal-card ev-cal-day-popup" onClick={(e) => e.stopPropagation()}>
+          <header className="modal-header">
+            <div>
+              <p className="eyebrow">Semáforo de eventos</p>
+              <h3>Detalle del día</h3>
+            </div>
+            <button type="button" className="open-popup-btn" onClick={closeDayPopup}>
+              <X size={16} /> Cerrar
+            </button>
+          </header>
+          <div className="ev-cal-detail ev-cal-detail--popup">
+            <DayDetailBody
+              selected={selected}
+              rcaCases={rcaCases}
+              onCreateRcaFromEvent={onCreateRcaFromEvent}
+              onOpenRca={openRca}
+              onCreateRca={createRca}
+              canNavigateRca={Boolean(onNavigateToRca)}
+            />
           </div>
-          <button type="button" className="open-popup-btn" onClick={onClose}>
-            <X size={16} /> Cerrar
-          </button>
-        </header>
+        </article>
+      </div>
+    ) : null;
 
-        <div className="ev-cal-legend" aria-label="Leyenda del semáforo">
-          <span className="ev-cal-chip ev-cal-chip--empty">Sin eventos</span>
-          <span className="ev-cal-chip ev-cal-chip--ok">Operativo</span>
-          <span className="ev-cal-chip ev-cal-chip--warn">Atención</span>
-          <span className="ev-cal-chip ev-cal-chip--risk">Falla</span>
-          <span className="ev-cal-legend-sum">
-            {summary.risk} rojo · {summary.warn} ámbar · {summary.ok} verde · {summary.totalEvents} evento(s)
-          </span>
+  const calendarGrid = (
+    <div className="ev-cal-grid" role="grid" aria-label="Calendario de eventos">
+      {WEEKDAYS.map((w) => (
+        <div key={w} className="ev-cal-weekday" role="columnheader">
+          {w}
         </div>
-
-        <div className="ev-cal-layout">
-          <div className="ev-cal-grid" role="grid" aria-label="Calendario de eventos">
-            {WEEKDAYS.map((w) => (
-              <div key={w} className="ev-cal-weekday" role="columnheader">
-                {w}
-              </div>
-            ))}
-            {Array.from({ length: leadingBlanks }, (_, i) => (
-              <div key={`blank-${i}`} className="ev-cal-day ev-cal-day--blank" aria-hidden />
-            ))}
-            {days.map((d) => {
-              const active = selectedDate === d.date;
-              const dayRcaCount = d.events.reduce((n, e) => n + rcasForEvent(e, rcaCases).length, 0);
-              return (
-                <button
-                  key={d.date}
-                  type="button"
-                  role="gridcell"
-                  className={`ev-cal-day ev-cal-day--${d.level}${active ? " is-active" : ""}${
-                    dayRcaCount > 0 ? " ev-cal-day--rca" : ""
-                  }`}
-                  onClick={() => setSelectedDate(d.date)}
-                  title={`${d.date}: ${levelLabel(d.level)} · ${d.events.length} evento(s)${
-                    dayRcaCount > 0 ? ` · ${dayRcaCount} RCA` : ""
-                  }`}
-                >
-                  <span className="ev-cal-day-num">{d.day}</span>
-                  {d.events.length > 0 ? (
-                    <span className="ev-cal-day-count">{d.events.length}</span>
-                  ) : (
-                    <span className="ev-cal-day-dot" aria-hidden />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
-          <aside className="ev-cal-detail">
-            {selected ? (
-              <>
-                <h4>
-                  {selected.date}
-                  <span className={`ev-cal-chip ev-cal-chip--${selected.level}`}>
-                    {levelLabel(selected.level)}
-                  </span>
-                </h4>
-                <p className="muted">
-                  {selected.events.length} evento(s) · {selected.failures} falla(s) ·{" "}
-                  {selected.downtimeHours.toFixed(1)} h
-                </p>
-                {selected.events.length === 0 ? (
-                  <p className="muted">Día sin registros en la bitácora.</p>
-                ) : (
-                  <ul className="ev-cal-event-list">
-                    {[...selected.events]
-                      .sort((a, b) => {
-                        const rank = (e: EnrichedEvent) =>
-                          e.eventType === "Falla" ? 0 : e.eventType === "Causa comun" ? 1 : isRcaEligibleEvent(e) ? 2 : 3;
-                        return rank(a) - rank(b) || a.equipment.localeCompare(b.equipment);
-                      })
-                      .map((e) => {
-                      const rcas = rcasForEvent(e, rcaCases);
-                      const canCreate = Boolean(onCreateRcaFromEvent) && isRcaEligibleEvent(e);
-                      return (
-                        <li key={e.id}>
-                          <div className="ev-cal-event-top">
-                            <strong>{e.equipment}</strong>
-                            <span
-                              className={
-                                e.eventType === "Falla"
-                                  ? "badge danger"
-                                  : e.eventType === "Causa comun"
-                                    ? "badge warning"
-                                    : "badge info"
-                              }
-                            >
-                              {e.eventType}
-                            </span>
-                          </div>
-                          <p>{e.cause || "Sin descripción"}</p>
-                          <small>
-                            {e.responsible} · {(e.downtimeHours ?? 0).toFixed(1)} h
-                          </small>
-                          {(rcas.length > 0 || canCreate) && (
-                            <div className="ev-cal-rca-actions">
-                              {canCreate ? (
-                                <button
-                                  type="button"
-                                  className="ev-rca-link ev-rca-link--create"
-                                  onClick={() => createRca(e)}
-                                >
-                                  <FilePlus2 size={11} /> {rcas.length > 0 ? "Crear otro RCA" : "Crear RCA"}
-                                </button>
-                              ) : null}
-                              {rcas.map((rca) => (
-                                <button
-                                  key={rca.id}
-                                  type="button"
-                                  className="ev-rca-link"
-                                  onClick={() => openRca(rca.id)}
-                                  disabled={!onNavigateToRca}
-                                  title={`${rca.eventLabel} · ${rca.priority} · ${rca.status}`}
-                                >
-                                  {rca.id} <ExternalLink size={11} />
-                                </button>
-                              ))}
-                            </div>
-                          )}
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
-              </>
+      ))}
+      {Array.from({ length: leadingBlanks }, (_, i) => (
+        <div key={`blank-${i}`} className="ev-cal-day ev-cal-day--blank" aria-hidden />
+      ))}
+      {days.map((d) => {
+        const active = selectedDate === d.date;
+        const dayRcaCount = d.events.reduce((n, e) => n + rcasForEvent(e, rcaCases).length, 0);
+        return (
+          <button
+            key={d.date}
+            type="button"
+            role="gridcell"
+            className={`ev-cal-day ev-cal-day--${d.level}${active ? " is-active" : ""}${
+              dayRcaCount > 0 ? " ev-cal-day--rca" : ""
+            }`}
+            onClick={() => setSelectedDate(d.date)}
+            title={`${d.date}: ${levelLabel(d.level)} · ${d.events.length} evento(s)${
+              dayRcaCount > 0 ? ` · ${dayRcaCount} RCA` : ""
+            }`}
+          >
+            <span className="ev-cal-day-num">{d.day}</span>
+            {d.events.length > 0 ? (
+              <span className="ev-cal-day-count">{d.events.length}</span>
             ) : (
-              <p className="muted ev-cal-hint">Seleccione un día para ver el detalle del semáforo.</p>
+              <span className="ev-cal-day-dot" aria-hidden />
             )}
-          </aside>
-        </div>
-      </article>
+          </button>
+        );
+      })}
     </div>
+  );
+
+  const legend = (
+    <div className="ev-cal-legend" aria-label="Leyenda del semáforo">
+      <span className="ev-cal-chip ev-cal-chip--ok">Operativo</span>
+      <span className="ev-cal-chip ev-cal-chip--warn">Atención</span>
+      <span className="ev-cal-chip ev-cal-chip--risk">Falla</span>
+    </div>
+  );
+
+  if (inline) {
+    return (
+      <>
+        <section className="ev-cal-panel" aria-label={`Calendario semáforo ${sourceLabel}`}>
+          <header className="ev-cal-panel-head">
+            <div>
+              <p className="eyebrow">Semáforo de eventos</p>
+              <h3>Calendario · {monthLabel}</h3>
+            </div>
+            <p className="ev-cal-legend-sum">
+              {summary.risk} rojo · {summary.warn} ámbar · {summary.ok} verde
+              <br />
+              {summary.totalEvents} evento(s)
+            </p>
+          </header>
+          {legend}
+          <div className="ev-cal-layout ev-cal-layout--inline">{calendarGrid}</div>
+        </section>
+        {dayPopup}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div className="modal-overlay ev-cal-overlay" role="dialog" aria-modal="true" onClick={onClose}>
+        <article className="modal-card modal-card--xl ev-cal-modal" onClick={(e) => e.stopPropagation()}>
+          <header className="modal-header">
+            <div>
+              <p className="eyebrow">Semáforo de eventos</p>
+              <h3>📅 Calendario · {monthLabel} {year}</h3>
+            </div>
+            {onClose ? (
+              <button type="button" className="open-popup-btn" onClick={onClose}>
+                <X size={16} /> Cerrar
+              </button>
+            ) : null}
+          </header>
+          {legend}
+          <p className="ev-cal-legend-sum" style={{ margin: "0 0 0.65rem" }}>
+            {summary.risk} rojo · {summary.warn} ámbar · {summary.ok} verde · {summary.totalEvents} evento(s)
+          </p>
+          <div className="ev-cal-layout ev-cal-layout--modal-only">{calendarGrid}</div>
+        </article>
+      </div>
+      {dayPopup}
+    </>
   );
 }

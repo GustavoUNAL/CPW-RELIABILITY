@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { AlertTriangle, Calendar, Clock, ExternalLink, FilePlus2, Filter, Search, X } from "lucide-react";
 import {
   computeEventStats,
@@ -48,29 +48,66 @@ function respBadgeClass(resp: EnrichedEvent["responsible"]) {
   return "badge info";
 }
 
-function StatCard({ label, value, hint }: { label: string; value: string; hint?: string }) {
+function StatCard({
+  label,
+  value,
+  legend,
+  hint,
+}: {
+  label: string;
+  value: string;
+  legend: string;
+  hint?: string;
+}) {
   return (
     <article className="field-stat-card ev-stat-card">
       <span className="field-stat-label">{label}</span>
       <strong className="field-stat-value">{value}</strong>
-      {hint ? <small>{hint}</small> : null}
+      {hint ? <small className="ev-stat-hint">{hint}</small> : null}
+      <small className="ev-stat-legend">{legend}</small>
     </article>
   );
 }
 
-function EventStatsRow({ events, label }: { events: EnrichedEvent[]; label: string }) {
+function EventStatsRow({ events, label }: { events: EnrichedEvent[]; label?: string }) {
   const s = computeEventStats(events);
   const contractual = events.filter(isContractualFailure).length;
   return (
     <div className="ev-stats-block">
-      <p className="ev-stats-source">{label}</p>
+      {label ? <p className="ev-stats-source">{label}</p> : null}
       <div className="field-stat-grid field-stat-grid--compact">
-        <StatCard label="Registros" value={String(s.total)} />
-        <StatCard label="Fallas" value={String(s.failures)} hint={`${contractual} asociadas a COPOWER`} />
-        <StatCard label="Operativos" value={String(s.operativo)} />
-        <StatCard label="Horas FS" value={hours(s.downtimeHours)} />
-        <StatCard label="PF contr" value={hours(s.pfContrHours)} hint="Notas GTE" />
-        <StatCard label="PF cli" value={hours(s.pfCliHours)} />
+        <StatCard
+          label="Registros"
+          value={String(s.total)}
+          legend="Total de eventos de la bitácora con los filtros activos."
+        />
+        <StatCard
+          label="Fallas"
+          value={String(s.failures)}
+          hint={`${contractual} asociadas a COPOWER`}
+          legend="Eventos tipo Falla. El subtítulo cuenta las imputables a COPOWER."
+        />
+        <StatCard
+          label="Operativos"
+          value={String(s.operativo)}
+          legend="Eventos operativos o de causa común (sin falla tipificada)."
+        />
+        <StatCard
+          label="Horas FS"
+          value={hours(s.downtimeHours)}
+          legend="Horas fuera de servicio acumuladas en los eventos filtrados."
+        />
+        <StatCard
+          label="PF contr"
+          value={hours(s.pfContrHours)}
+          hint="Notas GTE"
+          legend="Horas de pérdida de generación imputables al contratista (PF_contr)."
+        />
+        <StatCard
+          label="PF cli"
+          value={hours(s.pfCliHours)}
+          legend="Horas de pérdida de generación imputables al cliente (PF_cli)."
+        />
       </div>
     </div>
   );
@@ -339,6 +376,7 @@ function SourceColumn({
   onSelect,
   onNavigateToRca,
   rcaCases,
+  calendar,
 }: {
   source: ReportKey;
   events: EnrichedEvent[];
@@ -347,23 +385,16 @@ function SourceColumn({
   onSelect: (e: EnrichedEvent) => void;
   onNavigateToRca?: (rcaId?: string) => void;
   rcaCases: RcaCaseDetail[];
+  calendar?: {
+    month: string;
+    monthLabel: string;
+    sourceLabel: string;
+    onCreateRcaFromEvent?: (draft: RcaEventDraft) => void;
+  };
 }) {
   const filtered = useMemo(() => filterEvents(events, filters), [events, filters]);
   const label = source === "gran_tierra" ? "Gran Tierra Energy" : "COPOWER · Reporte diario";
   const badge = source === "gran_tierra" ? "gte" : "cpw";
-
-  const rcaLinked = useMemo(() => {
-    const ids = new Set<string>();
-    let failureHits = 0;
-    for (const e of filtered) {
-      if (!isRcaEligibleEvent(e)) continue;
-      const hits = relatedRcas(e, rcaCases);
-      if (hits.length === 0) continue;
-      failureHits += 1;
-      hits.forEach((r) => ids.add(r.id));
-    }
-    return { failureHits, rcaIds: [...ids].sort() };
-  }, [filtered, rcaCases]);
 
   return (
     <section className={`ev-source-column ev-source-column--${badge}`}>
@@ -374,20 +405,33 @@ function SourceColumn({
         </div>
         <span className={`source-badge ${badge}`}>{badge.toUpperCase()}</span>
       </header>
-      <EventStatsRow events={filtered} label="Indicadores filtrados" />
-      {source === "gran_tierra" && rcaLinked.rcaIds.length > 0 ? (
-        <div className="ev-rca-summary">
-          <p>
-            <strong>{rcaLinked.failureHits}</strong> falla(s) con RCA formal ·{" "}
-            {rcaLinked.rcaIds.join(", ")}
-          </p>
-          {onNavigateToRca ? (
-            <button type="button" className="ev-rca-link" onClick={() => onNavigateToRca()}>
-              Ver todos en RCA <ExternalLink size={12} />
-            </button>
-          ) : null}
-        </div>
-      ) : null}
+      <div className={calendar ? "ev-stats-cal-row" : undefined}>
+        {calendar ? (
+          <article className="ev-stats-panel">
+            <header className="ev-cal-panel-head">
+              <div>
+                <p className="eyebrow">Indicadores del periodo</p>
+                <h3>Resumen {calendar.monthLabel}</h3>
+              </div>
+            </header>
+            <EventStatsRow events={filtered} />
+          </article>
+        ) : (
+          <EventStatsRow events={filtered} label="Indicadores filtrados" />
+        )}
+        {calendar ? (
+          <GteEventCalendarModal
+            variant="inline"
+            month={calendar.month}
+            monthLabel={calendar.monthLabel}
+            events={events}
+            sourceLabel={calendar.sourceLabel}
+            onNavigateToRca={onNavigateToRca}
+            rcaCases={rcaCases}
+            onCreateRcaFromEvent={calendar.onCreateRcaFromEvent}
+          />
+        ) : null}
+      </div>
       <EventList
         events={filtered}
         selectedId={selectedId}
@@ -421,11 +465,6 @@ export function FailureEventsView({
   });
   const [selected, setSelected] = useState<EnrichedEvent | null>(null);
   const showCalendar = mode === "gte" || mode === "copower";
-  const [calendarOpen, setCalendarOpen] = useState(mode === "gte");
-
-  useEffect(() => {
-    if (mode === "gte") setCalendarOpen(true);
-  }, [mode, month]);
 
   const cpwSnap = getSnap("copower", month);
   const gteSnap = getSnap("gran_tierra", month);
@@ -435,8 +474,14 @@ export function FailureEventsView({
 
   const showCpw = mode === "dual" || mode === "copower";
   const showGte = mode === "dual" || mode === "gte";
-  const calendarEvents = mode === "copower" ? cpwEvents : gteEvents;
-  const calendarSource = mode === "copower" ? "COPOWER" : "Gran Tierra";
+  const calendarProps = showCalendar
+    ? {
+        month,
+        monthLabel,
+        sourceLabel: mode === "copower" ? "COPOWER" : "Gran Tierra",
+        onCreateRcaFromEvent,
+      }
+    : undefined;
 
   return (
     <div className="ev-module exec-dashboard">
@@ -455,26 +500,7 @@ export function FailureEventsView({
                 : "Gran Tierra Energy · Excel Data Soporte / informe mensual"}
           </p>
         </div>
-        {showCalendar ? (
-          <button type="button" className="open-popup-btn" onClick={() => setCalendarOpen(true)}>
-            📅 Semáforo calendario
-          </button>
-        ) : null}
       </header>
-
-      {showCalendar ? (
-        <GteEventCalendarModal
-          open={calendarOpen}
-          onClose={() => setCalendarOpen(false)}
-          month={month}
-          monthLabel={monthLabel}
-          events={calendarEvents}
-          sourceLabel={calendarSource}
-          onNavigateToRca={onNavigateToRca}
-          rcaCases={rcaCases}
-          onCreateRcaFromEvent={onCreateRcaFromEvent}
-        />
-      ) : null}
 
       {mode === "dual" ? (
         <div className="ev-dual-summary">
@@ -537,6 +563,7 @@ export function FailureEventsView({
               onSelect={setSelected}
               onNavigateToRca={onNavigateToRca}
               rcaCases={rcaCases}
+              calendar={mode === "copower" ? calendarProps : undefined}
             />
           ) : null}
           {showGte ? (
@@ -548,6 +575,7 @@ export function FailureEventsView({
               onSelect={setSelected}
               onNavigateToRca={onNavigateToRca}
               rcaCases={rcaCases}
+              calendar={mode === "gte" ? calendarProps : undefined}
             />
           ) : null}
         </div>
