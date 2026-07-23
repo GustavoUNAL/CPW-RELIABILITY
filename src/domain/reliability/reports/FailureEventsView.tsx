@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { AlertTriangle, Calendar, Clock, Filter, Search, X } from "lucide-react";
+import { AlertTriangle, Calendar, Clock, ExternalLink, Filter, Search, X } from "lucide-react";
 import {
   computeEventStats,
   enrichEventLog,
@@ -10,6 +10,7 @@ import {
 } from "../events/eventLogUtils";
 import { COPOWER_MONTHLY_DATA, type CopowerMonthKey } from "./copowerMonthly";
 import { GRAN_TIERRA_MONTHLY_DATA, type GranTierraMonthKey } from "./granTierraMonthly";
+import { findRcaCasesForEvent, type RcaCaseDetail } from "./gteJuneRcaCases";
 import { JUNE_2026_IMPUTABLE_EVENTS } from "./juneImputableEvents";
 import { GteEventCalendarModal } from "./GteEventCalendarModal";
 import type { ReportKey } from "../types";
@@ -24,6 +25,7 @@ type Props = {
   monthLabel: string;
   mode?: ViewMode;
   failuresOnlyDefault?: boolean;
+  onNavigateToRca?: (rcaId?: string) => void;
 };
 
 function getSnap(report: ReportKey, month: string) {
@@ -82,8 +84,22 @@ function findImputableMatch(event: EnrichedEvent) {
   );
 }
 
-function EventDetail({ event, onClose }: { event: EnrichedEvent; onClose: () => void }) {
+function relatedRcas(event: EnrichedEvent): RcaCaseDetail[] {
+  if (event.eventType !== "Falla" && event.eventType !== "Causa comun") return [];
+  return findRcaCasesForEvent(event.date, event.equipment);
+}
+
+function EventDetail({
+  event,
+  onClose,
+  onNavigateToRca,
+}: {
+  event: EnrichedEvent;
+  onClose: () => void;
+  onNavigateToRca?: (rcaId?: string) => void;
+}) {
   const imputable = findImputableMatch(event);
+  const rcas = relatedRcas(event);
 
   return (
     <aside className="ev-detail-panel">
@@ -157,6 +173,50 @@ function EventDetail({ event, onClose }: { event: EnrichedEvent; onClose: () => 
         </section>
       ) : null}
 
+      {rcas.length > 0 ? (
+        <section className="ev-detail-section ev-detail-rca">
+          <h4>RCA relacionados ({rcas.length})</h4>
+          <ul className="ev-rca-list">
+            {rcas.map((rca) => (
+              <li key={rca.id}>
+                <div className="ev-rca-row">
+                  <div>
+                    <strong>{rca.id}</strong>
+                    <span>
+                      {rca.eventLabel} · {rca.priority} · {rca.status}
+                    </span>
+                  </div>
+                  {onNavigateToRca ? (
+                    <button
+                      type="button"
+                      className="ev-rca-link"
+                      onClick={() => onNavigateToRca(rca.id)}
+                    >
+                      Ver en RCA <ExternalLink size={12} />
+                    </button>
+                  ) : null}
+                </div>
+              </li>
+            ))}
+          </ul>
+          {onNavigateToRca ? (
+            <button type="button" className="ev-rca-link ev-rca-link--all" onClick={() => onNavigateToRca()}>
+              Abrir sección RCA (Análisis) <ExternalLink size={12} />
+            </button>
+          ) : null}
+        </section>
+      ) : event.eventType === "Falla" ? (
+        <section className="ev-detail-section ev-detail-rca ev-detail-rca--empty">
+          <h4>RCA relacionados</h4>
+          <p>Sin RCA formal vinculado (solo se documentan fallas de mayor impacto / recurrencia).</p>
+          {onNavigateToRca ? (
+            <button type="button" className="ev-rca-link ev-rca-link--all" onClick={() => onNavigateToRca()}>
+              Ir a sección RCA <ExternalLink size={12} />
+            </button>
+          ) : null}
+        </section>
+      ) : null}
+
       {imputable ? (
         <section className="ev-detail-section ev-detail-imputable">
           <h4>Evento asociado a COPOWER verificado (junio)</h4>
@@ -189,30 +249,36 @@ function EventList({
 
   return (
     <ul className="ev-list">
-      {events.map((e) => (
-        <li key={e.id}>
-          <button
-            type="button"
-            className={`ev-list-item${selectedId === e.id ? " active" : ""}`}
-            onClick={() => onSelect(e)}
-          >
-            <div className="ev-list-item-head">
-              <strong>{e.equipment}</strong>
-              <span className={typeBadgeClass(e.eventType)}>{e.eventType}</span>
-            </div>
-            <div className="ev-list-item-meta">
-              <span>
-                <Calendar size={12} /> {e.date}
-              </span>
-              <span>
-                <Clock size={12} /> {hours(e.downtimeHours)}
-              </span>
-              <span className={respBadgeClass(e.responsible)}>{e.responsible}</span>
-            </div>
-            <p className="ev-list-item-cause">{e.cause}</p>
-          </button>
-        </li>
-      ))}
+      {events.map((e) => {
+        const rcas = relatedRcas(e);
+        return (
+          <li key={e.id}>
+            <button
+              type="button"
+              className={`ev-list-item${selectedId === e.id ? " active" : ""}`}
+              onClick={() => onSelect(e)}
+            >
+              <div className="ev-list-item-head">
+                <strong>{e.equipment}</strong>
+                <span className={typeBadgeClass(e.eventType)}>{e.eventType}</span>
+              </div>
+              <div className="ev-list-item-meta">
+                <span>
+                  <Calendar size={12} /> {e.date}
+                </span>
+                <span>
+                  <Clock size={12} /> {hours(e.downtimeHours)}
+                </span>
+                <span className={respBadgeClass(e.responsible)}>{e.responsible}</span>
+                {rcas.length > 0 ? (
+                  <span className="badge info ev-rca-badge">{rcas.map((r) => r.id).join(" · ")}</span>
+                ) : null}
+              </div>
+              <p className="ev-list-item-cause">{e.cause}</p>
+            </button>
+          </li>
+        );
+      })}
     </ul>
   );
 }
@@ -223,16 +289,31 @@ function SourceColumn({
   filters,
   selectedId,
   onSelect,
+  onNavigateToRca,
 }: {
   source: ReportKey;
   events: EnrichedEvent[];
   filters: EventFilters;
   selectedId: string | null;
   onSelect: (e: EnrichedEvent) => void;
+  onNavigateToRca?: (rcaId?: string) => void;
 }) {
   const filtered = useMemo(() => filterEvents(events, filters), [events, filters]);
   const label = source === "gran_tierra" ? "Gran Tierra Energy" : "COPOWER · Reporte diario";
   const badge = source === "gran_tierra" ? "gte" : "cpw";
+
+  const rcaLinked = useMemo(() => {
+    const ids = new Set<string>();
+    let failureHits = 0;
+    for (const e of filtered) {
+      if (e.eventType !== "Falla" && e.eventType !== "Causa comun") continue;
+      const hits = relatedRcas(e);
+      if (hits.length === 0) continue;
+      failureHits += 1;
+      hits.forEach((r) => ids.add(r.id));
+    }
+    return { failureHits, rcaIds: [...ids].sort() };
+  }, [filtered]);
 
   return (
     <section className={`ev-source-column ev-source-column--${badge}`}>
@@ -244,6 +325,19 @@ function SourceColumn({
         <span className={`source-badge ${badge}`}>{badge.toUpperCase()}</span>
       </header>
       <EventStatsRow events={filtered} label="Indicadores filtrados" />
+      {source === "gran_tierra" && rcaLinked.rcaIds.length > 0 ? (
+        <div className="ev-rca-summary">
+          <p>
+            <strong>{rcaLinked.failureHits}</strong> falla(s) con RCA formal ·{" "}
+            {rcaLinked.rcaIds.join(", ")}
+          </p>
+          {onNavigateToRca ? (
+            <button type="button" className="ev-rca-link" onClick={() => onNavigateToRca()}>
+              Ver todos en RCA <ExternalLink size={12} />
+            </button>
+          ) : null}
+        </div>
+      ) : null}
       <EventList
         events={filtered}
         selectedId={selectedId}
@@ -258,7 +352,13 @@ function SourceColumn({
   );
 }
 
-export function FailureEventsView({ month, monthLabel, mode = "dual", failuresOnlyDefault = false }: Props) {
+export function FailureEventsView({
+  month,
+  monthLabel,
+  mode = "dual",
+  failuresOnlyDefault = false,
+  onNavigateToRca,
+}: Props) {
   const [filters, setFilters] = useState<EventFilters>({
     type: "all",
     responsible: "all",
@@ -378,6 +478,7 @@ export function FailureEventsView({ month, monthLabel, mode = "dual", failuresOn
               filters={filters}
               selectedId={selected?.id ?? null}
               onSelect={setSelected}
+              onNavigateToRca={onNavigateToRca}
             />
           ) : null}
           {showGte ? (
@@ -387,11 +488,18 @@ export function FailureEventsView({ month, monthLabel, mode = "dual", failuresOn
               filters={filters}
               selectedId={selected?.id ?? null}
               onSelect={setSelected}
+              onNavigateToRca={onNavigateToRca}
             />
           ) : null}
         </div>
 
-        {selected ? <EventDetail event={selected} onClose={() => setSelected(null)} /> : null}
+        {selected ? (
+          <EventDetail
+            event={selected}
+            onClose={() => setSelected(null)}
+            onNavigateToRca={onNavigateToRca}
+          />
+        ) : null}
       </div>
 
       <aside className="exec-source-note">

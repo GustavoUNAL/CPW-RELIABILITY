@@ -110,12 +110,20 @@ function App() {
   const activeLeafLabel =
     (activeModule ? findLeafLabel(activeModule.children, activeLeafId) : null) ?? activeLeafId;
 
+  const [focusRcaId, setFocusRcaId] = useState<string | null>(null);
+
   const selectLeaf = (page: PageKey, leafId: string) => {
     setActivePage(page);
     setActiveLeafId(leafId);
     setOpenModules((prev) => ({ ...prev, [page]: true }));
     setNavOpen(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const navigateToRca = (rcaId?: string) => {
+    setFocusRcaId(rcaId ?? null);
+    setOpenGroups((prev) => ({ ...prev, "conf-analisis": true }));
+    selectLeaf("confiabilidad", "an-rca-gte");
   };
 
   const selectModule = (page: PageKey) => {
@@ -336,6 +344,9 @@ function App() {
           leafId={activeLeafId}
           month={selectedMonth}
           monthLabel={monthLabel}
+          onNavigateToRca={navigateToRca}
+          focusRcaId={focusRcaId}
+          onFocusRcaConsumed={() => setFocusRcaId(null)}
         />
       </main>
     </div>

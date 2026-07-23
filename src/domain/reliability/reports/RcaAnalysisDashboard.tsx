@@ -1,5 +1,5 @@
 import { AlertTriangle, CheckCircle2, FileSearch, ShieldAlert } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -14,6 +14,8 @@ import { buildGteJuneRcaCases, type RcaCaseDetail, type RcaPriority } from "./gt
 
 type Props = {
   monthLabel: string;
+  focusRcaId?: string | null;
+  onFocusRcaConsumed?: () => void;
 };
 
 const PRIORITY_COLOR: Record<RcaPriority, string> = {
@@ -23,9 +25,17 @@ const PRIORITY_COLOR: Record<RcaPriority, string> = {
   Baja: "#22c55e",
 };
 
-export function RcaAnalysisDashboard({ monthLabel }: Props) {
+export function RcaAnalysisDashboard({ monthLabel, focusRcaId, onFocusRcaConsumed }: Props) {
   const [cases, setCases] = useState<RcaCaseDetail[]>(() => buildGteJuneRcaCases());
   const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!focusRcaId) return;
+    if (cases.some((c) => c.id === focusRcaId)) {
+      setSelectedId(focusRcaId);
+    }
+    onFocusRcaConsumed?.();
+  }, [focusRcaId, cases, onFocusRcaConsumed]);
 
   const selected = cases.find((c) => c.id === selectedId) ?? null;
 

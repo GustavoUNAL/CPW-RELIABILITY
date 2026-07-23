@@ -51,6 +51,9 @@ type Props = {
   leafId: string;
   month: string;
   monthLabel: string;
+  onNavigateToRca?: (rcaId?: string) => void;
+  focusRcaId?: string | null;
+  onFocusRcaConsumed?: () => void;
 };
 
 const pct = (v: number | null | undefined, d = 2) =>
@@ -70,12 +73,18 @@ export function DualCompare({
   month,
   monthLabel,
   body,
+  onNavigateToRca,
+  focusRcaId,
+  onFocusRcaConsumed,
 }: {
   page: PageKey;
   leafId: string;
   month: string;
   monthLabel: string;
   body?: (report: ReportKey) => ReactNode;
+  onNavigateToRca?: (rcaId?: string) => void;
+  focusRcaId?: string | null;
+  onFocusRcaConsumed?: () => void;
 }) {
   return (
     <div className="dual-source-wrap dual-source-wrap--fit">
@@ -93,7 +102,16 @@ export function DualCompare({
               {body ? (
                 body(report)
               ) : (
-                <PlatformBody page={page} leafId={leafId} month={month} monthLabel={monthLabel} report={report} />
+                <PlatformBody
+                  page={page}
+                  leafId={leafId}
+                  month={month}
+                  monthLabel={monthLabel}
+                  report={report}
+                  onNavigateToRca={onNavigateToRca}
+                  focusRcaId={focusRcaId}
+                  onFocusRcaConsumed={onFocusRcaConsumed}
+                />
               )}
             </div>
           </section>
@@ -294,6 +312,9 @@ function PlatformBody({
   month,
   monthLabel,
   report,
+  onNavigateToRca,
+  focusRcaId,
+  onFocusRcaConsumed,
 }: Props & { report: ReportKey }) {
   const cpwMonth = (COPOWER_MONTHLY_DATA[month as CopowerMonthKey] ? month : "Jun") as CopowerMonthKey;
   const gteMonthOk = Boolean(GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey]);
@@ -366,35 +387,61 @@ function PlatformBody({
       const mode = report === "gran_tierra" ? "gte" : "copower";
       return (
         <ScreenShell report={report} headless>
-          <FailureEventsView month={month} monthLabel={monthLabel} mode={mode} />
+          <FailureEventsView
+            month={month}
+            monthLabel={monthLabel}
+            mode={mode}
+            onNavigateToRca={onNavigateToRca}
+          />
         </ScreenShell>
       );
     }
     if (leafId === "bd-fallas") {
       return (
         <ScreenShell report="dual" headless>
-          <FailureEventsView month={month} monthLabel={monthLabel} mode="dual" />
+          <FailureEventsView
+            month={month}
+            monthLabel={monthLabel}
+            mode="dual"
+            onNavigateToRca={onNavigateToRca}
+          />
         </ScreenShell>
       );
     }
     if (leafId === "bd-ev-copower" || leafId === "proc-eventos") {
       return (
         <ScreenShell report="copower" headless>
-          <FailureEventsView month={month} monthLabel={monthLabel} mode="copower" />
+          <FailureEventsView
+            month={month}
+            monthLabel={monthLabel}
+            mode="copower"
+            onNavigateToRca={onNavigateToRca}
+          />
         </ScreenShell>
       );
     }
     if (leafId === "bd-ev-gte") {
       return (
         <ScreenShell report="gran_tierra" headless>
-          <FailureEventsView month={month} monthLabel={monthLabel} mode="gte" />
+          <FailureEventsView
+            month={month}
+            monthLabel={monthLabel}
+            mode="gte"
+            onNavigateToRca={onNavigateToRca}
+          />
         </ScreenShell>
       );
     }
     if (leafId === "an-pareto" || leafId === "an-tendencias-fallas") {
       return (
         <ScreenShell report="dual" headless>
-          <FailureEventsView month={month} monthLabel={monthLabel} mode="dual" failuresOnlyDefault />
+          <FailureEventsView
+            month={month}
+            monthLabel={monthLabel}
+            mode="dual"
+            failuresOnlyDefault
+            onNavigateToRca={onNavigateToRca}
+          />
         </ScreenShell>
       );
     }
@@ -431,7 +478,13 @@ function PlatformBody({
       return <InterventionPlansDashboard report="gran_tierra" month={intervMonth} monthLabel={intervLabel} />;
     }
     if (leafId === "an-rca-gte" || leafId === "an-rca") {
-      return <RcaAnalysisDashboard monthLabel={month === "Jun" ? monthLabel : `${monthLabel} · RCA junio 2026`} />;
+      return (
+        <RcaAnalysisDashboard
+          monthLabel={month === "Jun" ? monthLabel : `${monthLabel} · RCA junio 2026`}
+          focusRcaId={focusRcaId}
+          onFocusRcaConsumed={onFocusRcaConsumed}
+        />
+      );
     }
     if (leafId === "proc-clasif") {
       return <FailureClassificationView month={month} monthLabel={monthLabel} />;
@@ -756,7 +809,15 @@ function PlatformBody({
   return <EmptyScreen detail="Seleccione una opción del árbol lateral." />;
 }
 
-export function PlatformContent({ page, leafId, month, monthLabel }: Props) {
+export function PlatformContent({
+  page,
+  leafId,
+  month,
+  monthLabel,
+  onNavigateToRca,
+  focusRcaId,
+  onFocusRcaConsumed,
+}: Props) {
   const ctx = resolveViewContext(page, leafId);
 
   if (leafId.startsWith("cmp-")) {
@@ -822,9 +883,30 @@ export function PlatformContent({ page, leafId, month, monthLabel }: Props) {
     !INTEGRATED_DUAL_LEAVES.has(leafId) &&
     !leafId.startsWith("cfg-campos")
   ) {
-    return <DualCompare page={page} leafId={leafId} month={month} monthLabel={monthLabel} />;
+    return (
+      <DualCompare
+        page={page}
+        leafId={leafId}
+        month={month}
+        monthLabel={monthLabel}
+        onNavigateToRca={onNavigateToRca}
+        focusRcaId={focusRcaId}
+        onFocusRcaConsumed={onFocusRcaConsumed}
+      />
+    );
   }
 
   const report = resolveReport(page, leafId);
-  return <PlatformBody page={page} leafId={leafId} month={month} monthLabel={monthLabel} report={report} />;
+  return (
+    <PlatformBody
+      page={page}
+      leafId={leafId}
+      month={month}
+      monthLabel={monthLabel}
+      report={report}
+      onNavigateToRca={onNavigateToRca}
+      focusRcaId={focusRcaId}
+      onFocusRcaConsumed={onFocusRcaConsumed}
+    />
+  );
 }

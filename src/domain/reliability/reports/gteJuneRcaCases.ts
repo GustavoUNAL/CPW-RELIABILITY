@@ -22,6 +22,23 @@ export type RcaCaseDetail = {
   closeDate: string | null;
 };
 
+function normAsset(id: string) {
+  return id.toUpperCase().replace(/[^A-Z0-9]/g, "");
+}
+
+/** Cruza un evento de bitácora con RCA formales (fecha + equipo / activos vinculados). */
+export function findRcaCasesForEvent(date: string, equipment: string): RcaCaseDetail[] {
+  const eq = normAsset(equipment);
+  if (!date || !eq) return [];
+  return buildGteJuneRcaCases().filter((rca) => {
+    if (rca.eventDate !== date) return false;
+    return rca.linkedAssets.some((asset) => {
+      const a = normAsset(asset);
+      return eq.includes(a) || a.includes(eq);
+    });
+  });
+}
+
 /** RCA de junio 2026 · Gran Tierra — solo eventos de mayor impacto / recurrencia / criticidad. */
 export function buildGteJuneRcaCases(): RcaCaseDetail[] {
   return [

@@ -259,10 +259,29 @@ function FieldHeroBanner({ field, monthLabel }: { field: FieldProfile; monthLabe
   );
 }
 
-function FleetUnitCard({ unit }: { unit: FleetUnit }) {
+type FleetLiveSnap = {
+  energiaKwh: number | null;
+  horasOperacion: number | null;
+  disp: number | null;
+  fallas: number;
+};
+
+function FleetUnitCard({ unit, live }: { unit: FleetUnit; live?: FleetLiveSnap }) {
   const fuelLabel = unit.combustible === "gas" ? "Gas" : "Diésel";
+  const avgKw = avgKwFromEnergy(live?.energiaKwh ?? null, live?.horasOperacion ?? null);
+  const loadPct =
+    avgKw != null && unit.kwNominal > 0 ? Math.min(120, (avgKw / unit.kwNominal) * 100) : null;
+  const mwh =
+    live?.energiaKwh != null && live.energiaKwh > 0
+      ? (live.energiaKwh / 1000).toFixed(1)
+      : null;
+
   return (
-    <article className={`field-fleet-unit field-fleet-unit--${unit.variant} field-fleet-unit--fuel-${unit.combustible}`}>
+    <article
+      className={`field-fleet-unit field-fleet-unit--${unit.variant} field-fleet-unit--fuel-${unit.combustible}${
+        live && live.fallas >= 2 ? " field-fleet-unit--hot" : ""
+      }`}
+    >
       <header className="field-fleet-unit-head">
         <div className="field-fleet-unit-title">
           <strong>{unit.id}</strong>
@@ -284,11 +303,38 @@ function FleetUnitCard({ unit }: { unit: FleetUnit }) {
         </div>
         {unit.deliveryVoltage ? (
           <div className="field-fleet-unit-specs--wide">
-            <dt>Entrega sistema</dt>
+            <dt>Entrega</dt>
             <dd>{unit.deliveryVoltage}</dd>
           </div>
         ) : null}
       </dl>
+      {live ? (
+        <div className="field-fleet-unit-live">
+          <div>
+            <span>Energía</span>
+            <strong>{mwh != null ? `${mwh} MWh` : "—"}</strong>
+          </div>
+          <div>
+            <span>Disp</span>
+            <strong>{pct(live.disp)}</strong>
+          </div>
+          <div>
+            <span>Carga</span>
+            <strong>{loadPct != null ? `${loadPct.toFixed(0)}%` : "—"}</strong>
+          </div>
+          <div>
+            <span>Fallas</span>
+            <strong className={live.fallas > 0 ? "field-fleet-unit-live--warn" : undefined}>
+              {live.fallas}
+            </strong>
+          </div>
+        </div>
+      ) : null}
+      {loadPct != null ? (
+        <div className="field-fleet-unit-load">
+          <CapacityBar delivered={avgKw} nominal={unit.kwNominal} />
+        </div>
+      ) : null}
     </article>
   );
 }
@@ -298,16 +344,19 @@ function FleetFamilyBlock({
   tagTone,
   subtitle,
   units,
+  liveById,
   first,
 }: {
   tag: string;
   tagTone: FleetVariant;
   subtitle: string;
   units: FleetUnit[];
+  liveById: Map<string, FleetLiveSnap>;
   first?: boolean;
 }) {
   if (units.length === 0) return null;
   const kw = units.reduce((s, u) => s + u.kwNominal, 0);
+  const energy = units.reduce((s, u) => s + (liveById.get(normId(u.id))?.energiaKwh ?? 0), 0);
   return (
     <div className={`field-fleet-family field-fleet-family--${tagTone}${first ? " field-fleet-family--first" : ""}`}>
       <header>
@@ -317,11 +366,12 @@ function FleetFamilyBlock({
         </div>
         <span className="field-fleet-family-kw">
           {units.length} und · {kw.toLocaleString("es-CO")} kW
+          {energy > 0 ? ` · ${(energy / 1000).toFixed(0)} MWh` : ""}
         </span>
       </header>
       <div className={`field-fleet-grid field-fleet-grid--${tagTone}`}>
         {units.map((u) => (
-          <FleetUnitCard key={u.id} unit={u} />
+          <FleetUnitCard key={u.id} unit={u} live={liveById.get(normId(u.id))} />
         ))}
       </div>
     </div>
@@ -331,10 +381,14 @@ function FleetFamilyBlock({
 function FleetPanel({
   fleet,
   fieldKey,
+  month,
+  monthLabel,
   compact = false,
 }: {
   fleet: FleetUnit[];
   fieldKey: FieldKey;
+  month: string;
+  monthLabel: string;
   compact?: boolean;
 }) {
   const cpw = fleet.filter((u) => u.variant === "cpw");
@@ -346,27 +400,79 @@ function FleetPanel({
   const kwInstalled = fleet.reduce((s, u) => s + u.kwNominal, 0);
   const kwGas = gasUnits.reduce((s, u) => s + u.kwNominal, 0);
   const kwDiesel = dieselUnits.reduce((s, u) => s + u.kwNominal, 0);
+  const voltagesDel = [...new Set(fleet.map((u) => u.deliveryVoltage).filter(Boolean))];
+  const voltagesGen = [...new Set(fleet.map((u) => u.voltage).filter(Boolean))];
+
+  const ops = useMemo(() => {
+    const a = getFieldOperational("copower", month, fieldKey);
+    const b = getFieldOperational("gran_tierra", month, fieldKey);
+    return a.available ? a : b;
+  }, [fieldKey, month]);
+
+  const liveById = useMemo(() => {
+    const map = new Map<string, FleetLiveSnap>();
+    for (const u of ops.units) {
+      map.set(normId(u.id), {
+        energiaKwh: u.energiaKwh,
+        horasOperacion: u.horasOperacion,
+        disp: u.disp,
+        fallas: u.fallas,
+      });
+    }
+    return map;
+  }, [ops.units]);
+
+  const topLive = useMemo(() => {
+    return [...ops.units]
+      .filter((u) => (u.energiaKwh ?? 0) > 0)
+      .sort((a, b) => (b.energiaKwh ?? 0) - (a.energiaKwh ?? 0))[0];
+  }, [ops.units]);
+
+  const genMwh =
+    ops.generationKwh != null && ops.generationKwh > 0
+      ? (ops.generationKwh / 1000).toFixed(1)
+      : null;
 
   return (
     <section className={`field-fleet-panel${compact ? " field-fleet-panel--compact" : ""}`}>
       <div className="field-section-label">
-        <Shield size={15} />
-        <span>Parque operativo · contrato</span>
+        <Zap size={15} />
+        <span>Parque de generación · {FIELD_PROFILES[fieldKey].label}</span>
         <span className="field-group-count">
-          {fleet.length} unidades · {kwInstalled.toLocaleString("es-CO")} kW
+          {fleet.length} und · {kwInstalled.toLocaleString("es-CO")} kW · {monthLabel}
         </span>
       </div>
 
-      <div className="field-fleet-summary">
+      <div className="field-fleet-summary field-fleet-summary--4">
+        <article className="field-fleet-summary-card">
+          <span>Potencia instalada</span>
+          <strong>{kwInstalled.toLocaleString("es-CO")} kW</strong>
+          <small>
+            {voltagesGen.join(" / ") || "480 V"} gen · {voltagesDel.join(" / ") || "N/D"} entrega
+          </small>
+        </article>
         <article className="field-fleet-summary-card field-fleet-summary-card--gas">
-          <span>Generación a gas</span>
+          <span>Flota a gas</span>
           <strong>{kwGas.toLocaleString("es-CO")} kW</strong>
-          <small>{gasUnits.length} máquinas · flota principal</small>
+          <small>
+            {gasUnits.length} máquinas · {cpw.length} CPW · {jinan.length} Jinan
+          </small>
         </article>
         <article className="field-fleet-summary-card field-fleet-summary-card--diesel">
           <span>Respaldo diésel</span>
           <strong>{kwDiesel.toLocaleString("es-CO")} kW</strong>
           <small>{dieselUnits.length} máquinas · contingencia</small>
+        </article>
+        <article className="field-fleet-summary-card field-fleet-summary-card--ops">
+          <span>Operación {monthLabel}</span>
+          <strong>{genMwh != null ? `${genMwh} MWh` : "N/D"}</strong>
+          <small>
+            {topLive
+              ? `Líder ${topLive.id} · ${((topLive.energiaKwh ?? 0) / 1000).toFixed(1)} MWh`
+              : ops.available
+                ? ops.reportLabel
+                : "Sin energía unitaria"}
+          </small>
         </article>
       </div>
 
@@ -376,33 +482,53 @@ function FleetPanel({
         </p>
       ) : (
         <>
+          <p className="muted field-fleet-ref">
+            Ficha técnica contractual + indicadores del periodo ({ops.available ? ops.reportLabel : "sin ops"}).
+            Capacidad = kW medio (energía / horas OP) vs nominal.
+          </p>
+
           <div className="field-fleet-band field-fleet-band--gas">
             <p className="field-fleet-band-label">Gas · operación principal</p>
             <FleetFamilyBlock
               tag="CPW"
               tagTone="cpw"
-              subtitle={`${cpw.length} × 800 kW · entrega 13,8 kV · ${fieldKey === "vonu" ? "Vonú" : "Costayaco"}`}
+              subtitle={`${cpw.length || "—"} × 800 kW · gas MT`}
               units={cpw}
+              liveById={liveById}
               first
             />
             <FleetFamilyBlock
               tag="Jinan"
               tagTone="jinan"
-              subtitle={`${jinan.length} × gas · ${fieldKey === "vonu" ? "Vonú BT 0,48 kV" : "Costayaco 13,8 kV"}`}
+              subtitle={
+                fieldKey === "vonu"
+                  ? `${jinan.length} × CPW500 · entrega 0,48 kV`
+                  : `${jinan.length} × 450 kW · gas`
+              }
               units={jinan}
+              liveById={liveById}
             />
           </div>
 
-          <div className="field-fleet-band field-fleet-band--diesel">
-            <p className="field-fleet-band-label">Diésel · respaldo (bitácora operativa)</p>
-            <FleetFamilyBlock
-              tag="G10x"
-              tagTone="jenbacher"
-              subtitle={`${jenbacher.length} × 500 kW · 480 V · respaldo diésel verificado en eventos`}
-              units={jenbacher}
-            />
-            <FleetFamilyBlock tag="Diésel" tagTone="diesel" subtitle="Otros diésel contractuales" units={diesel} />
-          </div>
+          {dieselUnits.length > 0 ? (
+            <div className="field-fleet-band field-fleet-band--diesel">
+              <p className="field-fleet-band-label">Diésel · respaldo</p>
+              <FleetFamilyBlock
+                tag="G10x"
+                tagTone="jenbacher"
+                subtitle={`${jenbacher.length} × 500 kW · 480 V`}
+                units={jenbacher}
+                liveById={liveById}
+              />
+              <FleetFamilyBlock
+                tag="Diésel"
+                tagTone="diesel"
+                subtitle="Otros diésel contractuales"
+                units={diesel}
+                liveById={liveById}
+              />
+            </div>
+          ) : null}
         </>
       )}
     </section>
@@ -1063,7 +1189,7 @@ function FieldPage({
 
   const sectionTitle =
     section === "parque"
-      ? "Parque operativo"
+      ? "Parque de generación"
       : section === "desempeno"
         ? "Desempeño del periodo"
         : section === "contrato"
@@ -1083,7 +1209,13 @@ function FieldPage({
       {showHero ? <FieldHeroBanner field={field} monthLabel={monthLabel} /> : null}
 
       {showParque && field.fleet ? (
-        <FleetPanel fleet={field.fleet} fieldKey={fieldKey} compact={section === "resumen"} />
+        <FleetPanel
+          fleet={field.fleet}
+          fieldKey={fieldKey}
+          month={month}
+          monthLabel={monthLabel}
+          compact={section === "resumen"}
+        />
       ) : null}
 
       {showDesempeno ? (

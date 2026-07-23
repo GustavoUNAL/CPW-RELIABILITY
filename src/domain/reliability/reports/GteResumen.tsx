@@ -257,7 +257,7 @@ export function GteResumen({ month }: Props) {
             <div className="exec-kpi">
               <span>Eficiencia estimada</span>
               <strong>{effPctLabel}</strong>
-              <small>Eficiencia estimada en todo el campo</small>
+              <small>Eficiencia estimada en todo el parque de generación</small>
             </div>
           </div>
           <p className="muted" style={{ marginTop: "0.65rem", fontSize: "0.78rem" }}>
@@ -449,7 +449,7 @@ export function GteResumen({ month }: Props) {
               <span>Eficiencia estimada</span>
               <strong>{effPctLabel}</strong>
               <p>Meta ≥ {META_EFF}%</p>
-              <small>Eficiencia estimada en todo el campo</small>
+              <small>Eficiencia estimada en todo el parque de generación</small>
             </div>
           </div>
         </article>
