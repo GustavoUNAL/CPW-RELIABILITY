@@ -179,34 +179,16 @@ export function GteResumen({ month }: Props) {
   }, [month]);
   const prevMonth = monthIdx > 0 ? GRAN_TIERRA_MONTH_ORDER[monthIdx - 1] : null;
   const prevData = prevMonth ? GRAN_TIERRA_MONTHLY_DATA[prevMonth] : null;
-  const prevEff = useMemo(() => {
-    if (!prevMonth) return null;
-    const pack = loadOperacionPack();
-    return eficienciaCampoSnapshot(pack.resumenDiario, prevMonth);
-  }, [prevMonth]);
   const effPctLabel =
     effCampo.general.eficienciaPct == null
       ? "N/D"
       : `${effCampo.general.eficienciaPct.toFixed(1)}%`;
-  const effCampoDetail = effCampo.porCampo
-    .filter((c) => c.eficienciaPct != null)
-    .map((c) => `${c.label} ${c.eficienciaPct!.toFixed(1)}%`)
-    .join(" · ");
   const effOk =
     effCampo.general.eficienciaPct != null && effCampo.general.eficienciaPct >= META_EFF;
 
   const fmtPpDelta = (curr: number | null | undefined, prev: number | null | undefined) => {
     if (curr == null || prev == null || Number.isNaN(curr) || Number.isNaN(prev)) return null;
     const pp = (curr - prev) * 100;
-    return {
-      text: `${pp >= 0 ? "+" : ""}${pp.toFixed(2)} pp vs ${prevData?.label ?? "mes ant."}`,
-      improved: pp > 0,
-      flat: Math.abs(pp) < 0.005,
-    };
-  };
-  const fmtEffPpDelta = (curr: number | null | undefined, prev: number | null | undefined) => {
-    if (curr == null || prev == null || Number.isNaN(curr) || Number.isNaN(prev)) return null;
-    const pp = curr - prev;
     return {
       text: `${pp >= 0 ? "+" : ""}${pp.toFixed(2)} pp vs ${prevData?.label ?? "mes ant."}`,
       improved: pp > 0,
@@ -225,10 +207,6 @@ export function GteResumen({ month }: Props) {
   };
   const deltaDisp = fmtPpDelta(data.kpi.availability, prevData?.kpi.availability);
   const deltaConf = fmtPpDelta(data.kpi.reliability, prevData?.kpi.reliability);
-  const deltaEff = fmtEffPpDelta(
-    effCampo.general.eficienciaPct,
-    prevEff?.general.eficienciaPct,
-  );
   const deltaGen = fmtGenDelta(data.totalGenerationKwh, prevData?.totalGenerationKwh);
 
   /** Desglose alineado al informe: Costayaco gas + diésel + Vonu. */
@@ -277,11 +255,9 @@ export function GteResumen({ month }: Props) {
               <small>{`Total ${gteEventLog.length}`}</small>
             </div>
             <div className="exec-kpi">
-              <span>Eficiencia de campo</span>
+              <span>Eficiencia estimada</span>
               <strong>{effPctLabel}</strong>
-              <small>
-                {effCampoDetail || "Sin gas/energía emparejados"} · OP diario {effCampo.yearMonth}
-              </small>
+              <small>Eficiencia estimada en todo el campo</small>
             </div>
           </div>
           <p className="muted" style={{ marginTop: "0.65rem", fontSize: "0.78rem" }}>
@@ -472,27 +448,8 @@ export function GteResumen({ month }: Props) {
             <div className={`exec-core${effCampo.general.eficienciaPct == null ? "" : effOk ? " ok" : " warn"}`}>
               <span>Eficiencia estimada</span>
               <strong>{effPctLabel}</strong>
-              <p>Meta ≥ {META_EFF}% · no viene en el PDF GTE</p>
-              <small>
-                Fuente OP diario {effCampo.yearMonth}
-                {effCampoDetail ? ` · ${effCampoDetail}` : " · sin gas/energía emparejados"}
-                {deltaEff ? (
-                  <>
-                    <br />
-                    <span
-                      className={
-                        deltaEff.flat
-                          ? undefined
-                          : deltaEff.improved
-                            ? "delta positive"
-                            : "delta negative"
-                      }
-                    >
-                      {deltaEff.text}
-                    </span>
-                  </>
-                ) : null}
-              </small>
+              <p>Meta ≥ {META_EFF}%</p>
+              <small>Eficiencia estimada en todo el campo</small>
             </div>
           </div>
         </article>
