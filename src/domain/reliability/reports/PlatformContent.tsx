@@ -578,7 +578,8 @@ function PlatformBody({
     if (leafId === "mto-optimizacion") {
       return (
         <MaintenanceOptimizationDashboard
-          monthLabel={month === "Jun" ? monthLabel : `${monthLabel} · MSO junio 2026`}
+          month={month}
+          monthLabel={month === "Jun" ? monthLabel : `${monthLabel} · sábana Putumayo`}
         />
       );
     }

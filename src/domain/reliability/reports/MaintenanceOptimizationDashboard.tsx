@@ -8,7 +8,7 @@ import {
   Target,
   TrendingDown,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -22,11 +22,12 @@ import {
   YAxis,
 } from "recharts";
 import {
-  buildGteJuneMaintenanceOptimization,
+  buildSabanaMaintenanceOptimization,
   portfolioKpis,
   strategyMix,
   topOpportunities,
-} from "./gteJuneMaintenanceOptimization";
+} from "./buildSabanaMaintenanceOptimization";
+import { MAINTENANCE_PLANS } from "./maintenancePlansData";
 import {
   CRITICALITY_COLOR,
   EVAL_COLOR,
@@ -39,6 +40,7 @@ import {
 } from "./maintenanceOptimizationTypes";
 
 type Props = {
+  month: string;
   monthLabel: string;
 };
 
@@ -82,11 +84,15 @@ function MphiCell({ mphi, band }: { mphi: number; band: PlanHealthBand }) {
   );
 }
 
-export function MaintenanceOptimizationDashboard({ monthLabel }: Props) {
-  const [plans, setPlans] = useState<MaintenanceOptimizationPlan[]>(() =>
-    buildGteJuneMaintenanceOptimization(),
-  );
+export function MaintenanceOptimizationDashboard({ month, monthLabel }: Props) {
+  const seed = useMemo(() => buildSabanaMaintenanceOptimization(month), [month]);
+  const [plans, setPlans] = useState<MaintenanceOptimizationPlan[]>(seed);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setPlans(seed);
+    setSelectedId(null);
+  }, [seed]);
 
   const selected = plans.find((p) => p.id === selectedId) ?? null;
   const kpis = useMemo(() => portfolioKpis(plans), [plans]);
@@ -96,16 +102,39 @@ export function MaintenanceOptimizationDashboard({ monthLabel }: Props) {
     () =>
       [...plans]
         .sort((a, b) => a.mphi - b.mphi)
+        .slice(0, 12)
         .map((p) => ({
-          id: p.assetId,
+          id: p.assetId.length > 10 ? p.assetId.slice(0, 9) + "…" : p.assetId,
+          fullId: p.assetId,
           mphi: p.mphi,
           band: p.healthBand,
         })),
     [plans],
   );
 
+  const sabanaKpis = useMemo(() => {
+    const monthKey = month === "YTD2026" ? null : month;
+    const exec = MAINTENANCE_PLANS.executions.filter(
+      (e) => e.programmed && (!monthKey || e.monthKey === monthKey),
+    );
+    const executed = exec.filter((e) => e.status === "ejecutado").length;
+    const pending = exec.filter((e) => e.status === "pendiente").length;
+    const postponed = exec.filter((e) =>
+      /posterg|no cumple|stand\s*by|horas de (operaci|mto|manten)/i.test(e.notes ?? ""),
+    ).length;
+    return {
+      programmed: exec.length,
+      executed,
+      pending,
+      postponed,
+      compliance: exec.length ? (executed / exec.length) * 100 : 0,
+    };
+  }, [month]);
+
   function updatePlan(id: string, patch: Partial<MaintenanceOptimizationPlan>) {
-    setPlans((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch, updatedAt: new Date().toISOString().slice(0, 10) } : p)));
+    setPlans((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, ...patch, updatedAt: new Date().toISOString().slice(0, 10) } : p)),
+    );
   }
 
   return (
@@ -114,16 +143,13 @@ export function MaintenanceOptimizationDashboard({ monthLabel }: Props) {
         <p className="eyebrow">Optimización de Planes de Mantenimiento · MSO</p>
         <div className="screen-shell-head">
           <h3>{monthLabel}</h3>
-          <span className="source-badge gte">GTE</span>
+          <span className="source-badge dual">Sábana + GTE</span>
         </div>
-        <p className="muted" style={{ marginTop: "0.35rem" }}>
-          Ingeniería de confiabilidad — evalúa efectividad del plan, no programa órdenes de trabajo (no es CMMS).
-        </p>
 
         <div className="exec-kpi-row" style={{ marginTop: "0.6rem" }}>
           <div className="exec-kpi">
             <Layers size={16} />
-            <span>Equipos analizados</span>
+            <span>Equipos en catálogo</span>
             <strong>{kpis.assetsAnalyzed}</strong>
           </div>
           <div className="exec-kpi">
@@ -135,6 +161,20 @@ export function MaintenanceOptimizationDashboard({ monthLabel }: Props) {
             <CheckCircle2 size={16} />
             <span>Planes optimizados</span>
             <strong>{kpis.plansOptimized}</strong>
+          </div>
+          <div className="exec-kpi">
+            <Activity size={16} />
+            <span>Cumplimiento sábana</span>
+            <strong>{sabanaKpis.compliance.toFixed(0)}%</strong>
+            <small>
+              {sabanaKpis.executed}/{sabanaKpis.programmed} ejecutados
+            </small>
+          </div>
+          <div className="exec-kpi">
+            <AlertTriangle size={16} />
+            <span>Aplazos / horas</span>
+            <strong>{sabanaKpis.postponed}</strong>
+            <small>{sabanaKpis.pending} pendientes</small>
           </div>
           <div className="exec-kpi">
             <PiggyBank size={16} />
@@ -156,7 +196,9 @@ export function MaintenanceOptimizationDashboard({ monthLabel }: Props) {
         <div className="dash-chart-grid mso-chart-grid" style={{ marginTop: "0.75rem" }}>
           <article className="dash-chart-panel">
             <h4>Índice de Salud del Plan (MPHI)</h4>
-            <p className="muted dash-chart-sub">0–100 · Excelente ≥80 · Aceptable 60–79 · Bajo &lt;60</p>
+            <p className="muted dash-chart-sub">
+              Peores 12 · 0–100 · basado en sábana + GTE · Excelente ≥80 · Bajo &lt;60
+            </p>
             <div className="dash-chart">
               <ResponsiveContainer width="100%" height={230}>
                 <BarChart data={mphiChart} margin={{ top: 8, right: 8, left: 0, bottom: 4 }}>

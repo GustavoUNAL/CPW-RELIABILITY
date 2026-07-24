@@ -123,12 +123,12 @@ for (let i = 4; i < 50; i++) {
   });
 }
 
-const monthlySummary = [];
+const excelPanelSummary = [];
 for (let i = 3; i < 40; i++) {
   const r = rows[i] ?? [];
   const mes = str(r[51]).toUpperCase();
   if (!MONTH_MAP[mes] && mes !== "TOTAL") continue;
-  monthlySummary.push({
+  excelPanelSummary.push({
     monthKey: MONTH_MAP[mes] ?? "TOTAL",
     monthLabel: mes === "TOTAL" ? "Total año" : mes.charAt(0) + mes.slice(1).toLowerCase(),
     totalHoursMto: num(r[53]) ?? 0,
@@ -146,7 +146,27 @@ for (let i = 30; i < 45; i++) {
   }
 }
 
-let currentMonthKey = null;
+const MONTH_KEYS = ["", "Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+const MONTH_LABELS = {
+  Ene: "Enero",
+  Feb: "Febrero",
+  Mar: "Marzo",
+  Abr: "Abril",
+  May: "Mayo",
+  Jun: "Junio",
+  Jul: "Julio",
+  Ago: "Agosto",
+  Sep: "Septiembre",
+  Oct: "Octubre",
+  Nov: "Noviembre",
+  Dic: "Diciembre",
+};
+
+function monthKeyFromIso(dateIso) {
+  const mm = Number(dateIso.slice(5, 7));
+  return MONTH_KEYS[mm] ?? null;
+}
+
 const days = [];
 const calendarSlots = [];
 const executions = [];
@@ -156,14 +176,7 @@ for (let i = 3; i < rows.length; i++) {
   const dateIso = toIsoDate(r[2]);
   if (!dateIso) continue;
 
-  const monthLabelCell = str(r[0]).toUpperCase();
-  if (MONTH_MAP[monthLabelCell]) currentMonthKey = MONTH_MAP[monthLabelCell];
-  if (!currentMonthKey && dateIso.length >= 7) {
-    const mm = Number(dateIso.slice(5, 7));
-    const keys = ["", "Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
-    currentMonthKey = keys[mm] ?? null;
-  }
-
+  const monthKey = monthKeyFromIso(dateIso);
   const weekday = str(r[1]);
   const totalManHoursDay = num(r[3]) ?? 0;
 
@@ -184,7 +197,7 @@ for (let i = 3; i < rows.length; i++) {
     daySlots.push(slot);
     calendarSlots.push({
       date: dateIso,
-      monthKey: currentMonthKey,
+      monthKey,
       ...slot,
     });
   }
@@ -197,19 +210,18 @@ for (let i = 3; i < rows.length; i++) {
   const execDate = execParsed || str(r[61]) || null;
   const notes = str(r[62]);
 
-  const day = {
+  days.push({
     date: dateIso,
     weekday,
-    monthKey: currentMonthKey,
+    monthKey,
     totalManHours: totalManHoursDay,
     slotCount: daySlots.length,
-  };
-  days.push(day);
+  });
 
   if (programmedRaw || statusRaw || equipmentPlanned) {
     executions.push({
       date: dateIso,
-      monthKey: currentMonthKey,
+      monthKey,
       programmed: isYes(programmedRaw),
       programmedLabel: programmedRaw || "—",
       equipment: equipmentPlanned || (daySlots.map((s) => s.equipment).join(", ") || "—"),
@@ -221,6 +233,62 @@ for (let i = 3; i < rows.length; i++) {
       plannedManHours: totalManHoursDay,
     });
   }
+}
+
+/** Resumen mensual recalculado desde calendario + control de ejecución (no el panel Excel). */
+const monthlyMap = new Map();
+for (const key of MONTH_KEYS.filter(Boolean)) {
+  monthlyMap.set(key, {
+    monthKey: key,
+    monthLabel: MONTH_LABELS[key],
+    plannedHoursMto: 0,
+    plannedManHours: 0,
+    executedHoursMto: 0,
+    executedManHours: 0,
+    programmedCount: 0,
+    executedCount: 0,
+    pendingCount: 0,
+    kind: "planificado",
+  });
+}
+
+const executedDates = new Set(
+  executions.filter((e) => e.status === "ejecutado").map((e) => e.date),
+);
+
+for (const slot of calendarSlots) {
+  if (!slot.monthKey || slot.isRun) continue;
+  const row = monthlyMap.get(slot.monthKey);
+  if (!row) continue;
+  row.plannedHoursMto += slot.hoursMto ?? 0;
+  row.plannedManHours += slot.manHours ?? 0;
+  if (executedDates.has(slot.date)) {
+    row.executedHoursMto += slot.hoursMto ?? 0;
+    row.executedManHours += slot.manHours ?? 0;
+  }
+}
+
+for (const e of executions) {
+  if (!e.monthKey || !e.programmed) continue;
+  const row = monthlyMap.get(e.monthKey);
+  if (!row) continue;
+  row.programmedCount += 1;
+  if (e.status === "ejecutado") row.executedCount += 1;
+  if (e.status === "pendiente") row.pendingCount += 1;
+}
+
+const monthlySummary = [...monthlyMap.values()].map((row) => ({
+  ...row,
+  /** Compat: horas planificadas en calendario. */
+  totalHoursMto: row.plannedHoursMto,
+  totalManHours: row.plannedManHours,
+  kind: row.executedCount > 0 ? (row.pendingCount > 0 && row.executedCount === 0 ? "planificado" : "mixto") : "planificado",
+}));
+
+for (const row of monthlySummary) {
+  if (row.executedCount > 0 && row.pendingCount === 0) row.kind = "ejecutado";
+  else if (row.executedCount > 0) row.kind = "mixto";
+  else row.kind = "planificado";
 }
 
 const byEquipment = new Map();
@@ -252,11 +320,12 @@ const payload = {
   extractedAt: new Date().toISOString().slice(0, 10),
   title: "Sábana de mantenimientos · Generación Putumayo",
   notes:
-    "Calendario diario 2026 + control de ejecución + catálogo de periodicidad (horas de operación). Fuente: hoja GENERACIÓN PUTUMAYO.",
+    "Calendario diario 2026, control de ejecución y catálogo de periodicidad.",
   fleet: units.map((u) => ({ equipment: u.equipment, model: u.model })),
   catalog,
   periodicityNotes,
   monthlySummary,
+  excelPanelSummary,
   statusCounts,
   equipmentStats,
   days,
@@ -281,6 +350,24 @@ export type MaintenanceCatalogItem = {
 };
 
 export type MaintenanceMonthlySummary = {
+  monthKey: string;
+  monthLabel: string;
+  /** Horas MTO marcadas en el calendario del mes (plan). */
+  plannedHoursMto: number;
+  plannedManHours: number;
+  /** Horas de días con estado Ejecutado. */
+  executedHoursMto: number;
+  executedManHours: number;
+  programmedCount: number;
+  executedCount: number;
+  pendingCount: number;
+  kind: "ejecutado" | "mixto" | "planificado";
+  /** Alias de plannedHoursMto (compat). */
+  totalHoursMto: number;
+  totalManHours: number;
+};
+
+export type MaintenanceExcelPanelRow = {
   monthKey: string;
   monthLabel: string;
   totalHoursMto: number;
@@ -338,6 +425,8 @@ export type MaintenancePlansPack = {
   catalog: MaintenanceCatalogItem[];
   periodicityNotes: { fleet: string; rule: string }[];
   monthlySummary: MaintenanceMonthlySummary[];
+  /** Panel lateral del Excel — no usar como fuente primaria. */
+  excelPanelSummary: MaintenanceExcelPanelRow[];
   statusCounts: Record<MaintenancePlanStatus, number>;
   equipmentStats: MaintenanceEquipmentStat[];
   days: MaintenanceDay[];

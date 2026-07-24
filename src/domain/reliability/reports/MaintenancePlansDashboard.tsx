@@ -118,12 +118,6 @@ export function MaintenancePlansDashboard({ month, monthLabel }: Props) {
         <div>
           <p className="eyebrow">Planes de mantenimiento · Generación Putumayo</p>
           <h2>{monthLabel}</h2>
-          <p className="muted">
-            {pack.title} · {pack.notes}
-          </p>
-          <p className="muted" style={{ marginTop: "0.25rem", fontSize: "0.75rem" }}>
-            Fuente: {pack.sourceFile} · hoja {pack.sheet} · extraído {pack.extractedAt}
-          </p>
         </div>
         <Wrench size={22} className="muted" />
       </header>
@@ -151,7 +145,7 @@ export function MaintenancePlansDashboard({ month, monthLabel }: Props) {
           </strong>
           <small>
             {monthSummary
-              ? `Resumen Excel: ${monthSummary.totalHoursMto} / ${monthSummary.totalManHours}`
+              ? `Plan ${monthSummary.plannedHoursMto} h · Ejec. ${monthSummary.executedHoursMto} h`
               : `${kpis.slots} intervenciones en calendario`}
           </small>
         </article>
@@ -159,17 +153,19 @@ export function MaintenancePlansDashboard({ month, monthLabel }: Props) {
 
       <section className="panel two-col">
         <article className="card">
-          <p className="eyebrow">Resumen mensual (sábana)</p>
-          <h3>Horas MTO y hombre · 2026</h3>
+          <p className="eyebrow">Resumen mensual</p>
+          <h3>Horas planificadas vs ejecutadas · 2026</h3>
           <div className="dash-chart" style={{ height: 240 }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={monthlyBars} margin={{ top: 8, right: 8, left: 0, bottom: 4 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
                 <XAxis dataKey="monthKey" tick={{ fontSize: 10 }} />
                 <YAxis tick={{ fontSize: 10 }} width={36} />
-                <Tooltip />
-                <Bar dataKey="totalHoursMto" name="Horas MTO" fill="#0f766e" radius={[3, 3, 0, 0]} />
-                <Bar dataKey="totalManHours" name="Horas hombre" fill="#6366f1" radius={[3, 3, 0, 0]} />
+                <Tooltip
+                  formatter={(value, name) => [`${Number(value).toFixed(0)} h`, String(name)]}
+                />
+                <Bar dataKey="plannedHoursMto" name="Planificadas" fill="#94a3b8" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="executedHoursMto" name="Ejecutadas" fill="#0f766e" radius={[3, 3, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

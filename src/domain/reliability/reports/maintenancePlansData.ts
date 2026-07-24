@@ -17,6 +17,24 @@ export type MaintenanceCatalogItem = {
 export type MaintenanceMonthlySummary = {
   monthKey: string;
   monthLabel: string;
+  /** Horas MTO marcadas en el calendario del mes (plan). */
+  plannedHoursMto: number;
+  plannedManHours: number;
+  /** Horas de días con estado Ejecutado. */
+  executedHoursMto: number;
+  executedManHours: number;
+  programmedCount: number;
+  executedCount: number;
+  pendingCount: number;
+  kind: "ejecutado" | "mixto" | "planificado";
+  /** Alias de plannedHoursMto (compat). */
+  totalHoursMto: number;
+  totalManHours: number;
+};
+
+export type MaintenanceExcelPanelRow = {
+  monthKey: string;
+  monthLabel: string;
   totalHoursMto: number;
   totalManHours: number;
 };
@@ -72,6 +90,8 @@ export type MaintenancePlansPack = {
   catalog: MaintenanceCatalogItem[];
   periodicityNotes: { fleet: string; rule: string }[];
   monthlySummary: MaintenanceMonthlySummary[];
+  /** Panel lateral del Excel — no usar como fuente primaria. */
+  excelPanelSummary: MaintenanceExcelPanelRow[];
   statusCounts: Record<MaintenancePlanStatus, number>;
   equipmentStats: MaintenanceEquipmentStat[];
   days: MaintenanceDay[];
@@ -84,7 +104,7 @@ export const MAINTENANCE_PLANS: MaintenancePlansPack = {
   "sheet": "GENERACIÓN PUTUMAYO",
   "extractedAt": "2026-07-24",
   "title": "Sábana de mantenimientos · Generación Putumayo",
-  "notes": "Calendario diario 2026 + control de ejecución + catálogo de periodicidad (horas de operación). Fuente: hoja GENERACIÓN PUTUMAYO.",
+  "notes": "Calendario diario 2026, control de ejecución y catálogo de periodicidad.",
   "fleet": [
     {
       "equipment": "CPW02",
@@ -339,6 +359,176 @@ export const MAINTENANCE_PLANS: MaintenancePlansPack = {
     }
   ],
   "monthlySummary": [
+    {
+      "monthKey": "Ene",
+      "monthLabel": "Enero",
+      "plannedHoursMto": 220,
+      "plannedManHours": 440,
+      "executedHoursMto": 220,
+      "executedManHours": 440,
+      "programmedCount": 21,
+      "executedCount": 21,
+      "pendingCount": 0,
+      "kind": "ejecutado",
+      "totalHoursMto": 220,
+      "totalManHours": 440
+    },
+    {
+      "monthKey": "Feb",
+      "monthLabel": "Febrero",
+      "plannedHoursMto": 192,
+      "plannedManHours": 384,
+      "executedHoursMto": 70,
+      "executedManHours": 140,
+      "programmedCount": 18,
+      "executedCount": 7,
+      "pendingCount": 11,
+      "kind": "mixto",
+      "totalHoursMto": 192,
+      "totalManHours": 384
+    },
+    {
+      "monthKey": "Mar",
+      "monthLabel": "Marzo",
+      "plannedHoursMto": 240,
+      "plannedManHours": 480,
+      "executedHoursMto": 150,
+      "executedManHours": 300,
+      "programmedCount": 20,
+      "executedCount": 11,
+      "pendingCount": 9,
+      "kind": "mixto",
+      "totalHoursMto": 240,
+      "totalManHours": 480
+    },
+    {
+      "monthKey": "Abr",
+      "monthLabel": "Abril",
+      "plannedHoursMto": 252,
+      "plannedManHours": 504,
+      "executedHoursMto": 150,
+      "executedManHours": 300,
+      "programmedCount": 20,
+      "executedCount": 10,
+      "pendingCount": 10,
+      "kind": "mixto",
+      "totalHoursMto": 252,
+      "totalManHours": 504
+    },
+    {
+      "monthKey": "May",
+      "monthLabel": "Mayo",
+      "plannedHoursMto": 206,
+      "plannedManHours": 412,
+      "executedHoursMto": 136,
+      "executedManHours": 272,
+      "programmedCount": 17,
+      "executedCount": 10,
+      "pendingCount": 7,
+      "kind": "mixto",
+      "totalHoursMto": 206,
+      "totalManHours": 412
+    },
+    {
+      "monthKey": "Jun",
+      "monthLabel": "Junio",
+      "plannedHoursMto": 226,
+      "plannedManHours": 448,
+      "executedHoursMto": 160,
+      "executedManHours": 316,
+      "programmedCount": 15,
+      "executedCount": 9,
+      "pendingCount": 6,
+      "kind": "mixto",
+      "totalHoursMto": 226,
+      "totalManHours": 448
+    },
+    {
+      "monthKey": "Jul",
+      "monthLabel": "Julio",
+      "plannedHoursMto": 268,
+      "plannedManHours": 512,
+      "executedHoursMto": 134,
+      "executedManHours": 256,
+      "programmedCount": 20,
+      "executedCount": 9,
+      "pendingCount": 11,
+      "kind": "mixto",
+      "totalHoursMto": 268,
+      "totalManHours": 512
+    },
+    {
+      "monthKey": "Ago",
+      "monthLabel": "Agosto",
+      "plannedHoursMto": 278,
+      "plannedManHours": 532,
+      "executedHoursMto": 0,
+      "executedManHours": 0,
+      "programmedCount": 17,
+      "executedCount": 0,
+      "pendingCount": 17,
+      "kind": "planificado",
+      "totalHoursMto": 278,
+      "totalManHours": 532
+    },
+    {
+      "monthKey": "Sep",
+      "monthLabel": "Septiembre",
+      "plannedHoursMto": 218,
+      "plannedManHours": 420,
+      "executedHoursMto": 0,
+      "executedManHours": 0,
+      "programmedCount": 16,
+      "executedCount": 0,
+      "pendingCount": 16,
+      "kind": "planificado",
+      "totalHoursMto": 218,
+      "totalManHours": 420
+    },
+    {
+      "monthKey": "Oct",
+      "monthLabel": "Octubre",
+      "plannedHoursMto": 258,
+      "plannedManHours": 500,
+      "executedHoursMto": 0,
+      "executedManHours": 0,
+      "programmedCount": 16,
+      "executedCount": 0,
+      "pendingCount": 16,
+      "kind": "planificado",
+      "totalHoursMto": 258,
+      "totalManHours": 500
+    },
+    {
+      "monthKey": "Nov",
+      "monthLabel": "Noviembre",
+      "plannedHoursMto": 222,
+      "plannedManHours": 432,
+      "executedHoursMto": 0,
+      "executedManHours": 0,
+      "programmedCount": 16,
+      "executedCount": 0,
+      "pendingCount": 16,
+      "kind": "planificado",
+      "totalHoursMto": 222,
+      "totalManHours": 432
+    },
+    {
+      "monthKey": "Dic",
+      "monthLabel": "Diciembre",
+      "plannedHoursMto": 232,
+      "plannedManHours": 456,
+      "executedHoursMto": 0,
+      "executedManHours": 0,
+      "programmedCount": 14,
+      "executedCount": 0,
+      "pendingCount": 14,
+      "kind": "planificado",
+      "totalHoursMto": 232,
+      "totalManHours": 456
+    }
+  ],
+  "excelPanelSummary": [
     {
       "monthKey": "Ene",
       "monthLabel": "Enero",
