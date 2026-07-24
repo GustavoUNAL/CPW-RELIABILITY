@@ -380,8 +380,9 @@ export function topOpportunities(plans: MaintenanceOptimizationPlan[], limit = 4
     .map((p) => ({
       assetId: p.assetId,
       action: p.recommendations[0]?.recommendation ?? p.expectedBenefit,
-      stars: p.impactIndex >= 8 ? 5 : p.impactIndex >= 6 ? 4 : p.impactIndex >= 4 ? 3 : 2,
       mphi: p.mphi,
+      healthBand: p.healthBand,
+      impactIndex: p.impactIndex,
     }));
 }
 

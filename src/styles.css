@@ -5488,9 +5488,20 @@ tr.row-focal td {
 
 .mso-opp-list em {
   font-style: normal;
-  font-size: 0.78rem;
-  color: #ca8a04;
   white-space: nowrap;
+}
+
+.mso-mphi-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+}
+
+.mso-mphi-cell strong {
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
 }
 
 .mso-plan-box {
@@ -5603,6 +5614,22 @@ tr.row-focal td {
 .dr-matrix-footer .dr-matrix-cell,
 .dr-matrix-footer .dr-matrix-axis {
   min-height: auto;
+}
+
+.dr-matrix.dr-matrix-lg {
+  max-width: 52rem;
+  margin-inline: auto;
+}
+
+.dr-matrix.dr-matrix-lg .dr-matrix-cell {
+  min-height: 3.1rem;
+  font-size: 0.72rem;
+  padding: 0.2rem;
+}
+
+.dr-matrix.dr-matrix-lg .dr-matrix-row {
+  grid-template-columns: 1.6rem repeat(5, minmax(0, 1fr));
+  gap: 0.28rem;
 }
 
 @media (max-width: 900px) {
@@ -5737,6 +5764,20 @@ tr.row-focal td {
 .op-panel--summary {
   background: color-mix(in oklab, #0f766e 5%, var(--panel-soft));
   border-color: color-mix(in oklab, #0f766e 22%, var(--border));
+}
+
+.rep-conclusions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.35rem;
+}
+
+.rep-conclusions p {
+  margin: 0;
+  line-height: 1.55;
+  color: var(--text);
+  max-width: 72rem;
 }
 
 .op-summary {
@@ -6506,6 +6547,161 @@ tr.row-focal td {
   color: var(--text-muted);
 }
 
+.ev-bitacora-section,
+.ev-formal-rca-section {
+  margin-top: 1rem;
+  padding: 0.85rem 1rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel);
+}
+
+.ev-formal-rca-section {
+  border-color: color-mix(in oklab, #0e6e8c 28%, var(--border));
+  background: color-mix(in oklab, #0e6e8c 6%, var(--panel));
+}
+
+.ev-bitacora-head,
+.ev-formal-rca-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.65rem;
+}
+
+.ev-bitacora-head h3,
+.ev-formal-rca-head h3 {
+  margin: 0.15rem 0 0.2rem;
+  font-size: 1.05rem;
+}
+
+.ev-bitacora-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 1rem;
+  margin-top: 0.15rem;
+}
+
+.ev-bitacora-meta-row .muted {
+  margin: 0;
+}
+
+.ev-bitacora-filter select {
+  width: auto;
+  min-width: 9.5rem;
+  font-size: 0.76rem;
+  padding: 0.28rem 0.45rem;
+}
+
+.inv-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  align-items: center;
+}
+
+.inv-search {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: min(22rem, 100%);
+  flex: 1;
+  color: var(--text-muted);
+}
+
+.inv-search input {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.78rem;
+  padding: 0.28rem 0.5rem;
+}
+
+.inv-family-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14.5rem, 1fr));
+  gap: 0.65rem;
+}
+
+.inv-family-card {
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-soft);
+  padding: 0.7rem 0.8rem;
+  cursor: pointer;
+  color: inherit;
+  box-shadow: inset 3px 0 0 var(--inv-accent, #64748b);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.inv-family-card:hover,
+.inv-family-card.is-active {
+  border-color: color-mix(in oklab, var(--inv-accent, #64748b) 45%, var(--border));
+  background: color-mix(in oklab, var(--inv-accent, #64748b) 8%, var(--panel-soft));
+}
+
+.inv-family-card header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.45rem;
+  margin-bottom: 0.55rem;
+}
+
+.inv-family-card header strong {
+  font-size: 0.95rem;
+}
+
+.inv-family-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem 0.55rem;
+}
+
+.inv-family-metrics span {
+  display: block;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.inv-family-metrics em {
+  font-style: normal;
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.inv-family-metrics small {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-left: 0.1rem;
+}
+
+.inv-family-bar {
+  display: flex;
+  height: 0.35rem;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 0.65rem;
+  background: color-mix(in oklab, var(--border) 70%, transparent);
+}
+
+.inv-family-bar span {
+  display: block;
+  height: 100%;
+}
+
+.ev-bitacora-section .ev-list {
+  max-height: min(64vh, 44rem);
+}
+
+.ev-formal-rca-section .ev-list {
+  max-height: min(52vh, 36rem);
+}
+
 .ev-list {
   list-style: none;
   margin: 0;
@@ -6515,6 +6711,19 @@ tr.row-focal td {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+}
+
+.ev-event-id {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.64rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  color: var(--text);
+  background: color-mix(in oklab, var(--accent) 10%, var(--panel-soft));
+  border: 1px solid color-mix(in oklab, var(--accent) 22%, var(--border));
+  border-radius: 4px;
+  padding: 0.08rem 0.35rem;
+  white-space: nowrap;
 }
 
 .ev-list-item {
@@ -6572,15 +6781,61 @@ tr.row-focal td {
   overflow: hidden;
 }
 
-.ev-detail-panel {
-  position: sticky;
-  top: 0.5rem;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 0.85rem;
-  background: var(--panel);
-  max-height: 70vh;
-  overflow-y: auto;
+.ev-modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.ev-modal-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+
+.ev-event-modal label {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-bottom: 0.2rem;
+}
+
+.ev-event-modal textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 4.5rem;
+}
+
+.ev-save-warn {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0.65rem 0 0.25rem;
+  padding: 0.7rem 0.8rem;
+  border-radius: 10px;
+  border: 1px solid color-mix(in oklab, #d97706 45%, var(--border));
+  background: color-mix(in oklab, #d97706 12%, var(--panel-soft));
+}
+
+.ev-save-warn strong {
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.ev-save-warn p {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+  max-width: 42rem;
+}
+
+.ev-save-warn-confirm {
+  background: color-mix(in oklab, #d97706 22%, var(--panel)) !important;
+  border-color: color-mix(in oklab, #d97706 50%, var(--border)) !important;
 }
 
 .ev-detail-head {
@@ -6606,8 +6861,9 @@ tr.row-focal td {
 
 .ev-detail-date {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.45rem;
   margin: 0 0 0.65rem;
   font-size: 0.78rem;
   color: var(--text-muted);

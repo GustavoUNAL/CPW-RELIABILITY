@@ -38,10 +38,23 @@ export function parseEventNotes(notes: string): ParsedEventNotes {
   return out;
 }
 
+/** ID corto estable para relacionar bitácora ↔ RCA / CAPA / planes (visible en UI). */
+export function buildEventRelId(
+  source: ReportKey,
+  date: string,
+  equipment: string,
+  index: number,
+): string {
+  const src = source === "gran_tierra" ? "G" : "C";
+  const d = (date || "0000-00-00").slice(5).replace("-", ""); // MMDD
+  const eq = (equipment || "X").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6) || "X";
+  return `${src}${d}-${eq}-${String(index + 1).padStart(2, "0")}`;
+}
+
 export function enrichEvent(event: EventRecord, source: ReportKey, index: number): EnrichedEvent {
   return {
     ...event,
-    id: `${source}-${event.date}-${event.equipment}-${index}`,
+    id: buildEventRelId(source, event.date, event.equipment, index),
     source,
     parsed: parseEventNotes(event.notes),
   };

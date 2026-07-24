@@ -165,6 +165,7 @@ export const PROJECT_NAV_TREE: NavModule[] = [
       { id: "mto-dashboard", label: "Planes de mantenimiento" },
       { id: "mto-optimizacion", label: "Optimización del mantenimiento" },
       { id: "an-interv-gte", label: "Planes de intervención" },
+      { id: "ga-inventario", label: "Mínimos de inventario" },
     ],
   },
   {

@@ -28,7 +28,22 @@ function normAsset(id: string) {
   return id.toUpperCase().replace(/[^A-Z0-9]/g, "");
 }
 
-/** Cruza un evento de bitácora con RCA formales (fecha + equipo / activos vinculados). */
+/** Solo RCA con PDF formal (carpeta data/RCA → public/rca). */
+export function rcaHasFormalDocument(rca: RcaCaseDetail): boolean {
+  return (rca.pdfUrls?.length ?? 0) > 0;
+}
+
+function assetMatchesEvent(equipmentNorm: string, asset: string): boolean {
+  const a = normAsset(asset);
+  if (!a) return false;
+  if (equipmentNorm === "PARQUE" || equipmentNorm.includes("PARQUE")) return true;
+  return equipmentNorm.includes(a) || a.includes(equipmentNorm);
+}
+
+/**
+ * Cruza un evento de bitácora solo con RCA formales entregados (PDF en carpeta RCA).
+ * Fecha + equipo / activos vinculados. Los casos sin PDF (p. ej. RCA-001…006 analíticos) no se relacionan.
+ */
 export function findRcaCasesForEvent(
   date: string,
   equipment: string,
@@ -37,15 +52,17 @@ export function findRcaCasesForEvent(
   const eq = normAsset(equipment);
   if (!date || !eq) return [];
   return cases.filter((rca) => {
+    if (!rcaHasFormalDocument(rca)) return false;
     if (rca.eventDate !== date) return false;
-    return rca.linkedAssets.some((asset) => {
-      const a = normAsset(asset);
-      return eq.includes(a) || a.includes(eq);
-    });
+    return rca.linkedAssets.some((asset) => assetMatchesEvent(eq, asset));
   });
 }
 
-/** RCA de junio 2026 · Gran Tierra — solo eventos de mayor impacto / recurrencia / criticidad. */
+/**
+ * Catálogo de casos RCA junio 2026.
+ * - Con `pdfUrls`: RCA formal entregado (fuente: data/RCA / public/rca). Solo estos se cruzan con la bitácora.
+ * - Sin PDF: casos analíticos de seguimiento interno; no implican entrega documental al cliente.
+ */
 export function buildGteJuneRcaCases(): RcaCaseDetail[] {
   return [
     {
@@ -206,10 +223,10 @@ export function buildGteJuneRcaCases(): RcaCaseDetail[] {
     {
       id: "RCA-030",
       title: "Shutdown General Costayaco — Vector Shift EEP 34.5 kV",
-      eventLabel: "Vector Shift · falla reconectador EEP",
-      status: "En curso",
-      priority: "Crítica",
-      equipment: "Parque Costayaco",
+      eventLabel: "Vector Shift — Falla en reconectador EEP 34.5 kV",
+      status: "Cerrado",
+      priority: "Alta",
+      equipment: "Parque Costayaco (CPW01–07, CPW12, JINAN-01/02)",
       linkedAssets: [
         "CPW01",
         "CPW02",
@@ -226,24 +243,25 @@ export function buildGteJuneRcaCases(): RcaCaseDetail[] {
       ],
       eventDate: "2026-06-22",
       problem:
-        "Shutdown general del parque de generación a gas en Costayaco por perturbación eléctrica externa (Vector Shift) asociada a falla en reconectador EEP 34.5 kV (circuito Puerto Limón).",
+        "22-jun-2026 03:49 hrs: Shutdown General en Campo Costayaco que afectó CPW-01 a CPW-07, CPW-12, JINAN-01 y JINAN-02. Perturbación en red 34.5 kV EEP (circuito Puerto Limón) generó Vector Shift en la barra; a las 03:52 salen Turbina Soenergy y MRU; 03:53 CPW-01/02/03 disparan I>> etapa 2 en < 2 s.",
       immediateCause:
-        "Actuación simultánea de protecciones de sobrecorriente (I>> etapa 2) ante condición severa de la barra.",
+        "Apertura del reconectador EEP → Vector Shift → colapso de tensión de barra → AVR inyecta Q → sobrecorriente I>> etapa 2 (CPW-03 304 A, CPW-01 317 A, CPW-02 306 A) con GB OFF coordinado.",
       rootCause:
-        "Perturbación común de red externa (EEP); no se identifica falla interna de los generadores CPW-01/02/03 como causa raíz.",
+        "Hipótesis principal: falla en reconectador EEP 34.5 kV Puerto Limón como iniciador (perturbación común externa). Hipótesis alterna: salida de Turbina Soenergy como iniciador. Causa raíz definitiva pendiente de SOE turbina, registros MRU, informe EEP y SCADA sincronizado. Descarte: falla interna de generadores (actuación simultánea < 2 s).",
       actions: [
-        "Análisis eléctrico de secuencia de disparo (< 2 s).",
-        "Validación de actuación correcta de protecciones.",
-        "Seguimiento SOE turbina pendiente de cierre.",
-        "Entrega de reporte RCA formal a Gran Tierra (Sec. 30).",
+        "GB OFF automático por protecciones; activación Diesel CAT #2-3-4 + CPW diesel para auxiliares.",
+        "Verificación de integridad: generadores, excitación, gobernadores, protecciones y auxiliares.",
+        "Restablecimiento: sincronización al SIN ~04:08; turbina Diesel 04:58 / GLP 05:13.",
+        "Pendiente cierre: SOE Turbina Soenergy (crítica), alarmas MRU, informe EEP reconectador, secuencia frontera y SCADA con tiempo común.",
+        "Preventivas: validar ajustes 50/51, 59, 81O/81U; protocolo de coordinación con EEP; respaldo de eventos eléctricos.",
       ],
       result:
-        "RCA formal entregado (2 PDF). Estado operativo del análisis: ABIERTO — pendiente SOE turbina.",
+        "PDF formal Sec. 30 entregado a GTE (2 archivos en data/RCA). Elaboró Daniel Durán · Revisó David Cornejo · Aprobó Wilson Oliveros (22-jun-26).",
       linkedPlanId: "IP-GTE-004",
-      category: "Red eléctrica",
-      responsible: "COPOWER / Eléctrico",
+      category: "Red eléctrica / Vector Shift",
+      responsible: "Daniel Durán · Ing. Confiabilidad",
       company: "COPOWER",
-      closeDate: null,
+      closeDate: "2026-06-22",
       pdfUrls: [
         "/rca/RCA-Costayaco-2026-06-22-Vector-Shift.pdf",
         "/rca/RCA-Costayaco-2026-06-22-Vector-Shift-rev1.pdf",

@@ -160,9 +160,9 @@ export const JUNE_2026_AUDIT_ROWS: AuditRow[] = [
   },
   {
     indicator: "RCA / reportes de falla entregados",
-    pdfValue: "2 de 7",
-    excelValue: "Sin tracker de entregas en carpeta",
+    pdfValue: "1 de 7 (caso formal · 2 PDF revisiones)",
+    excelValue: "data/RCA · Vector Shift 22-jun (Sec. 30)",
     match: true,
-    note: "Ambas fuentes confirman ausencia de RCA formales.",
+    note: "Único RCA formal en carpeta: Shutdown Costayaco / Vector Shift EEP. El resto de fallas no tiene PDF entregado.",
   },
 ];

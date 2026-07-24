@@ -12,6 +12,7 @@ import { portfolioSummary } from "./degradationRiskEngine";
 import { buildOperationalPlanForPeriod, planKpis } from "./buildOperationalPlan";
 import { GRAN_TIERRA_MONTHLY_DATA, type GranTierraMonthKey } from "./granTierraMonthly";
 import { COPOWER_MONTHLY_DATA, type CopowerMonthKey } from "./copowerMonthly";
+import { EXEC_JUN } from "./executiveJune2026";
 
 type Props = {
   month: string;
@@ -354,24 +355,60 @@ export function MonthlyReportDashboard({ month, monthLabel, section }: Props) {
           <div className="op-panel-head">
             <h4>13. Conclusiones</h4>
           </div>
-          <ul className="rep-conclusions">
-            <li>
-              Priorizar activos de mayor impacto ({planPack.criticalAssets
-                .slice(0, 3)
-                .map((a) => a.assetId)
-                .join(", ") || "N/D"}
-              ).
-            </li>
-            <li>
-              Cerrar CAPA vencidas/críticas y validar efectividad de acciones post-RCA.
-            </li>
-            <li>
-              Ejecutar el plan del próximo período con enfoque en disponibilidad ≥98%.
-            </li>
-            <li>
-              Mantener seguimiento MRU / gas y estabilidad eléctrica del parque.
-            </li>
-          </ul>
+          <div className="rep-conclusions">
+            {month === "Jun" ? (
+              <>
+                <p>
+                  El desempeño de junio permitió identificar oportunidades concretas de mejora en
+                  confiabilidad y mantenimiento. La disponibilidad y confiabilidad del sistema
+                  Costayaco/Vonú cerraron en {(EXEC_JUN.availability * 100).toFixed(2)}%, con
+                  recuperación frente a mayo (MTBF {EXEC_JUN.mtbfHours.toFixed(2)} h · MTTR{" "}
+                  {EXEC_JUN.mttrHours.toFixed(2)} h), aunque aún por debajo de la meta contractual del
+                  98%. Se requiere mantener el seguimiento de los eventos críticos, asegurar el
+                  cierre efectivo de las acciones y gestionar oportunamente los recursos o
+                  decisiones necesarios para reducir riesgos operacionales.
+                </p>
+                <p>
+                  El foco operativo debe concentrarse en {EXEC_JUN.focalUnit} ({EXEC_JUN.focalUnitFailures}{" "}
+                  fallas en el periodo) y en el evento de Vector Shift / Shutdown Costayaco del
+                  22-jun, con RCA Sec. 30 ya entregado. Es prioritario validar la efectividad de las
+                  acciones derivadas, completar el cierre documental de las fallas imputables y
+                  sostener el plan de intervención vinculado para evitar reincidencias.
+                </p>
+                <p>
+                  Para el próximo periodo se recomienda ejecutar las oportunidades de optimización
+                  de mantenimiento en activos de mayor impacto (
+                  {planPack.criticalAssets
+                    .slice(0, 3)
+                    .map((a) => a.assetId)
+                    .join(", ") || "N/D"}
+                  ), cerrar CAPA vencidas o críticas, y mantener vigilancia sobre estabilidad
+                  eléctrica, MRU/gas y disponibilidad proyectada ≥98%, con seguimiento oportuno de
+                  alertas y riesgos del parque.
+                </p>
+              </>
+            ) : (
+              <>
+                <p>
+                  El desempeño de {monthLabel} permitió identificar oportunidades concretas de
+                  mejora en confiabilidad y mantenimiento. Se requiere mantener el seguimiento de
+                  los eventos críticos, asegurar el cierre efectivo de las acciones y gestionar
+                  oportunamente los recursos o decisiones necesarios para reducir riesgos
+                  operacionales.
+                </p>
+                <p>
+                  Priorizar activos de mayor impacto (
+                  {planPack.criticalAssets
+                    .slice(0, 3)
+                    .map((a) => a.assetId)
+                    .join(", ") || "N/D"}
+                  ), cerrar CAPA vencidas o críticas y ejecutar el plan del próximo periodo con
+                  enfoque en disponibilidad ≥98%, manteniendo seguimiento de MRU/gas y estabilidad
+                  eléctrica del parque.
+                </p>
+              </>
+            )}
+          </div>
         </section>
 
         <section id="rep-inf-export" className="op-panel">

@@ -31,6 +31,7 @@ import {
   CRITICALITY_COLOR,
   EVAL_COLOR,
   HEALTH_COLOR,
+  OPT_STATUS_COLOR,
   type CriticalityLevel,
   type MaintenanceOptimizationPlan,
   type OptimizationStatus,
@@ -53,27 +54,7 @@ const TIMELINE = [
   "Validación",
 ];
 
-function stars(n: number) {
-  return "★".repeat(n) + "☆".repeat(Math.max(0, 5 - n));
-}
-
-function CritBadge({ level }: { level: CriticalityLevel }) {
-  const color = CRITICALITY_COLOR[level];
-  return (
-    <span
-      className="badge"
-      style={{
-        background: `color-mix(in oklab, ${color} 22%, var(--panel-soft))`,
-        color,
-      }}
-    >
-      {level}
-    </span>
-  );
-}
-
-function HealthBadge({ band }: { band: PlanHealthBand }) {
-  const color = HEALTH_COLOR[band];
+function ToneBadge({ label, color }: { label: string; color: string }) {
   return (
     <span
       className="badge"
@@ -82,8 +63,22 @@ function HealthBadge({ band }: { band: PlanHealthBand }) {
         color,
       }}
     >
-      {band}
+      {label}
     </span>
+  );
+}
+
+function CritBadge({ level }: { level: CriticalityLevel }) {
+  return <ToneBadge label={level} color={CRITICALITY_COLOR[level]} />;
+}
+
+function MphiCell({ mphi, band }: { mphi: number; band: PlanHealthBand }) {
+  const color = HEALTH_COLOR[band];
+  return (
+    <div className="mso-mphi-cell">
+      <strong style={{ color }}>{mphi}</strong>
+      <ToneBadge label={band} color={color} />
+    </div>
   );
 }
 
@@ -161,7 +156,7 @@ export function MaintenanceOptimizationDashboard({ monthLabel }: Props) {
         <div className="dash-chart-grid mso-chart-grid" style={{ marginTop: "0.75rem" }}>
           <article className="dash-chart-panel">
             <h4>Índice de Salud del Plan (MPHI)</h4>
-            <p className="muted dash-chart-sub">0–100 · Excelente ≥80 · Aceptable 60–79 · Requiere optimización &lt;60</p>
+            <p className="muted dash-chart-sub">0–100 · Excelente ≥80 · Aceptable 60–79 · Bajo &lt;60</p>
             <div className="dash-chart">
               <ResponsiveContainer width="100%" height={230}>
                 <BarChart data={mphiChart} margin={{ top: 8, right: 8, left: 0, bottom: 4 }}>
@@ -212,7 +207,9 @@ export function MaintenanceOptimizationDashboard({ monthLabel }: Props) {
                 <li key={o.assetId}>
                   <strong>{o.assetId}</strong>
                   <span>{o.action}</span>
-                  <em title={`MPHI ${o.mphi}`}>{stars(o.stars)}</em>
+                  <em title={`Impacto ${o.impactIndex}`}>
+                    <ToneBadge label={`MPHI ${o.mphi}`} color={HEALTH_COLOR[o.healthBand]} />
+                  </em>
                 </li>
               ))}
             </ul>
@@ -229,7 +226,7 @@ export function MaintenanceOptimizationDashboard({ monthLabel }: Props) {
                 <th>Frecuencia actual</th>
                 <th>Estrategia recomendada</th>
                 <th>Nueva frecuencia</th>
-                <th>MPHI</th>
+                <th>Salud MPHI</th>
                 <th>Estado</th>
                 <th>Beneficio esperado</th>
               </tr>
@@ -253,12 +250,14 @@ export function MaintenanceOptimizationDashboard({ monthLabel }: Props) {
                   <td>{p.recommendedStrategy}</td>
                   <td>{p.recommendedFrequency}</td>
                   <td>
-                    <HealthBadge band={p.healthBand} />
-                    <div className="muted" style={{ fontSize: "0.72rem" }}>
-                      {p.mphi}/100
-                    </div>
+                    <MphiCell mphi={p.mphi} band={p.healthBand} />
                   </td>
-                  <td>{p.optimizationStatus}</td>
+                  <td>
+                    <ToneBadge
+                      label={p.optimizationStatus}
+                      color={OPT_STATUS_COLOR[p.optimizationStatus]}
+                    />
+                  </td>
                   <td className="detalle-cell">{p.expectedBenefit}</td>
                 </tr>
               ))}

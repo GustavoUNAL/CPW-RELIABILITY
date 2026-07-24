@@ -62,6 +62,60 @@ const RISK_MATRIX_COLORS = [
   ["#fca5a5", "#fca5a5", "#f87171", "#ef4444", "#b91c1c"],
 ];
 
+export function RiskMatrix5x5({
+  assets,
+  maxLabels = 2,
+  className,
+}: {
+  assets: Pick<AssetHealth, "assetId" | "probability" | "impact">[];
+  maxLabels?: number;
+  className?: string;
+}) {
+  const matrixCells = useMemo(() => {
+    const map = new Map<string, string[]>();
+    for (const a of assets) {
+      const key = `${a.probability}-${a.impact}`;
+      const list = map.get(key) ?? [];
+      list.push(a.assetId);
+      map.set(key, list);
+    }
+    return map;
+  }, [assets]);
+
+  return (
+    <div className={className ? `dr-matrix ${className}` : "dr-matrix"}>
+      {[5, 4, 3, 2, 1].map((p) => (
+        <div key={p} className="dr-matrix-row">
+          <span className="dr-matrix-axis">{p}</span>
+          {[1, 2, 3, 4, 5].map((i) => {
+            const key = `${p}-${i}`;
+            const labels = matrixCells.get(key) ?? [];
+            return (
+              <div
+                key={key}
+                className="dr-matrix-cell"
+                style={{ background: RISK_MATRIX_COLORS[p - 1][i - 1] }}
+                title={`P${p}×I${i}=${p * i}${labels.length ? ` · ${labels.join(", ")}` : ""}`}
+              >
+                {labels.slice(0, maxLabels).join(" ")}
+                {labels.length > maxLabels ? ` +${labels.length - maxLabels}` : ""}
+              </div>
+            );
+          })}
+        </div>
+      ))}
+      <div className="dr-matrix-row dr-matrix-footer">
+        <span className="dr-matrix-axis" />
+        {[1, 2, 3, 4, 5].map((i) => (
+          <span key={i} className="dr-matrix-axis">
+            {i}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function Badge({
   label,
   color,
@@ -142,16 +196,6 @@ export function DegradationRiskDashboard({ monthLabel }: Props) {
   const dist = useMemo(() => riskDistribution(assets), [assets]);
   const topDeg = useMemo(() => topDegrading(assets, 5), [assets]);
   const riskRows = useMemo(() => allRiskRows(assets).slice(0, 12), [assets]);
-  const matrixCells = useMemo(() => {
-    const map = new Map<string, string[]>();
-    for (const a of assets) {
-      const key = `${a.probability}-${a.impact}`;
-      const list = map.get(key) ?? [];
-      list.push(a.assetId);
-      map.set(key, list);
-    }
-    return map;
-  }, [assets]);
 
   return (
     <div className="panel">
@@ -240,36 +284,7 @@ export function DegradationRiskDashboard({ monthLabel }: Props) {
           <article className="dash-chart-panel">
             <h4>Matriz de riesgo 5×5</h4>
             <p className="muted dash-chart-sub">Impacto → · Probabilidad ↑</p>
-            <div className="dr-matrix">
-              {[5, 4, 3, 2, 1].map((p) => (
-                <div key={p} className="dr-matrix-row">
-                  <span className="dr-matrix-axis">{p}</span>
-                  {[1, 2, 3, 4, 5].map((i) => {
-                    const key = `${p}-${i}`;
-                    const labels = matrixCells.get(key) ?? [];
-                    return (
-                      <div
-                        key={key}
-                        className="dr-matrix-cell"
-                        style={{ background: RISK_MATRIX_COLORS[p - 1][i - 1] }}
-                        title={`P${p}×I${i}=${p * i}`}
-                      >
-                        {labels.slice(0, 2).join(" ")}
-                        {labels.length > 2 ? ` +${labels.length - 2}` : ""}
-                      </div>
-                    );
-                  })}
-                </div>
-              ))}
-              <div className="dr-matrix-row dr-matrix-footer">
-                <span className="dr-matrix-axis" />
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <span key={i} className="dr-matrix-axis">
-                    {i}
-                  </span>
-                ))}
-              </div>
-            </div>
+            <RiskMatrix5x5 assets={assets} />
           </article>
         </div>
 

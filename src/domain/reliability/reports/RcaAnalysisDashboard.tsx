@@ -1,4 +1,4 @@
-import { AlertTriangle, CheckCircle2, ExternalLink, FilePlus2, FileSearch, FileText, ShieldAlert, X } from "lucide-react";
+import { AlertTriangle, ExternalLink, FilePlus2, FileText, Link2, Wrench, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import {
   Bar,
@@ -10,8 +10,21 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { buildGteJuneRcaCases, type RcaCaseDetail, type RcaPriority } from "./gteJuneRcaCases";
-import { docsForRca, RCA_DELIVERED_COUNT, RCA_DELIVERED_DOCUMENTS } from "./rcaDocuments";
+import { enrichEventLog } from "../events/eventLogUtils";
+import {
+  buildGteJuneRcaCases,
+  findRcaCasesForEvent,
+  rcaHasFormalDocument,
+  type RcaCaseDetail,
+  type RcaPriority,
+} from "./gteJuneRcaCases";
+import { GRAN_TIERRA_MONTHLY_DATA } from "./granTierraMonthly";
+import {
+  docsForRca,
+  RCA_DELIVERED_COUNT,
+  RCA_DELIVERED_DOCUMENTS,
+  RCA_FOLDER_LABEL,
+} from "./rcaDocuments";
 
 type Props = {
   monthLabel: string;
@@ -42,14 +55,26 @@ export function RcaAnalysisDashboard({
   const setCases = onCasesChange ?? setLocalCases;
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [scope, setScope] = useState<"folder" | "all">("folder");
 
   useEffect(() => {
     if (!focusRcaId) return;
     if (cases.some((c) => c.id === focusRcaId)) {
       setSelectedId(focusRcaId);
+      setScope("all");
     }
     onFocusRcaConsumed?.();
   }, [focusRcaId, cases, onFocusRcaConsumed]);
+
+  const visibleCases = useMemo(() => {
+    const list =
+      scope === "folder" ? cases.filter((c) => rcaHasFormalDocument(c) || docsForRca(c.id).length > 0) : cases;
+    return [...list].sort((a, b) => {
+      const af = rcaHasFormalDocument(a) || docsForRca(a.id).length > 0 ? 0 : 1;
+      const bf = rcaHasFormalDocument(b) || docsForRca(b.id).length > 0 ? 0 : 1;
+      return af - bf || b.eventDate.localeCompare(a.eventDate) || a.id.localeCompare(b.id);
+    });
+  }, [cases, scope]);
 
   const selected = cases.find((c) => c.id === selectedId) ?? null;
   const selectedDocs = selected
@@ -60,36 +85,46 @@ export function RcaAnalysisDashboard({
           title: selected.title,
           eventLabel: selected.eventLabel,
           eventDate: selected.eventDate,
+          eventTime: "",
           equipment: selected.equipment,
           linkedRcaId: selected.id,
+          sequential: selected.id,
           url,
           fileName: url.split("/").pop() ?? `documento-${i + 1}.pdf`,
           pages: 0,
           revision: `Adjunto ${i + 1}`,
           status: "Entregado" as const,
+          docStatus: selected.status,
+          elaboratedBy: selected.responsible,
+          reviewedBy: "—",
+          approvedBy: "—",
           notes: "",
         }))
     : [];
 
   const stats = useMemo(() => {
-    const total = cases.length;
-    const closed = cases.filter((c) => c.status === "Cerrado").length;
-    const critical = cases.filter((c) => c.priority === "Crítica").length;
-    const high = cases.filter((c) => c.priority === "Alta").length;
-    const pending = cases.filter((c) => c.status !== "Cerrado").length;
-    const withPdf = cases.filter((c) => (c.pdfUrls?.length ?? 0) > 0 || docsForRca(c.id).length > 0).length;
-    return { total, closed, critical, high, open: pending, withPdf, deliveredDocs: RCA_DELIVERED_COUNT };
+    const folderCases = cases.filter((c) => rcaHasFormalDocument(c) || docsForRca(c.id).length > 0);
+    const gteEvents = enrichEventLog(GRAN_TIERRA_MONTHLY_DATA.Jun?.eventLog ?? [], "gran_tierra");
+    const linkedEvents = gteEvents.filter(
+      (e) => findRcaCasesForEvent(e.date, e.equipment, folderCases).length > 0,
+    );
+    const assets = new Set(folderCases.flatMap((c) => c.linkedAssets));
+    return {
+      formalRca: RCA_DELIVERED_COUNT,
+      linkedFailureEvents: linkedEvents.length,
+      affectedAssets: assets.size,
+      withPlan: folderCases.filter((c) => Boolean(c.linkedPlanId)).length,
+    };
   }, [cases]);
 
-  const chartData = useMemo(
-    () =>
-      cases.map((c) => ({
-        id: c.id,
-        score: c.priority === "Crítica" ? 3 : c.priority === "Alta" ? 2 : c.priority === "Media" ? 1 : 0.5,
-        priority: c.priority,
-        title: c.eventLabel,
-      })),
-    [cases],
+  const summaryChartData = useMemo(
+    () => [
+      { key: "RCA formales", value: stats.formalRca, fill: "#0ea5e9" },
+      { key: "Eventos de falla", value: stats.linkedFailureEvents, fill: "#f97316" },
+      { key: "Equipos afectados", value: stats.affectedAssets, fill: "#6366f1" },
+      { key: "Con plan", value: stats.withPlan, fill: "#22c55e" },
+    ],
+    [stats],
   );
 
   function updateCase(id: string, patch: Partial<RcaCaseDetail>) {
@@ -121,6 +156,16 @@ export function RcaAnalysisDashboard({
           <h3>{monthLabel}</h3>
           <div className="rca-head-actions">
             <span className="source-badge gte">GTE</span>
+            <label className="ev-bitacora-filter">
+              <select
+                value={scope}
+                onChange={(e) => setScope(e.target.value as "folder" | "all")}
+                aria-label="Alcance de casos RCA"
+              >
+                <option value="folder">Solo {RCA_FOLDER_LABEL}</option>
+                <option value="all">Todos los casos</option>
+              </select>
+            </label>
             {onCreateBlankRca ? (
               <button type="button" className="open-popup-btn" onClick={onCreateBlankRca}>
                 <FilePlus2 size={14} /> Nuevo RCA
@@ -128,57 +173,73 @@ export function RcaAnalysisDashboard({
             ) : null}
           </div>
         </div>
-        <p className="muted" style={{ marginTop: "0.35rem" }}>
-          Eventos de mayor impacto / recurrencia · PDF entregados en <code>data/RCA</code> (también en{" "}
-          <code>/rca</code>). Nuevos casos se guardan en este navegador.
-        </p>
-
         <div className="exec-kpi-row" style={{ marginTop: "0.6rem" }}>
           <div className="exec-kpi">
-            <FileSearch size={16} />
-            <span>RCA totales</span>
-            <strong>{stats.total}</strong>
-          </div>
-          <div className="exec-kpi">
-            <CheckCircle2 size={16} />
-            <span>Cerrados</span>
-            <strong>{stats.closed}</strong>
-          </div>
-          <div className="exec-kpi">
             <FileText size={16} />
-            <span>PDF entregados</span>
-            <strong>{stats.deliveredDocs}</strong>
-            <small>{stats.withPdf} caso(s) con adjunto</small>
-          </div>
-          <div className="exec-kpi">
-            <ShieldAlert size={16} />
-            <span>Prioridad crítica</span>
-            <strong>{stats.critical}</strong>
+            <span>RCA formales</span>
+            <strong>{stats.formalRca}</strong>
+            <small>Entregados a GTE</small>
           </div>
           <div className="exec-kpi">
             <AlertTriangle size={16} />
-            <span>Abiertos</span>
-            <strong>{stats.open}</strong>
+            <span>Eventos de falla registrados</span>
+            <strong>{stats.linkedFailureEvents}</strong>
+            <small>Bitácora GTE vinculados</small>
+          </div>
+          <div className="exec-kpi">
+            <Wrench size={16} />
+            <span>Equipos afectados</span>
+            <strong>{stats.affectedAssets}</strong>
+            <small>Activos en RCA formales</small>
+          </div>
+          <div className="exec-kpi">
+            <Link2 size={16} />
+            <span>Con plan de intervención</span>
+            <strong>{stats.withPlan}</strong>
+            <small>RCA con plan vinculado</small>
           </div>
         </div>
 
+        <article className="dash-chart-panel" style={{ marginTop: "0.7rem" }}>
+          <h4>Resumen RCA formales</h4>
+          <p className="muted dash-chart-sub">
+            {stats.formalRca} RCA · {stats.linkedFailureEvents} eventos · {stats.affectedAssets} equipos
+          </p>
+          <div className="dash-chart">
+            <ResponsiveContainer width="100%" height={240}>
+              <BarChart data={summaryChartData} margin={{ top: 8, right: 8, left: 0, bottom: 8 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
+                <XAxis dataKey="key" tick={{ fontSize: 10 }} interval={0} />
+                <YAxis tick={{ fontSize: 10 }} width={28} allowDecimals={false} />
+                <Tooltip formatter={(value) => [value, "Cantidad"]} />
+                <Bar dataKey="value" name="Cantidad" radius={[4, 4, 0, 0]}>
+                  {summaryChartData.map((row) => (
+                    <Cell key={row.key} fill={row.fill} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </article>
+
         <section className="panel" style={{ marginTop: "0.75rem" }}>
           <article className="card">
-            <p className="eyebrow">Documentos formales</p>
-            <h3>RCA PDF entregados a Gran Tierra</h3>
+            <p className="eyebrow">Documentos en {RCA_FOLDER_LABEL}</p>
+            <h3>RCA PDF · Secuencial 30 · Vector Shift</h3>
             <p className="muted" style={{ marginTop: "0.25rem" }}>
-              {RCA_DELIVERED_COUNT} archivo(s) · abra el visor o descargue el PDF.
+              {RCA_DELIVERED_COUNT} RCA formales · elaboró Daniel Durán · aprobó Wilson Oliveros · vinculados a bitácora.
             </p>
             <div className="table-wrap" style={{ marginTop: "0.55rem" }}>
               <table>
                 <thead>
                   <tr>
                     <th>Documento</th>
-                    <th>Fecha evento</th>
+                    <th>Evento</th>
+                    <th>Sec.</th>
                     <th>RCA</th>
                     <th>Revisión</th>
-                    <th>Páginas</th>
-                    <th>Estado</th>
+                    <th>Pág.</th>
+                    <th>Estado doc.</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -191,7 +252,13 @@ export function RcaAnalysisDashboard({
                           {doc.fileName}
                         </div>
                       </td>
-                      <td>{doc.eventDate}</td>
+                      <td>
+                        {doc.eventDate} {doc.eventTime}
+                        <div className="muted" style={{ fontSize: "0.7rem" }}>
+                          {doc.equipment}
+                        </div>
+                      </td>
+                      <td>{doc.sequential}</td>
                       <td>
                         <button
                           type="button"
@@ -204,7 +271,7 @@ export function RcaAnalysisDashboard({
                       <td>{doc.revision}</td>
                       <td>{doc.pages}</td>
                       <td>
-                        <span className="badge success">{doc.status}</span>
+                        <span className="badge">{doc.docStatus}</span>
                       </td>
                       <td>
                         <div className="rca-doc-actions">
@@ -224,32 +291,7 @@ export function RcaAnalysisDashboard({
           </article>
         </section>
 
-        <article className="dash-chart-panel" style={{ marginTop: "0.7rem" }}>
-          <h4>Criticidad de RCA seleccionados</h4>
-          <p className="muted dash-chart-sub">Escala relativa: Crítica=3 · Alta=2 · Media=1</p>
-          <div className="dash-chart">
-            <ResponsiveContainer width="100%" height={240}>
-              <BarChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 4 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
-                <XAxis dataKey="id" tick={{ fontSize: 10 }} interval={0} />
-                <YAxis tick={{ fontSize: 10 }} width={28} allowDecimals={false} />
-                <Tooltip
-                  formatter={(_, __, item) => {
-                    const row = item?.payload as { priority?: string; title?: string } | undefined;
-                    return [row?.priority ?? "", row?.title ?? "Prioridad"];
-                  }}
-                />
-                <Bar dataKey="score" name="Criticidad" radius={[4, 4, 0, 0]}>
-                  {chartData.map((row) => (
-                    <Cell key={row.id} fill={PRIORITY_COLOR[row.priority]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </article>
-
-        <div className="table-wrap" style={{ marginTop: "0.7rem" }}>
+<div className="table-wrap" style={{ marginTop: "0.7rem" }}>
           <table>
             <thead>
               <tr>
@@ -266,59 +308,73 @@ export function RcaAnalysisDashboard({
               </tr>
             </thead>
             <tbody>
-              {cases.map((c) => {
-                const docs = docsForRca(c.id);
-                const pdfCount = docs.length || (c.pdfUrls?.length ?? 0);
-                return (
-                <tr key={c.id}>
-                  <td>
-                    <button
-                      type="button"
-                      className="sort-button"
-                      title="Abrir RCA"
-                      onClick={() => setSelectedId(c.id)}
-                    >
-                      {c.id}
-                    </button>
+              {visibleCases.length === 0 ? (
+                <tr>
+                  <td colSpan={10} className="muted">
+                    Sin casos en el alcance seleccionado.
                   </td>
-                  <td>{c.eventLabel}</td>
-                  <td>{c.equipment}</td>
-                  <td>{c.eventDate}</td>
-                  <td>
-                    <span
-                      className="badge"
-                      style={{
-                        background: `color-mix(in oklab, ${PRIORITY_COLOR[c.priority]} 22%, var(--panel-soft))`,
-                        color: PRIORITY_COLOR[c.priority],
-                      }}
-                    >
-                      {c.priority}
-                    </span>
-                  </td>
-                  <td>{c.status}</td>
-                  <td>{c.category}</td>
-                  <td>{c.linkedPlanId ?? "—"}</td>
-                  <td>
-                    {pdfCount > 0 ? (
-                      <button
-                        type="button"
-                        className="ev-rca-link"
-                        onClick={() => {
-                          setSelectedId(c.id);
-                          const first = docs[0]?.url ?? c.pdfUrls?.[0];
-                          if (first) setPdfUrl(first);
-                        }}
-                      >
-                        <FileText size={12} /> {pdfCount}
-                      </button>
-                    ) : (
-                      "—"
-                    )}
-                  </td>
-                  <td className="detalle-cell">{c.result || "—"}</td>
                 </tr>
-              );
-              })}
+              ) : (
+                visibleCases.map((c) => {
+                  const docs = docsForRca(c.id);
+                  const pdfCount = docs.length || (c.pdfUrls?.length ?? 0);
+                  const formal = pdfCount > 0;
+                  return (
+                    <tr key={c.id}>
+                      <td>
+                        <button
+                          type="button"
+                          className="sort-button"
+                          title="Abrir RCA"
+                          onClick={() => setSelectedId(c.id)}
+                        >
+                          {c.id}
+                        </button>
+                        {formal ? (
+                          <div className="muted" style={{ fontSize: "0.65rem" }}>
+                            {RCA_FOLDER_LABEL}
+                          </div>
+                        ) : null}
+                      </td>
+                      <td>{c.eventLabel}</td>
+                      <td>{c.equipment}</td>
+                      <td>{c.eventDate}</td>
+                      <td>
+                        <span
+                          className="badge"
+                          style={{
+                            background: `color-mix(in oklab, ${PRIORITY_COLOR[c.priority]} 22%, var(--panel-soft))`,
+                            color: PRIORITY_COLOR[c.priority],
+                          }}
+                        >
+                          {c.priority}
+                        </span>
+                      </td>
+                      <td>{c.status}</td>
+                      <td>{c.category}</td>
+                      <td>{c.linkedPlanId ?? "—"}</td>
+                      <td>
+                        {pdfCount > 0 ? (
+                          <button
+                            type="button"
+                            className="ev-rca-link"
+                            onClick={() => {
+                              setSelectedId(c.id);
+                              const first = docs[0]?.url ?? c.pdfUrls?.[0];
+                              if (first) setPdfUrl(first);
+                            }}
+                          >
+                            <FileText size={12} /> {pdfCount}
+                          </button>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
+                      <td className="detalle-cell">{c.result || "—"}</td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>

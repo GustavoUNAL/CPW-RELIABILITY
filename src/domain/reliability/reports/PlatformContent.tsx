@@ -18,6 +18,8 @@ import type { RcaCaseDetail } from "./gteJuneRcaCases";
 import type { RcaEventDraft } from "./rcaCaseStore";
 import { MaintenanceOptimizationDashboard } from "./MaintenanceOptimizationDashboard";
 import { DegradationRiskDashboard } from "./DegradationRiskDashboard";
+import { RiskMatrixDashboard } from "./RiskMatrixDashboard";
+import { InventoryMinimumsDashboard } from "./InventoryMinimumsDashboard";
 import { ActionTrackingDashboard } from "./ActionTrackingDashboard";
 import { OperationalPlanningDashboard } from "./OperationalPlanningDashboard";
 import { MonthlyReportDashboard } from "./MonthlyReportDashboard";
@@ -36,7 +38,6 @@ import { SourceMeetingBrief, SourceMonthCompare } from "./SourcePanels";
 import { MarcoContractual } from "./MarcoContractual";
 import { ContractComplianceDashboard } from "./ContractComplianceDashboard";
 import { CONTRACT_CALC_BASE, CONTRACTUAL_KPI_TARGETS } from "../contracts/gteOrders";
-import { assessTechnicalRisk } from "../risk/technicalRisk";
 import {
   capaFocusFromLeaf,
   generationSectionFromLeaf,
@@ -570,6 +571,7 @@ function PlatformBody({
     leafId === "mto-degradacion" ||
     leafId === "mto-dashboard" ||
     leafId === "ga-salud" ||
+    leafId === "ga-inventario" ||
     page === "gestion_activos"
   ) {
     if (leafId === "mto-optimizacion") {
@@ -588,6 +590,9 @@ function PlatformBody({
     }
     if (leafId === "mto-dashboard") {
       return <DashboardMantenimiento month={month} monthLabel={monthLabel} />;
+    }
+    if (leafId === "ga-inventario") {
+      return <InventoryMinimumsDashboard />;
     }
   }
 
@@ -765,46 +770,10 @@ function PlatformBody({
   }
 
   if (leafId === "an-riesgo") {
-    const snap = getSnap("copower", month);
-    const rows = (snap?.machineIndicators ?? [])
-      .filter((m) => m.unidad !== "SISTEMA N")
-      .map((m) => ({
-        ...m,
-        assessed: assessTechnicalRisk({
-          fallas: m.fallas,
-          mtbfLabel: m.mtbfLabel,
-          mttrHours: m.mttrHours,
-          disponibilidadPct: m.disponibilidadPct,
-          skip: m.cumplimiento === "N/A",
-        }),
-      }));
     return (
-      <ScreenShell
-        report="copower"
-        title="Matriz de riesgo técnico"
-        subtitle="Probabilidad × Consecuencia — pendiente validación formal"
-      >
-        <div className="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Unidad</th>
-                <th>Fallas</th>
-                <th>Riesgo</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => (
-                <tr key={r.unidad}>
-                  <td>{r.unidad}</td>
-                  <td>{r.fallas}</td>
-                  <td>{r.assessed.riesgo}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </ScreenShell>
+      <RiskMatrixDashboard
+        monthLabel={month === "Jun" ? monthLabel : `${monthLabel} · evaluación junio 2026`}
+      />
     );
   }
 

@@ -1,6 +1,6 @@
 import { buildGteJuneRcaCases, type RcaCaseDetail } from "./gteJuneRcaCases";
 
-const STORAGE_KEY = "cpw-rca-cases-v1";
+const STORAGE_KEY = "cpw-rca-cases-v3";
 
 export type RcaEventDraft = {
   date: string;

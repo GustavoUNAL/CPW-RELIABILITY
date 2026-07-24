@@ -17,7 +17,7 @@ import {
 import { CONTRACTUAL_KPI_TARGETS, getReliabilityDeduction } from "../contracts/gteOrders";
 import { loadOperacionPack } from "../operacion/api";
 import { EFICIENCIA_FORMULA, eficienciaCampoSnapshot } from "../operacion/eficiencia";
-import { JUNE_2026_IMPUTABLE_EVENTS } from "./juneImputableEvents";
+import { EXEC_JUN } from "./executiveJune2026";
 import {
   COPOWER_KPI_FROM_MONTHS,
   COPOWER_MONTHLY_DATA,
@@ -507,11 +507,12 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
     });
   }
 
-  if (month === "Jun" && JUNE_2026_IMPUTABLE_EVENTS.length > 0) {
+  if (month === "Jun" && EXEC_JUN.rcaRequired > 0) {
+    const pendingRca = Math.max(0, EXEC_JUN.rcaRequired - EXEC_JUN.rcaDelivered);
     alerts.push({
-      active: true,
-      title: "RCA de fallas asociadas pendientes",
-      detail: `2/${JUNE_2026_IMPUTABLE_EVENTS.length} entregados · restan ${JUNE_2026_IMPUTABLE_EVENTS.length - 2} · riesgo multa 4% adicional`,
+      active: pendingRca > 0,
+      title: "RCA formales pendientes de entrega",
+      detail: `${EXEC_JUN.rcaDelivered}/${EXEC_JUN.rcaRequired} casos con PDF en data/RCA · restan ${pendingRca} · riesgo multa 4% adicional`,
     });
   }
 

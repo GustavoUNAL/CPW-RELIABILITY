@@ -3309,6 +3309,96 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
     ],
     "eventLog": [
       {
+        "date": "2026-06-22",
+        "equipment": "CPW01",
+        "eventType": "Causa comun",
+        "cause": "03:49 Shutdown general Costayaco por Vector Shift — falla reconectador EEP 34.5 kV circuito Puerto Limón. Protecciones I>> etapa 2; origen externo red EEP. RCA formal Sec. 30.",
+        "downtimeHours": 0,
+        "responsible": "GTE",
+        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 0.0 h | Falla_evento 0 | RCA-030"
+      },
+      {
+        "date": "2026-06-22",
+        "equipment": "CPW02",
+        "eventType": "Causa comun",
+        "cause": "03:49 Shutdown general Costayaco por Vector Shift — falla reconectador EEP 34.5 kV circuito Puerto Limón. Protecciones I>> etapa 2; origen externo red EEP. RCA formal Sec. 30.",
+        "downtimeHours": 0,
+        "responsible": "GTE",
+        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 0.0 h | Falla_evento 0 | RCA-030"
+      },
+      {
+        "date": "2026-06-22",
+        "equipment": "CPW03",
+        "eventType": "Causa comun",
+        "cause": "03:49 Shutdown general Costayaco por Vector Shift — falla reconectador EEP 34.5 kV circuito Puerto Limón. Protecciones I>> etapa 2; origen externo red EEP. RCA formal Sec. 30.",
+        "downtimeHours": 0,
+        "responsible": "GTE",
+        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 0.0 h | Falla_evento 0 | RCA-030"
+      },
+      {
+        "date": "2026-06-22",
+        "equipment": "CPW04",
+        "eventType": "Causa comun",
+        "cause": "03:49 Shutdown general Costayaco por Vector Shift — falla reconectador EEP 34.5 kV circuito Puerto Limón. Origen externo red EEP. RCA formal Sec. 30.",
+        "downtimeHours": 0,
+        "responsible": "GTE",
+        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 0.0 h | Falla_evento 0 | RCA-030"
+      },
+      {
+        "date": "2026-06-22",
+        "equipment": "CPW05",
+        "eventType": "Causa comun",
+        "cause": "03:49 Shutdown general Costayaco por Vector Shift — falla reconectador EEP 34.5 kV circuito Puerto Limón. Origen externo red EEP. RCA formal Sec. 30.",
+        "downtimeHours": 0,
+        "responsible": "GTE",
+        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 0.0 h | Falla_evento 0 | RCA-030"
+      },
+      {
+        "date": "2026-06-22",
+        "equipment": "CPW06",
+        "eventType": "Causa comun",
+        "cause": "03:49 Shutdown general Costayaco por Vector Shift — falla reconectador EEP 34.5 kV. MAINS FAILURE / DAVR Trip. Origen externo red EEP. RCA formal Sec. 30.",
+        "downtimeHours": 0,
+        "responsible": "GTE",
+        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 0.0 h | Falla_evento 0 | RCA-030"
+      },
+      {
+        "date": "2026-06-22",
+        "equipment": "CPW07",
+        "eventType": "Causa comun",
+        "cause": "03:49 Shutdown general Costayaco por Vector Shift — falla reconectador EEP 34.5 kV circuito Puerto Limón. Origen externo red EEP. RCA formal Sec. 30.",
+        "downtimeHours": 0,
+        "responsible": "GTE",
+        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 0.0 h | Falla_evento 0 | RCA-030"
+      },
+      {
+        "date": "2026-06-22",
+        "equipment": "CPW12",
+        "eventType": "Causa comun",
+        "cause": "03:49 Shutdown general Costayaco por Vector Shift — falla reconectador EEP 34.5 kV circuito Puerto Limón. Origen externo red EEP. RCA formal Sec. 30.",
+        "downtimeHours": 0,
+        "responsible": "GTE",
+        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 0.0 h | Falla_evento 0 | RCA-030"
+      },
+      {
+        "date": "2026-06-22",
+        "equipment": "JIN-01",
+        "eventType": "Causa comun",
+        "cause": "03:49 Shutdown general Costayaco por Vector Shift — falla reconectador EEP 34.5 kV circuito Puerto Limón. Origen externo red EEP. RCA formal Sec. 30.",
+        "downtimeHours": 0,
+        "responsible": "GTE",
+        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 0.0 h | Falla_evento 0 | RCA-030"
+      },
+      {
+        "date": "2026-06-22",
+        "equipment": "JIN-02",
+        "eventType": "Causa comun",
+        "cause": "03:49 Shutdown general Costayaco por Vector Shift — falla reconectador EEP 34.5 kV circuito Puerto Limón. Origen externo red EEP. RCA formal Sec. 30.",
+        "downtimeHours": 0,
+        "responsible": "GTE",
+        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 0.0 h | Falla_evento 0 | RCA-030"
+      },
+      {
         "date": "2026-06-28",
         "equipment": "CPW01",
         "eventType": "Operativo",

@@ -35,7 +35,7 @@ export type OptimizationStatus =
   | "Implementado"
   | "Validado";
 
-export type PlanHealthBand = "Excelente" | "Aceptable" | "Requiere optimización";
+export type PlanHealthBand = "Excelente" | "Aceptable" | "Bajo";
 
 export type EvaluationLabel = "Adecuado" | "Requiere ajuste" | "Deficiente";
 
@@ -112,7 +112,15 @@ export const CRITICALITY_COLOR: Record<CriticalityLevel, string> = {
 export const HEALTH_COLOR: Record<PlanHealthBand, string> = {
   Excelente: "#16a34a",
   Aceptable: "#ca8a04",
+  Bajo: "#dc2626",
+};
+
+export const OPT_STATUS_COLOR: Record<OptimizationStatus, string> = {
+  "Pendiente análisis": "#64748b",
   "Requiere optimización": "#dc2626",
+  "En aprobación": "#d97706",
+  Implementado: "#2563eb",
+  Validado: "#16a34a",
 };
 
 export const EVAL_COLOR: Record<EvaluationLabel, string> = {
@@ -124,7 +132,7 @@ export const EVAL_COLOR: Record<EvaluationLabel, string> = {
 export function healthBandFromMphi(mphi: number): PlanHealthBand {
   if (mphi >= 80) return "Excelente";
   if (mphi >= 60) return "Aceptable";
-  return "Requiere optimización";
+  return "Bajo";
 }
 
 export function evaluationFromMphi(mphi: number): EvaluationLabel {

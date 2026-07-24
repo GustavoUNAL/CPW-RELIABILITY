@@ -49,7 +49,8 @@ export const EXEC_JUN = {
   hoursPp: 28,
   hoursPfContr: 20,
   hoursPfCli: 189,
-  rcaDelivered: 2,
+  /** Casos RCA formales con PDF en data/RCA (1 caso · 2 revisiones del 22-jun Vector Shift). */
+  rcaDelivered: 1,
   rcaRequired: 7,
   excelFailureRows: 10,
   focalUnit: "CPW06",
