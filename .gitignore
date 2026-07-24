@@ -2,8 +2,5 @@ node_modules
 dist
 .pycache
 *.tsbuildinfo
-
-# Local Excel sources (too large for GitHub)
-data/mantenimiento /
 *.DS_Store
 ~$*.xlsx

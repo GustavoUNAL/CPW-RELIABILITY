@@ -8738,3 +8738,117 @@ tr.row-focal td {
     min-height: 2.8rem;
   }
 }
+
+/* —— Planes de mantenimiento (sábana Putumayo) —— */
+.mto-plans {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.mto-plans-notes {
+  margin: 0 0 0.75rem;
+  padding-left: 1.1rem;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.mto-plans-fleet {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+  gap: 0.4rem;
+}
+
+.mto-plans-fleet-item {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-soft);
+  padding: 0.4rem 0.5rem;
+}
+
+.mto-plans-fleet-item strong {
+  display: block;
+  font-size: 0.78rem;
+}
+
+.mto-plans-fleet-item span {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.mto-plans-toolbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.55rem;
+}
+
+.mto-plans-toolbar h3 {
+  margin: 0.15rem 0 0;
+}
+
+.mto-plans-filters {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.mto-plans-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.mto-plans-filters select,
+.mto-plans-search input {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.78rem;
+}
+
+.mto-plans-search {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.2rem 0.45rem;
+  background: var(--panel);
+}
+
+.mto-plans-search input {
+  border: none;
+  outline: none;
+  min-width: 11rem;
+  background: transparent;
+}
+
+.mto-plans-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0 0 0.65rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.mto-plans-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.mto-plans-notes-cell {
+  max-width: 22rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+}

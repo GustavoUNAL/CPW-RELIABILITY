@@ -17,6 +17,7 @@ import { RcaAnalysisDashboard } from "./RcaAnalysisDashboard";
 import type { RcaCaseDetail } from "./gteJuneRcaCases";
 import type { RcaEventDraft } from "./rcaCaseStore";
 import { MaintenanceOptimizationDashboard } from "./MaintenanceOptimizationDashboard";
+import { MaintenancePlansDashboard } from "./MaintenancePlansDashboard";
 import { DegradationRiskDashboard } from "./DegradationRiskDashboard";
 import { RiskMatrixDashboard } from "./RiskMatrixDashboard";
 import { InventoryMinimumsDashboard } from "./InventoryMinimumsDashboard";
@@ -589,7 +590,7 @@ function PlatformBody({
       );
     }
     if (leafId === "mto-dashboard") {
-      return <DashboardMantenimiento month={month} monthLabel={monthLabel} />;
+      return <MaintenancePlansDashboard month={month} monthLabel={monthLabel} />;
     }
     if (leafId === "ga-inventario") {
       return <InventoryMinimumsDashboard />;
