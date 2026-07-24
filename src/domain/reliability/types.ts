@@ -162,6 +162,7 @@ export type PageKey =
   | "generacion"
   | "operacion"
   | "confiabilidad"
+  | "mantenimiento"
   | "gestion_activos"
   | "gestion_acciones"
   | "planeacion";

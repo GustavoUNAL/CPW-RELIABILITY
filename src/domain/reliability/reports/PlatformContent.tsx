@@ -14,6 +14,8 @@ import { EventInsightsDashboard } from "./EventInsightsDashboard";
 import { OperacionModule, operacionSectionFromLeaf } from "../operacion/OperacionModule";
 import { InterventionPlansDashboard } from "./InterventionPlansDashboard";
 import { RcaAnalysisDashboard } from "./RcaAnalysisDashboard";
+import { CostayacoRcaEventsApp } from "../rca/CostayacoRcaEventsApp";
+import type { RcaEventoFalla } from "../rca/types";
 import type { RcaCaseDetail } from "./gteJuneRcaCases";
 import type { RcaEventDraft } from "./rcaCaseStore";
 import { MaintenanceOptimizationDashboard } from "./MaintenanceOptimizationDashboard";
@@ -63,6 +65,11 @@ type Props = {
   onRcaCasesChange?: (next: RcaCaseDetail[] | ((prev: RcaCaseDetail[]) => RcaCaseDetail[])) => void;
   onCreateRcaFromEvent?: (draft: RcaEventDraft) => void;
   onCreateBlankRca?: () => void;
+  costayacoRcaEvents?: RcaEventoFalla[];
+  onCostayacoRcaChange?: (next: RcaEventoFalla) => void;
+  onNavigateToCostayacoRca?: (evtId?: string) => void;
+  focusCostayacoRcaId?: string | null;
+  onFocusCostayacoRcaConsumed?: () => void;
 };
 
 const pct = (v: number | null | undefined, d = 2) =>
@@ -89,6 +96,11 @@ export function DualCompare({
   onRcaCasesChange,
   onCreateRcaFromEvent,
   onCreateBlankRca,
+  costayacoRcaEvents,
+  onCostayacoRcaChange,
+  onNavigateToCostayacoRca,
+  focusCostayacoRcaId,
+  onFocusCostayacoRcaConsumed,
 }: {
   page: PageKey;
   leafId: string;
@@ -102,6 +114,11 @@ export function DualCompare({
   onRcaCasesChange?: (next: RcaCaseDetail[] | ((prev: RcaCaseDetail[]) => RcaCaseDetail[])) => void;
   onCreateRcaFromEvent?: (draft: RcaEventDraft) => void;
   onCreateBlankRca?: () => void;
+  costayacoRcaEvents?: RcaEventoFalla[];
+  onCostayacoRcaChange?: (next: RcaEventoFalla) => void;
+  onNavigateToCostayacoRca?: (evtId?: string) => void;
+  focusCostayacoRcaId?: string | null;
+  onFocusCostayacoRcaConsumed?: () => void;
 }) {
   return (
     <div className="dual-source-wrap dual-source-wrap--fit">
@@ -132,6 +149,11 @@ export function DualCompare({
                   onRcaCasesChange={onRcaCasesChange}
                   onCreateRcaFromEvent={onCreateRcaFromEvent}
                   onCreateBlankRca={onCreateBlankRca}
+                  costayacoRcaEvents={costayacoRcaEvents}
+                  onCostayacoRcaChange={onCostayacoRcaChange}
+                  onNavigateToCostayacoRca={onNavigateToCostayacoRca}
+                  focusCostayacoRcaId={focusCostayacoRcaId}
+                  onFocusCostayacoRcaConsumed={onFocusCostayacoRcaConsumed}
                 />
               )}
             </div>
@@ -340,6 +362,11 @@ function PlatformBody({
   onRcaCasesChange,
   onCreateRcaFromEvent,
   onCreateBlankRca,
+  costayacoRcaEvents,
+  onCostayacoRcaChange,
+  onNavigateToCostayacoRca,
+  focusCostayacoRcaId,
+  onFocusCostayacoRcaConsumed,
 }: Props & { report: ReportKey }) {
   const cpwMonth = (COPOWER_MONTHLY_DATA[month as CopowerMonthKey] ? month : "Jun") as CopowerMonthKey;
   const gteMonthOk = Boolean(GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey]);
@@ -401,6 +428,7 @@ function PlatformBody({
     leafId.startsWith("an-badactors") ||
     leafId.startsWith("an-interv") ||
     leafId === "an-rca-gte" ||
+    leafId === "an-rca-casos" ||
     leafId === "an-rca" ||
     leafId === "an-pareto" ||
     leafId === "an-tendencias-fallas" ||
@@ -419,6 +447,9 @@ function PlatformBody({
             onNavigateToRca={onNavigateToRca}
             rcaCases={rcaCases}
             onCreateRcaFromEvent={onCreateRcaFromEvent}
+            costayacoRcaEvents={costayacoRcaEvents}
+            onCostayacoRcaChange={onCostayacoRcaChange}
+            onNavigateToCostayacoRca={onNavigateToCostayacoRca}
           />
         </ScreenShell>
       );
@@ -433,6 +464,9 @@ function PlatformBody({
             onNavigateToRca={onNavigateToRca}
             rcaCases={rcaCases}
             onCreateRcaFromEvent={onCreateRcaFromEvent}
+            costayacoRcaEvents={costayacoRcaEvents}
+            onCostayacoRcaChange={onCostayacoRcaChange}
+            onNavigateToCostayacoRca={onNavigateToCostayacoRca}
           />
         </ScreenShell>
       );
@@ -447,6 +481,9 @@ function PlatformBody({
             onNavigateToRca={onNavigateToRca}
             rcaCases={rcaCases}
             onCreateRcaFromEvent={onCreateRcaFromEvent}
+            costayacoRcaEvents={costayacoRcaEvents}
+            onCostayacoRcaChange={onCostayacoRcaChange}
+            onNavigateToCostayacoRca={onNavigateToCostayacoRca}
           />
         </ScreenShell>
       );
@@ -461,6 +498,9 @@ function PlatformBody({
             onNavigateToRca={onNavigateToRca}
             rcaCases={rcaCases}
             onCreateRcaFromEvent={onCreateRcaFromEvent}
+            costayacoRcaEvents={costayacoRcaEvents}
+            onCostayacoRcaChange={onCostayacoRcaChange}
+            onNavigateToCostayacoRca={onNavigateToCostayacoRca}
           />
         </ScreenShell>
       );
@@ -476,6 +516,9 @@ function PlatformBody({
             onNavigateToRca={onNavigateToRca}
             rcaCases={rcaCases}
             onCreateRcaFromEvent={onCreateRcaFromEvent}
+            costayacoRcaEvents={costayacoRcaEvents}
+            onCostayacoRcaChange={onCostayacoRcaChange}
+            onNavigateToCostayacoRca={onNavigateToCostayacoRca}
           />
         </ScreenShell>
       );
@@ -512,7 +555,17 @@ function PlatformBody({
       const intervLabel = month === "Jun" ? monthLabel : `${monthLabel} · datos junio 2026`;
       return <InterventionPlansDashboard report="gran_tierra" month={intervMonth} monthLabel={intervLabel} />;
     }
-    if (leafId === "an-rca-gte" || leafId === "an-rca") {
+    if (leafId === "an-rca-gte") {
+      return (
+        <CostayacoRcaEventsApp
+          events={costayacoRcaEvents}
+          onEventChange={onCostayacoRcaChange}
+          focusId={focusCostayacoRcaId}
+          onFocusConsumed={onFocusCostayacoRcaConsumed}
+        />
+      );
+    }
+    if (leafId === "an-rca-casos" || leafId === "an-rca") {
       return (
         <RcaAnalysisDashboard
           monthLabel={month === "Jun" ? monthLabel : `${monthLabel} · RCA junio 2026`}
@@ -571,8 +624,10 @@ function PlatformBody({
     leafId === "mto-optimizacion" ||
     leafId === "mto-degradacion" ||
     leafId === "mto-dashboard" ||
+    leafId === "dash-mto" ||
     leafId === "ga-salud" ||
     leafId === "ga-inventario" ||
+    page === "mantenimiento" ||
     page === "gestion_activos"
   ) {
     if (leafId === "mto-optimizacion") {
@@ -592,6 +647,9 @@ function PlatformBody({
     }
     if (leafId === "mto-dashboard") {
       return <MaintenancePlansDashboard month={month} monthLabel={monthLabel} />;
+    }
+    if (leafId === "dash-mto") {
+      return <DashboardMantenimiento month={month} monthLabel={monthLabel} />;
     }
     if (leafId === "ga-inventario") {
       return <InventoryMinimumsDashboard />;
@@ -831,6 +889,11 @@ export function PlatformContent({
   onRcaCasesChange,
   onCreateRcaFromEvent,
   onCreateBlankRca,
+  costayacoRcaEvents,
+  onCostayacoRcaChange,
+  onNavigateToCostayacoRca,
+  focusCostayacoRcaId,
+  onFocusCostayacoRcaConsumed,
 }: Props) {
   const ctx = resolveViewContext(page, leafId);
 
@@ -910,6 +973,11 @@ export function PlatformContent({
         onRcaCasesChange={onRcaCasesChange}
         onCreateRcaFromEvent={onCreateRcaFromEvent}
         onCreateBlankRca={onCreateBlankRca}
+        costayacoRcaEvents={costayacoRcaEvents}
+        onCostayacoRcaChange={onCostayacoRcaChange}
+        onNavigateToCostayacoRca={onNavigateToCostayacoRca}
+        focusCostayacoRcaId={focusCostayacoRcaId}
+        onFocusCostayacoRcaConsumed={onFocusCostayacoRcaConsumed}
       />
     );
   }
@@ -929,6 +997,11 @@ export function PlatformContent({
       onRcaCasesChange={onRcaCasesChange}
       onCreateRcaFromEvent={onCreateRcaFromEvent}
       onCreateBlankRca={onCreateBlankRca}
+      costayacoRcaEvents={costayacoRcaEvents}
+      onCostayacoRcaChange={onCostayacoRcaChange}
+      onNavigateToCostayacoRca={onNavigateToCostayacoRca}
+      focusCostayacoRcaId={focusCostayacoRcaId}
+      onFocusCostayacoRcaConsumed={onFocusCostayacoRcaConsumed}
     />
   );
 }

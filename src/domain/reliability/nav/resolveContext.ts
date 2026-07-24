@@ -67,6 +67,7 @@ const GTE_LEAVES = new Set([
   "rep-cliente",
   "an-rca",
   "an-rca-gte",
+  "an-rca-casos",
   "dash-operacion-gte",
   "dash-contrato",
   "an-repetitivos-gte",
@@ -214,7 +215,8 @@ function isGteLeaf(_page: PageKey, leafId: string) {
 
 function isDualLeaf(page: PageKey, leafId: string) {
   if (page === "gestion_acciones" || page === "planeacion") return true;
-  if (page === "gestion_activos" && (leafId === "mto-dashboard" || leafId.startsWith("capa"))) return true;
+  if (page === "mantenimiento" && (leafId === "mto-dashboard" || leafId === "dash-mto")) return true;
+  if (page === "gestion_activos" && leafId.startsWith("capa")) return true;
   if (leafId === "cmp-periodo-copower" || leafId === "cmp-periodo-gte") return false;
   if (leafId.startsWith("cmp-")) return true;
   if (leafId.startsWith("cq-")) return true;

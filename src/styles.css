@@ -8777,6 +8777,38 @@ tr.row-focal td {
   color: var(--text-muted);
 }
 
+.mto-plans-period {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.mto-plans-month {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mto-plans-month label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.mto-plans-month select {
+  padding: 0.35rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--panel-soft);
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 .mto-plans-toolbar {
   display: flex;
   align-items: flex-start;
@@ -8851,4 +8883,596 @@ tr.row-focal td {
   max-width: 22rem;
   font-size: 0.78rem;
   line-height: 1.35;
+}
+
+/* —— Fichas RCA Costayaco —— */
+.rca-app-hero {
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.rca-app-tabs {
+  display: inline-flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.rca-app-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid var(--border);
+  background: var(--panel-soft);
+  color: var(--text-muted);
+  border-radius: 8px;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rca-app-tabs button.active {
+  color: var(--text);
+  border-color: color-mix(in oklab, var(--accent) 45%, var(--border));
+  background: color-mix(in oklab, var(--accent) 12%, var(--panel-soft));
+}
+
+.rca-filters {
+  max-width: 100%;
+}
+
+.rca-events-table code {
+  font-size: 0.72rem;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.rca-row-click {
+  cursor: pointer;
+}
+
+.rca-row-click:hover {
+  background: color-mix(in oklab, var(--accent) 8%, transparent);
+}
+
+.rca-event-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.75rem;
+}
+
+.rca-event-card {
+  text-align: left;
+  border: 1px solid var(--border);
+  background: var(--panel-soft);
+  border-radius: 12px;
+  padding: 0.85rem 0.95rem;
+  cursor: pointer;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.rca-event-card:hover {
+  border-color: color-mix(in oklab, var(--accent) 40%, var(--border));
+}
+
+.rca-event-card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.rca-event-card-top code {
+  font-size: 0.68rem;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.rca-event-card h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+.rca-event-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.55rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  align-items: center;
+}
+
+.rca-event-card-sys {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.rca-event-card-go {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.rca-qbadge,
+.rca-crit-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.12rem 0.5rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.rca-qbadge--completo {
+  color: #15803d;
+  background: color-mix(in oklab, #16a34a 16%, var(--panel-soft));
+  border-color: color-mix(in oklab, #16a34a 30%, transparent);
+}
+
+.rca-qbadge--parcial {
+  color: #a16207;
+  background: color-mix(in oklab, #eab308 16%, var(--panel-soft));
+  border-color: color-mix(in oklab, #eab308 30%, transparent);
+}
+
+.rca-qbadge--inferido {
+  color: #c2410c;
+  background: color-mix(in oklab, #ea580c 16%, var(--panel-soft));
+  border-color: color-mix(in oklab, #ea580c 30%, transparent);
+}
+
+.rca-qbadge--vacio {
+  color: #64748b;
+  background: color-mix(in oklab, #94a3b8 16%, var(--panel-soft));
+  border-color: color-mix(in oklab, #94a3b8 30%, transparent);
+}
+
+.rca-mark {
+  border-radius: 4px;
+  padding: 0.05rem 0.28rem;
+  font-weight: 700;
+  font-size: 0.92em;
+}
+
+.rca-mark--supuesto {
+  background: color-mix(in oklab, #ea580c 22%, transparent);
+  color: #9a3412;
+}
+
+.rca-mark--pendiente {
+  background: color-mix(in oklab, #64748b 22%, transparent);
+  color: #334155;
+}
+
+.rca-warn-banner {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in oklab, #ea580c 40%, var(--border));
+  background: color-mix(in oklab, #ea580c 10%, var(--panel-soft));
+  margin-bottom: 1rem;
+}
+
+.rca-warn-banner strong {
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.rca-warn-banner p {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--text-muted);
+}
+
+.rca-detail-head {
+  margin-bottom: 1rem;
+}
+
+.rca-detail-title-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin-top: 0.65rem;
+}
+
+.rca-detail-title-row h2 {
+  margin: 0.2rem 0 0;
+  max-width: 52rem;
+  line-height: 1.25;
+}
+
+.rca-detail-badges {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.rca-detail-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.55rem;
+  margin-top: 0.9rem;
+}
+
+.rca-detail-kpis > div {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.55rem 0.7rem;
+  background: var(--panel-soft);
+}
+
+.rca-detail-kpis span {
+  display: block;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.rca-detail-kpis strong {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.88rem;
+  font-weight: 650;
+}
+
+.rca-section {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  background: var(--panel);
+  margin-bottom: 0.75rem;
+}
+
+.rca-section h3 {
+  margin: 0 0 0.65rem;
+  font-size: 0.95rem;
+}
+
+.rca-section-head {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.65rem;
+}
+
+.rca-section-head h3 {
+  margin: 0;
+}
+
+.rca-prose {
+  margin: 0;
+  line-height: 1.55;
+  font-size: 0.9rem;
+}
+
+.rca-bullets {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.rca-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.rca-timeline-item {
+  display: grid;
+  grid-template-columns: 12px 1fr;
+  gap: 0.7rem;
+  position: relative;
+}
+
+.rca-timeline-rail {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-top: 0.35rem;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 18%, transparent);
+}
+
+.rca-timeline-item:not(:last-child) .rca-timeline-rail::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 1.1rem;
+  bottom: -0.7rem;
+  width: 2px;
+  background: color-mix(in oklab, var(--border) 80%, transparent);
+}
+
+.rca-timeline-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.65rem;
+  align-items: center;
+  margin-bottom: 0.2rem;
+}
+
+.rca-timeline-meta time {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.rca-timeline-origen {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.08rem 0.45rem;
+}
+
+.rca-timeline-body p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.rca-five-table th:first-child,
+.rca-five-table td:first-child {
+  width: 2.5rem;
+}
+
+.rca-grid-2,
+.rca-grid-3 {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.rca-grid-2 {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.rca-grid-3 {
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.rca-grid-2 p,
+.rca-grid-3 strong {
+  margin: 0.2rem 0 0;
+  font-size: 0.88rem;
+}
+
+.rca-cause-stack {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.rca-cause-stack article {
+  border-left: 3px solid var(--accent);
+  padding: 0.45rem 0.7rem;
+  background: var(--panel-soft);
+  border-radius: 0 8px 8px 0;
+}
+
+.rca-cause-stack h4 {
+  margin: 0 0 0.25rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.rca-cause-stack p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.rca-two-col {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.75rem;
+}
+
+.rca-related,
+.rca-pattern-events {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.rca-related-link {
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--border);
+  background: var(--panel-soft);
+  border-radius: 8px;
+  padding: 0.55rem 0.7rem;
+  cursor: pointer;
+  color: inherit;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.rca-related-link:hover {
+  border-color: color-mix(in oklab, var(--accent) 40%, var(--border));
+}
+
+.rca-related-link > span {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.rca-related-link em {
+  font-style: normal;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.rca-pattern-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 0.75rem;
+}
+
+.rca-pattern-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.85rem;
+  background: var(--panel-soft);
+}
+
+.rca-pattern-card h4 {
+  margin: 0 0 0.45rem;
+  font-size: 0.95rem;
+}
+
+.rca-pattern-events .rca-related-link {
+  flex-direction: column;
+}
+
+.rca-quality-issues li {
+  font-size: 0.88rem;
+}
+
+.rca-empty-inline {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 720px) {
+  .rca-detail-title-row h2 {
+    font-size: 1.15rem;
+  }
+}
+
+.ev-detail-costayaco {
+  border-color: color-mix(in oklab, #ea580c 35%, var(--border));
+  background: color-mix(in oklab, #ea580c 6%, var(--panel-soft));
+}
+
+.ev-costayaco-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.3rem;
+}
+
+.rca-edit-overlay {
+  z-index: 80;
+}
+
+.rca-edit-modal {
+  max-width: min(960px, 96vw);
+  max-height: min(92vh, 920px);
+  overflow: auto;
+  padding: 1rem 1.1rem 1.25rem;
+}
+
+.rca-edit-toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 0.65rem;
+}
+
+.rca-edit-toolbar-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.rca-saved-flash {
+  font-size: 0.78rem;
+  color: #15803d;
+  font-weight: 650;
+}
+
+.rca-edit-title-fields,
+.rca-edit-meta-grid {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.rca-edit-title-fields {
+  grid-template-columns: minmax(140px, 220px) 1fr;
+  width: 100%;
+}
+
+.rca-edit-meta-grid {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  margin-top: 0.75rem;
+}
+
+.rca-edit-grow {
+  grid-column: 1 / -1;
+}
+
+.rca-detail--editable label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}
+
+.rca-detail--editable input,
+.rca-detail--editable select,
+.rca-detail--editable textarea {
+  font: inherit;
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 500;
+  font-size: 0.86rem;
+  color: var(--text);
+  background: var(--panel-soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.4rem 0.55rem;
+}
+
+.rca-detail--editable textarea {
+  resize: vertical;
+  line-height: 1.45;
+}
+
+.rca-edit-check {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 0.4rem !important;
+  text-transform: none !important;
+  font-size: 0.82rem !important;
+  letter-spacing: normal !important;
+  margin-top: 1.15rem;
 }

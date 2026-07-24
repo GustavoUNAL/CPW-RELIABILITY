@@ -5,6 +5,7 @@ import {
   Database,
   FileText,
   Gauge,
+  HeartPulse,
   LayoutDashboard,
   MapPin,
   Menu,
@@ -21,6 +22,12 @@ import {
   persistRcaCases,
   type RcaEventDraft,
 } from "./domain/reliability/reports/rcaCaseStore";
+import {
+  loadCostayacoRcaEvents,
+  persistCostayacoRcaEvents,
+  upsertCostayacoRcaEvent,
+} from "./domain/reliability/rca/rcaEventStore";
+import type { RcaEventoFalla } from "./domain/reliability/rca/types";
 import type { PageKey } from "./domain/reliability/types";
 import {
   PROJECT_NAV_TREE,
@@ -41,7 +48,8 @@ const MODULE_ICONS: Record<PageKey, ReactNode> = {
   generacion: <Zap size={16} />,
   operacion: <Database size={16} />,
   confiabilidad: <Gauge size={16} />,
-  gestion_activos: <Wrench size={16} />,
+  mantenimiento: <Wrench size={16} />,
+  gestion_activos: <HeartPulse size={16} />,
   gestion_acciones: <ClipboardCheck size={16} />,
   planeacion: <CalendarRange size={16} />,
 };
@@ -119,7 +127,11 @@ function App() {
     (activeModule ? findLeafLabel(activeModule.children, activeLeafId) : null) ?? activeLeafId;
 
   const [focusRcaId, setFocusRcaId] = useState<string | null>(null);
+  const [focusCostayacoRcaId, setFocusCostayacoRcaId] = useState<string | null>(null);
   const [rcaCases, setRcaCases] = useState<RcaCaseDetail[]>(() => loadRcaCases());
+  const [costayacoRcaEvents, setCostayacoRcaEvents] = useState<RcaEventoFalla[]>(() =>
+    loadCostayacoRcaEvents(),
+  );
 
   const selectLeaf = (page: PageKey, leafId: string) => {
     setActivePage(page);
@@ -137,9 +149,34 @@ function App() {
     });
   };
 
+  const updateCostayacoRca = (next: RcaEventoFalla) => {
+    setCostayacoRcaEvents((prev) => {
+      const updated = upsertCostayacoRcaEvent(prev, next);
+      persistCostayacoRcaEvents(updated);
+      return updated;
+    });
+  };
+
   const navigateToRca = (rcaId?: string) => {
+    if (rcaId?.startsWith("EVT-")) {
+      setFocusCostayacoRcaId(rcaId);
+      setOpenGroups((prev) => ({ ...prev, "conf-analisis": true }));
+      selectLeaf("confiabilidad", "an-rca-gte");
+      return;
+    }
     setFocusRcaId(rcaId ?? null);
     setOpenGroups((prev) => ({ ...prev, "conf-analisis": true }));
+    selectLeaf("confiabilidad", "an-rca-casos");
+  };
+
+  const navigateToCostayacoRca = (evtId?: string) => {
+    setFocusCostayacoRcaId(evtId ?? null);
+    setOpenGroups((prev) => ({
+      ...prev,
+      "conf-eventos": true,
+      "conf-bitacoras": true,
+      "conf-analisis": true,
+    }));
     selectLeaf("confiabilidad", "an-rca-gte");
   };
 
@@ -388,6 +425,11 @@ function App() {
           onRcaCasesChange={updateRcaCases}
           onCreateRcaFromEvent={createRcaFromEvent}
           onCreateBlankRca={createBlankRcaCase}
+          costayacoRcaEvents={costayacoRcaEvents}
+          onCostayacoRcaChange={updateCostayacoRca}
+          onNavigateToCostayacoRca={navigateToCostayacoRca}
+          focusCostayacoRcaId={focusCostayacoRcaId}
+          onFocusCostayacoRcaConsumed={() => setFocusCostayacoRcaId(null)}
         />
       </main>
     </div>

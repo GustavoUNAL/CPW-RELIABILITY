@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { AlertTriangle, Calendar, Clock, ExternalLink, FilePlus2, Filter, Search, X } from "lucide-react";
+import { AlertTriangle, Calendar, Clock, ExternalLink, FilePlus2, Filter, Search } from "lucide-react";
 import {
   computeEventStats,
   enrichEventLog,
@@ -22,6 +22,12 @@ import { JUNE_2026_IMPUTABLE_EVENTS } from "./juneImputableEvents";
 import type { RcaEventDraft } from "./rcaCaseStore";
 import { GteEventCalendarModal } from "./GteEventCalendarModal";
 import type { ReportKey } from "../types";
+import { CriticalityBadge } from "../rca/components/CriticalityBadge";
+import { EditableEventDetail } from "../rca/components/EditableEventDetail";
+import { QualityBadge } from "../rca/components/QualityBadge";
+import { findCostayacoRcasForEvent } from "../rca/matchCostayacoRca";
+import { loadCostayacoRcaEvents, persistCostayacoRcaEvents, upsertCostayacoRcaEvent } from "../rca/rcaEventStore";
+import type { RcaEventoFalla } from "../rca/types";
 
 const hours = (v: number) =>
   `${v.toLocaleString("es-CO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} h`;
@@ -36,6 +42,9 @@ type Props = {
   onNavigateToRca?: (rcaId?: string) => void;
   rcaCases?: RcaCaseDetail[];
   onCreateRcaFromEvent?: (draft: RcaEventDraft) => void;
+  costayacoRcaEvents?: RcaEventoFalla[];
+  onCostayacoRcaChange?: (next: RcaEventoFalla) => void;
+  onNavigateToCostayacoRca?: (evtId?: string) => void;
 };
 
 function getSnap(report: ReportKey, month: string) {
@@ -178,6 +187,9 @@ function EventDetailModal({
   onNavigateToRca,
   rcaCases,
   onCreateRcaFromEvent,
+  costayacoRcaEvents,
+  onCostayacoRcaChange,
+  onNavigateToCostayacoRca,
 }: {
   event: EnrichedEvent;
   onClose: () => void;
@@ -185,6 +197,9 @@ function EventDetailModal({
   onNavigateToRca?: (rcaId?: string) => void;
   rcaCases: RcaCaseDetail[];
   onCreateRcaFromEvent?: (draft: RcaEventDraft) => void;
+  costayacoRcaEvents: RcaEventoFalla[];
+  onCostayacoRcaChange?: (next: RcaEventoFalla) => void;
+  onNavigateToCostayacoRca?: (evtId?: string) => void;
 }) {
   const [draft, setDraft] = useState<EventEditPatch>({
     date: event.date,
@@ -197,6 +212,7 @@ function EventDetailModal({
   });
   const [savedFlash, setSavedFlash] = useState(false);
   const [confirmAction, setConfirmAction] = useState<"save" | "close" | null>(null);
+  const [editingCostayacoId, setEditingCostayacoId] = useState<string | null>(null);
 
   useEffect(() => {
     setDraft({
@@ -210,6 +226,7 @@ function EventDetailModal({
     });
     setSavedFlash(false);
     setConfirmAction(null);
+    setEditingCostayacoId(null);
   }, [event]);
 
   const isDirty = useMemo(() => {
@@ -228,6 +245,10 @@ function EventDetailModal({
   useEffect(() => {
     const onKey = (ev: KeyboardEvent) => {
       if (ev.key !== "Escape") return;
+      if (editingCostayacoId) {
+        setEditingCostayacoId(null);
+        return;
+      }
       if (confirmAction) {
         setConfirmAction(null);
         return;
@@ -240,10 +261,19 @@ function EventDetailModal({
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [confirmAction, isDirty, onClose]);
+  }, [confirmAction, editingCostayacoId, isDirty, onClose]);
 
   const imputable = findImputableMatch({ ...event, ...draft } as EnrichedEvent);
   const rcas = relatedRcas(event, rcaCases);
+  const costayacoRcas = findCostayacoRcasForEvent(
+    draft.date ?? event.date,
+    draft.equipment ?? event.equipment,
+    costayacoRcaEvents,
+  );
+  const editingCostayaco =
+    editingCostayacoId != null
+      ? costayacoRcaEvents.find((e) => e.id === editingCostayacoId) ?? null
+      : null;
   const canCreate = Boolean(onCreateRcaFromEvent) && isRcaEligibleEvent(event);
   const parsed = parseEventNotes(draft.notes ?? event.notes ?? "");
 
@@ -485,6 +515,67 @@ function EventDetailModal({
           />
         </div>
 
+        {costayacoRcas.length > 0 ? (
+          <section className="ev-detail-section ev-detail-rca ev-detail-costayaco">
+            <h4>Fichas RCA Costayaco ({costayacoRcas.length})</h4>
+            <p className="muted" style={{ marginTop: 0, fontSize: "0.8rem" }}>
+              Registro consolidado Notion + PDF Vector Shift. Editable desde esta vista.
+            </p>
+            <ul className="ev-rca-list">
+              {costayacoRcas.map((rca) => (
+                <li key={rca.id}>
+                  <div className="ev-rca-row">
+                    <div>
+                      <strong>{rca.id}</strong>
+                      <span>{rca.titulo}</span>
+                      <div className="ev-costayaco-badges">
+                        <QualityBadge value={rca.calidad_dato} />
+                        <CriticalityBadge value={rca.criticidad} />
+                      </div>
+                    </div>
+                    <div className="ev-rca-actions">
+                      {onCostayacoRcaChange ? (
+                        <button
+                          type="button"
+                          className="ev-rca-link ev-rca-link--create"
+                          onClick={() => setEditingCostayacoId(rca.id)}
+                        >
+                          Editar ficha
+                        </button>
+                      ) : null}
+                      {onNavigateToCostayacoRca ? (
+                        <button
+                          type="button"
+                          className="ev-rca-link"
+                          onClick={() => onNavigateToCostayacoRca(rca.id)}
+                        >
+                          Abrir en RCA <ExternalLink size={12} />
+                        </button>
+                      ) : null}
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : (
+          <section className="ev-detail-section ev-detail-rca ev-detail-rca--empty">
+            <h4>Fichas RCA Costayaco</h4>
+            <p>Sin ficha EVT vinculada por fecha/equipo en el consolidado de junio 2026.</p>
+            {onNavigateToCostayacoRca ? (
+              <div className="ev-rca-actions">
+                <button
+                  type="button"
+                  className="ev-rca-link ev-rca-link--all"
+                  onClick={() => onNavigateToCostayacoRca()}
+                >
+                  Ir a Fichas RCA · Costayaco <ExternalLink size={12} />
+                </button>
+              </div>
+            ) : null}
+          </section>
+        )}
+
         {rcas.length > 0 ? (
           <section className="ev-detail-section ev-detail-rca">
             <h4>RCA relacionados ({rcas.length})</h4>
@@ -563,6 +654,30 @@ function EventDetailModal({
           <p className="alert-inline">Falla asociada a COPOWER / PF_contr &gt; 0</p>
         ) : null}
       </article>
+
+      {editingCostayaco && onCostayacoRcaChange ? (
+        <div
+          className="modal-overlay rca-edit-overlay"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setEditingCostayacoId(null)}
+        >
+          <div
+            className="modal-card modal-card--xl rca-edit-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <EditableEventDetail
+              event={editingCostayaco}
+              compact
+              onClose={() => setEditingCostayacoId(null)}
+              onSave={(next) => {
+                onCostayacoRcaChange(next);
+              }}
+              onOpenRelated={(id) => setEditingCostayacoId(id)}
+            />
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -573,12 +688,14 @@ function EventList({
   onSelect,
   emptyMessage,
   rcaCases,
+  costayacoRcaEvents,
 }: {
   events: EnrichedEvent[];
   selectedId: string | null;
   onSelect: (e: EnrichedEvent) => void;
   emptyMessage: string;
   rcaCases: RcaCaseDetail[];
+  costayacoRcaEvents: RcaEventoFalla[];
 }) {
   if (events.length === 0) {
     return <p className="empty-state">{emptyMessage}</p>;
@@ -588,6 +705,7 @@ function EventList({
     <ul className="ev-list">
       {events.map((e) => {
         const rcas = relatedRcas(e, rcaCases);
+        const cyRcas = findCostayacoRcasForEvent(e.date, e.equipment, costayacoRcaEvents);
         return (
           <li key={e.id}>
             <button
@@ -610,6 +728,11 @@ function EventList({
                   <Clock size={12} /> {hours(e.downtimeHours)}
                 </span>
                 <span className={respBadgeClass(e.responsible)}>{e.responsible}</span>
+                {cyRcas.length > 0 ? (
+                  <span className="badge warn ev-rca-badge" title={cyRcas.map((r) => r.id).join(", ")}>
+                    EVT {cyRcas.length}
+                  </span>
+                ) : null}
                 {rcas.length > 0 ? (
                   <span className="badge info ev-rca-badge">{rcas.map((r) => r.id).join(" · ")}</span>
                 ) : null}
@@ -628,12 +751,14 @@ function FormalRcaEventsSection({
   selectedId,
   onSelect,
   rcaCases,
+  costayacoRcaEvents,
   onNavigateToRca,
 }: {
   events: EnrichedEvent[];
   selectedId: string | null;
   onSelect: (e: EnrichedEvent) => void;
   rcaCases: RcaCaseDetail[];
+  costayacoRcaEvents: RcaEventoFalla[];
   onNavigateToRca?: (rcaId?: string) => void;
 }) {
   if (events.length === 0) return null;
@@ -661,6 +786,7 @@ function FormalRcaEventsSection({
         selectedId={selectedId}
         onSelect={onSelect}
         rcaCases={rcaCases}
+        costayacoRcaEvents={costayacoRcaEvents}
         emptyMessage="Sin eventos con RCA formal para los filtros actuales."
       />
     </section>
@@ -672,11 +798,13 @@ function BitacoraEventsSection({
   selectedId,
   onSelect,
   rcaCases,
+  costayacoRcaEvents,
 }: {
   events: EnrichedEvent[];
   selectedId: string | null;
   onSelect: (e: EnrichedEvent) => void;
   rcaCases: RcaCaseDetail[];
+  costayacoRcaEvents: RcaEventoFalla[];
 }) {
   const [typeFilter, setTypeFilter] = useState<"all" | EnrichedEvent["eventType"]>("all");
   const visible = useMemo(
@@ -715,6 +843,7 @@ function BitacoraEventsSection({
         selectedId={selectedId}
         onSelect={onSelect}
         rcaCases={rcaCases}
+        costayacoRcaEvents={costayacoRcaEvents}
         emptyMessage="Ningún evento coincide con el filtro de tipo."
       />
     </section>
@@ -795,8 +924,24 @@ export function FailureEventsView({
   onNavigateToRca,
   rcaCases: rcaCasesProp,
   onCreateRcaFromEvent,
+  costayacoRcaEvents: costayacoProp,
+  onCostayacoRcaChange,
+  onNavigateToCostayacoRca,
 }: Props) {
   const rcaCases = rcaCasesProp ?? buildGteJuneRcaCases();
+  const [localCostayaco, setLocalCostayaco] = useState<RcaEventoFalla[]>(() => loadCostayacoRcaEvents());
+  const costayacoRcaEvents = costayacoProp ?? localCostayaco;
+  const handleCostayacoChange = (next: RcaEventoFalla) => {
+    if (onCostayacoRcaChange) {
+      onCostayacoRcaChange(next);
+      return;
+    }
+    setLocalCostayaco((prev) => {
+      const updated = upsertCostayacoRcaEvent(prev, next);
+      persistCostayacoRcaEvents(updated);
+      return updated;
+    });
+  };
   const [filters, setFilters] = useState<EventFilters>({
     type: "all",
     responsible: "all",
@@ -955,6 +1100,7 @@ export function FailureEventsView({
         selectedId={selectedId}
         onSelect={handleSelect}
         rcaCases={rcaCases}
+        costayacoRcaEvents={costayacoRcaEvents}
       />
 
       <FormalRcaEventsSection
@@ -962,6 +1108,7 @@ export function FailureEventsView({
         selectedId={selectedId}
         onSelect={handleSelect}
         rcaCases={rcaCases}
+        costayacoRcaEvents={costayacoRcaEvents}
         onNavigateToRca={onNavigateToRca}
       />
 
@@ -973,6 +1120,9 @@ export function FailureEventsView({
           onNavigateToRca={onNavigateToRca}
           rcaCases={rcaCases}
           onCreateRcaFromEvent={onCreateRcaFromEvent}
+          costayacoRcaEvents={costayacoRcaEvents}
+          onCostayacoRcaChange={handleCostayacoChange}
+          onNavigateToCostayacoRca={onNavigateToCostayacoRca}
         />
       ) : null}
     </div>
