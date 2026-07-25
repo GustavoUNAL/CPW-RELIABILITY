@@ -38,30 +38,93 @@ export function parseEventNotes(notes: string): ParsedEventNotes {
   return out;
 }
 
-/** ID corto estable para relacionar bitácora ↔ RCA / CAPA / planes (visible en UI). */
-export function buildEventRelId(
-  source: ReportKey,
-  date: string,
-  equipment: string,
-  index: number,
-): string {
-  const src = source === "gran_tierra" ? "G" : "C";
-  const d = (date || "0000-00-00").slice(5).replace("-", ""); // MMDD
-  const eq = (equipment || "X").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6) || "X";
-  return `${src}${d}-${eq}-${String(index + 1).padStart(2, "0")}`;
+/** Normaliza causa para detectar el mismo incidente repetido por unidad. */
+export function normalizeCauseKey(cause: string): string {
+  return cause
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .replace(/[.,;:]+$/g, "")
+    .trim()
+    .slice(0, 72);
 }
 
-export function enrichEvent(event: EventRecord, source: ReportKey, index: number): EnrichedEvent {
+/**
+ * Consolida filas del mismo incidente (misma fecha + tipo + causa) que
+ * aparecen una vez por equipo — p. ej. Vector Shift 22-jun en 10 unidades.
+ */
+export function collapseRepeatedEvents(events: EventRecord[]): EventRecord[] {
+  const order: string[] = [];
+  const groups = new Map<string, EventRecord[]>();
+
+  for (const event of events) {
+    const key = `${event.date}|${event.eventType}|${normalizeCauseKey(event.cause || "")}`;
+    if (!groups.has(key)) {
+      groups.set(key, []);
+      order.push(key);
+    }
+    groups.get(key)!.push(event);
+  }
+
+  return order.map((key) => {
+    const group = groups.get(key)!;
+    if (group.length === 1) return group[0];
+
+    const equipment = [
+      ...new Set(group.map((e) => e.equipment.trim()).filter(Boolean)),
+    ].join(", ");
+    const downtimeHours = group.reduce((sum, e) => sum + (Number(e.downtimeHours) || 0), 0);
+    const base = group[0];
+    const unitNote = `${group.length} unidades consolidadas`;
+    const notes = base.notes?.includes("unidades consolidadas")
+      ? base.notes
+      : [base.notes, unitNote].filter(Boolean).join(" | ");
+
+    return {
+      ...base,
+      equipment,
+      downtimeHours,
+      notes,
+      cause: base.cause,
+    };
+  });
+}
+
+/** ID corto estable para relacionar bitácora ↔ RCA / CAPA / planes (visible en UI).
+ *  Formato: G0603-1 → fuente + MMDD + secuencia del día (el equipo ya se muestra aparte).
+ */
+export function buildEventRelId(source: ReportKey, date: string, daySeq: number): string {
+  const src = source === "gran_tierra" ? "G" : "C";
+  const d = (date || "0000-00-00").slice(5).replace("-", ""); // MMDD
+  return `${src}${d}-${daySeq}`;
+}
+
+export function enrichEvent(
+  event: EventRecord,
+  source: ReportKey,
+  daySeq: number,
+): EnrichedEvent {
   return {
     ...event,
-    id: buildEventRelId(source, event.date, event.equipment, index),
+    id: buildEventRelId(source, event.date, daySeq),
     source,
     parsed: parseEventNotes(event.notes),
   };
 }
 
-export function enrichEventLog(events: EventRecord[], source: ReportKey): EnrichedEvent[] {
-  return events.map((e, i) => enrichEvent(e, source, i));
+export function enrichEventLog(
+  events: EventRecord[],
+  source: ReportKey,
+  options?: { collapseRepeated?: boolean },
+): EnrichedEvent[] {
+  const sourceEvents =
+    options?.collapseRepeated === false ? events : collapseRepeatedEvents(events);
+  const dayCount = new Map<string, number>();
+  return sourceEvents.map((e) => {
+    const key = e.date || "0000-00-00";
+    const next = (dayCount.get(key) ?? 0) + 1;
+    dayCount.set(key, next);
+    return enrichEvent(e, source, next);
+  });
 }
 
 export type EventLogStats = {

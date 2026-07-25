@@ -6807,6 +6807,18 @@ tr.row-focal td {
   min-height: 4.5rem;
 }
 
+.ev-event-modal.modal-card--xl {
+  max-width: min(1440px, 99vw);
+  width: min(1440px, 99vw);
+  max-height: min(94vh, 980px);
+  overflow: auto;
+}
+
+.ev-event-modal .modal-header--rca {
+  margin-bottom: 0.35rem;
+  padding-bottom: 0.35rem;
+}
+
 .ev-save-warn {
   display: flex;
   flex-wrap: wrap;
@@ -9177,35 +9189,46 @@ tr.row-focal td {
 .rca-timeline {
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 0.25rem 0 0.15rem;
   display: grid;
-  gap: 0.7rem;
+  gap: 0;
 }
 
 .rca-timeline-item {
   display: grid;
-  grid-template-columns: 12px 1fr;
-  gap: 0.7rem;
+  grid-template-columns: 1.1rem 1fr;
+  gap: 0.85rem;
   position: relative;
+  padding-bottom: 1rem;
+}
+
+.rca-timeline-item:last-child {
+  padding-bottom: 0.15rem;
 }
 
 .rca-timeline-rail {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  margin-top: 0.35rem;
-  background: var(--accent);
+  margin-top: 0.28rem;
+  background: color-mix(in oklab, var(--accent) 85%, white);
   box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 18%, transparent);
+  position: relative;
+  z-index: 1;
 }
 
 .rca-timeline-item:not(:last-child) .rca-timeline-rail::after {
   content: "";
   position: absolute;
-  left: 4px;
-  top: 1.1rem;
-  bottom: -0.7rem;
+  left: 5px;
+  top: 14px;
+  bottom: calc(-1rem - 2px);
   width: 2px;
-  background: color-mix(in oklab, var(--border) 80%, transparent);
+  background: linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--accent) 45%, var(--border)),
+    color-mix(in oklab, var(--border) 80%, transparent)
+  );
 }
 
 .rca-timeline-meta {
@@ -9213,27 +9236,55 @@ tr.row-focal td {
   flex-wrap: wrap;
   gap: 0.4rem 0.65rem;
   align-items: center;
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.25rem;
 }
 
 .rca-timeline-meta time {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.78rem;
   font-weight: 700;
+  color: color-mix(in oklab, var(--accent) 55%, var(--text));
 }
 
 .rca-timeline-origen {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
+  font-weight: 600;
   color: var(--text-muted);
   border: 1px solid var(--border);
   border-radius: 999px;
-  padding: 0.08rem 0.45rem;
+  padding: 0.1rem 0.5rem;
+  background: var(--panel-soft);
+}
+
+.rca-timeline-body {
+  min-width: 0;
+  padding: 0.45rem 0.7rem 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: color-mix(in oklab, var(--panel-soft) 70%, transparent);
 }
 
 .rca-timeline-body p {
   margin: 0;
   font-size: 0.88rem;
   line-height: 1.45;
+}
+
+.rca-report-title {
+  margin: 0.2rem 0 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.rca-report--view .rca-report-table th {
+  width: 28%;
+}
+
+.rca-report--view .rca-prose {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
 
 .rca-five-table th:first-child,
@@ -9381,6 +9432,780 @@ tr.row-focal td {
   flex-wrap: wrap;
   gap: 0.3rem;
   margin-top: 0.3rem;
+}
+
+.ev-rca-report-wrap {
+  margin-top: 0.75rem;
+}
+
+.ev-rca-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.65rem;
+}
+
+.ev-rca-tabs button {
+  border: 1px solid var(--border);
+  background: var(--panel-soft);
+  color: var(--text-muted);
+  border-radius: 8px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ev-rca-tabs button.active {
+  color: var(--text);
+  border-color: color-mix(in oklab, var(--accent) 45%, var(--border));
+  background: color-mix(in oklab, var(--accent) 12%, var(--panel-soft));
+}
+
+.ev-bitacora-details {
+  margin-top: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.65rem 0.85rem 0.8rem;
+  background: var(--panel-soft);
+}
+
+.ev-bitacora-details > summary {
+  cursor: pointer;
+  font-weight: 650;
+  font-size: 0.84rem;
+  color: var(--text);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.ev-bitacora-details > summary::before {
+  content: "▸";
+  color: var(--accent);
+  font-size: 0.75rem;
+}
+
+.ev-bitacora-details[open] > summary::before {
+  content: "▾";
+}
+
+.ev-bitacora-details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.ev-rca-context {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-bottom: 0.85rem;
+}
+
+.ev-rca-context-alert {
+  margin: 0;
+}
+
+.ev-rca-context-card {
+  margin: 0;
+}
+
+.ev-rca-context .ev-detail-imputable {
+  padding: 0.7rem 0.85rem;
+  border-radius: 12px;
+}
+
+.ev-rca-context .ev-detail-imputable h4 {
+  margin: 0 0 0.3rem;
+  font-size: 0.8rem;
+}
+
+.ev-rca-context .ev-detail-imputable p {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.4;
+}
+
+.ev-rca-context .ev-detail-imputable small {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--text-muted);
+}
+
+.rca-toolbar {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.rca-toolbar .btn,
+.rca-toolbar .ev-rca-link {
+  border-radius: 999px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.rca-report {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.rca-report--slides {
+  min-height: min(68vh, 720px);
+}
+
+.rca-report-head--slim {
+  margin-bottom: 0;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.rca-slide-current-label {
+  margin: 0.15rem 0 0;
+  font-size: 1.05rem;
+  font-weight: 750;
+}
+
+.rca-slide-stage {
+  flex: 1;
+  min-height: min(54vh, 580px);
+  display: flex;
+}
+
+.rca-slide {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: color-mix(in oklab, var(--panel) 94%, var(--panel-soft));
+  overflow: hidden;
+  min-height: min(54vh, 580px);
+  box-shadow: 0 10px 28px color-mix(in oklab, black 4%, transparent);
+}
+
+.rca-slide-head {
+  padding: 0.85rem 1.1rem;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--accent) 7%, var(--panel-soft)),
+    var(--panel-soft)
+  );
+}
+
+.rca-slide-head h4 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 750;
+}
+
+.rca-slide-body {
+  flex: 1;
+  padding: 1.1rem 1.2rem 1.25rem;
+  overflow: auto;
+}
+
+.rca-slide-cover {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.rca-slide-resumen {
+  margin-top: 0.15rem;
+}
+
+.rca-slide-cover-title {
+  margin: 0;
+  font-size: 1.55rem;
+  line-height: 1.25;
+  font-weight: 750;
+}
+
+.rca-slide-cover-id {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--text-muted);
+}
+
+.rca-slide-sub {
+  margin: 0 0 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.rca-prose--lg {
+  font-size: 1.08rem;
+  line-height: 1.55;
+}
+
+.rca-cause-stack-slide {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.rca-actions-split--stack {
+  grid-template-columns: 1fr;
+}
+
+.rca-pager {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.7rem 0.35rem 0.2rem;
+  border-top: 1px solid var(--border);
+  margin-top: 0.15rem;
+  position: sticky;
+  bottom: 0;
+  background: color-mix(in oklab, var(--panel) 94%, transparent);
+  backdrop-filter: blur(8px);
+  z-index: 2;
+}
+
+.rca-pager-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 0.5rem 0.9rem;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 650;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.rca-pager-nav:hover:not(:disabled) {
+  border-color: color-mix(in oklab, var(--accent) 40%, var(--border));
+  background: color-mix(in oklab, var(--accent) 8%, var(--panel));
+}
+
+.rca-pager-nav:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.rca-pager-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.rca-pager-progress {
+  width: min(100%, 28rem);
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--border) 80%, transparent);
+  overflow: hidden;
+}
+
+.rca-pager-progress > div {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--accent) 70%, #38bdf8),
+    var(--accent)
+  );
+  transition: width 0.25s ease;
+}
+
+.rca-pager-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: center;
+}
+
+.rca-pager-dot {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.08rem;
+  min-width: 3.6rem;
+  border: 1px solid transparent;
+  background: color-mix(in oklab, var(--panel-soft) 80%, transparent);
+  color: var(--text-muted);
+  border-radius: 12px;
+  padding: 0.38rem 0.45rem;
+  cursor: pointer;
+  font: inherit;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.rca-pager-dot:hover {
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.rca-pager-dot span {
+  font-size: 0.82rem;
+  font-weight: 750;
+  line-height: 1;
+}
+
+.rca-pager-dot small {
+  font-size: 0.62rem;
+  font-weight: 600;
+  line-height: 1.1;
+  max-width: 4.4rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rca-pager-dot.active {
+  color: var(--text);
+  border-color: color-mix(in oklab, var(--accent) 55%, var(--border));
+  background: color-mix(in oklab, var(--accent) 14%, var(--panel));
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 12%, transparent);
+}
+
+.rca-pager-count {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 650;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+.rca-report-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.rca-report-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  align-items: stretch;
+}
+
+.rca-report-row--hero {
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+}
+
+.rca-span-full {
+  grid-column: 1 / -1;
+}
+
+.rca-panel {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--panel-soft) 55%, transparent);
+  padding: 0.75rem 0.85rem 0.9rem;
+  min-width: 0;
+}
+
+.rca-panel--empty {
+  border-style: dashed;
+  opacity: 0.35;
+}
+
+.rca-report-section {
+  border-top: none;
+  padding-top: 0;
+}
+
+.rca-report-section > h4 {
+  margin: 0 0 0.55rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.rca-report-n {
+  color: var(--accent);
+  margin-right: 0.15rem;
+}
+
+.rca-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.rca-meta-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel);
+  padding: 0.7rem 0.8rem;
+  min-width: 0;
+}
+
+.rca-meta-card--wide {
+  grid-column: 1 / -1;
+}
+
+.rca-meta-card > span {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.rca-meta-card > strong {
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.rca-kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.rca-kpi-strip > div {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--panel);
+  padding: 0.95rem 1rem;
+  min-height: 5.6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.rca-kpi-strip span {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
+}
+
+.rca-kpi-strip strong {
+  display: block;
+  font-size: 1.35rem;
+  font-weight: 780;
+  line-height: 1.25;
+  word-break: break-word;
+}
+
+.rca-cause-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+  padding: 0.55rem 0.7rem;
+}
+
+.rca-cause-card h5,
+.rca-actions-split h5 {
+  margin: 0 0 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.rca-cause-card p {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.rca-cause-card--root {
+  border-color: color-mix(in oklab, var(--accent) 35%, var(--border));
+  background: color-mix(in oklab, var(--accent) 6%, var(--panel));
+}
+
+.rca-actions-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.rca-report-table--meta {
+  display: grid;
+}
+
+.rca-report-table--meta tbody {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem 0.75rem;
+}
+
+.rca-report-table--meta tr {
+  display: grid;
+  grid-template-columns: 7.5rem 1fr;
+  gap: 0.4rem;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.35rem 0.5rem;
+  background: var(--panel);
+}
+
+.rca-report-table--meta th,
+.rca-report-table--meta td {
+  border: none;
+  padding: 0;
+  background: transparent;
+  width: auto;
+  white-space: normal;
+}
+
+@media (max-width: 1100px) {
+  .rca-report-row,
+  .rca-report-row--hero {
+    grid-template-columns: 1fr;
+  }
+
+  .rca-meta-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rca-actions-split,
+  .rca-kpi-strip,
+  .rca-report-table--meta tbody {
+    grid-template-columns: 1fr;
+  }
+
+  .rca-pager {
+    grid-template-columns: 1fr;
+  }
+
+  .rca-pager-nav {
+    justify-content: center;
+  }
+}
+
+.rca-report-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.85rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.rca-report-fuente {
+  margin: 0.25rem 0 0;
+  font-size: 0.78rem;
+}
+
+.rca-report-head-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.45rem;
+}
+
+.rca-report-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  justify-content: flex-end;
+}
+
+.rca-report-table-wrap {
+  margin: 0;
+}
+
+.rca-report-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.rca-report-table th,
+.rca-report-table td {
+  border: 1px solid var(--border);
+  padding: 0.4rem 0.55rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.rca-report-table th {
+  background: var(--panel-soft);
+  font-weight: 650;
+  width: 28%;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.rca-report-table td code {
+  font-size: 0.78rem;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.rca-report-cause {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.rca-report-cause p {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.rca-report-note {
+  margin-top: 0.55rem;
+  padding: 0.55rem 0.7rem;
+  border-left: 3px solid color-mix(in oklab, #d97706 70%, var(--border));
+  background: color-mix(in oklab, #d97706 8%, var(--panel-soft));
+  border-radius: 0 8px 8px 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.rca-report--editable .rca-report-title-input {
+  display: block;
+  width: 100%;
+  margin-top: 0.2rem;
+}
+
+.rca-report--editable .rca-report-title-input input {
+  width: 100%;
+  font-size: 1.15rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text);
+  padding: 0.15rem 0.35rem;
+  border-radius: 8px;
+}
+
+.rca-report--editable .rca-report-title-input input:hover,
+.rca-report--editable .rca-report-title-input input:focus {
+  border-color: var(--border);
+  background: var(--panel-soft);
+  outline: none;
+}
+
+.rca-report--editable .rca-inline-input {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  min-width: 12rem;
+  padding: 0.1rem 0.3rem;
+  border-radius: 6px;
+}
+
+.rca-report--editable .rca-inline-input:hover,
+.rca-report--editable .rca-inline-input:focus {
+  border-color: var(--border);
+  background: var(--panel-soft);
+  outline: none;
+}
+
+.rca-report-table--edit th {
+  width: 30%;
+  font-weight: 650;
+  color: var(--text-muted);
+  background: var(--panel-soft);
+  white-space: nowrap;
+}
+
+.rca-report-table--edit input,
+.rca-report-table--edit select,
+.rca-report-table--edit textarea,
+.rca-report--editable .rca-report-section > textarea,
+.rca-report--editable .rca-report-cause--edit textarea,
+.rca-report--editable .rca-notes-label textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--panel) 88%, white);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 0.4rem 0.55rem;
+  font: inherit;
+  font-size: 0.84rem;
+  resize: vertical;
+}
+
+.rca-report-table--edit input:focus,
+.rca-report-table--edit select:focus,
+.rca-report-table--edit textarea:focus,
+.rca-report--editable textarea:focus {
+  outline: 2px solid color-mix(in oklab, var(--accent) 35%, transparent);
+  border-color: color-mix(in oklab, var(--accent) 45%, var(--border));
+}
+
+.rca-inline-unit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 10rem;
+}
+
+.rca-sync-hint {
+  font-size: 0.72rem;
+  margin-left: 0.25rem;
+}
+
+.rca-report-cause--edit {
+  gap: 0.7rem;
+}
+
+.rca-report-cause--edit label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.rca-add-row {
+  margin-top: 0.45rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+}
+
+.rca-icon-btn {
+  padding: 0.25rem;
+  min-width: auto;
+}
+
+.rca-notes-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.65rem;
+}
+
+.ev-event-id--rca {
+  color: color-mix(in oklab, #ea580c 70%, var(--text));
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .rca-edit-overlay {
