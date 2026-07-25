@@ -22,6 +22,7 @@ import type { RcaEventDraft } from "./rcaCaseStore";
 import { GteEventCalendarModal } from "./GteEventCalendarModal";
 import type { ReportKey } from "../types";
 import { EditableEventDetail } from "../rca/components/EditableEventDetail";
+import { shortRcaEventId } from "../rca/data";
 import { findCostayacoRcasForEvent } from "../rca/matchCostayacoRca";
 import { loadCostayacoRcaEvents, persistCostayacoRcaEvents, upsertCostayacoRcaEvent } from "../rca/rcaEventStore";
 import type { RcaEventoFalla } from "../rca/types";
@@ -414,7 +415,7 @@ function EventDetailModal({
                     className={rca.id === activeRca.id ? "active" : undefined}
                     onClick={() => setActiveRcaId(rca.id)}
                   >
-                    {rca.id.replace(/^EVT-2026-/, "")}
+                    {shortRcaEventId(rca.id)}
                   </button>
                 ))}
               </div>

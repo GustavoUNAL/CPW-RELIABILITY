@@ -382,7 +382,7 @@ export function buildSabanaMaintenanceOptimization(month: string): MaintenanceOp
 
     const operatingHours = Math.max(
       agg?.mtoHours ?? 0,
-      gte ? Math.round((gte.disponibilidadPct / 100) * 720) : cat.periodicityHrs,
+      gte ? Math.round((availabilityPct / 100) * 720) : cat.periodicityHrs,
     );
 
     const mphi = computeMphi({
@@ -401,7 +401,7 @@ export function buildSabanaMaintenanceOptimization(month: string): MaintenanceOp
     const justification = [
       `Sábana Putumayo${monthKey ? ` · ${monthKey}` : " · YTD"}: ${programmed} PM programados, ${executed} ejecutados (${(compliance * 100).toFixed(0)}%), ${pending} pendientes, ${postponed} con aplazamiento/horas.`,
       gte
-        ? `GTE ${gteSnap.label}: disp. ${gte.disponibilidadPct.toFixed(2)}%, fallas ${gte.fallas}, MTBF ${gte.mtbfLabel}.`
+        ? `GTE ${gteSnap.label}: disp. ${availabilityPct.toFixed(2)}%, fallas ${gte.fallas}, MTBF ${gte.mtbfLabel}.`
         : "Sin fila GTE de indicador para esta unidad en el mes; se usa solo evidencia de sábana.",
       `Periodicidad catálogo: ${cat.periodicityHrs} h · esfuerzo típico ${cat.hoursMto} h MTO / ${cat.manHours} H-H.`,
     ].join(" ");

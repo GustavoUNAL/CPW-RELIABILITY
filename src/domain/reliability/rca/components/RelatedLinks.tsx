@@ -1,5 +1,5 @@
 import { Link2 } from "lucide-react";
-import { findRcaEventoById } from "../data";
+import { findRcaEventoById, shortRcaEventId } from "../data";
 
 type Props = {
   ids: string[];
@@ -20,7 +20,7 @@ export function RelatedLinks({ ids, onOpen }: Props) {
             <button type="button" className="rca-related-link" onClick={() => onOpen(id)}>
               <Link2 size={14} />
               <span>
-                <strong>{id}</strong>
+                <strong title={id}>{shortRcaEventId(id)}</strong>
                 {ev ? <em>{ev.titulo}</em> : null}
               </span>
             </button>

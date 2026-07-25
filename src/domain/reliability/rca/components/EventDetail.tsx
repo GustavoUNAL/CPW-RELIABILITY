@@ -1,6 +1,6 @@
 import { AlertTriangle, ArrowLeft } from "lucide-react";
 import type { ReactNode } from "react";
-import { equipoLabel } from "../data";
+import { equipoLabel, shortRcaEventId } from "../data";
 import type { RcaEventoFalla } from "../types";
 import { needsWarningBanner, UncertaintyText } from "../uncertainty";
 import { CriticalityBadge } from "./CriticalityBadge";
@@ -56,7 +56,7 @@ export function EventDetail({ event, onBack, onOpenRelated }: Props) {
         <div className="rca-detail-title-row">
           <div>
             <p className="eyebrow">
-              <code>{event.id}</code> · {event.fuente}
+              <code title={event.id}>{shortRcaEventId(event.id)}</code>
             </p>
             <h2>{event.titulo}</h2>
           </div>

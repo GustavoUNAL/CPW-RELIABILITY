@@ -1,5 +1,5 @@
 import { ChevronRight } from "lucide-react";
-import { equipoLabel } from "../data";
+import { equipoLabel, shortRcaEventId } from "../data";
 import type { RcaEventoFalla } from "../types";
 import { CriticalityBadge } from "./CriticalityBadge";
 import { QualityBadge } from "./QualityBadge";
@@ -20,7 +20,7 @@ export function EventCard({ event, onOpen }: Props) {
   return (
     <button type="button" className="rca-event-card" onClick={() => onOpen(event.id)}>
       <div className="rca-event-card-top">
-        <code>{event.id}</code>
+        <code title={event.id}>{shortRcaEventId(event.id)}</code>
         <QualityBadge value={event.calidad_dato} />
       </div>
       <h3>{event.titulo}</h3>

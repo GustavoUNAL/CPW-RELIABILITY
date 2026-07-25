@@ -9,7 +9,6 @@ import {
   Gauge,
   Layers,
   MapPin,
-  Shield,
   Zap,
 } from "lucide-react";
 import {
@@ -1214,7 +1213,7 @@ function FieldPage({
           fieldKey={fieldKey}
           month={month}
           monthLabel={monthLabel}
-          compact={section === "resumen"}
+          compact={false}
         />
       ) : null}
 

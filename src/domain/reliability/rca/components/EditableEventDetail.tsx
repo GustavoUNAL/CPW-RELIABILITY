@@ -17,6 +17,7 @@ import type {
   RcaEstadoEvento,
   RcaEventoFalla,
 } from "../types";
+import { equipoLabel, shortRcaEventId } from "../data";
 import { needsWarningBanner, UncertaintyText } from "../uncertainty";
 import { CriticalityBadge } from "./CriticalityBadge";
 import { FiveWhysTable } from "./FiveWhysTable";
@@ -64,7 +65,7 @@ type SlideId =
   | "cierre";
 
 const SLIDES: Array<{ id: SlideId; label: string; short: string }> = [
-  { id: "portada", label: "Portada, info y resumen", short: "Portada" },
+  { id: "portada", label: "Resumen", short: "Resumen" },
   { id: "timeline", label: "Línea de tiempo", short: "Timeline" },
   { id: "tecnica", label: "Descripción y clasificación", short: "Técnica" },
   { id: "causas", label: "Análisis de causa", short: "Causas" },
@@ -90,15 +91,6 @@ function FieldRow({ label, children }: { label: string; children: ReactNode }) {
       <th scope="row">{label}</th>
       <td>{children}</td>
     </tr>
-  );
-}
-
-function MetaCard({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="rca-meta-card">
-      <span>{label}</span>
-      <strong>{children}</strong>
-    </div>
   );
 }
 
@@ -390,55 +382,54 @@ export function EditableEventDetail({
     </div>
   );
 
-  const metaView = (
-    <div className="rca-meta-grid">
-      <MetaCard label="Fecha">{formatLongDate(draft.fecha)}</MetaCard>
-      <MetaCard label="Hora">{draft.hora || "—"}</MetaCard>
-      <MetaCard label="Equipo">
-        <UncertaintyText text={equipoValue || "—"} />
-      </MetaCard>
-      <MetaCard label="Duración">
-        {draft.duracion_horas != null ? `${draft.duracion_horas} h` : "—"}
-      </MetaCard>
-      <MetaCard label="Estado">{ESTADO_LABEL[draft.estado] ?? draft.estado}</MetaCard>
-      <MetaCard label="Criticidad">{CRIT_LABEL[draft.criticidad] ?? draft.criticidad}</MetaCard>
-      <MetaCard label="Calidad">{draft.calidad_dato}</MetaCard>
-      <MetaCard label="Responsable">{draft.responsable || "—"}</MetaCard>
-      <div className="rca-meta-card rca-meta-card--wide">
-        <span>Sistema</span>
-        <strong>
-          <UncertaintyText text={draft.sistema || "—"} />
-        </strong>
-      </div>
-    </div>
-  );
-
   let slideContent: ReactNode = null;
 
   if (slide.id === "portada") {
+    const shortId = shortRcaEventId(draft.id);
+    const equipoTxt = equipoLabel(draft.equipo);
+    const impactoHoras =
+      draft.impacto.disponibilidad_horas ?? draft.duracion_horas ?? draft.indicadores.horas_indisponibles;
+    const energia =
+      draft.impacto.energia_no_generada_kwh ?? draft.indicadores.energia_no_generada;
+    const modoFalla = draft.clasificacion.modo_falla || "—";
+    const componente = draft.clasificacion.componente_afectado || "—";
+    const tipoFalla = draft.clasificacion.tipo || "—";
+    const causaRaiz = draft.causa.raiz || draft.causa.inmediata || "—";
+
     slideContent = (
-      <SlideShell title="1. Portada, información y resumen">
+      <SlideShell title="Resumen">
         <div className="rca-slide-cover">
-          <p className="eyebrow">Ficha RCA · Costayaco</p>
-          {editing ? (
-            <label className="rca-report-title-input">
-              <span className="sr-only">Título</span>
-              <input
-                value={draft.titulo}
-                onChange={(e) => patch("titulo", e.target.value)}
-                placeholder="Título del evento"
-              />
-            </label>
-          ) : (
-            <h2 className="rca-slide-cover-title">{draft.titulo}</h2>
-          )}
-          <p className="rca-slide-cover-id">
-            <code>{draft.id}</code>
-          </p>
-          <div className="rca-report-badges" style={{ justifyContent: "flex-start" }}>
-            <QualityBadge value={draft.calidad_dato} />
-            <CriticalityBadge value={draft.criticidad} />
+          <div className="rca-slide-cover-top">
+            <div>
+              <p className="eyebrow">RCA Costayaco · Junio 2026 · GTE / COPOWER</p>
+              {editing ? (
+                <label className="rca-report-title-input">
+                  <span className="sr-only">Título</span>
+                  <input
+                    value={draft.titulo}
+                    onChange={(e) => patch("titulo", e.target.value)}
+                    placeholder="Título del evento"
+                  />
+                </label>
+              ) : (
+                <h2 className="rca-slide-cover-title">{draft.titulo}</h2>
+              )}
+            </div>
+            <div className="rca-slide-cover-idblock" title={draft.id}>
+              <span>ID</span>
+              <code>{shortId}</code>
+            </div>
           </div>
+
+          <div className="rca-report-badges" style={{ justifyContent: "flex-start" }}>
+            <span className="badge">{ESTADO_LABEL[draft.estado] ?? draft.estado}</span>
+            <CriticalityBadge value={draft.criticidad} />
+            <QualityBadge value={draft.calidad_dato} />
+            {draft.clasificacion.falla_repetitiva ? (
+              <span className="badge warn">Falla repetitiva</span>
+            ) : null}
+          </div>
+
           {warn ? (
             <div className="rca-warn-banner" role="status">
               <AlertTriangle size={18} />
@@ -458,7 +449,93 @@ export function EditableEventDetail({
               </div>
             </div>
           ) : null}
-          {editing ? metaEdit : metaView}
+
+          {editing ? (
+            metaEdit
+          ) : (
+            <>
+              <div className="rca-cover-facts">
+                <div>
+                  <span>Fecha</span>
+                  <strong>{formatLongDate(draft.fecha)}</strong>
+                </div>
+                <div>
+                  <span>Hora</span>
+                  <strong>{draft.hora || "—"}</strong>
+                </div>
+                <div>
+                  <span>Equipo</span>
+                  <strong>{equipoTxt}</strong>
+                </div>
+                <div>
+                  <span>Duración</span>
+                  <strong>{draft.duracion_horas != null ? `${draft.duracion_horas} h` : "—"}</strong>
+                </div>
+                <div>
+                  <span>Responsable</span>
+                  <strong>{draft.responsable || "—"}</strong>
+                </div>
+                <div>
+                  <span>Sistema</span>
+                  <strong>
+                    <UncertaintyText text={draft.sistema || "—"} />
+                  </strong>
+                </div>
+              </div>
+
+              <div className="rca-cover-class">
+                <div>
+                  <span>Tipo</span>
+                  <strong>
+                    <UncertaintyText text={tipoFalla} />
+                  </strong>
+                </div>
+                <div>
+                  <span>Modo de falla</span>
+                  <strong>
+                    <UncertaintyText text={modoFalla} />
+                  </strong>
+                </div>
+                <div>
+                  <span>Componente</span>
+                  <strong>
+                    <UncertaintyText text={componente} />
+                  </strong>
+                </div>
+              </div>
+
+              <div className="rca-cover-kpis">
+                <div>
+                  <span>Horas FS</span>
+                  <strong>{impactoHoras != null && impactoHoras !== "" ? `${impactoHoras} h` : "—"}</strong>
+                </div>
+                <div>
+                  <span>Energía no generada</span>
+                  <strong>
+                    {energia != null && energia !== ""
+                      ? typeof energia === "number"
+                        ? `${energia.toLocaleString("es-CO")} kWh`
+                        : String(energia)
+                      : "—"}
+                  </strong>
+                </div>
+                <div>
+                  <span>Riesgo operación</span>
+                  <strong>
+                    <UncertaintyText text={draft.impacto.riesgo_operacion || "—"} />
+                  </strong>
+                </div>
+              </div>
+
+              <section className="rca-panel rca-cover-root">
+                <h5 className="rca-slide-sub">Causa raíz</h5>
+                <p className="rca-prose">
+                  <UncertaintyText text={causaRaiz} />
+                </p>
+              </section>
+            </>
+          )}
+
           <section className="rca-panel rca-slide-resumen">
             <h5 className="rca-slide-sub">Resumen ejecutivo</h5>
             {editing ? (
@@ -473,6 +550,7 @@ export function EditableEventDetail({
               </p>
             )}
           </section>
+
         </div>
       </SlideShell>
     );
@@ -923,16 +1001,6 @@ export function EditableEventDetail({
                   onChange={(e) => patch("notas_pendientes", linesToList(e.target.value))}
                 />
               </label>
-            ) : draft.notas_pendientes.length > 0 ? (
-              <aside className="rca-report-note" role="note">
-                <strong>Nota:</strong>{" "}
-                {draft.notas_pendientes.map((n, i) => (
-                  <span key={`${i}-${n.slice(0, 20)}`}>
-                    {i > 0 ? " " : ""}
-                    <UncertaintyText text={n} />
-                  </span>
-                ))}
-              </aside>
             ) : null}
           </section>
           {onOpenRelated ? (
@@ -968,8 +1036,8 @@ export function EditableEventDetail({
     >
       <header className="rca-report-head rca-report-head--slim">
         <div className="rca-report-head-main">
-          <p className="eyebrow" style={{ margin: 0 }}>
-            {draft.id}
+          <p className="eyebrow" style={{ margin: 0 }} title={draft.id}>
+            {shortRcaEventId(draft.id)}
           </p>
           <p className="rca-slide-current-label">{slide.label}</p>
         </div>
