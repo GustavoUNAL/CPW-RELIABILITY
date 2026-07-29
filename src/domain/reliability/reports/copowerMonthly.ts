@@ -2767,7 +2767,7 @@ export const COPOWER_MONTHLY_DATA: Record<CopowerMonthKey, CopowerMonthlySnapsho
         "date": "2026-05-16",
         "equipment": "CPW01",
         "eventType": "Falla",
-        "cause": "16:18:00 hrs Salen equipos de línea cpw01, cpw-02, cpw-03, por apertura de RL por vector shiift y salida MRU. 16:39:00 hrs cpw-03 equipo ingresa en linea. 16:54:00 hrs equipo cpw-0",
+        "cause": "16:18:00 hrs Salen equipos de línea cpw01, cpw-02, cpw-03, por apertura de RL por salida de la máquina y salida MRU. 16:39:00 hrs cpw-03 equipo ingresa en linea. 16:54:00 hrs equipo cpw-0",
         "downtimeHours": 1.5,
         "responsible": "COPOWER",
         "notes": "Día · Sat Dec 30 1899 16:18:00 GMT-0456 (Colombia Standard Time)"
@@ -2848,7 +2848,7 @@ export const COPOWER_MONTHLY_DATA: Record<CopowerMonthKey, CopowerMonthlySnapsho
         "date": "2026-05-28",
         "equipment": "JIN-10",
         "eventType": "Falla",
-        "cause": "03:39 Apertura RL por vector shift - FDL SI - EEP reporta alarma por sobrecorriente cto 34.5 villagarzon - pto guzman - 03:47 Se sincroniza campo cyc al SIN - Inicia SI Sale de lin",
+        "cause": "03:39 Apertura RL por salida de la máquina - FDL SI - EEP reporta alarma por sobrecorriente cto 34.5 villagarzon - pto guzman - 03:47 Se sincroniza campo cyc al SIN - Inicia SI Sale de lin",
         "downtimeHours": 0,
         "responsible": "COPOWER",
         "notes": "Noche · Sat Dec 30 1899 03:40:00 GMT-0456 (Colombia Standard Time)"
@@ -3734,7 +3734,7 @@ export const COPOWER_MONTHLY_DATA: Record<CopowerMonthKey, CopowerMonthlySnapsho
         "date": "2026-06-12",
         "equipment": "JIN-01",
         "eventType": "Falla",
-        "cause": "3:53:00 a. m. salen de linea toda la generasion a gas equipos cpwo1-2-3-4-5-6-7-12-jinan1 y jinan 2 por motivo de Apertura del SIN por vector shift – Desestabiliza toda la generaci",
+        "cause": "3:53:00 a. m. salen de linea toda la generasion a gas equipos cpwo1-2-3-4-5-6-7-12-jinan1 y jinan 2 por motivo de Apertura del SIN por salida de la máquina – Desestabiliza toda la generaci",
         "downtimeHours": 0,
         "responsible": "COPOWER",
         "notes": "Noche · Sat Dec 30 1899 03:53:00 GMT-0456 (Colombia Standard Time)"
@@ -5317,37 +5317,37 @@ export const COPOWER_MONTHLY_DATA: Record<CopowerMonthKey, CopowerMonthlySnapsho
       {
         "date": "2026-06-28",
         "equipment": "CPW01",
-        "eventType": "Falla",
+        "eventType": "Operativo",
         "cause": "7:14hr sale de linea equipo cpw01 por salida MRU. 8:28 hr ingresa a linea modo reparto de carga",
         "downtimeHours": 1,
-        "responsible": "COPOWER",
+        "responsible": "GTE",
         "notes": "Día · Sat Dec 30 1899 07:14:00 GMT-0456 (Colombia Standard Time)"
       },
       {
         "date": "2026-06-28",
         "equipment": "CPW02",
-        "eventType": "Falla",
+        "eventType": "Operativo",
         "cause": "7:14hr sale de linea equipo cpw02 por salida MRU. 8:26 hr ingresa a linea modo reparto de carga",
         "downtimeHours": 1,
-        "responsible": "COPOWER",
+        "responsible": "GTE",
         "notes": "Día · Sat Dec 30 1899 07:14:00 GMT-0456 (Colombia Standard Time)"
       },
       {
         "date": "2026-06-28",
         "equipment": "CPW03",
-        "eventType": "Falla",
+        "eventType": "Operativo",
         "cause": "7:14hr sale de linea equipo cpw03 por salida MRU. 8:23 hr ingresa a linea modo reparto de carga",
         "downtimeHours": 1,
-        "responsible": "COPOWER",
+        "responsible": "GTE",
         "notes": "Día · Sat Dec 30 1899 07:14:00 GMT-0456 (Colombia Standard Time)"
       },
       {
         "date": "2026-06-28",
         "equipment": "CPW07",
-        "eventType": "Falla",
+        "eventType": "Operativo",
         "cause": "7:14hr sale de linea equipo cpw07 por salida MRU. 8:20 hr ingresa a linea modo reparto de carga",
         "downtimeHours": 1,
-        "responsible": "COPOWER",
+        "responsible": "GTE",
         "notes": "Día · Sat Dec 30 1899 07:14:00 GMT-0456 (Colombia Standard Time)"
       },
       {
@@ -5358,15 +5358,6 @@ export const COPOWER_MONTHLY_DATA: Record<CopowerMonthKey, CopowerMonthlySnapsho
         "downtimeHours": 0,
         "responsible": "COPOWER",
         "notes": "Día · Sat Dec 30 1899 07:33:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-06-28",
-        "equipment": "CPW06",
-        "eventType": "Falla",
-        "cause": "7:31hr sale de linea equipo cpw06 sale de linea por sobrecarga. 7:46 hr ingresa a linea modo reparto de carga",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 07:31:00 GMT-0456 (Colombia Standard Time)"
       },
       {
         "date": "2026-06-28",

@@ -22,6 +22,8 @@ import {
 import {
   allRiskRows,
   buildGteDegradationRiskPortfolio,
+  GTE_JUNE_DEG_SEED,
+  gteJuneDegradationContext,
   riskDistribution,
   topDegrading,
 } from "./buildDegradationRiskPortfolio";
@@ -196,6 +198,7 @@ export function DegradationRiskDashboard({ monthLabel }: Props) {
   const dist = useMemo(() => riskDistribution(assets), [assets]);
   const topDeg = useMemo(() => topDegrading(assets, 5), [assets]);
   const riskRows = useMemo(() => allRiskRows(assets).slice(0, 12), [assets]);
+  const gteCtx = useMemo(() => gteJuneDegradationContext(assets), [assets]);
 
   return (
     <div className="panel">
@@ -206,7 +209,9 @@ export function DegradationRiskDashboard({ monthLabel }: Props) {
           <span className="source-badge gte">GTE</span>
         </div>
         <p className="muted" style={{ marginTop: "0.35rem" }}>
-          Análisis predictivo rule-based — anticipa deterioro antes de la falla crítica (no es CMMS ni RCA).
+          Portafolio Costayaco alineado a Gran Tierra: {gteCtx.failures} fallas COPOWER ·{" "}
+          {gteCtx.pfContrHours.toLocaleString("es-CO", { minimumFractionDigits: 2 })} h PF_contr · MTTR
+          2,60 h · MTBF 986,71 h. Enlazado a RCA / IP / MSO. Seed {GTE_JUNE_DEG_SEED}.
         </p>
 
         <div className="exec-kpi-row" style={{ marginTop: "0.6rem" }}>
@@ -237,8 +242,9 @@ export function DegradationRiskDashboard({ monthLabel }: Props) {
           </div>
           <div className="exec-kpi">
             <Gauge size={16} />
-            <span>Alertas activas</span>
-            <strong>{summary.activeAlerts}</strong>
+            <span>Fallas COPOWER</span>
+            <strong>{gteCtx.failures}</strong>
+            <small>PF_contr {gteCtx.pfContrHours} h</small>
           </div>
         </div>
 
@@ -431,6 +437,12 @@ export function DegradationRiskDashboard({ monthLabel }: Props) {
                 </p>
               ) : null}
 
+              {selected.juneNotes ? (
+                <p className="muted" style={{ marginTop: "0.55rem" }}>
+                  <strong>Contexto GTE junio:</strong> {selected.juneNotes}
+                </p>
+              ) : null}
+
               <h4 style={{ margin: "0.85rem 0 0.35rem" }}>Indicadores actuales</h4>
               <div className="exec-kpi-row">
                 {(() => {
@@ -466,6 +478,14 @@ export function DegradationRiskDashboard({ monthLabel }: Props) {
                         <small>
                           <TrendText direction={selected.failuresTrend} invertGood />
                         </small>
+                      </div>
+                      <div className="exec-kpi">
+                        <span>PF_contr</span>
+                        <strong>
+                          {last?.pfContrHours != null
+                            ? `${last.pfContrHours.toLocaleString("es-CO", { maximumFractionDigits: 2 })} h`
+                            : "—"}
+                        </strong>
                       </div>
                       <div className="exec-kpi">
                         <span>Horas operación</span>

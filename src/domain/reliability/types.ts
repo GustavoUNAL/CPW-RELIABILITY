@@ -152,7 +152,7 @@ export type EventRecord = {
   eventType: "Falla" | "Causa comun" | "Operativo";
   cause: string;
   downtimeHours: number;
-  responsible: "COPOWER" | "GTE" | "Externo";
+  responsible: "COPOWER" | "GTE" | "GTE + COPOWER" | "Externo";
   notes: string;
 };
 

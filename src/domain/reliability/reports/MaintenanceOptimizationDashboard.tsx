@@ -27,6 +27,10 @@ import {
   strategyMix,
   topOpportunities,
 } from "./buildSabanaMaintenanceOptimization";
+import {
+  buildGteJuneMaintenanceOptimization,
+  GTE_JUNE_MSO_SEED,
+} from "./gteJuneMaintenanceOptimization";
 import { MAINTENANCE_PLANS } from "./maintenancePlansData";
 import {
   CRITICALITY_COLOR,
@@ -38,10 +42,13 @@ import {
   type OptimizationStatus,
   type PlanHealthBand,
 } from "./maintenanceOptimizationTypes";
+import type { ReportKey } from "../types";
 
 type Props = {
   month: string;
   monthLabel: string;
+  /** Preferencia de fuente: GTE usa portafolio canónico de Costayaco. */
+  report?: ReportKey;
 };
 
 const STRATEGY_COLORS = ["#0f766e", "#2563eb", "#d97706", "#7c3aed", "#dc2626", "#64748b"];
@@ -84,8 +91,12 @@ function MphiCell({ mphi, band }: { mphi: number; band: PlanHealthBand }) {
   );
 }
 
-export function MaintenanceOptimizationDashboard({ month, monthLabel }: Props) {
-  const seed = useMemo(() => buildSabanaMaintenanceOptimization(month), [month]);
+export function MaintenanceOptimizationDashboard({ month, monthLabel, report }: Props) {
+  const useGteCanon = month === "Jun" || report === "gran_tierra";
+  const seed = useMemo(
+    () => (useGteCanon ? buildGteJuneMaintenanceOptimization() : buildSabanaMaintenanceOptimization(month)),
+    [month, useGteCanon, GTE_JUNE_MSO_SEED],
+  );
   const [plans, setPlans] = useState<MaintenanceOptimizationPlan[]>(seed);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -111,6 +122,16 @@ export function MaintenanceOptimizationDashboard({ month, monthLabel }: Props) {
         })),
     [plans],
   );
+
+  const gtePortfolioStats = useMemo(() => {
+    if (!useGteCanon) return null;
+    const units = plans.filter((p) => p.assetId !== "MRU");
+    const failures = units.reduce((n, p) => n + p.failures, 0);
+    const pfContr = units.reduce((n, p) => n + p.outageHours, 0);
+    const withRca = plans.filter((p) => p.linkedRcaIds.length > 0).length;
+    const needOpt = plans.filter((p) => p.optimizationStatus === "Requiere optimización").length;
+    return { failures, pfContr, withRca, needOpt };
+  }, [plans, useGteCanon]);
 
   const sabanaKpis = useMemo(() => {
     const monthKey = month === "YTD2026" ? null : month;
@@ -143,13 +164,21 @@ export function MaintenanceOptimizationDashboard({ month, monthLabel }: Props) {
         <p className="eyebrow">Optimización de Planes de Mantenimiento · MSO</p>
         <div className="screen-shell-head">
           <h3>{monthLabel}</h3>
-          <span className="source-badge dual">Sábana + GTE</span>
+          <span className={`source-badge ${useGteCanon ? "gte" : "dual"}`}>
+            {useGteCanon ? "GTE" : "Sábana + GTE"}
+          </span>
         </div>
+        {useGteCanon ? (
+          <p className="muted" style={{ marginTop: "0.35rem" }}>
+            Portafolio Costayaco alineado a bitácora Gran Tierra: 7 fallas COPOWER · 18,22 h PF_contr ·
+            MTTR 2,60 h · MTBF 986,71 h. Enlazado a RCA e IP-GTE. Seed {GTE_JUNE_MSO_SEED}.
+          </p>
+        ) : null}
 
         <div className="exec-kpi-row" style={{ marginTop: "0.6rem" }}>
           <div className="exec-kpi">
             <Layers size={16} />
-            <span>Equipos en catálogo</span>
+            <span>{useGteCanon ? "Activos Costayaco" : "Equipos en catálogo"}</span>
             <strong>{kpis.assetsAnalyzed}</strong>
           </div>
           <div className="exec-kpi">
@@ -162,20 +191,39 @@ export function MaintenanceOptimizationDashboard({ month, monthLabel }: Props) {
             <span>Planes optimizados</span>
             <strong>{kpis.plansOptimized}</strong>
           </div>
-          <div className="exec-kpi">
-            <Activity size={16} />
-            <span>Cumplimiento sábana</span>
-            <strong>{sabanaKpis.compliance.toFixed(0)}%</strong>
-            <small>
-              {sabanaKpis.executed}/{sabanaKpis.programmed} ejecutados
-            </small>
-          </div>
-          <div className="exec-kpi">
-            <AlertTriangle size={16} />
-            <span>Aplazos / horas</span>
-            <strong>{sabanaKpis.postponed}</strong>
-            <small>{sabanaKpis.pending} pendientes</small>
-          </div>
+          {useGteCanon && gtePortfolioStats ? (
+            <>
+              <div className="exec-kpi">
+                <AlertTriangle size={16} />
+                <span>Fallas COPOWER</span>
+                <strong>{gtePortfolioStats.failures}</strong>
+                <small>PF_contr {gtePortfolioStats.pfContr.toFixed(2)} h</small>
+              </div>
+              <div className="exec-kpi">
+                <Activity size={16} />
+                <span>Con RCA / plan</span>
+                <strong>{gtePortfolioStats.withRca}</strong>
+                <small>{gtePortfolioStats.needOpt} requieren optimización</small>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="exec-kpi">
+                <Activity size={16} />
+                <span>Cumplimiento sábana</span>
+                <strong>{sabanaKpis.compliance.toFixed(0)}%</strong>
+                <small>
+                  {sabanaKpis.executed}/{sabanaKpis.programmed} ejecutados
+                </small>
+              </div>
+              <div className="exec-kpi">
+                <AlertTriangle size={16} />
+                <span>Aplazos / horas</span>
+                <strong>{sabanaKpis.postponed}</strong>
+                <small>{sabanaKpis.pending} pendientes</small>
+              </div>
+            </>
+          )}
           <div className="exec-kpi">
             <PiggyBank size={16} />
             <span>Ahorro estimado</span>
@@ -197,7 +245,9 @@ export function MaintenanceOptimizationDashboard({ month, monthLabel }: Props) {
           <article className="dash-chart-panel">
             <h4>Índice de Salud del Plan (MPHI)</h4>
             <p className="muted dash-chart-sub">
-              Peores 12 · 0–100 · basado en sábana + GTE · Excelente ≥80 · Bajo &lt;60
+              {useGteCanon
+                ? "Portafolio GTE junio · 0–100 · Excelente ≥80 · Bajo <60"
+                : "Peores 12 · 0–100 · basado en sábana + GTE · Excelente ≥80 · Bajo <60"}
             </p>
             <div className="dash-chart">
               <ResponsiveContainer width="100%" height={230}>

@@ -24,6 +24,9 @@ export type RcaCaseDetail = {
   pdfUrls?: string[];
 };
 
+/** Bump para forzar rehidratación desde seed (localStorage). */
+export const GTE_JUNE_RCA_SEED = "2026-07-26-rca-r6";
+
 function normAsset(id: string) {
   return id.toUpperCase().replace(/[^A-Z0-9]/g, "");
 }
@@ -42,7 +45,7 @@ function assetMatchesEvent(equipmentNorm: string, asset: string): boolean {
 
 /**
  * Cruza un evento de bitácora solo con RCA formales entregados (PDF en carpeta RCA).
- * Fecha + equipo / activos vinculados. Los casos sin PDF (p. ej. RCA-001…006 analíticos) no se relacionan.
+ * Fecha + equipo / activos vinculados. Los casos sin PDF (analíticos) no se relacionan aquí.
  */
 export function findRcaCasesForEvent(
   date: string,
@@ -59,171 +62,247 @@ export function findRcaCasesForEvent(
 }
 
 /**
- * Catálogo de casos RCA junio 2026.
- * - Con `pdfUrls`: RCA formal entregado (fuente: data/RCA / public/rca). Solo estos se cruzan con la bitácora.
- * - Sin PDF: casos analíticos de seguimiento interno; no implican entrega documental al cliente.
+ * Catálogo de casos RCA junio 2026 — alineado a bitácora consolidada:
+ * 7 fallas COPOWER · 18,22 h PF_contr · + externo 28-jun (no imputable) · + FO salida de la máquina 22-jun (PDF).
+ *
+ * IDs ↔ planes de intervención:
+ * RCA-001 ↔ IP-GTE-001 (K4) · RCA-002 ↔ IP-GTE-002 (escape) · RCA-003 ↔ IP-GTE-003 (intercooler)
+ * RCA-004 ↔ IP-GTE-004 (Q>) · RCA-005 ↔ IP-GTE-005 (externo) · RCA-006 ↔ IP-GTE-006 (MRU)
+ * RCA-007 ↔ IP-GTE-007 (FO-44) · RCA-008 ↔ IP-GTE-009 (CPW03) · RCA-030 = PDF formal 22-jun
  */
 export function buildGteJuneRcaCases(): RcaCaseDetail[] {
   return [
     {
       id: "RCA-001",
-      title: "Detonación del Generador CPW03",
-      eventLabel: "Detonación del motor",
-      status: "Cerrado",
-      priority: "Crítica",
-      equipment: "CPW03",
-      linkedAssets: ["CPW03"],
-      eventDate: "2026-06-11",
-      problem:
-        "Detonación del motor durante la operación, ocasionando la salida del equipo y la ejecución de mantenimiento correctivo.",
-      immediateCause: "Combustión anormal dentro del cilindro.",
-      rootCause:
-        "Variaciones en la calidad y presión del gas combustible, sumadas a un desajuste de los parámetros de combustión.",
-      actions: [
-        "Calibración del sistema de combustión.",
-        "Verificación del sistema de encendido.",
-        "Revisión del suministro de gas.",
-        "Actualización de parámetros del motor.",
-      ],
-      result: "No se registraron nuevas detonaciones posteriores a la intervención.",
-      linkedPlanId: "IP-GTE-001",
-      category: "Combustión",
-      responsible: "Confiabilidad",
-      company: "COPOWER",
-      closeDate: "2026-07-18",
-    },
-    {
-      id: "RCA-002",
-      title: "Daño del Sistema de Admisión (CPW01)",
-      eventLabel: "Daño sistema de admisión",
+      title: "Detonación por señal errónea relé K4 — CPW01",
+      eventLabel: "Detonación relé K4",
       status: "Cerrado",
       priority: "Alta",
       equipment: "CPW01",
       linkedAssets: ["CPW01"],
-      eventDate: "2026-06-03",
-      problem: "Daño en el sistema de admisión y flexible del motor.",
-      immediateCause: "Falla mecánica del conjunto de admisión.",
-      rootCause: "Desgaste progresivo y esfuerzos mecánicos asociados al sistema de admisión.",
+      eventDate: "2026-06-07",
+      problem:
+        "07-jun-2026: shutdown por detonación asociada a señal errónea del relé K4. PF_contr 3,00 h. Se cambia base y relé K4.",
+      immediateCause: "Señal espuria en base/relé K4 que provocó corte de gas y detonación.",
+      rootCause:
+        "Envejecimiento/contacto deficiente de componentes de tablero sin rutina de inspección que lo detecte; ausencia de señal redundante ante lectura errónea única.",
       actions: [
-        "Sustitución del flexible.",
-        "Inspección completa del sistema.",
-        "Actualización del procedimiento de montaje.",
-        "Lista de verificación antes del arranque.",
+        "Reemplazo de base y relé K4.",
+        "Verificación de cableado y contacto de shutoff de gas.",
+        "Prueba de arranque y estabilidad de combustión.",
+        "Incluir bases de relé en checklist eléctrico post-evento.",
       ],
-      result: "No se presentaron nuevas fallas en el sistema de admisión.",
+      result: "Equipo restablecido; sin reincidencias K4 en el periodo de seguimiento.",
+      linkedPlanId: "IP-GTE-001",
+      category: "Sensores / Relés",
+      responsible: "Eléctrico / Confiabilidad",
+      company: "COPOWER",
+      closeDate: "2026-07-10",
+    },
+    {
+      id: "RCA-002",
+      title: "Fuga flexible de escape — CPW01",
+      eventLabel: "Falla flexible múltiple de escape",
+      status: "Cerrado",
+      priority: "Alta",
+      equipment: "CPW01",
+      linkedAssets: ["CPW01"],
+      eventDate: "2026-06-05",
+      problem:
+        "05-jun-2026: salida a correctivo por falla del flexible de escape (afectación post-exostación 02-jun). PF_contr 2,00 h.",
+      immediateCause: "Fuga en junta/flexible de escape revelada en operación.",
+      rootCause: "Deterioro post-mantenimiento en tren de admisión/escape; montaje sin checklist de torque obligatorio.",
+      actions: [
+        "Inspección completa del tren de admisión/escape.",
+        "Cambio de flexibles / junta turbo.",
+        "Verificación de torque.",
+        "Actualización del procedimiento de montaje.",
+        "Lista de chequeo antes del arranque.",
+      ],
+      result: "No se presentaron nuevas fugas de escape en seguimiento.",
       linkedPlanId: "IP-GTE-002",
-      category: "Admisión/Escape",
+      category: "Admisión / Escape",
       responsible: "Mecánico",
       company: "COPOWER",
       closeDate: "2026-07-12",
     },
     {
       id: "RCA-003",
-      title: "Obstrucción del Intercooler (CPW06)",
+      title: "Obstrucción del intercooler por secuestrante — CPW06",
       eventLabel: "Obstrucción del intercooler",
       status: "Cerrado",
       priority: "Media",
       equipment: "CPW06",
       linkedAssets: ["CPW06"],
       eventDate: "2026-06-03",
-      problem: "Obstrucción del intercooler por acumulación de residuos.",
-      immediateCause: "Reducción del flujo de aire de admisión.",
+      problem:
+        "03-jun-2026: cambio de intercooler por exceso de residuo de secuestrante. PF_contr 4,00 h. Responsabilidad compartida GTE + COPOWER.",
+      immediateCause: "Reducción del flujo de aire de admisión por obstrucción del núcleo.",
       rootCause:
-        "Acumulación de residuos del sistema de tratamiento y mantenimiento preventivo insuficiente.",
+        "Contaminantes del programa de tratamiento (secuestrante H2S) sin barrera de filtración suficiente antes del intercambiador.",
       actions: [
-        "Limpieza del intercooler.",
-        "Revisión del sistema de tratamiento.",
-        "Definición de frecuencia de inspección.",
+        "Inspección interna del intercooler.",
+        "Análisis de secuestrante / calidad de gas.",
+        "Cambio de núcleo / limpieza.",
+        "Definir inspección mensual con dosificación activa.",
+        "Monitoreo de ΔP y temperatura de admisión.",
       ],
-      result: "Temperaturas de operación estabilizadas.",
+      result: "Núcleo cambiado; ΔP normal; temperaturas estabilizadas.",
       linkedPlanId: "IP-GTE-003",
-      category: "Enfriamiento/Lub",
+      category: "Tratamiento gas / Enfriamiento",
       responsible: "Mecánico",
-      company: "COPOWER",
+      company: "GTE + COPOWER",
       closeDate: "2026-07-09",
     },
     {
       id: "RCA-004",
-      title: "Perturbación Eléctrica del Parque",
-      eventLabel: "Perturbación eléctrica",
-      status: "Cerrado",
+      title: "Salida CPW-06 por protección Q> (evento transitorio MRU)",
+      eventLabel: "Disparo por sobrepotencia reactiva Q>",
+      status: "En curso",
       priority: "Alta",
-      equipment: "CPW06, CPW07",
-      linkedAssets: ["CPW06", "CPW07"],
+      equipment: "CPW06",
+      linkedAssets: ["CPW06", "CPW07", "MRU"],
       eventDate: "2026-06-27",
-      problem: "Salida de generadores por perturbación eléctrica del sistema.",
-      immediateCause: "Variación de tensión y potencia reactiva.",
-      rootCause: "Condición transitoria de la red eléctrica externa al generador.",
+      problem:
+        "Tras salida de la MRU, CPW-06 disparó protección Q>. FO sin horas oficiales; FS≈2,30 h y ≈2.420 kWh estimados solo por tendencia. Causa raíz y responsabilidad en investigación (AVR / Q> / DEIF / CPW-07).",
+      immediateCause:
+        "Actuación de la protección Q> por incremento súbito de potencia reactiva durante la salida de la MRU.",
+      rootCause:
+        "No determinada. Sin evidencia suficiente para atribuir a un componente específico; investigación abierta.",
       actions: [
-        "Revisión de ajustes de protecciones.",
-        "Verificación del AVR.",
-        "Validación del sincronismo.",
-        "Análisis de registros eléctricos.",
+        "Revisión de tendencias, unifilares y modos de operación (realizada).",
+        "Revisión preliminar AVR y registros DEIF (realizada).",
+        "Mesa técnica Operaciones e Ingeniería (realizada).",
+        "Validar configuración Q> y AVR DVC-550 (pendiente).",
+        "Analizar interacción CPW-06/CPW-07 y coordinación de protecciones (pendiente).",
       ],
       result:
-        "No se identificaron fallas propias en los generadores; se confirmó el origen externo del evento.",
+        "Evento en investigación. No confirmar causa raíz ni asignar responsabilidad hasta validar configuraciones.",
       linkedPlanId: "IP-GTE-004",
-      category: "Red eléctrica",
-      responsible: "Eléctrico",
-      company: "GTE",
-      closeDate: "2026-07-25",
+      category: "Protecciones / AVR",
+      responsible: "Eléctrico / Confiabilidad",
+      company: "COPOWER",
+      closeDate: null,
     },
     {
       id: "RCA-005",
-      title: "Potencia Inversa y Sobrecarga",
-      eventLabel: "Potencia inversa y sobrecarga",
+      title: "Perturbación externa en la red de 34,5 kV",
+      eventLabel: "Falla por salida de la máquina / red externa 34,5 kV",
       status: "Cerrado",
       priority: "Alta",
-      equipment: "CPW05, CPW06",
-      linkedAssets: ["CPW05", "CPW06"],
+      equipment: "CPW01 / CPW02 / CPW03 / CPW05 / CPW06 / CPW07",
+      linkedAssets: ["CPW01", "CPW02", "CPW03", "CPW05", "CPW06", "CPW07"],
       eventDate: "2026-06-28",
-      problem: "Disparos por potencia inversa y sobrecarga posteriores a la salida de la MRU.",
-      immediateCause: "Redistribución súbita de carga entre los generadores.",
+      problem:
+        "Perturbación externa en la red de 34,5 kV (gallinazo / salida de la máquina), pérdida MRU + Chiller y salida de múltiples unidades; sobrecarga CPW-06 y parada manual CPW-05. FS=0,38 h (07:10–07:33); ≈1.730 kWh. No imputable a COPOWER.",
+      immediateCause:
+        "Actuación de la protección por salida de la máquina por perturbación externa de la red de 34,5 kV, con pérdida de MRU + Chiller y redistribución de carga (sobrecarga CPW-06).",
       rootCause:
-        "Pérdida de capacidad del sistema de tratamiento de gas (MRU), provocando cambios operativos en la generación.",
+        "Apertura del circuito 34,5 kV Mocoa–Villagarzón por sobrecorriente (gallinazo). Sin fallas propias de los grupos electrógenos.",
       actions: [
-        "Revisión del Load Sharing.",
-        "Calibración de gobernadores.",
-        "Ajuste de protecciones.",
-        "Actualización del procedimiento operativo.",
+        "Inspección de equipos y verificación de ausencia de fallas internas.",
+        "Ingreso secuencial de unidades y validación de parámetros.",
+        "Comprobación del funcionamiento de protecciones.",
+        "Inspección de gobernación de CPW-05 y CPW-06.",
+        "Mantener coordinación con CCM ante contingencias externas.",
       ],
-      result: "No se registraron nuevos eventos similares durante el período de seguimiento.",
+      result:
+        "Operación estabilizada; protecciones actuaron correctamente; sin anomalías atribuibles a los grupos. FS/kWh de la ficha son estimaciones técnicas.",
       linkedPlanId: "IP-GTE-005",
-      category: "Gobernación",
-      responsible: "Instrumentación",
-      company: "COPOWER",
-      closeDate: "2026-07-28",
+      category: "Red eléctrica externa",
+      responsible: "Externo / coordinación CCM",
+      company: "Externo",
+      closeDate: "2026-06-28",
     },
     {
       id: "RCA-006",
-      title: "Baja Disponibilidad de la MRU",
+      title: "Baja disponibilidad de la MRU",
       eventLabel: "Baja disponibilidad MRU",
-      status: "Cerrado",
+      status: "En curso",
       priority: "Crítica",
       equipment: "MRU",
       linkedAssets: ["MRU"],
       eventDate: "2026-06-25",
-      problem: "Paradas repetitivas de la MRU con impacto sobre varios generadores.",
+      problem: "Paradas repetitivas de la MRU (mto / NGL) con alto impacto en PF_cli y habilitantes de fallas (p. ej. Q> 27-jun).",
       immediateCause: "Indisponibilidad del sistema de tratamiento de gas.",
       rootCause:
-        "Condiciones operacionales asociadas al manejo de NGL y mantenimiento del sistema de tratamiento.",
+        "Condiciones operacionales asociadas al manejo de NGL y mantenimiento del sistema de tratamiento (responsabilidad GTE).",
       actions: [
-        "Programa de mantenimiento preventivo.",
-        "Monitoreo continuo de NGL.",
-        "Implementación de alarmas tempranas.",
-        "Optimización del procedimiento operativo.",
+        "RCA de la MRU (en curso GTE).",
+        "Programa predictivo de la MRU.",
+        "Monitoreo continuo de nivel NGL.",
+        "Alarmas anticipadas NGL/MRU.",
+        "Revisión del sistema Quincy.",
       ],
-      result: "Incremento de la disponibilidad del sistema y reducción de las afectaciones a la generación.",
+      result: "Acciones GTE en curso; seguimiento conjunto GTE–COPOWER.",
       linkedPlanId: "IP-GTE-006",
-      category: "MRU/NGL",
+      category: "MRU / NGL",
       responsible: "Gran Tierra",
       company: "GTE",
-      closeDate: "2026-07-30",
+      closeDate: null,
+    },
+    {
+      id: "RCA-007",
+      title: "Cascada FO-44 — selectividad RL / 480 V",
+      eventLabel: "FO-44 EEP Jauno–Piamonte + RL/480 V",
+      status: "En curso",
+      priority: "Crítica",
+      equipment: "CPW04 / CPW05",
+      linkedAssets: ["CPW04", "CPW05", "CPW06", "CPW07", "MRU", "Parque"],
+      eventDate: "2026-06-23",
+      problem:
+        "23–24 jun: cascada EEP Jauno–Piamonte + RL sin selectividad + disparo 480 V. PF_contr CPW04 1,00 h + CPW05 2,00 h = 3,00 h. Ajuste final 8×/15× aplicado; efectividad pendiente de validación.",
+      immediateCause: "Propagación del disturbio EEP a auxiliares 480 V por falta de selectividad RL.",
+      rootCause:
+        "Iniciador externo (reconectador EEP inestable) + habilitante interno accionable: descoordinación de protecciones RL→480 V.",
+      actions: [
+        "Estudio formal de coordinación 34,5 kV → RL → 480 V (pendiente).",
+        "Aplicar ajuste Isd=8×Ir / Ii=15×In en ambos pares (hecho 24-jun).",
+        "Descargar data TRIP y validar corrientes/fases (pendiente).",
+        "Gestionar EEP y monitoreo de calidad de energía en frontera (pendiente).",
+        "Evaluar desacople/respaldo de auxiliares 480 V (pendiente).",
+      ],
+      result: "Ajuste aplicado; validación de no-reincidencia y estudio de coordinación pendientes.",
+      linkedPlanId: "IP-GTE-007",
+      category: "Protecciones / Red externa",
+      responsible: "Eléctrico + gestión EEP",
+      company: "COPOWER / EEP",
+      closeDate: null,
+    },
+    {
+      id: "RCA-008",
+      title: "Salida de servicio por perturbación transitoria — CPW03",
+      eventLabel: "Perturbación transitoria durante la operación",
+      status: "En curso",
+      priority: "Alta",
+      equipment: "CPW03",
+      linkedAssets: ["CPW03"],
+      eventDate: "2026-06-11",
+      problem:
+        "CPW-03 (J320, ~669 kW / 64 %): perturbación transitoria durante la operación con reducción abrupta de potencia y corriente. Salida de servicio por lógica de protección; retorno 19:25 (FS≈3,92 h). Sin daño físico ni reemplazo de componentes. Energía no generada ≈2.620 kWh (estimado).",
+      immediateCause:
+        "Salida automática del grupo electrógeno como respuesta a una condición transitoria detectada durante la operación.",
+      rootCause:
+        "No determinada. La evidencia disponible no permite identificar de manera concluyente el mecanismo físico que originó la perturbación.",
+      actions: [
+        "Inspección general del grupo electrógeno — sin anomalías.",
+        "Verificación de condiciones operativas y restablecimiento.",
+        "Arranque, sincronización y retorno a línea 19:25.",
+        "PENDIENTE: fortalecer captura de información de diagnóstico en eventos transitorios.",
+        "PENDIENTE: confirmar energía no generada con totalizadores de generación.",
+      ],
+      result:
+        "Equipo operando normalmente tras el restablecimiento. Causa raíz no determinada; diagnóstico abierto (IP-GTE-009).",
+      linkedPlanId: "IP-GTE-009",
+      category: "Red / Transitorio",
+      responsible: "Confiabilidad / Eléctrico",
+      company: "COPOWER",
+      closeDate: null,
     },
     {
       id: "RCA-030",
-      title: "Shutdown General Costayaco — Vector Shift EEP 34.5 kV",
-      eventLabel: "Vector Shift — Falla en reconectador EEP 34.5 kV",
+      title: "Shutdown General Costayaco — salida de la máquina · EEP 34.5 kV",
+      eventLabel: "Salida de la máquina — falla en reconectador EEP 34.5 kV",
       status: "Cerrado",
       priority: "Alta",
       equipment: "Parque Costayaco (CPW01–07, CPW12, JINAN-01/02)",
@@ -243,9 +322,9 @@ export function buildGteJuneRcaCases(): RcaCaseDetail[] {
       ],
       eventDate: "2026-06-22",
       problem:
-        "22-jun-2026 03:49 hrs: Shutdown General en Campo Costayaco que afectó CPW-01 a CPW-07, CPW-12, JINAN-01 y JINAN-02. Perturbación en red 34.5 kV EEP (circuito Puerto Limón) generó Vector Shift en la barra; a las 03:52 salen Turbina Soenergy y MRU; 03:53 CPW-01/02/03 disparan I>> etapa 2 en < 2 s.",
+        "22-jun-2026 03:49 hrs: Shutdown General en Campo Costayaco que afectó CPW-01 a CPW-07, CPW-12, JINAN-01 y JINAN-02. Perturbación en red 34.5 kV EEP (circuito Puerto Limón) generó salida de la máquina en la barra; a las 03:52 salen Turbina Soenergy y MRU; 03:53 CPW-01/02/03 disparan I>> etapa 2 en < 2 s.",
       immediateCause:
-        "Apertura del reconectador EEP → Vector Shift → colapso de tensión de barra → AVR inyecta Q → sobrecorriente I>> etapa 2 (CPW-03 304 A, CPW-01 317 A, CPW-02 306 A) con GB OFF coordinado.",
+        "Apertura del reconectador EEP → salida de la máquina → colapso de tensión de barra → AVR inyecta Q → sobrecorriente I>> etapa 2 (CPW-03 304 A, CPW-01 317 A, CPW-02 306 A) con GB OFF coordinado.",
       rootCause:
         "Hipótesis principal: falla en reconectador EEP 34.5 kV Puerto Limón como iniciador (perturbación común externa). Hipótesis alterna: salida de Turbina Soenergy como iniciador. Causa raíz definitiva pendiente de SOE turbina, registros MRU, informe EEP y SCADA sincronizado. Descarte: falla interna de generadores (actuación simultánea < 2 s).",
       actions: [
@@ -256,9 +335,9 @@ export function buildGteJuneRcaCases(): RcaCaseDetail[] {
         "Preventivas: validar ajustes 50/51, 59, 81O/81U; protocolo de coordinación con EEP; respaldo de eventos eléctricos.",
       ],
       result:
-        "PDF formal Sec. 30 entregado a GTE (2 archivos en data/RCA). Elaboró Daniel Durán · Revisó David Cornejo · Aprobó Wilson Oliveros (22-jun-26).",
-      linkedPlanId: "IP-GTE-004",
-      category: "Red eléctrica / Vector Shift",
+        "PDF formal Sec. 30 entregado a GTE (2 archivos en data/RCA). Elaboró Daniel Durán · Revisó David Cornejo · Aprobó Wilson Oliveros (22-jun-26). Sin plan IP dedicado (evento distinto al 28-jun).",
+      linkedPlanId: null,
+      category: "Red eléctrica / salida de máquina",
       responsible: "Daniel Durán · Ing. Confiabilidad",
       company: "COPOWER",
       closeDate: "2026-06-22",

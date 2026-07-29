@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { PlatformContent } from "./domain/reliability/reports/PlatformContent";
 import type { RcaCaseDetail } from "./domain/reliability/reports/gteJuneRcaCases";
+import { GTE_JUNE_RCA_SEED } from "./domain/reliability/reports/gteJuneRcaCases";
 import {
   createBlankRca,
   createRcaDraftFromEvent,
@@ -23,6 +24,7 @@ import {
   type RcaEventDraft,
 } from "./domain/reliability/reports/rcaCaseStore";
 import {
+  getCostayacoSeedStamp,
   loadCostayacoRcaEvents,
   persistCostayacoRcaEvents,
   upsertCostayacoRcaEvent,
@@ -132,6 +134,16 @@ function App() {
   const [costayacoRcaEvents, setCostayacoRcaEvents] = useState<RcaEventoFalla[]>(() =>
     loadCostayacoRcaEvents(),
   );
+  const costayacoSeedStamp = getCostayacoSeedStamp();
+
+  // El JSON seed es la fuente de verdad: rehidrata al montar / al cambiar el stamp del pack.
+  useEffect(() => {
+    setCostayacoRcaEvents(loadCostayacoRcaEvents());
+  }, [costayacoSeedStamp]);
+
+  useEffect(() => {
+    setRcaCases(loadRcaCases());
+  }, [GTE_JUNE_RCA_SEED]);
 
   const selectLeaf = (page: PageKey, leafId: string) => {
     setActivePage(page);

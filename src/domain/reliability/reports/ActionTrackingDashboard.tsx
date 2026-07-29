@@ -227,95 +227,6 @@ export function ActionTrackingDashboard({ monthLabel, focusId }: Props) {
           Gestor central de acciones · {monthLabel} · RCA, intervención, MSO, riesgos, eventos, reuniones y contrato.
         </p>
 
-        {(kpis.overdue > 0 || kpis.dueSoon > 0 || kpis.criticalOpen > 0) && (
-          <p className="alert-inline" style={{ marginTop: "0.55rem" }}>
-            Alertas: {kpis.overdue} vencida(s) · {kpis.dueSoon} vence(n) en ≤7 días ·{" "}
-            {kpis.criticalOpen} crítica(s) abierta(s)
-            {kpis.stale > 0 ? ` · ${kpis.stale} sin actualización >30 días` : ""}
-          </p>
-        )}
-
-        <section id="capa-sec-resumen" className="capa-kpi-block">
-          <div className="capa-kpi-group">
-            <p className="capa-kpi-group-label">Volumen</p>
-            <div className="capa-kpi-grid capa-kpi-grid--5">
-              <article className="capa-kpi-card">
-                <header>
-                  <ListChecks size={15} />
-                  <span>Totales</span>
-                </header>
-                <strong>{kpis.total}</strong>
-                <small>Portafolio filtrado</small>
-              </article>
-              <article className="capa-kpi-card">
-                <header>
-                  <Clock3 size={15} />
-                  <span>Pendientes</span>
-                </header>
-                <strong>{kpis.pending}</strong>
-                <small>Pendiente / asignada</small>
-              </article>
-              <article className="capa-kpi-card">
-                <header>
-                  <Workflow size={15} />
-                  <span>En ejecución</span>
-                </header>
-                <strong>{kpis.running}</strong>
-                <small>Ejecución / validación</small>
-              </article>
-              <article className={`capa-kpi-card${kpis.overdue > 0 ? " capa-kpi-card--danger" : ""}`}>
-                <header>
-                  <AlertTriangle size={15} />
-                  <span>Vencidas</span>
-                </header>
-                <strong>{kpis.overdue}</strong>
-                <small>Fuera de fecha</small>
-              </article>
-              <article className="capa-kpi-card capa-kpi-card--ok">
-                <header>
-                  <CheckCircle2 size={15} />
-                  <span>Cerradas</span>
-                </header>
-                <strong>{kpis.closed}</strong>
-                <small>Ciclo completado</small>
-              </article>
-            </div>
-          </div>
-
-          <div id="capa-sec-efectividad" className="capa-kpi-group">
-            <p className="capa-kpi-group-label">Desempeño</p>
-            <div className="capa-kpi-grid capa-kpi-grid--3">
-              <article className="capa-kpi-card capa-kpi-card--accent">
-                <header>
-                  <Percent size={15} />
-                  <span>Cumplimiento</span>
-                </header>
-                <strong>{kpis.compliance}%</strong>
-                <small>Cerradas / totales</small>
-              </article>
-              <article className="capa-kpi-card capa-kpi-card--accent">
-                <header>
-                  <Percent size={15} />
-                  <span>Efectividad</span>
-                </header>
-                <strong>{kpis.effectivenessPct}%</strong>
-                <small>Verificadas con efectividad alta</small>
-              </article>
-              <article className="capa-kpi-card capa-kpi-card--accent">
-                <header>
-                  <Timer size={15} />
-                  <span>Tiempo medio de cierre</span>
-                </header>
-                <strong>
-                  {kpis.avgCloseDays}
-                  <span className="capa-kpi-unit"> días</span>
-                </strong>
-                <small>Promedio de acciones cerradas</small>
-              </article>
-            </div>
-          </div>
-        </section>
-
         <div id="capa-sec-acciones" className="capa-filters">
           <label className="capa-filter-search">
             <span>Buscar</span>
@@ -416,6 +327,87 @@ export function ActionTrackingDashboard({ monthLabel, focusId }: Props) {
             </select>
           </label>
         </div>
+
+        <section id="capa-sec-resumen" className="capa-kpi-block">
+          <div className="capa-kpi-group">
+            <p className="capa-kpi-group-label">Volumen</p>
+            <div className="capa-kpi-grid capa-kpi-grid--5">
+              <article className="capa-kpi-card">
+                <header>
+                  <ListChecks size={15} />
+                  <span>Totales</span>
+                </header>
+                <strong>{kpis.total}</strong>
+                <small>Portafolio filtrado</small>
+              </article>
+              <article className="capa-kpi-card">
+                <header>
+                  <Clock3 size={15} />
+                  <span>Pendientes</span>
+                </header>
+                <strong>{kpis.pending}</strong>
+                <small>Pendiente / asignada</small>
+              </article>
+              <article className="capa-kpi-card">
+                <header>
+                  <Workflow size={15} />
+                  <span>En ejecución</span>
+                </header>
+                <strong>{kpis.running}</strong>
+                <small>Ejecución / validación</small>
+              </article>
+              <article className={`capa-kpi-card${kpis.overdue > 0 ? " capa-kpi-card--danger" : ""}`}>
+                <header>
+                  <AlertTriangle size={15} />
+                  <span>Vencidas</span>
+                </header>
+                <strong>{kpis.overdue}</strong>
+                <small>Fuera de fecha</small>
+              </article>
+              <article className="capa-kpi-card capa-kpi-card--ok">
+                <header>
+                  <CheckCircle2 size={15} />
+                  <span>Cerradas</span>
+                </header>
+                <strong>{kpis.closed}</strong>
+                <small>Ciclo completado</small>
+              </article>
+            </div>
+          </div>
+
+          <div id="capa-sec-efectividad" className="capa-kpi-group">
+            <p className="capa-kpi-group-label">Desempeño</p>
+            <div className="capa-kpi-grid capa-kpi-grid--3">
+              <article className="capa-kpi-card capa-kpi-card--accent">
+                <header>
+                  <Percent size={15} />
+                  <span>Cumplimiento</span>
+                </header>
+                <strong>{kpis.compliance}%</strong>
+                <small>Cerradas / totales</small>
+              </article>
+              <article className="capa-kpi-card capa-kpi-card--accent">
+                <header>
+                  <Percent size={15} />
+                  <span>Efectividad</span>
+                </header>
+                <strong>{kpis.effectivenessPct}%</strong>
+                <small>Verificadas con efectividad alta</small>
+              </article>
+              <article className="capa-kpi-card capa-kpi-card--accent">
+                <header>
+                  <Timer size={15} />
+                  <span>Tiempo medio de cierre</span>
+                </header>
+                <strong>
+                  {kpis.avgCloseDays}
+                  <span className="capa-kpi-unit"> días</span>
+                </strong>
+                <small>Promedio de acciones cerradas</small>
+              </article>
+            </div>
+          </div>
+        </section>
 
         <div id="capa-sec-indicadores" className="capa-chart-grid" style={{ marginTop: "0.9rem" }}>
           <article className="dash-chart-panel">

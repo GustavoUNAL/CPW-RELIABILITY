@@ -159,12 +159,18 @@ export function EditableEventDetail({
   const [savedFlash, setSavedFlash] = useState(false);
   const [page, setPage] = useState(0);
 
+  const cronologiaKey = useMemo(
+    () => event.cronologia.map((item) => `${item.hora}|${item.evento}|${item.origen}`).join("\n"),
+    [event.cronologia],
+  );
+
   useEffect(() => {
     setDraft(structuredClone(event));
     setEditing(startEditing);
     setSavedFlash(false);
     setPage(0);
-  }, [event, startEditing]);
+    // Rehidrata al cambiar el contenido seed (resumen, cronología, etc.), no solo la referencia.
+  }, [event, event.id, event.resumen_ejecutivo, cronologiaKey, startEditing]);
 
   const dirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(event), [draft, event]);
   const warn = needsWarningBanner(draft);
@@ -451,105 +457,123 @@ export function EditableEventDetail({
           ) : null}
 
           {editing ? (
-            metaEdit
+            <>
+              {metaEdit}
+              <section className="rca-panel rca-slide-resumen">
+                <h5 className="rca-slide-sub">Resumen ejecutivo</h5>
+                <textarea
+                  rows={4}
+                  value={draft.resumen_ejecutivo}
+                  onChange={(e) => patch("resumen_ejecutivo", e.target.value)}
+                />
+              </section>
+            </>
           ) : (
             <>
-              <div className="rca-cover-facts">
-                <div>
-                  <span>Fecha</span>
-                  <strong>{formatLongDate(draft.fecha)}</strong>
+              <div className="rca-cover-info-grid">
+                <div className="rca-cover-facts">
+                  <div>
+                    <span>Fecha</span>
+                    <strong>{formatLongDate(draft.fecha)}</strong>
+                  </div>
+                  <div>
+                    <span>Hora</span>
+                    <strong>{draft.hora || "—"}</strong>
+                  </div>
+                  <div>
+                    <span>Equipo</span>
+                    <strong>{equipoTxt}</strong>
+                  </div>
+                  <div>
+                    <span>Duración</span>
+                    <strong>{draft.duracion_horas != null ? `${draft.duracion_horas} h` : "—"}</strong>
+                  </div>
+                  <div>
+                    <span>Responsable</span>
+                    <strong>{draft.responsable || "—"}</strong>
+                  </div>
+                  <div>
+                    <span>Sistema</span>
+                    <strong>
+                      <UncertaintyText text={draft.sistema || "—"} />
+                    </strong>
+                  </div>
                 </div>
-                <div>
-                  <span>Hora</span>
-                  <strong>{draft.hora || "—"}</strong>
+
+                <div className="rca-cover-class">
+                  <div>
+                    <span>Tipo</span>
+                    <strong>
+                      <UncertaintyText text={tipoFalla} />
+                    </strong>
+                  </div>
+                  <div>
+                    <span>Modo de falla</span>
+                    <strong>
+                      <UncertaintyText text={modoFalla} />
+                    </strong>
+                  </div>
+                  <div>
+                    <span>Componente</span>
+                    <strong>
+                      <UncertaintyText text={componente} />
+                    </strong>
+                  </div>
                 </div>
-                <div>
-                  <span>Equipo</span>
-                  <strong>{equipoTxt}</strong>
-                </div>
-                <div>
-                  <span>Duración</span>
-                  <strong>{draft.duracion_horas != null ? `${draft.duracion_horas} h` : "—"}</strong>
-                </div>
-                <div>
-                  <span>Responsable</span>
-                  <strong>{draft.responsable || "—"}</strong>
-                </div>
-                <div>
-                  <span>Sistema</span>
-                  <strong>
-                    <UncertaintyText text={draft.sistema || "—"} />
-                  </strong>
+
+                <div className="rca-cover-kpis">
+                  <div>
+                    <span>Horas FS</span>
+                    <strong>{impactoHoras != null && impactoHoras !== "" ? `${impactoHoras} h` : "—"}</strong>
+                  </div>
+                  <div>
+                    <span>Energía no generada</span>
+                    <strong>
+                      {energia != null && energia !== ""
+                        ? typeof energia === "number"
+                          ? `${energia.toLocaleString("es-CO")} kWh`
+                          : String(energia)
+                        : "—"}
+                    </strong>
+                  </div>
+                  <div>
+                    <span>Riesgo operación</span>
+                    <strong>
+                      <UncertaintyText text={draft.impacto.riesgo_operacion || "—"} />
+                    </strong>
+                  </div>
                 </div>
               </div>
 
-              <div className="rca-cover-class">
-                <div>
-                  <span>Tipo</span>
-                  <strong>
-                    <UncertaintyText text={tipoFalla} />
-                  </strong>
-                </div>
-                <div>
-                  <span>Modo de falla</span>
-                  <strong>
-                    <UncertaintyText text={modoFalla} />
-                  </strong>
-                </div>
-                <div>
-                  <span>Componente</span>
-                  <strong>
-                    <UncertaintyText text={componente} />
-                  </strong>
-                </div>
+              <div className="rca-cover-analysis-grid">
+                <section className="rca-panel rca-cover-root">
+                  <h5 className="rca-slide-sub">Causa raíz</h5>
+                  <p className="rca-prose">
+                    <UncertaintyText text={causaRaiz} />
+                  </p>
+                </section>
+                <section className="rca-panel rca-slide-resumen">
+                  <h5 className="rca-slide-sub">Resumen ejecutivo</h5>
+                  <p className="rca-prose rca-prose--lg">
+                    <UncertaintyText text={draft.resumen_ejecutivo || "—"} />
+                  </p>
+                </section>
               </div>
-
-              <div className="rca-cover-kpis">
-                <div>
-                  <span>Horas FS</span>
-                  <strong>{impactoHoras != null && impactoHoras !== "" ? `${impactoHoras} h` : "—"}</strong>
-                </div>
-                <div>
-                  <span>Energía no generada</span>
-                  <strong>
-                    {energia != null && energia !== ""
-                      ? typeof energia === "number"
-                        ? `${energia.toLocaleString("es-CO")} kWh`
-                        : String(energia)
-                      : "—"}
-                  </strong>
-                </div>
-                <div>
-                  <span>Riesgo operación</span>
-                  <strong>
-                    <UncertaintyText text={draft.impacto.riesgo_operacion || "—"} />
-                  </strong>
-                </div>
-              </div>
-
-              <section className="rca-panel rca-cover-root">
-                <h5 className="rca-slide-sub">Causa raíz</h5>
-                <p className="rca-prose">
-                  <UncertaintyText text={causaRaiz} />
-                </p>
-              </section>
             </>
           )}
 
-          <section className="rca-panel rca-slide-resumen">
-            <h5 className="rca-slide-sub">Resumen ejecutivo</h5>
-            {editing ? (
-              <textarea
-                rows={5}
-                value={draft.resumen_ejecutivo}
-                onChange={(e) => patch("resumen_ejecutivo", e.target.value)}
-              />
-            ) : (
-              <p className="rca-prose rca-prose--lg">
-                <UncertaintyText text={draft.resumen_ejecutivo || "—"} />
-              </p>
-            )}
-          </section>
+          {draft.cronologia.length > 0 ? (
+            <section className="rca-panel rca-slide-timeline-h">
+              <h5 className="rca-slide-sub">Línea de tiempo</h5>
+              {editing ? (
+                <p className="muted" style={{ margin: 0, fontSize: "0.8rem" }}>
+                  Edita la cronología en la diapositiva Timeline.
+                </p>
+              ) : (
+                <Timeline items={draft.cronologia} variant="horizontal" />
+              )}
+            </section>
+          ) : null}
 
         </div>
       </SlideShell>

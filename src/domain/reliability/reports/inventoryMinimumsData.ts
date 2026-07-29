@@ -22,8 +22,8 @@ export type InventoryMinPack = {
 export const INVENTORY_MINIMUMS: InventoryMinPack = {
   "sourceFile": "data/mantenimiento /INVENTARIO ACTUALIZADO 2026.xlsx",
   "sheet": "REPUESTOS Y CONSUMIBLES EQIPOS",
-  "extractedAt": "2026-07-24",
-  "notes": "STOCK (columna D) = stock mínimo · EXISTENCIA = cantidad actual. Fuente: hoja REPUESTOS Y CONSUMIBLES.",
+  "extractedAt": "2026-07-26",
+  "notes": "STOCK (columna D) = stock mínimo · EXISTENCIA = cantidad actual. Fuente: hoja REPUESTOS Y CONSUMIBLES. Existencias críticas de junio se ajustan vía inventoryPlanningCritical.ts.",
   "items": [
     {
       "id": "INV-0001",

@@ -4,13 +4,29 @@
     "cliente": "GTE",
     "operador": "COPOWER LTDA.",
     "periodo": "junio 2026",
-    "fuente": "Notion (Reunión 23 julio) + RCA Vector Shift 22-jun (PDF rev1)",
-    "generado": "2026-07-24",
+    "fuente": "Notion (Reunión 23 julio) + RCA salida de la máquina 22-jun (PDF rev1)",
+    "generado": "2026-07-27-r21",
     "flota": {
-      "unidades": ["CPW-01","CPW-02","CPW-03","CPW-04","CPW-05","CPW-06","CPW-07","CPW-12","JINAN-01","JINAN-02"],
+      "unidades": [
+        "CPW-01",
+        "CPW-02",
+        "CPW-03",
+        "CPW-04",
+        "CPW-05",
+        "CPW-06",
+        "CPW-07",
+        "CPW-12",
+        "JINAN-01",
+        "JINAN-02"
+      ],
       "marca_modelo": "Jenbacher J320 – J420",
       "ubicacion": "Campo Costayaco (CYC)",
-      "tipos_gas": ["Gas MRU + Chiller","Gas Moqueta","Gas Costayaco","Gas Vonu"]
+      "tipos_gas": [
+        "Gas MRU + Chiller",
+        "Gas Moqueta",
+        "Gas Costayaco",
+        "Gas Vonu"
+      ]
     },
     "leyenda_calidad_dato": {
       "completo": "Datos confirmados en la fuente",
@@ -18,7 +34,12 @@
       "inferido": "Causa/análisis deducido por ingeniería; requiere validación",
       "vacio": "Sin información; estructura para llenar"
     },
-    "leyenda_estado": ["abierto","en_seguimiento","cerrado","sin_marcar"],
+    "leyenda_estado": [
+      "abierto",
+      "en_seguimiento",
+      "cerrado",
+      "sin_marcar"
+    ],
     "esquema_evento": {
       "id": "string único",
       "titulo": "string",
@@ -55,7 +76,7 @@
       "id": "EVT-2026-06-03-CPW06",
       "titulo": "Pérdida de potencia por obstrucción del intercooler",
       "fecha": "2026-06-03",
-      "hora": null,
+      "hora": "15:20",
       "equipo": "CPW-06",
       "sistema": "Admisión de gas / Intercooler (enfriamiento de mezcla)",
       "duracion_horas": 6,
@@ -66,11 +87,31 @@
       "es_supuesto": false,
       "resumen_ejecutivo": "CPW-06 presentó pérdida progresiva de potencia (~900 → 680 kW entre el 31 may y el 3 jun) por obstrucción del intercooler de admisión. Delta de presión ~200 mbar y material contaminante en la corriente de gas asociado al secuestrante de H2S. 6 h fuera de servicio con respaldo diésel G102J (~5 h). Se cambió el interno del intercooler y se rediseñó; delta de presión actual ~20 mbar (< 80 = normal).",
       "cronologia": [
-        {"hora": "31-may", "evento": "Inicio de caída de potencia (900 → 680 kW)", "origen": "Proceso"},
-        {"hora": "1-2 jun", "evento": "Incremento sostenido de delta de presión (~200 mbar)", "origen": "Proceso"},
-        {"hora": "3-jun", "evento": "Salida de servicio; entra respaldo diésel G102J (~5 h)", "origen": "Operación"},
-        {"hora": "3-jun", "evento": "Cambio del interno del intercooler; rediseño de aletas", "origen": "Mantenimiento"},
-        {"hora": "post", "evento": "Delta de presión estabilizado en ~20 mbar", "origen": "Seguimiento"}
+        {
+          "hora": "31-may",
+          "evento": "Inicio de caída de potencia (900 → 680 kW)",
+          "origen": "Proceso"
+        },
+        {
+          "hora": "1-2 jun",
+          "evento": "Incremento sostenido de delta de presión (~200 mbar)",
+          "origen": "Proceso"
+        },
+        {
+          "hora": "15:20",
+          "evento": "Salida de servicio; entra respaldo diésel G102J (~5 h)",
+          "origen": "Operación"
+        },
+        {
+          "hora": "3-jun",
+          "evento": "Cambio del interno del intercooler; rediseño de aletas",
+          "origen": "Mantenimiento"
+        },
+        {
+          "hora": "post",
+          "evento": "Delta de presión estabilizado en ~20 mbar",
+          "origen": "Seguimiento"
+        }
       ],
       "descripcion_tecnica": "Taponamiento del intercooler por depósito de contaminantes arrastrados en la corriente de gas. Pese a la cadena de filtración (scrubber, filtro coalescente, filtro de partículas), las partículas finas del secuestrante de H2S ingresan y, ante el choque térmico en el intercooler, se adhieren formando incrustación, reduciendo el área de intercambio y elevando el delta de presión. Gas de alto H2S (~2500 ppm) tratado con químico (Champion).",
       "clasificacion": {
@@ -86,28 +127,77 @@
         "raiz": "El programa de tratamiento químico del H2S introduce un contaminante compatible con incrustación, sin una barrera de filtración capaz de retenerlo antes del intercambiador; falta de especificación/control de calidad del gas aguas arriba."
       },
       "cinco_porques": [
-        {"n": 1, "pregunta": "¿Por qué cayó la potencia?", "respuesta": "Obstrucción del intercooler"},
-        {"n": 2, "pregunta": "¿Por qué se obstruyó?", "respuesta": "Depósito de contaminante por choque térmico"},
-        {"n": 3, "pregunta": "¿Por qué había contaminante?", "respuesta": "Arrastre del secuestrante de H2S en el gas"},
-        {"n": 4, "pregunta": "¿Por qué pasó la filtración?", "respuesta": "Partícula fina no retenida por scrubber/coalescente/filtro"},
-        {"n": 5, "pregunta": "¿Por qué se usa ese químico/dosis?", "respuesta": "Control de H2S (~2500 ppm) sin control de subproductos"}
+        {
+          "n": 1,
+          "pregunta": "¿Por qué cayó la potencia?",
+          "respuesta": "Obstrucción del intercooler"
+        },
+        {
+          "n": 2,
+          "pregunta": "¿Por qué se obstruyó?",
+          "respuesta": "Depósito de contaminante por choque térmico"
+        },
+        {
+          "n": 3,
+          "pregunta": "¿Por qué había contaminante?",
+          "respuesta": "Arrastre del secuestrante de H2S en el gas"
+        },
+        {
+          "n": 4,
+          "pregunta": "¿Por qué pasó la filtración?",
+          "respuesta": "Partícula fina no retenida por scrubber/coalescente/filtro"
+        },
+        {
+          "n": 5,
+          "pregunta": "¿Por qué se usa ese químico/dosis?",
+          "respuesta": "Control de H2S (~2500 ppm) sin control de subproductos"
+        }
       ],
-      "factores_contribuyentes": ["Calidad del combustible (gas moqueta)","Diseño del químico secuestrante de H2S","Diseño térmico del intercooler original","Ausencia de alarma temprana de delta de presión"],
-      "acciones_correctivas": ["Cambio del interno del intercooler con stock mínimo de repuestos","Respaldo con unidad diésel G102J"],
-      "acciones_preventivas": ["Rediseño del intercooler (recálculo de número de aletas de disipación, cambio interno)","Evaluación/cambio del químico de control de H2S","Réplica de la mejora aplicada en la J320","Reparación de 2 intercoolers adicionales para CPW-05 y respaldo de CPW-06/CPW-04"],
-      "impacto": {"disponibilidad_horas": 6, "energia_no_generada_kwh": 5220, "riesgo_operacion": "Uso de unidad diésel G102J durante ~5 h"},
+      "factores_contribuyentes": [
+        "Calidad del combustible (gas moqueta)",
+        "Diseño del químico secuestrante de H2S",
+        "Diseño térmico del intercooler original",
+        "Ausencia de alarma temprana de delta de presión"
+      ],
+      "acciones_correctivas": [
+        "Cambio del interno del intercooler con stock mínimo de repuestos",
+        "Respaldo con unidad diésel G102J"
+      ],
+      "acciones_preventivas": [
+        "Rediseño del intercooler (recálculo de número de aletas de disipación, cambio interno)",
+        "Evaluación/cambio del químico de control de H2S",
+        "Réplica de la mejora aplicada en la J320",
+        "Reparación de 2 intercoolers adicionales para CPW-05 y respaldo de CPW-06/CPW-04"
+      ],
+      "impacto": {
+        "disponibilidad_horas": 6,
+        "energia_no_generada_kwh": 5220,
+        "riesgo_operacion": "Uso de unidad diésel G102J durante ~5 h"
+      },
       "validacion": "Indicador: delta de presión del intercooler. Umbral < 80 mbar (actual ~20 mbar = OK). Seguimiento continuo en CPW-04, CPW-05 y CPW-06.",
-      "lecciones_aprendidas": ["El tratamiento químico del H2S puede generar contaminación aguas abajo","Es un modo de falla de flota, no aislado","Conviene monitoreo continuo de delta de presión con alarma temprana y especificación de calidad de gas"],
-      "indicadores": {"horas_indisponibles": 6, "energia_no_generada": "~870 kW × 6 h ≈ 5.220 kWh", "falla_repetitiva": true},
-      "notas_pendientes": ["Confirmar valores 'aprox.' con registros SCADA"],
-      "relacionados": ["EVT-2026-06-11-CPW03-A"],
+      "lecciones_aprendidas": [
+        "El tratamiento químico del H2S puede generar contaminación aguas abajo",
+        "Es un modo de falla de flota, no aislado",
+        "Conviene monitoreo continuo de delta de presión con alarma temprana y especificación de calidad de gas"
+      ],
+      "indicadores": {
+        "horas_indisponibles": 6,
+        "energia_no_generada": "~870 kW × 6 h ≈ 5.220 kWh",
+        "falla_repetitiva": true
+      },
+      "notas_pendientes": [
+        "Confirmar valores 'aprox.' con registros SCADA"
+      ],
+      "relacionados": [
+        "EVT-2026-06-11-CPW03-A"
+      ],
       "fuente": "Notion - Evento de Falla 3 junio"
     },
     {
       "id": "EVT-2026-06-05-CPW01",
       "titulo": "Fuga en junta de escape del turbo revelada a plena carga",
       "fecha": "2026-06-05",
-      "hora": null,
+      "hora": "18:06",
       "equipo": "CPW-01",
       "sistema": "Múltiple de gas de escape / junta del turbo",
       "duracion_horas": 2,
@@ -118,11 +208,31 @@
       "es_supuesto": false,
       "resumen_ejecutivo": "Tras una reparación previa (posterior a una explosión interna), la junta de escape que conecta el turbo presentó una fuga que afectó el flexible del múltiple de gas de escape. El defecto no era visible en inspección visual y solo se manifestó a plena carga. 2 h fuera de servicio con respaldo diésel. Se reemplazó la junta con stock de repuestos y se cerró el evento.",
       "cronologia": [
-        {"hora": "previo", "evento": "Reparación por explosión interna", "origen": "Mantenimiento"},
-        {"hora": "—", "evento": "Arranque del equipo (gas aún no en condiciones idóneas)", "origen": "Operación"},
-        {"hora": "—", "evento": "Fuga visible solo al alcanzar plena carga", "origen": "Falla"},
-        {"hora": "—", "evento": "Salida de servicio (2 h) + respaldo diésel", "origen": "Operación"},
-        {"hora": "—", "evento": "Cambio de junta y flexible; equipo restablecido", "origen": "Mantenimiento"}
+        {
+          "hora": "previo",
+          "evento": "Reparación por explosión interna",
+          "origen": "Mantenimiento"
+        },
+        {
+          "hora": "—",
+          "evento": "Arranque del equipo (gas aún no en condiciones idóneas)",
+          "origen": "Operación"
+        },
+        {
+          "hora": "—",
+          "evento": "Fuga visible solo al alcanzar plena carga",
+          "origen": "Falla"
+        },
+        {
+          "hora": "—",
+          "evento": "Salida de servicio (2 h) + respaldo diésel",
+          "origen": "Operación"
+        },
+        {
+          "hora": "—",
+          "evento": "Cambio de junta y flexible; equipo restablecido",
+          "origen": "Mantenimiento"
+        }
       ],
       "descripcion_tecnica": "Fuga en la junta que une el turbo con el múltiple de escape, afectando el flexible. Bajo carga parcial la fuga no era detectable; a máxima carga, la dilatación térmica y la mayor presión de gases de escape la evidenciaron. Precedente: explosión interna asociada a temperatura de gas no idónea.",
       "clasificacion": {
@@ -138,20 +248,64 @@
         "raiz": "Ausencia de un protocolo obligatorio de prueba a máxima carga posterior a reparaciones, agravado por el arranque del equipo con gas fuera de condiciones idóneas por orden operativa (CCM / Gran Tierra)."
       },
       "cinco_porques": [
-        {"n": 1, "pregunta": "¿Por qué salió el equipo?", "respuesta": "Fuga en junta de escape del turbo"},
-        {"n": 2, "pregunta": "¿Por qué se produjo la fuga?", "respuesta": "Sellado deficiente tras reparación"},
-        {"n": 3, "pregunta": "¿Por qué no se detectó antes?", "respuesta": "Solo se manifiesta a plena carga; no visible a la vista"},
-        {"n": 4, "pregunta": "¿Por qué no se probó a carga?", "respuesta": "No existe protocolo de prueba de carga post-reparación"},
-        {"n": 5, "pregunta": "¿Por qué se arrancó así?", "respuesta": "Orden operativa con gas fuera de condiciones idóneas"}
+        {
+          "n": 1,
+          "pregunta": "¿Por qué salió el equipo?",
+          "respuesta": "Fuga en junta de escape del turbo"
+        },
+        {
+          "n": 2,
+          "pregunta": "¿Por qué se produjo la fuga?",
+          "respuesta": "Sellado deficiente tras reparación"
+        },
+        {
+          "n": 3,
+          "pregunta": "¿Por qué no se detectó antes?",
+          "respuesta": "Solo se manifiesta a plena carga; no visible a la vista"
+        },
+        {
+          "n": 4,
+          "pregunta": "¿Por qué no se probó a carga?",
+          "respuesta": "No existe protocolo de prueba de carga post-reparación"
+        },
+        {
+          "n": 5,
+          "pregunta": "¿Por qué se arrancó así?",
+          "respuesta": "Orden operativa con gas fuera de condiciones idóneas"
+        }
       ],
-      "factores_contribuyentes": ["Verificación post-reparación","Arranque prematuro por orden externa","Calidad/temperatura del gas","Precedente de explosión interna"],
-      "acciones_correctivas": ["Cambio de la junta y parte afectada con stock de repuestos"],
-      "acciones_preventivas": ["Incorporar al protocolo interno pruebas de máxima carga durante 6 h tras reparaciones mayores","Declararse 'en prueba x horas' ante afectaciones mayores (no se factura durante la prueba)","Solicitar temperatura de gas idónea antes de arrancar"],
-      "impacto": {"disponibilidad_horas": 2, "energia_no_generada_kwh": 1294, "riesgo_operacion": "Perder una unidad y 2 h de operación diésel"},
+      "factores_contribuyentes": [
+        "Verificación post-reparación",
+        "Arranque prematuro por orden externa",
+        "Calidad/temperatura del gas",
+        "Precedente de explosión interna"
+      ],
+      "acciones_correctivas": [
+        "Cambio de la junta y parte afectada con stock de repuestos"
+      ],
+      "acciones_preventivas": [
+        "Incorporar al protocolo interno pruebas de máxima carga durante 6 h tras reparaciones mayores",
+        "Declararse 'en prueba x horas' ante afectaciones mayores (no se factura durante la prueba)",
+        "Solicitar temperatura de gas idónea antes de arrancar"
+      ],
+      "impacto": {
+        "disponibilidad_horas": 2,
+        "energia_no_generada_kwh": 1294,
+        "riesgo_operacion": "Perder una unidad y 2 h de operación diésel"
+      },
       "validacion": "Indicador: ausencia de fugas en prueba de carga sostenida (6 h) tras reparación. Responsable: Operación + Mantenimiento COPOWER.",
-      "lecciones_aprendidas": ["Toda reparación mayor debe validarse a plena carga antes de operación comercial","No arrancar con gas fuera de especificación aunque exista presión operativa externa; usar figura de 'declaración en prueba'"],
-      "indicadores": {"horas_indisponibles": 2, "energia_no_generada": "647 kW × 2 h ≈ 1.294 kWh", "falla_repetitiva": false},
-      "notas_pendientes": ["Confirmar temperatura de gas y secuencia de arranque con registros de CCM"],
+      "lecciones_aprendidas": [
+        "Toda reparación mayor debe validarse a plena carga antes de operación comercial",
+        "No arrancar con gas fuera de especificación aunque exista presión operativa externa; usar figura de 'declaración en prueba'"
+      ],
+      "indicadores": {
+        "horas_indisponibles": 2,
+        "energia_no_generada": "647 kW × 2 h ≈ 1.294 kWh",
+        "falla_repetitiva": false
+      },
+      "notas_pendientes": [
+        "Confirmar temperatura de gas y secuencia de arranque con registros de CCM"
+      ],
       "relacionados": [],
       "fuente": "Notion - Evento de Falla 2 (5 junio)"
     },
@@ -159,22 +313,42 @@
       "id": "EVT-2026-06-07-CPW01",
       "titulo": "Detonación / shutdown por señal errónea del relé K4",
       "fecha": "2026-06-07",
-      "hora": null,
+      "hora": "16:52",
       "equipo": "CPW-01",
       "sistema": "Cámara de combustión / control eléctrico (relé K4, válvula shutoff)",
       "duracion_horas": 3,
-      "responsable": null,
+      "responsable": "COPOWER",
       "estado": "en_seguimiento",
       "criticidad": "alta",
       "calidad_dato": "completo",
       "es_supuesto": false,
       "resumen_ejecutivo": "Un corte de suministro de gas provocó una detonación en el equipo, reflejada en un shutdown por detonación. La causa se ubicó en una señal errónea del relé K4 por afectación en su base, vinculada a la actuación de la válvula shutoff (seguridad de corte de gas). Se reemplazó la base del relé; 3 h fuera de servicio.",
       "cronologia": [
-        {"hora": "—", "evento": "Señal errónea del relé K4 (base afectada)", "origen": "Control"},
-        {"hora": "—", "evento": "Actuación de la válvula shutoff → corte de gas", "origen": "Consecuencia"},
-        {"hora": "—", "evento": "Detonación / shut down del equipo", "origen": "Falla"},
-        {"hora": "—", "evento": "Inspección del tablero; cambio de base del relé K4", "origen": "Mantenimiento"},
-        {"hora": "—", "evento": "Equipo restablecido (3 h fuera de servicio)", "origen": "Operación"}
+        {
+          "hora": "—",
+          "evento": "Señal errónea del relé K4 (base afectada)",
+          "origen": "Control"
+        },
+        {
+          "hora": "—",
+          "evento": "Actuación de la válvula shutoff → corte de gas",
+          "origen": "Consecuencia"
+        },
+        {
+          "hora": "—",
+          "evento": "Detonación / shut down del equipo",
+          "origen": "Falla"
+        },
+        {
+          "hora": "—",
+          "evento": "Inspección del tablero; cambio de base del relé K4",
+          "origen": "Mantenimiento"
+        },
+        {
+          "hora": "—",
+          "evento": "Equipo restablecido (3 h fuera de servicio)",
+          "origen": "Operación"
+        }
       ],
       "descripcion_tecnica": "La base del relé K4 sufrió una afectación que generó una señal falsa/errónea, provocando la actuación de la válvula de corte de gas (shutoff). El corte súbito de combustible en operación produjo una detonación en la cámara de combustión y el disparo de la unidad. La inspección del tablero confirmó daño en la base del relé.",
       "clasificacion": {
@@ -190,129 +364,208 @@
         "raiz": "Envejecimiento/contacto deficiente de componentes de tablero sin rutina de inspección/termografía que lo detecte, y ausencia de señal redundante que evite el disparo ante una única lectura errónea."
       },
       "cinco_porques": [
-        {"n": 1, "pregunta": "¿Por qué hubo shut down?", "respuesta": "Detonación por corte de gas"},
-        {"n": 2, "pregunta": "¿Por qué se cortó el gas?", "respuesta": "Actuó la válvula shutoff"},
-        {"n": 3, "pregunta": "¿Por qué actuó?", "respuesta": "Señal errónea del relé K4"},
-        {"n": 4, "pregunta": "¿Por qué la señal errónea?", "respuesta": "Base del relé afectada / mal contacto"},
-        {"n": 5, "pregunta": "¿Por qué falló la base?", "respuesta": "Desgaste sin inspección periódica ni redundancia"}
+        {
+          "n": 1,
+          "pregunta": "¿Por qué hubo shut down?",
+          "respuesta": "Detonación por corte de gas"
+        },
+        {
+          "n": 2,
+          "pregunta": "¿Por qué se cortó el gas?",
+          "respuesta": "Actuó la válvula shutoff"
+        },
+        {
+          "n": 3,
+          "pregunta": "¿Por qué actuó?",
+          "respuesta": "Señal errónea del relé K4"
+        },
+        {
+          "n": 4,
+          "pregunta": "¿Por qué la señal errónea?",
+          "respuesta": "Base del relé afectada / mal contacto"
+        },
+        {
+          "n": 5,
+          "pregunta": "¿Por qué falló la base?",
+          "respuesta": "Desgaste sin inspección periódica ni redundancia"
+        }
       ],
-      "factores_contribuyentes": ["Mantenimiento de tableros eléctricos","Obsolescencia/desgaste de componentes","Arquitectura de señal sin redundancia","Condiciones ambientales del tablero"],
-      "acciones_correctivas": ["Cambio de la base del relé K4"],
-      "acciones_preventivas": ["Intensificar rutina de mantenimiento de tableros eléctricos (incluir inspección/termografía)","Implementar señal redundante para la lógica de corte de gas"],
-      "impacto": {"disponibilidad_horas": 3, "energia_no_generada_kwh": null, "riesgo_operacion": "Pérdida de la generación requerida"},
+      "factores_contribuyentes": [
+        "Mantenimiento de tableros eléctricos",
+        "Obsolescencia/desgaste de componentes",
+        "Arquitectura de señal sin redundancia",
+        "Condiciones ambientales del tablero"
+      ],
+      "acciones_correctivas": [
+        "Cambio de la base del relé K4"
+      ],
+      "acciones_preventivas": [
+        "Intensificar rutina de mantenimiento de tableros eléctricos (incluir inspección/termografía)",
+        "Implementar señal redundante para la lógica de corte de gas"
+      ],
+      "impacto": {
+        "disponibilidad_horas": 3,
+        "energia_no_generada_kwh": null,
+        "riesgo_operacion": "Pérdida de la generación requerida"
+      },
       "validacion": "Indicador: ausencia de disparos por señal espuria; verificación de contactos en próxima rutina.",
-      "lecciones_aprendidas": ["Componentes de bajo costo (base de relé) pueden causar disparos de alto impacto","La redundancia de señales en lógicas de seguridad reduce disparos falsos"],
-      "indicadores": {"horas_indisponibles": 3, "energia_no_generada": "INCONSISTENTE: nota indica 647 kW × 2 h pero duración fue 3 h", "falla_repetitiva": false},
-      "notas_pendientes": ["Corregir inconsistencia: duración 3 h vs cálculo de energía con 2 h. Confirmar con SCADA."],
+      "lecciones_aprendidas": [
+        "Componentes de bajo costo (base de relé) pueden causar disparos de alto impacto",
+        "La redundancia de señales en lógicas de seguridad reduce disparos falsos"
+      ],
+      "indicadores": {
+        "horas_indisponibles": 3,
+        "energia_no_generada": "INCONSISTENTE: nota indica 647 kW × 2 h pero duración fue 3 h",
+        "falla_repetitiva": false
+      },
+      "notas_pendientes": [
+        "Corregir inconsistencia: duración 3 h vs cálculo de energía con 2 h. Confirmar con SCADA."
+      ],
       "relacionados": [],
       "fuente": "Notion - Evento de Falla 07 06 2026"
     },
     {
       "id": "EVT-2026-06-11-CPW03-A",
-      "titulo": "Detonación por alta temperatura del MAT + pérdida de HMI",
+      "titulo": "Salida de servicio por perturbación transitoria durante la operación del grupo electrógeno CPW-03",
       "fecha": "2026-06-11",
-      "hora": null,
+      "hora": "15:12",
       "equipo": "CPW-03",
-      "sistema": "Combustión / control de temperatura de mezcla (MAT)",
-      "duracion_horas": null,
-      "responsable": null,
+      "sistema": "Sistema de generación eléctrica",
+      "duracion_horas": 3.92,
+      "responsable": "COPOWER",
       "estado": "cerrado",
       "criticidad": "alta",
-      "calidad_dato": "inferido",
-      "es_supuesto": true,
-      "resumen_ejecutivo": "CPW-03 sufrió detonación por alta temperatura del MAT (sensor de temperatura de la mezcla), con presión menor a 3 (≈ -305, dato a aclarar). El equipo quedó sin visualización (pérdida de HMI). Marcado 'cerrado' pero sin causa/impacto/acciones documentadas.",
+      "calidad_dato": "parcial",
+      "es_supuesto": false,
+      "resumen_ejecutivo": "El 11 de junio de 2026 el grupo electrógeno CPW-03 presentó una perturbación transitoria durante su operación, ocasionando la salida de servicio de la unidad como respuesta de protección. El personal de Operación y Mantenimiento atendió el evento de manera oportuna, ejecutando las verificaciones técnicas correspondientes y restableciendo la operación del equipo el mismo día, sin evidenciar daños físicos ni requerirse reemplazo de componentes. El análisis de la información disponible permitió reconstruir la secuencia del evento e identificar que se trató de una condición transitoria. Aunque no fue posible establecer de manera concluyente el mecanismo físico que originó la perturbación inicial, la unidad retornó a operación estable y se definieron acciones de seguimiento para fortalecer el diagnóstico y la confiabilidad operacional.",
       "cronologia": [
-        {"hora": "—", "evento": "Elevación de la temperatura del MAT", "origen": "Proceso"},
-        {"hora": "—", "evento": "Detonación en el equipo", "origen": "Falla"},
-        {"hora": "—", "evento": "Pérdida de visualización (HMI)", "origen": "Consecuencia"},
-        {"hora": "—", "evento": "Disparo / salida de servicio", "origen": "Protección"}
+        {
+          "hora": "14:50",
+          "evento": "Operación estable del grupo electrógeno.",
+          "origen": "Historiador"
+        },
+        {
+          "hora": "15:12",
+          "evento": "Inicio de la perturbación con reducción de potencia y corriente.",
+          "origen": "Historiador"
+        },
+        {
+          "hora": "15:12–15:23",
+          "evento": "Comportamiento transitorio de las variables operativas.",
+          "origen": "Historiador"
+        },
+        {
+          "hora": "15:23–19:25",
+          "evento": "Ejecución de actividades de diagnóstico, inspección y restablecimiento.",
+          "origen": "FO-GE-033"
+        },
+        {
+          "hora": "19:25",
+          "evento": "Arranque, sincronización y retorno a operación.",
+          "origen": "FO-GE-033"
+        }
       ],
-      "descripcion_tecnica": "Una temperatura de mezcla (MAT) elevada reduce el margen a la detonación (knock): la mezcla aire-gas más caliente se autoenciende antes de tiempo. La pérdida de visualización sugiere una falla concurrente de HMI o comunicación. El dato 'p < 3 / -305' requiere aclaración.",
+      "descripcion_tecnica": "Previo al evento, el grupo electrógeno operaba de manera estable alrededor de 669 kW, equivalente aproximadamente al 64 % de su capacidad nominal, manteniendo velocidad y frecuencia dentro de los parámetros normales de operación. A las 15:12 aproximadamente se registró una disminución abrupta de la potencia generada y de la corriente de salida, acompañada por variaciones transitorias en las variables operativas del equipo. Como consecuencia, la unidad salió de servicio conforme a su lógica de protección. Posteriormente se realizaron las verificaciones técnicas establecidas en el procedimiento de mantenimiento, confirmándose la condición operativa del equipo. Finalizadas las actividades, la unidad fue sincronizada nuevamente al sistema y retornó a operación estable sin evidenciar anomalías posteriores.",
       "clasificacion": {
-        "tipo": "Control/combustión (térmica)",
-        "modo_falla": "Detonación por alta temperatura de mezcla + pérdida de HMI",
-        "componente_afectado": "Sensor/lazo MAT; intercooler o enfriamiento de mezcla (SUPUESTO)",
+        "tipo": "Falla",
+        "modo_falla": "Salida de servicio por perturbación transitoria durante la operación.",
+        "componente_afectado": "Grupo electrógeno (sin evidencia de componente físico defectuoso).",
         "criticidad": "alta",
-        "falla_repetitiva": null
+        "falla_repetitiva": false
       },
       "causa": {
-        "inmediata": "Detonación por temperatura del MAT por encima del límite seguro.",
-        "basica": "(SUPUESTO) Enfriamiento insuficiente de la mezcla (posible restricción/incrustación del intercooler como en CPW-06/04/05) o deriva del sensor MAT.",
-        "raiz": "(SUPUESTO) Misma familia de falla de intercooler por contaminación del gas, o falta de calibración del lazo de temperatura de mezcla; la pérdida de HMI dificultó la respuesta."
+        "inmediata": "Salida automática del grupo electrógeno como respuesta a una condición transitoria detectada durante la operación.",
+        "basica": "Perturbación transitoria del proceso cuya causa específica no pudo establecerse con la información disponible.",
+        "raiz": "No determinada. La evidencia disponible no permite identificar de manera concluyente el mecanismo físico que originó el evento."
       },
       "cinco_porques": [
-        {"n": 1, "pregunta": "¿Por qué detonó?", "respuesta": "Alta temperatura del MAT"},
-        {"n": 2, "pregunta": "¿Por qué subió el MAT?", "respuesta": "Enfriamiento insuficiente de la mezcla (SUPUESTO)"},
-        {"n": 3, "pregunta": "¿Por qué insuficiente?", "respuesta": "Restricción del intercooler o falla de sensor (SUPUESTO)"},
-        {"n": 4, "pregunta": "¿Por qué la restricción?", "respuesta": "Contaminación por químico H2S, patrón de flota (SUPUESTO)"},
-        {"n": 5, "pregunta": "¿Por qué no se anticipó?", "respuesta": "Sin alarma temprana + pérdida de HMI"}
+        {
+          "n": 1,
+          "pregunta": "¿Por qué salió de servicio el grupo electrógeno?",
+          "respuesta": "Porque se presentó una perturbación transitoria durante la operación."
+        },
+        {
+          "n": 2,
+          "pregunta": "¿Por qué ocurrió la perturbación?",
+          "respuesta": "Se evidenció una disminución abrupta de las variables eléctricas de generación."
+        },
+        {
+          "n": 3,
+          "pregunta": "¿Por qué se presentó esa condición?",
+          "respuesta": "No fue posible determinar el mecanismo físico específico con la información disponible."
+        },
+        {
+          "n": 4,
+          "pregunta": "¿Por qué no fue posible determinarlo?",
+          "respuesta": "La información histórica registrada no fue suficiente para caracterizar completamente el origen del evento."
+        },
+        {
+          "n": 5,
+          "pregunta": "¿Por qué no se contaba con información suficiente?",
+          "respuesta": "El evento fue de carácter transitorio y no se disponía de todas las variables de diagnóstico requeridas para establecer una causa concluyente."
+        }
       ],
-      "factores_contribuyentes": ["Enfriamiento de mezcla","Calidad de combustible","Calibración del sensor MAT","Disponibilidad de HMI/visualización"],
-      "acciones_correctivas": ["PENDIENTE - no documentadas. Recomendado: verificar/calibrar lazo MAT, inspeccionar intercooler, revisar falla de HMI, confirmar parámetros de knock"],
-      "acciones_preventivas": ["PENDIENTE"],
-      "impacto": {"disponibilidad_horas": null, "energia_no_generada_kwh": null, "riesgo_operacion": "PENDIENTE"},
-      "validacion": "PENDIENTE - definir indicador (temperatura MAT en rango, ausencia de knock).",
-      "lecciones_aprendidas": ["La pérdida de visualización durante un disparo retrasa el diagnóstico: revisar redundancia de HMI","Posible vínculo con la campaña de intercoolers"],
-      "indicadores": {"horas_indisponibles": "PENDIENTE", "energia_no_generada": "PENDIENTE", "falla_repetitiva": "por confirmar"},
-      "notas_pendientes": ["Confirmar dato 'p < 3 / -305'","Confirmar duración","Verificar si el estado 'cerrado' es correcto","Posible duplicado con EVT-2026-06-11-CPW03-B"],
-      "relacionados": ["EVT-2026-06-11-CPW03-B","EVT-2026-06-03-CPW06"],
-      "fuente": "Notion - Evento de Falla 11 de junio COPOWER"
-    },
-    {
-      "id": "EVT-2026-06-11-CPW03-B",
-      "titulo": "Apagado del generador por potencia inversa",
-      "fecha": "2026-06-11",
-      "hora": "15:13",
-      "equipo": "CPW-03",
-      "sistema": "Generador / protección de potencia inversa (relé 32)",
-      "duracion_horas": null,
-      "responsable": null,
-      "estado": "sin_marcar",
-      "criticidad": "media-alta",
-      "calidad_dato": "inferido",
-      "es_supuesto": true,
-      "resumen_ejecutivo": "A las 15:13 el generador se apagó por potencia inversa (reverse power): el generador pasó a consumir potencia de la red en lugar de entregarla, actuando la protección 32. Posible mismo evento/día que EVT-2026-06-11-CPW03-A visto desde la óptica de Gran Tierra (GTE).",
-      "cronologia": [
-        {"hora": "15:13", "evento": "Disparo del generador por potencia inversa", "origen": "Protección"},
-        {"hora": "—", "evento": "Salida de servicio (duración pendiente)", "origen": "Consecuencia"}
+      "factores_contribuyentes": [
+        "Naturaleza transitoria del evento.",
+        "Información limitada para el diagnóstico detallado.",
+        "Ausencia de variables específicas de combustión para el instante del evento.",
+        "No se evidenciaron daños físicos que permitieran identificar un mecanismo de falla permanente."
       ],
-      "descripcion_tecnica": "La potencia inversa ocurre cuando el motor deja de entregar par suficiente (pérdida de combustible, caída de RPM, falla de gobernación) y el generador, aún sincronizado, motoriza. La protección 32 lo detecta y dispara. Causas típicas: corte/baja de gas, falla del gobernador, o problema de sincronización.",
-      "clasificacion": {
-        "tipo": "Eléctrica / Control (protección 32)",
-        "modo_falla": "Motorización del generador → disparo por potencia inversa",
-        "componente_afectado": "Motor primario / gobernación / suministro de gas (SUPUESTO)",
-        "criticidad": "media-alta",
-        "falla_repetitiva": true
+      "acciones_correctivas": [
+        "Inspección general del grupo electrógeno.",
+        "Verificación de las condiciones operativas del equipo.",
+        "Restablecimiento de las condiciones normales de operación.",
+        "Arranque y sincronización de la unidad.",
+        "Confirmación de estabilidad operacional posterior al evento."
+      ],
+      "acciones_preventivas": [
+        "Fortalecer la captura de información de diagnóstico durante eventos transitorios.",
+        "Revisar el comportamiento histórico de variables operativas para identificar tendencias.",
+        "Continuar el seguimiento de eventos similares dentro del programa de confiabilidad.",
+        "Complementar futuros análisis con información ampliada del sistema de monitoreo cuando esté disponible."
+      ],
+      "impacto": {
+        "disponibilidad_horas": 3.92,
+        "energia_no_generada_kwh": 2620,
+        "riesgo_operacion": "Bajo. El equipo retornó a operación estable sin evidenciar degradación en su desempeño."
       },
-      "causa": {
-        "inmediata": "Actuación de la protección de potencia inversa por caída de la potencia entregada.",
-        "basica": "(SUPUESTO) Pérdida súbita de par del motor por baja/corte de gas o falla del gobernador.",
-        "raiz": "(SUPUESTO) A determinar: suministro/calidad de gas, ajuste/estado del gobernador, o coordinación de protecciones. Se repite el modo 'potencia inversa' el 28-jun."
-      },
-      "cinco_porques": [
-        {"n": 1, "pregunta": "¿Por qué se apagó?", "respuesta": "Disparo por potencia inversa"},
-        {"n": 2, "pregunta": "¿Por qué potencia inversa?", "respuesta": "Caída de potencia entregada por el motor (SUPUESTO)"},
-        {"n": 3, "pregunta": "¿Por qué cayó la potencia?", "respuesta": "Baja de gas o falla de gobernación (SUPUESTO)"},
-        {"n": 4, "pregunta": "¿Por qué?", "respuesta": "PENDIENTE"},
-        {"n": 5, "pregunta": "¿Por qué?", "respuesta": "PENDIENTE"}
+      "validacion": "Una vez finalizadas las actividades de verificación y restablecimiento, el grupo electrógeno retornó a operación normal, manteniendo estabilidad en carga, velocidad y frecuencia, sin registrarse nuevas anomalías asociadas al evento.",
+      "lecciones_aprendidas": [
+        "La disponibilidad de información histórica de alta resolución mejora la capacidad de diagnóstico.",
+        "Los eventos transitorios requieren una captura oportuna de registros para facilitar el análisis de causa.",
+        "La verificación integral del equipo antes del reemplazo de componentes permite evitar intervenciones innecesarias.",
+        "El seguimiento posterior al restablecimiento es fundamental para confirmar la estabilidad operacional."
       ],
-      "factores_contribuyentes": ["Suministro/calidad de gas","Gobernación (governor)","Sincronización","Coordinación de protecciones"],
-      "acciones_correctivas": ["PENDIENTE. Recomendado: descargar histórico SCADA de 15:13 (RPM, potencia, presión de gas), revisar gobernador y ajustes de protección 32"],
-      "acciones_preventivas": ["PENDIENTE"],
-      "impacto": {"disponibilidad_horas": null, "energia_no_generada_kwh": null, "riesgo_operacion": "PENDIENTE"},
-      "validacion": "PENDIENTE - definir indicador tras identificar la causa.",
-      "lecciones_aprendidas": ["Consolidar con el evento COPOWER del mismo día para evitar duplicidad","La recurrencia de potencia inversa (11 y 28 jun) sugiere revisión sistémica de la gobernación"],
-      "indicadores": {"horas_indisponibles": "PENDIENTE", "energia_no_generada": "PENDIENTE", "falla_repetitiva": true},
-      "notas_pendientes": ["Verificar si es duplicado de EVT-2026-06-11-CPW03-A"],
-      "relacionados": ["EVT-2026-06-11-CPW03-A","EVT-2026-06-28-GOB","EVT-2026-06-22-GENERAL"],
-      "fuente": "Notion - Evento de Falla 11 GTE"
+      "indicadores": {
+        "horas_indisponibles": 3.92,
+        "energia_no_generada": "≈ 2.620 kWh (estimado)",
+        "falla_repetitiva": false
+      },
+      "notas_pendientes": [
+        "Complementar el análisis con información histórica adicional cuando esté disponible.",
+        "Confirmar la energía no generada mediante los totalizadores de generación.",
+        "Mantener seguimiento dentro del programa de confiabilidad para verificar ausencia de recurrencia."
+      ],
+      "relacionados": [],
+      "fuente": "FO-GE-033 v.01, Historiador SCADA y registros de Operación y Mantenimiento Copower"
     },
     {
       "id": "EVT-2026-06-22-GENERAL",
-      "titulo": "Shutdown General de Campo Costayaco por Vector Shift (reconectador EEP 34.5 kV)",
+      "titulo": "Shutdown General de Campo Costayaco por salida de la máquina (reconectador EEP 34.5 kV)",
       "fecha": "2026-06-22",
-      "hora": "03:49",
-      "equipo": ["CPW-01","CPW-02","CPW-03","CPW-04","CPW-05","CPW-06","CPW-07","CPW-12","JINAN-01","JINAN-02"],
+      "hora": "07:45",
+      "equipo": [
+        "CPW-01",
+        "CPW-02",
+        "CPW-03",
+        "CPW-04",
+        "CPW-05",
+        "CPW-06",
+        "CPW-07",
+        "CPW-12",
+        "JINAN-01",
+        "JINAN-02"
+      ],
       "sistema": "Red 34.5 kV / barra de generación del campo / protecciones",
       "duracion_horas": 1.5,
       "responsable": "Daniel Durán (Ing. Confiabilidad) / David Cornejo (Coord. O&M) / Wilson Oliveros (Líder Operaciones Gen)",
@@ -320,199 +573,578 @@
       "criticidad": "critica",
       "calidad_dato": "completo",
       "es_supuesto": false,
-      "resumen_ejecutivo": "El 22-jun-26 a las 03:52 se produjo un Shutdown General que afectó toda la flota a gas. Desencadenado por una perturbación eléctrica externa en la red de 34.5 kV de EEP: falla del reconectador del circuito de Puerto Limón que generó un salto de vector (Vector Shift) en la barra. CPW-01/02/03 NO fallaron por causa interna: sus protecciones de sobrecorriente (I>> etapa 2) actuaron correctamente ante la condición externa. Disparo simultáneo en < 2 s confirma perturbación común de barra, no avería individual.",
+      "resumen_ejecutivo": "El 22-jun-26 a las 03:52 se produjo un Shutdown General que afectó toda la flota a gas. Desencadenado por una perturbación eléctrica externa en la red de 34.5 kV de EEP: falla del reconectador del circuito de Puerto Limón que generó un salida de la máquina en la barra. CPW-01/02/03 NO fallaron por causa interna: sus protecciones de sobrecorriente (I>> etapa 2) actuaron correctamente ante la condición externa. Disparo simultáneo en < 2 s confirma perturbación común de barra, no avería individual.",
       "cronologia": [
-        {"hora": "03:49:00", "evento": "Apertura del reconectador EEP en circuito 34.5 kV Puerto Limón. Se genera Vector Shift. Inicio de Shutdown General.", "origen": "Externo — Red EEP"},
-        {"hora": "03:52:00", "evento": "Salen de servicio Turbina Soenergy y planta MRU. Se pierde el ancla principal de carga y referencia de reactivos.", "origen": "Consecuencia"},
-        {"hora": "03:53:06-08", "evento": "CPW-03 (304 A), CPW-01 (317 A), CPW-02 (306 A) registran I>> etapa 2 en < 2 s. GB OFF coordinado. Shutdown General completo.", "origen": "Protecciones — correcto"},
-        {"hora": "03:53:13", "evento": "CPW-06 registra MAINS FAILURE y DAVR Trip. Pérdida de referencia de barra confirmada.", "origen": "Consecuencia"},
-        {"hora": "03:53:xx", "evento": "Sobrevelocidad CPW-01 111.5% (2034 rpm), G f>2 111.7%, sobretensión CPW-02/04/05 entre 114-116%. Efectos post-disparo por rechazo de carga.", "origen": "Efectos post-disparo"},
-        {"hora": "03:53:00", "evento": "Diesel CAT #2-3-4 + CPW diesel iniciados para restablecer auxiliares y cargas críticas.", "origen": "Respuesta operativa"},
-        {"hora": "04:08", "evento": "Pre-confirmación con EEP. Se sincroniza Campo Costayaco al SIN.", "origen": "Restablecimiento"},
-        {"hora": "04:20", "evento": "Se estabiliza SIC #1-6-7.", "origen": "Restablecimiento"},
-        {"hora": "04:58", "evento": "Turbina sincronizada en modo Diesel.", "origen": "Restablecimiento"},
-        {"hora": "05:13", "evento": "Turbina operando en modo GLP.", "origen": "Restablecimiento"},
-        {"hora": "05:18", "evento": "Inicia Black Hat (BH) #9.", "origen": "Restablecimiento"}
+        {
+          "hora": "03:49:00",
+          "evento": "Apertura del reconectador EEP en circuito 34.5 kV Puerto Limón. Se genera salida de la máquina. Inicio de Shutdown General.",
+          "origen": "Externo — Red EEP"
+        },
+        {
+          "hora": "03:52:00",
+          "evento": "Salen de servicio Turbina Soenergy y planta MRU. Se pierde el ancla principal de carga y referencia de reactivos.",
+          "origen": "Consecuencia"
+        },
+        {
+          "hora": "03:53:06-08",
+          "evento": "CPW-03 (304 A), CPW-01 (317 A), CPW-02 (306 A) registran I>> etapa 2 en < 2 s. GB OFF coordinado. Shutdown General completo.",
+          "origen": "Protecciones — correcto"
+        },
+        {
+          "hora": "03:53:13",
+          "evento": "CPW-06 registra MAINS FAILURE y DAVR Trip. Pérdida de referencia de barra confirmada.",
+          "origen": "Consecuencia"
+        },
+        {
+          "hora": "03:53:xx",
+          "evento": "Sobrevelocidad CPW-01 111.5% (2034 rpm), G f>2 111.7%, sobretensión CPW-02/04/05 entre 114-116%. Efectos post-disparo por rechazo de carga.",
+          "origen": "Efectos post-disparo"
+        },
+        {
+          "hora": "03:53:00",
+          "evento": "Diesel CAT #2-3-4 + CPW diesel iniciados para restablecer auxiliares y cargas críticas.",
+          "origen": "Respuesta operativa"
+        },
+        {
+          "hora": "04:08",
+          "evento": "Pre-confirmación con EEP. Se sincroniza Campo Costayaco al SIN.",
+          "origen": "Restablecimiento"
+        },
+        {
+          "hora": "04:20",
+          "evento": "Se estabiliza SIC #1-6-7.",
+          "origen": "Restablecimiento"
+        },
+        {
+          "hora": "04:58",
+          "evento": "Turbina sincronizada en modo Diesel.",
+          "origen": "Restablecimiento"
+        },
+        {
+          "hora": "05:13",
+          "evento": "Turbina operando en modo GLP.",
+          "origen": "Restablecimiento"
+        },
+        {
+          "hora": "05:18",
+          "evento": "Inicia Black Hat (BH) #9.",
+          "origen": "Restablecimiento"
+        }
       ],
-      "descripcion_tecnica": "Cadena causal Vector Shift → Sobrecorriente. Etapa 1: la apertura del reconectador EEP generó un salto brusco del ángulo de fase (Vector Shift), desconectó la Turbina Soenergy (03:52) y colapsó la tensión de barra (Bus U ~3,55-4,09 kV, FP 0.45-0.51). Etapa 2: el AVR de cada generador inyectó potencia reactiva (Q) para sostener tensión (comportamiento correcto), elevando la corriente de armadura (CPW-03 304 A, CPW-01 317 A, CPW-02 306 A). Etapa 3: al superar el umbral I>> etapa 2, los tres GB abrieron en < 2 s. Fenómenos post-disparo (sobrevelocidad, sobrefrecuencia, sobretensión) son consecuencia del rechazo de carga, no causa.",
+      "descripcion_tecnica": "Cadena causal salida de la máquina → Sobrecorriente. Etapa 1: la apertura del reconectador EEP generó un salto brusco del ángulo de fase (salida de la máquina), desconectó la Turbina Soenergy (03:52) y colapsó la tensión de barra (Bus U ~3,55-4,09 kV, FP 0.45-0.51). Etapa 2: el AVR de cada generador inyectó potencia reactiva (Q) para sostener tensión (comportamiento correcto), elevando la corriente de armadura (CPW-03 304 A, CPW-01 317 A, CPW-02 306 A). Etapa 3: al superar el umbral I>> etapa 2, los tres GB abrieron en < 2 s. Fenómenos post-disparo (sobrevelocidad, sobrefrecuencia, sobretensión) son consecuencia del rechazo de carga, no causa.",
       "clasificacion": {
         "tipo": "Eléctrica (perturbación externa de red)",
-        "modo_falla": "Vector Shift → colapso de tensión → sobrecorriente → disparo coordinado de protecciones",
+        "modo_falla": "salida de la máquina → colapso de tensión → sobrecorriente → disparo coordinado de protecciones",
         "componente_afectado": "Reconectador EEP 34.5 kV Puerto Limón (externo); barra de generación del campo",
         "criticidad": "critica",
         "falla_repetitiva": false
       },
       "causa": {
         "inmediata": "Actuación de protecciones de sobrecorriente (I>> etapa 2) por sobrecorriente producto del colapso de tensión de barra.",
-        "basica": "Vector Shift originado por la apertura/falla del reconectador EEP 34.5 kV, que desestabilizó la referencia angular y desconectó la turbina (ancla del sistema).",
+        "basica": "salida de la máquina originado por la apertura/falla del reconectador EEP 34.5 kV, que desestabilizó la referencia angular y desconectó la turbina (ancla del sistema).",
         "raiz": "NO DEFINITIVA (RCA ABIERTO). Dos hipótesis: (1) Falla del reconectador EEP Puerto Limón como iniciador (principal); (2) Salida de la turbina Soenergy como iniciador. Requiere correlación cronológica sincronizada de turbina, MRU, EEP y frontera."
       },
       "cinco_porques": [
-        {"n": 1, "pregunta": "¿Por qué shutdown general?", "respuesta": "Disparo coordinado de protecciones I>> en toda la flota"},
-        {"n": 2, "pregunta": "¿Por qué dispararon las protecciones?", "respuesta": "Sobrecorriente de armadura por colapso de tensión de barra"},
-        {"n": 3, "pregunta": "¿Por qué colapsó la tensión?", "respuesta": "Pérdida de la turbina Soenergy (ancla de potencia/reactivos) tras Vector Shift"},
-        {"n": 4, "pregunta": "¿Por qué el Vector Shift?", "respuesta": "Apertura/falla del reconectador EEP 34.5 kV Puerto Limón (hipótesis principal)"},
-        {"n": 5, "pregunta": "¿Por qué falló el reconectador?", "respuesta": "PENDIENTE - requiere informe técnico oficial de EEP"}
+        {
+          "n": 1,
+          "pregunta": "¿Por qué shutdown general?",
+          "respuesta": "Disparo coordinado de protecciones I>> en toda la flota"
+        },
+        {
+          "n": 2,
+          "pregunta": "¿Por qué dispararon las protecciones?",
+          "respuesta": "Sobrecorriente de armadura por colapso de tensión de barra"
+        },
+        {
+          "n": 3,
+          "pregunta": "¿Por qué colapsó la tensión?",
+          "respuesta": "Pérdida de la turbina Soenergy (ancla de potencia/reactivos) tras salida de la máquina"
+        },
+        {
+          "n": 4,
+          "pregunta": "¿Por qué hubo salida de la máquina?",
+          "respuesta": "Apertura/falla del reconectador EEP 34.5 kV Puerto Limón (hipótesis principal)"
+        },
+        {
+          "n": 5,
+          "pregunta": "¿Por qué falló el reconectador?",
+          "respuesta": "PENDIENTE - requiere informe técnico oficial de EEP"
+        }
       ],
-      "factores_contribuyentes": ["Perturbación externa de la red EEP","Dependencia de la turbina Soenergy como ancla de estabilidad","Ajustes de protecciones (50/51, 59, 81)","Falta de compensación reactiva/almacenamiento para respuesta transitoria","Falta de coordinación operativa con EEP para maniobras"],
-      "acciones_correctivas": ["Inspeccionar el interruptor principal de barra (registros de apertura, condiciones mecánicas/eléctricas, descartar disparos espurios)","Validar sistema de comunicaciones (alarmas Shd AMC Com, Shd Comun IE650, Remote Comm. GB Off)","Realizar pruebas funcionales secundarias de protecciones y verificar coordinación","Coordinar con EEP para obtener informe técnico oficial de la falla del reconectador"],
-      "acciones_preventivas": ["Revisar y validar ajustes de sobrecorriente (50/51), sobretensión (59), sobrefrecuencia (81O), subfrecuencia (81U)","Establecer procedimiento para descargar y respaldar eventos del sistema eléctrico (histórico de tendencias)","Evaluar sistema de almacenamiento de energía o capacitores de compensación reactiva","Establecer protocolo de coordinación operativa con EEP para notificación previa de maniobras en 34.5 kV"],
-      "impacto": {"disponibilidad_horas": 1.5, "energia_no_generada_kwh": null, "riesgo_operacion": "Shutdown total del campo; pérdida de turbina, MRU y toda la generación a gas; restablecimiento escalonado con diésel"},
+      "factores_contribuyentes": [
+        "Perturbación externa de la red EEP",
+        "Dependencia de la turbina Soenergy como ancla de estabilidad",
+        "Ajustes de protecciones (50/51, 59, 81)",
+        "Falta de compensación reactiva/almacenamiento para respuesta transitoria",
+        "Falta de coordinación operativa con EEP para maniobras"
+      ],
+      "acciones_correctivas": [
+        "Inspeccionar el interruptor principal de barra (registros de apertura, condiciones mecánicas/eléctricas, descartar disparos espurios)",
+        "Validar sistema de comunicaciones (alarmas Shd AMC Com, Shd Comun IE650, Remote Comm. GB Off)",
+        "Realizar pruebas funcionales secundarias de protecciones y verificar coordinación",
+        "Coordinar con EEP para obtener informe técnico oficial de la falla del reconectador"
+      ],
+      "acciones_preventivas": [
+        "Revisar y validar ajustes de sobrecorriente (50/51), sobretensión (59), sobrefrecuencia (81O), subfrecuencia (81U)",
+        "Establecer procedimiento para descargar y respaldar eventos del sistema eléctrico (histórico de tendencias)",
+        "Evaluar sistema de almacenamiento de energía o capacitores de compensación reactiva",
+        "Establecer protocolo de coordinación operativa con EEP para notificación previa de maniobras en 34.5 kV"
+      ],
+      "impacto": {
+        "disponibilidad_horas": 1.5,
+        "energia_no_generada_kwh": null,
+        "riesgo_operacion": "Shutdown total del campo; pérdida de turbina, MRU y toda la generación a gas; restablecimiento escalonado con diésel"
+      },
       "validacion": "RCA ABIERTO. Cierre requiere: secuencia de eventos de Turbina Soenergy (CRÍTICA), registros MRU (ALTA), informe EEP reconectador (ALTA), secuencia de frontera (ALTA), SCADA con estampas sincronizadas (MEDIA).",
-      "lecciones_aprendidas": ["La flota es vulnerable a perturbaciones de la red EEP de 34.5 kV","La turbina Soenergy es un punto único de estabilidad (ancla de reactivos)","Necesidad de compensación reactiva y de coordinación previa de maniobras con EEP"],
-      "indicadores": {"horas_indisponibles": "~1.5 h (03:49 a ~05:18 restablecimiento escalonado)", "energia_no_generada": "PENDIENTE - toda la flota", "falla_repetitiva": false},
-      "notas_pendientes": ["RCA ABIERTO pendiente de registros turbina/MRU/EEP/frontera","Usar solo la versión rev1 (sin notas internas 'NOTA DANIEL')","Este evento explica el mecanismo de sobrevelocidad/potencia inversa de los eventos 27 y 28 jun"],
-      "relacionados": ["EVT-2026-06-11-CPW03-B","EVT-2026-06-27-SOBRE","EVT-2026-06-28-GOB"],
+      "lecciones_aprendidas": [
+        "La flota es vulnerable a perturbaciones de la red EEP de 34.5 kV",
+        "La turbina Soenergy es un punto único de estabilidad (ancla de reactivos)",
+        "Necesidad de compensación reactiva y de coordinación previa de maniobras con EEP"
+      ],
+      "indicadores": {
+        "horas_indisponibles": 1.5,
+        "energia_no_generada": "PENDIENTE - toda la flota",
+        "falla_repetitiva": false
+      },
+      "notas_pendientes": [
+        "RCA ABIERTO pendiente de registros turbina/MRU/EEP/frontera",
+        "Usar solo la versión rev1 (sin notas internas 'NOTA DANIEL')",
+        "Este evento explica el mecanismo de sobrevelocidad/potencia inversa de los eventos 27 y 28 jun"
+      ],
+      "relacionados": [
+        "EVT-2026-06-27-CPW06",
+        "EVT-2026-06-28-RED34KV-A"
+      ],
       "fuente": "PDF - RCA-Costayaco-2026-06-22-Vector-Shift rev1 (Secuencial 30)"
     },
     {
       "id": "EVT-2026-06-23-CPW04",
-      "titulo": "Disparo en tablero de auxiliares 480V por coordinación de protecciones",
+      "titulo": "Disparos en cascada por reconectador EEP y descoordinación de protecciones 480 V",
       "fecha": "2026-06-23",
-      "hora": null,
-      "equipo": "CPW-04",
-      "sistema": "Tablero de sistemas auxiliares de 480 V",
-      "duracion_horas": 1,
-      "responsable": null,
-      "estado": "sin_marcar",
-      "criticidad": "media",
-      "calidad_dato": "inferido",
-      "es_supuesto": true,
-      "resumen_ejecutivo": "Evento en el tablero de sistemas auxiliares de 480 V de CPW-04, con indicio de falla de coordinación de protecciones: una protección aguas arriba disparó antes que la aguas abajo, sacando más carga de la necesaria.",
-      "cronologia": [
-        {"hora": "—", "evento": "Perturbación/falla en el tablero de auxiliares 480 V", "origen": "Eléctrico"},
-        {"hora": "—", "evento": "Disparo por descoordinación de protecciones (SUPUESTO)", "origen": "Protección"},
-        {"hora": "—", "evento": "Salida de servicio (~1 h)", "origen": "Consecuencia"}
-      ],
-      "descripcion_tecnica": "En una descoordinación de protecciones los ajustes de tiempo/corriente de los interruptores no están escalonados: ante una falla en un ramal, dispara un breaker superior en vez del más cercano, ampliando el alcance del corte. Aplica a auxiliares de 480 V (bombas, ventiladores, controles).",
-      "clasificacion": {
-        "tipo": "Eléctrica (protecciones/coordinación)",
-        "modo_falla": "Disparo por descoordinación de protecciones (SUPUESTO)",
-        "componente_afectado": "Tablero auxiliar 480 V / interruptores de protección",
-        "criticidad": "media",
-        "falla_repetitiva": null
-      },
-      "causa": {
-        "inmediata": "Disparo en el tablero de auxiliares de 480 V.",
-        "basica": "(SUPUESTO) Ajustes de protección no coordinados (curvas tiempo-corriente sin selectividad).",
-        "raiz": "(SUPUESTO) Falta de estudio actualizado de coordinación de protecciones/selectividad para el tablero de 480 V, o ajuste incorrecto tras cambio de configuración."
-      },
-      "cinco_porques": [
-        {"n": 1, "pregunta": "¿Por qué salió el equipo?", "respuesta": "Disparo en tablero 480 V"},
-        {"n": 2, "pregunta": "¿Por qué disparó ese breaker?", "respuesta": "Descoordinación de protecciones (SUPUESTO)"},
-        {"n": 3, "pregunta": "¿Por qué descoordinación?", "respuesta": "Ajustes sin selectividad (SUPUESTO)"},
-        {"n": 4, "pregunta": "¿Por qué?", "respuesta": "Falta estudio de coordinación actualizado (SUPUESTO)"},
-        {"n": 5, "pregunta": "¿Por qué?", "respuesta": "PENDIENTE"}
-      ],
-      "factores_contribuyentes": ["Ajustes de relés/breakers","Estudio de coordinación","Mantenimiento eléctrico","Posible falla origen (sobrecarga/cortocircuito) en un ramal"],
-      "acciones_correctivas": ["PENDIENTE. Recomendado: realizar/actualizar estudio de coordinación de protecciones del tablero de 480 V"],
-      "acciones_preventivas": ["PENDIENTE. Verificar ajustes de curvas tiempo-corriente y registros de disparo"],
-      "impacto": {"disponibilidad_horas": 1, "energia_no_generada_kwh": null, "riesgo_operacion": "PENDIENTE"},
-      "validacion": "PENDIENTE - verificar selectividad tras reajuste (prueba de inyección secundaria).",
-      "lecciones_aprendidas": ["La coordinación de protecciones debe revisarse periódicamente y tras cambios de carga/configuración"],
-      "indicadores": {"horas_indisponibles": "~1 (confirmar unidad)", "energia_no_generada": "PENDIENTE", "falla_repetitiva": "por confirmar"},
-      "notas_pendientes": ["Confirmar duración","Describir la falla origen y si hubo daño de equipo"],
-      "relacionados": [],
-      "fuente": "Notion - Evento de Falla 23 de junio"
-    },
-    {
-      "id": "EVT-2026-06-27-SOBRE",
-      "titulo": "Salida del equipo por sobre-(velocidad/temperatura) [incompleto]",
-      "fecha": "2026-06-27",
-      "hora": null,
-      "equipo": "PENDIENTE",
-      "sistema": "Por definir (motor / control)",
-      "duracion_horas": null,
-      "responsable": null,
-      "estado": "sin_marcar",
-      "criticidad": "media-alta",
-      "calidad_dato": "inferido",
-      "es_supuesto": true,
-      "resumen_ejecutivo": "Salida de servicio por una condición de 'sobre-' (frase incompleta en la fuente). Hipótesis probables: sobrevelocidad (overspeed) o sobretemperatura (overtemp). Faltan equipo, causa e impacto.",
-      "cronologia": [
-        {"hora": "—", "evento": "Condición de 'sobre-' (velocidad/temperatura) (SUPUESTO)", "origen": "Falla"},
-        {"hora": "—", "evento": "Disparo protectivo / salida de servicio", "origen": "Protección"}
-      ],
-      "descripcion_tecnica": "(SUPUESTO) Si sobrevelocidad: pérdida de carga súbita o falla del gobernador provoca aceleración; la protección de overspeed dispara. Si sobretemperatura: falla de enfriamiento eleva la temperatura por encima del límite y dispara.",
-      "clasificacion": {
-        "tipo": "Mecánica / Control (SUPUESTO)",
-        "modo_falla": "Disparo por sobrevelocidad o sobretemperatura (SUPUESTO)",
-        "componente_afectado": "Gobernador / sistema de enfriamiento (SUPUESTO)",
-        "criticidad": "media-alta",
-        "falla_repetitiva": null
-      },
-      "causa": {
-        "inmediata": "Disparo por condición de 'sobre-' (a precisar).",
-        "basica": "(SUPUESTO) Falla de gobernación (si overspeed) o de enfriamiento (si overtemp).",
-        "raiz": "(SUPUESTO) PENDIENTE - depende de la variable involucrada."
-      },
-      "cinco_porques": [
-        {"n": 1, "pregunta": "¿Por qué salió?", "respuesta": "Disparo por condición de 'sobre-' (PENDIENTE precisar)"},
-        {"n": 2, "pregunta": "¿Por qué?", "respuesta": "PENDIENTE"},
-        {"n": 3, "pregunta": "¿Por qué?", "respuesta": "PENDIENTE"},
-        {"n": 4, "pregunta": "¿Por qué?", "respuesta": "PENDIENTE"},
-        {"n": 5, "pregunta": "¿Por qué?", "respuesta": "PENDIENTE"}
-      ],
-      "factores_contribuyentes": ["PENDIENTE"],
-      "acciones_correctivas": ["PENDIENTE. Recomendado: recuperar registro de disparo (código de alarma) para confirmar la variable"],
-      "acciones_preventivas": ["PENDIENTE"],
-      "impacto": {"disponibilidad_horas": null, "energia_no_generada_kwh": null, "riesgo_operacion": "PENDIENTE"},
-      "validacion": "PENDIENTE",
-      "lecciones_aprendidas": ["Completar el registro del evento el mismo día evita perder trazabilidad (código de alarma, equipo, valores)"],
-      "indicadores": {"horas_indisponibles": "PENDIENTE", "energia_no_generada": "PENDIENTE", "falla_repetitiva": "por confirmar"},
-      "notas_pendientes": ["Registro incompleto: completar descripción 'salida del equipo por sobre...' con código de alarma y equipo"],
-      "relacionados": ["EVT-2026-06-22-GENERAL","EVT-2026-06-28-GOB"],
-      "fuente": "Notion - Evento de Falla 27 de junio"
-    },
-    {
-      "id": "EVT-2026-06-28-GOB",
-      "titulo": "Potencia inversa y falla en la gobernación",
-      "fecha": "2026-06-28",
-      "hora": null,
-      "equipo": "PENDIENTE",
-      "sistema": "Gobernación (governor) / protección de potencia inversa",
-      "duracion_horas": null,
-      "responsable": null,
-      "estado": "sin_marcar",
+      "hora": "15:24",
+      "equipo": "CPW-01 a CPW-07 / MRU / auxiliares 480 V",
+      "sistema": "Red 34,5 kV Jauno–Piamonte / RL / barras e interruptores 480 V",
+      "duracion_horas": 3,
+      "responsable": "EEP (iniciador externo) + COPOWER (coordinación de protecciones)",
+      "estado": "en_seguimiento",
       "criticidad": "alta",
-      "calidad_dato": "inferido",
-      "es_supuesto": true,
-      "resumen_ejecutivo": "Disparo del equipo por potencia inversa asociado a una falla en la gobernación (governor). El gobernador dejó de mantener velocidad/carga, la potencia entregada cayó y el generador se motorizó, actuando la protección 32.",
+      "calidad_dato": "parcial",
+      "es_supuesto": false,
+      "resumen_ejecutivo": "4 disparos EEP en ~14 h (23–24 jun). RL no selectivo + 480 V en 1,5× propagaron SD a CPW-04/05/06/07. Ajuste 8×/15× hecho; efectividad por validar.",
       "cronologia": [
-        {"hora": "—", "evento": "Falla en la gobernación (control de velocidad)", "origen": "Control"},
-        {"hora": "—", "evento": "Caída de potencia → motorización del generador", "origen": "Consecuencia"},
-        {"hora": "—", "evento": "Disparo por potencia inversa / salida de servicio", "origen": "Protección"}
+        {
+          "hora": "23-jun 15:24",
+          "evento": "1er disparo EEP → 480 V → SD CPW-04/05",
+          "origen": "EEP / Eléctrico"
+        },
+        {
+          "hora": "23-jun 16:59",
+          "evento": "2º disparo; RL no actúa. Isd 1,5→8×Ir",
+          "origen": "Protecciones / Mantenimiento"
+        },
+        {
+          "hora": "23-jun 22:06",
+          "evento": "3er disparo; MRU/pozos afectados",
+          "origen": "Eléctrico / Proceso"
+        },
+        {
+          "hora": "24-jun 05:13",
+          "evento": "4º disparo; abren 480 V 04/05 y 06/07; SD auxiliares",
+          "origen": "EEP / Protección"
+        },
+        {
+          "hora": "acción final",
+          "evento": "Ajuste final ambos pares: Isd=8×Ir, Ii=15×In",
+          "origen": "Mantenimiento eléctrico"
+        }
       ],
-      "descripcion_tecnica": "El gobernador regula el flujo de combustible para mantener velocidad (frecuencia) y carga. Una falla del gobernador (actuador, señal de velocidad, sintonía) provoca pérdida de par; con el generador sincronizado, la máquina consume potencia y la protección de potencia inversa dispara.",
+      "descripcion_tecnica": "La reconexión recurrente del reconectador EEP en 34,5 kV inyectó transitorios de tensión/corriente aguas abajo. El RL no despejó el disturbio en el nivel superior (brecha de selectividad), por lo que alcanzó los interruptores principales de 480 V. Con Isd e Ii ajustados originalmente a 1,5×, estos dispararon por sobrecorriente y causaron SD seguros de los grupos. La topología amplificó el impacto: barras 480 V compartidas alimentan auxiliares de otras unidades, y la infraestructura común de gas (MRU + Chiller / pozos) también respondió al transitorio. Por eso un evento externo de red se convirtió en apagones múltiples de planta. Las fotos de campo confirman equipo/ajustes, pero los valores exactos de corriente de TRIP requieren descargar la data del relé; no se infieren.",
       "clasificacion": {
-        "tipo": "Control (gobernación) / Eléctrica (protección 32)",
-        "modo_falla": "Falla de gobernación → potencia inversa",
-        "componente_afectado": "Gobernador (actuador/señal/sintonía) (SUPUESTO)",
+        "tipo": "Eléctrica externa + descoordinación interna de protecciones",
+        "modo_falla": "Transitorio EEP → RL no selectivo → disparo 480 V → SD",
+        "componente_afectado": "Reconectador EEP, RL, interruptores 480 V, barras auxiliares",
         "criticidad": "alta",
         "falla_repetitiva": true
       },
       "causa": {
-        "inmediata": "Disparo por potencia inversa.",
-        "basica": "Falla en la gobernación que reduce la potencia entregada por el motor.",
-        "raiz": "(SUPUESTO) A determinar en el gobernador: desgaste/falla del actuador, deriva del sensor de velocidad (pickup), pérdida de sintonía (PID), o problema de suministro de gas no compensado."
+        "inmediata": "Disparo por sobrecorriente de interruptores principales de 480 V ante transitorios recurrentes provenientes de la red EEP.",
+        "basica": "Falta de selectividad: RL no operó aguas arriba y los umbrales 480 V (Isd=1,5×Ir; Ii=1,5×In) eran demasiado sensibles para el transitorio.",
+        "raiz": "DETERMINADA. Iniciador externo: operación recurrente/inestable del reconectador EEP Jauno–Piamonte. Habilitante interno accionable: descoordinación de protecciones RL→480 V, que permitió propagar el disturbio y amplificarlo a nivel planta."
       },
       "cinco_porques": [
-        {"n": 1, "pregunta": "¿Por qué disparó?", "respuesta": "Potencia inversa"},
-        {"n": 2, "pregunta": "¿Por qué potencia inversa?", "respuesta": "Caída de potencia del motor"},
-        {"n": 3, "pregunta": "¿Por qué cayó la potencia?", "respuesta": "Falla en la gobernación"},
-        {"n": 4, "pregunta": "¿Por qué falló la gobernación?", "respuesta": "Actuador/pickup/sintonía (SUPUESTO)"},
-        {"n": 5, "pregunta": "¿Por qué?", "respuesta": "PENDIENTE"}
+        {
+          "n": 1,
+          "pregunta": "¿Por qué salieron varias unidades?",
+          "respuesta": "Dispararon los interruptores principales de 480 V y se perdieron barras/auxiliares"
+        },
+        {
+          "n": 2,
+          "pregunta": "¿Por qué dispararon los interruptores 480 V?",
+          "respuesta": "Recibieron transitorios de sobrecorriente por operaciones repetidas del reconectador EEP"
+        },
+        {
+          "n": 3,
+          "pregunta": "¿Por qué el transitorio llegó al nivel 480 V?",
+          "respuesta": "El RL aguas arriba no operó selectivamente para despejarlo"
+        },
+        {
+          "n": 4,
+          "pregunta": "¿Por qué el 480 V no hizo ride-through?",
+          "respuesta": "Isd e Ii estaban ajustados a 1,5×, demasiado sensibles para el transitorio observado"
+        },
+        {
+          "n": 5,
+          "pregunta": "¿Por qué el impacto alcanzó casi toda la planta?",
+          "respuesta": "Dependencias compartidas: barras 480 V para auxiliares y sistema común MRU/pozos"
+        }
       ],
-      "factores_contribuyentes": ["Estado del gobernador","Señal de velocidad","Suministro/presión de gas","Mantenimiento del lazo de control"],
-      "acciones_correctivas": ["PENDIENTE. Recomendado: diagnóstico del gobernador (actuador y pickup), revisión de sintonía, verificación de presión de gas"],
-      "acciones_preventivas": ["PENDIENTE. Abrir análisis conjunto de los eventos de potencia inversa (11 y 28 jun) para descartar causa común"],
-      "impacto": {"disponibilidad_horas": null, "energia_no_generada_kwh": null, "riesgo_operacion": "PENDIENTE"},
-      "validacion": "PENDIENTE - estabilidad de velocidad/carga tras intervención del gobernador.",
-      "lecciones_aprendidas": ["Dos disparos por potencia inversa en junio (11 y 28) sugieren revisar la gobernación como tema sistémico"],
-      "indicadores": {"horas_indisponibles": "PENDIENTE", "energia_no_generada": "PENDIENTE", "falla_repetitiva": true},
-      "notas_pendientes": ["Falta equipo, duración e impacto","Consolidar con el evento del 11 jun para análisis de causa común de gobernación"],
-      "relacionados": ["EVT-2026-06-11-CPW03-B","EVT-2026-06-22-GENERAL","EVT-2026-06-27-SOBRE"],
-      "fuente": "Notion - Evento de Falla 28 de junio"
+      "factores_contribuyentes": [
+        "Cuatro operaciones del reconectador EEP en ~14 h",
+        "RL sin actuación selectiva",
+        "Ajustes iniciales Isd=1,5×Ir e Ii=1,5×In",
+        "Servicios auxiliares de varias unidades dependientes de barras 480 V compartidas",
+        "Acoplamiento con MRU/pozos y suministro común de gas",
+        "Inconsistencia a reconciliar: FO indica alta presión de succión MRU; registro operativo menciona baja presión en BH-9/BH-11"
+      ],
+      "acciones_correctivas": [
+        "Restablecimiento de interruptores y normalización después de cada disparo (ejecutado)",
+        "Ajuste interino Isd 1,5→8×Ir tras evento 16:59 (ejecutado; NO evitó recurrencias posteriores)",
+        "Ajuste final en ambos pares CPW-04/05 y CPW-06/07: Isd=8×Ir e Ii=15×In (ejecutado)",
+        "PENDIENTE: descargar data completa de TRIP del relé para valores exactos de corriente/fase",
+        "PENDIENTE: estudio formal de coordinación/selectividad 34,5 kV → RL → 480 V"
+      ],
+      "acciones_preventivas": [
+        "Validar por estudio que Isd=8×Ir / Ii=15×In mantiene despeje de fallas internas y seguridad de arco eléctrico",
+        "Gestionar con EEP la inestabilidad del reconectador Jauno–Piamonte e instalar monitoreo de calidad de energía en la frontera",
+        "Evaluar ride-through e inmunidad a huecos/transitorios del sistema 480 V",
+        "Desacoplar/respaldar servicios auxiliares para eliminar el punto único de falla entre unidades",
+        "Revisar setpoints y lógica de rearranque de MRU/pozos ante transitorios eléctricos",
+        "Registrar próximos disparos EEP vs. ocurrencia de SD para verificar efectividad"
+      ],
+      "impacto": {
+        "disponibilidad_horas": 3,
+        "energia_no_generada_kwh": null,
+        "riesgo_operacion": "Alto: 4 recurrencias / ~14 h. PF_contr CPW-04/05 = 3 h."
+      },
+      "validacion": "Causa raíz determinada por FO-GE-033 No. 44: iniciador EEP + descoordinación RL/480 V. Efectividad NO confirmada: el ajuste interino no evitó eventos 3 y 4; validar ajuste final con estudio y próximos transitorios. No presentar como resuelto hasta demostrar selectividad y protección ante falla interna.",
+      "lecciones_aprendidas": [
+        "Un origen externo no elimina responsabilidad interna: la coordinación define si el disturbio queda contenido o escala a apagón de planta",
+        "Desensibilizar protecciones sin estudio puede mejorar ride-through pero reducir el margen de protección",
+        "Dependencias compartidas de auxiliares y gas convierten fallas locales en eventos de causa común"
+      ],
+      "indicadores": {
+        "horas_indisponibles": 3,
+        "energia_no_generada": "PENDIENTE — calcular por unidad/evento con totalizadores",
+        "falla_repetitiva": true
+      },
+      "notas_pendientes": [
+        "Estudio y curvas de coordinación 34,5 kV → RL → 480 V",
+        "Descarga de data de TRIP y corrientes exactas por fase",
+        "Confirmar efectividad del ajuste final Isd/Ii",
+        "Reconciliar alta vs. baja presión de succión MRU/pozos",
+        "Cuantificar energía no generada por unidad y por los cuatro eventos"
+      ],
+      "relacionados": [],
+      "fuente": "FO-GE-033 No. 44 — verificación 23–24/06/2026 + registro operativo GTE"
+    },
+    {
+      "id": "EVT-2026-06-27-CPW06",
+      "titulo": "Salida del grupo electrógeno CPW-06 por activación de la protección Q> durante evento transitorio asociado a la MRU",
+      "fecha": "2026-06-27",
+      "hora": "03:17",
+      "equipo": [
+        "CPW-06"
+      ],
+      "sistema": "Sistema de generación Costayaco — Grupo electrógeno CPW-06, sistema MRU, protección por potencia reactiva (Q>), regulador AVR DVC-550, controlador DEIF y sistema eléctrico asociado",
+      "duracion_horas": 2.3,
+      "responsable": "En investigación",
+      "estado": "en_seguimiento",
+      "criticidad": "alta",
+      "calidad_dato": "completo",
+      "es_supuesto": false,
+      "resumen_ejecutivo": "Durante un evento transitorio asociado a la salida de la MRU y de la generación relacionada, el grupo electrógeno CPW-06 incrementó su aporte de potencia reactiva para sostener la tensión del sistema. Esta condición produjo la actuación de la protección Q>, ocasionando la apertura del interruptor y la salida inmediata del equipo. El FO-GE-033 del 27 de junio no registra horas del evento; las únicas horas estimables provienen de la tendencia operacional: inicio ≈03:17 h, recuperación ≈05:21 h y estabilización ≈05:35 h (FS ≈2,30 h / 2 h 18 min). Energía no generada estimada ≈2.420 kWh (1.051 kW nom. × 2,30 h). Causa raíz y responsabilidad en investigación.",
+      "cronologia": [
+        {
+          "hora": "03:17 (aprox.)",
+          "evento": "Inicio estimado del evento según tendencia; salida MRU e incremento de Q.",
+          "origen": "Tendencia (no hora oficial FO)"
+        },
+        {
+          "hora": "03:17 (aprox.)",
+          "evento": "Actuación protección Q> y apertura del interruptor; salida CPW-06.",
+          "origen": "Protección / tendencia"
+        },
+        {
+          "hora": "03:17–05:21 (aprox.)",
+          "evento": "Equipo fuera de línea (corriente ≈0 A, FP = 0, Q ≈ 0).",
+          "origen": "Tendencia"
+        },
+        {
+          "hora": "05:21 (aprox.)",
+          "evento": "Inicio de resincronización.",
+          "origen": "Tendencia"
+        },
+        {
+          "hora": "05:21–05:35 (aprox.)",
+          "evento": "Incremento progresivo de carga hasta condición estable.",
+          "origen": "Tendencia"
+        },
+        {
+          "hora": "05:35 (aprox.)",
+          "evento": "Operación estable (fin de ventana FS ≈2,30 h).",
+          "origen": "Tendencia"
+        }
+      ],
+      "descripcion_tecnica": "Condición previa: frecuencia ≈60 Hz; corriente promedio ≈1.150–1.180 A; FP ≈0,91; Q ≈380–400 kVAr. Evento: salida de la MRU; el AVR incrementa potencia reactiva; actúa protección Q>; se abre el interruptor; el grupo sale de línea. Tendencia: corriente ≈0 A, FP = 0, Q ≈ 0; frecuencia del bus ≈60 Hz. Recuperación ≈05:21 h; estabilización ≈05:35 h. Importante: el reporte no documenta horas oficiales del evento; 03:17 / 05:21 / 05:35 y FS ≈2,30 h son estimaciones exclusivas de la curva de tendencias, no horas oficiales inventadas.",
+      "clasificacion": {
+        "tipo": "Falla",
+        "modo_falla": "Actuación de la protección por sobrepotencia reactiva (Q>) durante un evento transitorio generado por la salida de la MRU y la generación asociada.",
+        "componente_afectado": "Protección Q>, regulador automático de voltaje (AVR DVC-550), controlador DEIF, interruptor del generador, sistema MRU e interacción operativa CPW-06/CPW-07.",
+        "criticidad": "alta",
+        "falla_repetitiva": null
+      },
+      "causa": {
+        "inmediata": "Actuación de la protección Q> debido al incremento súbito de potencia reactiva durante la salida de la MRU.",
+        "basica": "Posible interacción entre el AVR DVC-550, la configuración de la protección Q> y la condición operativa compartida entre CPW-06 y CPW-07. Hipótesis aún no validada.",
+        "raiz": "No determinada. El informe indica expresamente que no existe evidencia técnica suficiente para atribuir la falla a un componente específico y que la causa raíz permanece en investigación."
+      },
+      "cinco_porques": [
+        {
+          "n": 1,
+          "pregunta": "¿Por qué salió de servicio el CPW-06?",
+          "respuesta": "Porque actuó la protección por sobrepotencia reactiva (Q>)."
+        },
+        {
+          "n": 2,
+          "pregunta": "¿Por qué actuó la protección Q>?",
+          "respuesta": "Porque el generador incrementó significativamente el suministro de potencia reactiva."
+        },
+        {
+          "n": 3,
+          "pregunta": "¿Por qué aumentó la potencia reactiva?",
+          "respuesta": "Porque ocurrió un evento transitorio generado por la salida de la MRU."
+        },
+        {
+          "n": 4,
+          "pregunta": "¿Por qué la respuesta del generador produjo esa condición?",
+          "respuesta": "Porque el AVR respondió intentando sostener la tensión del sistema durante la perturbación."
+        },
+        {
+          "n": 5,
+          "pregunta": "¿Por qué esa respuesta terminó provocando el disparo?",
+          "respuesta": "Porque aún no se ha validado completamente la coordinación entre el AVR DVC-550, la protección Q>, el controlador DEIF y la condición operativa compartida entre CPW-06 y CPW-07."
+        }
+      ],
+      "factores_contribuyentes": [
+        "Salida de la MRU.",
+        "Evento transitorio del sistema.",
+        "Configuración pendiente de validar del AVR.",
+        "Configuración pendiente de validar de la protección Q>.",
+        "Arquitectura compartida CPW-06 / CPW-07.",
+        "Falta de validación completa de coordinación de protecciones."
+      ],
+      "acciones_correctivas": [
+        "Revisión de tendencias operativas (realizada).",
+        "Revisión de diagramas unifilares (realizada).",
+        "Validación de modos de operación (realizada).",
+        "Revisión preliminar del AVR (realizada).",
+        "Revisión de registros DEIF (realizada).",
+        "Mesa técnica entre Operaciones e Ingeniería (realizada).",
+        "Validar configuración de protección Q> (pendiente).",
+        "Revisar parámetros del AVR DVC-550 (pendiente).",
+        "Analizar históricos DEIF (pendiente).",
+        "Verificar tendencias de tensión y potencia reactiva (pendiente).",
+        "Revisar coordinación entre CPW-06 y CPW-07 (pendiente)."
+      ],
+      "acciones_preventivas": [
+        "Conformar mesa técnica con DEIF, Operaciones e Ingeniería.",
+        "Validar coordinación entre AVR y protección Q>.",
+        "Actualizar criterios de coordinación de protecciones si el análisis lo justifica.",
+        "Priorizar el cierre del RCA debido a la recurrencia de eventos asociados a la MRU.",
+        "Realizar pruebas funcionales posteriores a cualquier ajuste de configuración."
+      ],
+      "impacto": {
+        "disponibilidad_horas": 2.3,
+        "energia_no_generada_kwh": 2420,
+        "riesgo_operacion": "Alto, debido a la indisponibilidad del grupo generador durante un evento transitorio y al riesgo de recurrencia mientras no se valide la coordinación entre el AVR, la protección Q> y la interacción operativa con el CPW-07. Energía ≈2.420 kWh (2,42 MWh) con potencia nominal 1.051 kW × 2,30 h. Si se usa potencia promedio pre-disparo (p. ej. 900–950 kW), el valor sería menor (≈2,1–2,2 MWh)."
+      },
+      "validacion": "FO-GE-033 no registra horas del evento. Cronología y FS ≈2,30 h se estiman únicamente desde la tendencia (frecuencia, corriente, FP, Q). Energía ≈2.420 kWh es estimación con potencia nominal; recalculable con potencia promedio pre-disparo si esa es la metodología COPOWER. Causa raíz pendiente de validar configuraciones AVR / Q> / DEIF / CPW-07.",
+      "lecciones_aprendidas": [
+        "Los eventos transitorios pueden provocar incrementos significativos de potencia reactiva.",
+        "La coordinación entre AVR y protección Q> debe verificarse para condiciones dinámicas.",
+        "Las tendencias operativas permiten reconstruir con precisión la secuencia del evento.",
+        "No debe asignarse una causa raíz sin evidencia técnica suficiente.",
+        "El FO del 27-jun no trae horas; no debe inventarse una hora oficial distinta a la estimada por tendencia."
+      ],
+      "indicadores": {
+        "horas_indisponibles": 2.3,
+        "energia_no_generada": "≈ 2.420 kWh (2,42 MWh) — estimación con 1.051 kW nom. × 2,30 h; con kW promedio pre-disparo ≈2,1–2,2 MWh",
+        "falla_repetitiva": null
+      },
+      "notas_pendientes": [
+        "Validar configuración de la protección Q>.",
+        "Validar configuración del AVR DVC-550.",
+        "Analizar registros históricos DEIF.",
+        "Confirmar interacción entre CPW-06 y CPW-07.",
+        "Cerrar el análisis de causa raíz.",
+        "No inventar horas oficiales: solo usar estimaciones de tendencia mientras el FO no las registre.",
+        "Opcional: recalcular kWh no generados con potencia promedio pre-disparo (metodología COPOWER) si aplica."
+      ],
+      "relacionados": [
+        "CPW-07",
+        "MRU",
+        "Protección Q>",
+        "AVR DVC-550",
+        "Controlador DEIF",
+        "Sistema de generación Costayaco"
+      ],
+      "fuente": "FO-GE-033 (27-jun-2026; sin horas de evento en el reporte) + tendencia operacional para estimar cronología, FS ≈2,30 h (03:17–05:35 aprox.) y energía ≈2.420 kWh (1.051 kW × 2,30 h)"
+    },
+    {
+      "id": "EVT-2026-06-28-RED34KV-A",
+      "titulo": "Salida simultánea de grupos electrógenos por perturbación externa en red de 34,5 kV",
+      "fecha": "2026-06-28",
+      "hora": "07:10",
+      "equipo": [
+        "CPW-01",
+        "CPW-02",
+        "CPW-03",
+        "CPW-05",
+        "CPW-06",
+        "CPW-07"
+      ],
+      "sistema": "Costayaco — red 34,5 kV / salida de la máquina / MRU",
+      "duracion_horas": 0.38,
+      "responsable": "Externo",
+      "estado": "cerrado",
+      "criticidad": "alta",
+      "calidad_dato": "completo",
+      "es_supuesto": false,
+      "resumen_ejecutivo": "Perturbación externa en 34,5 kV (gallinazo) activó salida de la máquina: pérdida de MRU + Chiller y salida de CPW-01/02/03/07. Redistribución sobrecargó CPW-06 y forzó parada de CPW-05 (07:33). Sin fallas propias. FS 0,38 h; ≈1.730 kWh.",
+      "cronologia": [
+        {
+          "hora": "07:10",
+          "evento": "Apertura RL por salida de la máquina / apertura circuito 34,5 kV Mocoa–Villagarzón por sobrecorriente.",
+          "origen": "Perturbación externa"
+        },
+        {
+          "hora": "07:14",
+          "evento": "Salida automática CPW-01, CPW-02, CPW-03 y CPW-07; pérdida MRU + Chiller.",
+          "origen": "Protección"
+        },
+        {
+          "hora": "07:31",
+          "evento": "Sobrecarga y salida CPW-06.",
+          "origen": "Redistribución de carga"
+        },
+        {
+          "hora": "07:33",
+          "evento": "Parada manual controlada del CPW-05 (fin del intervalo FS 0,38 h / 23 min).",
+          "origen": "Estabilidad operativa"
+        },
+        {
+          "hora": "Posterior",
+          "evento": "Operación normalizada (hora exacta de restablecimiento por unidad no registrada en el reporte).",
+          "origen": "Operación CCM"
+        }
+      ],
+      "descripcion_tecnica": "Antes del evento, CPW-01/02/03/07 operaban ≈680 kW (MRU + Chiller) y CPW-05/06 ≈900 kW (gas Moqueta); potencia total afectada de referencia 4×680 + 2×900 = 4.520 kW. Durante la contingencia: apertura 34,5 kV, salida de la máquina, pérdida MRU + Chiller, salida de unidades, redistribución, sobrecarga CPW-06 y parada controlada CPW-05. Observación de confiabilidad: no conviene estimar horas de indisponibilidad hasta recuperación completa de carga nominal porque el informe no registra esa hora por unidad. El único intervalo claramente delimitado es 07:10–07:33 (23 min = 0,38 h). Si Horas FS se contabilizan hasta recuperación plena, tomar registros Axiom/CCM.",
+      "clasificacion": {
+        "tipo": "Falla",
+        "modo_falla": "Falla por perturbación externa en la red de 34,5 kV con actuación de la protección por salida de la máquina, pérdida del sistema MRU + Chiller y redistribución de carga que produjo sobrecarga en el CPW-06.",
+        "componente_afectado": "Red eléctrica de 34,5 kV, protección por salida de la máquina, sistema MRU + Chiller, generador CPW-06, gobernación del CPW-05, controladores DEIF y protecciones de generación.",
+        "criticidad": "alta",
+        "falla_repetitiva": false
+      },
+      "causa": {
+        "inmediata": "Actuación de la protección por salida de la máquina debido a una perturbación externa en la red de 34,5 kV, ocasionando la pérdida del sistema MRU + Chiller y la salida automática de las unidades de generación. La redistribución de carga produjo la sobrecarga del CPW-06.",
+        "basica": "Perturbación externa sobre la red eléctrica de 34,5 kV que provocó la desenergización del sistema MRU + Chiller y una redistribución brusca de carga sobre las unidades remanentes.",
+        "raiz": "Evento externo a los grupos electrógenos. La apertura del circuito 34,5 kV Mocoa–Villagarzón por una sobrecorriente ocasionada por el choque de un gallinazo con la red eléctrica generó la actuación de la protección por salida de la máquina. El informe concluye que no se evidenciaron fallas mecánicas, eléctricas ni electrónicas atribuibles a los grupos electrógenos."
+      },
+      "cinco_porques": [
+        {
+          "n": 1,
+          "pregunta": "¿Por qué salieron de servicio varias unidades?",
+          "respuesta": "Porque actuó la protección por salida de la máquina."
+        },
+        {
+          "n": 2,
+          "pregunta": "¿Por qué actuó la protección por salida de la máquina?",
+          "respuesta": "Porque se perdió la referencia eléctrica debido a la perturbación de la red."
+        },
+        {
+          "n": 3,
+          "pregunta": "¿Por qué se perdió la referencia eléctrica?",
+          "respuesta": "Porque abrió el circuito de 34,5 kV."
+        },
+        {
+          "n": 4,
+          "pregunta": "¿Por qué abrió el circuito?",
+          "respuesta": "Porque ocurrió una sobrecorriente."
+        },
+        {
+          "n": 5,
+          "pregunta": "¿Por qué ocurrió la sobrecorriente?",
+          "respuesta": "Porque un gallinazo impactó la infraestructura de la red eléctrica."
+        }
+      ],
+      "factores_contribuyentes": [
+        "Perturbación externa.",
+        "Pérdida de MRU + Chiller.",
+        "Redistribución automática de carga.",
+        "Sobrecarga del CPW-06.",
+        "Parada preventiva del CPW-05.",
+        "Actuación correcta de las protecciones."
+      ],
+      "acciones_correctivas": [
+        "Inspección de equipos.",
+        "Verificación de ausencia de fallas internas.",
+        "Ingreso secuencial de unidades.",
+        "Validación de parámetros operativos.",
+        "Comprobación del funcionamiento de protecciones.",
+        "Inspección del sistema de gobernación de CPW-05 y CPW-06."
+      ],
+      "acciones_preventivas": [
+        "Mantener coordinación con el operador del CCM.",
+        "Continuar verificando la respuesta de las protecciones.",
+        "Revisar periódicamente la coordinación entre protecciones y sistema de generación.",
+        "Conservar monitoreo de gobernación de las unidades durante contingencias."
+      ],
+      "impacto": {
+        "disponibilidad_horas": 0.38,
+        "energia_no_generada_kwh": 1730,
+        "riesgo_operacion": "Alto — salida de 6 unidades y sobrecarga CPW-06."
+      },
+      "validacion": "Cronología FO/DEIF: 07:10, 07:14, 07:31, 07:33. Operación normalizada posteriormente sin hora exacta por unidad. FS 0,38 h y ≈1.730 kWh corresponden únicamente al intervalo delimitado de la contingencia principal. Protecciones actuaron correctamente; sin fallas atribuibles a los grupos.",
+      "lecciones_aprendidas": [
+        "Las perturbaciones externas pueden generar eventos de causa común en múltiples unidades.",
+        "La protección por salida de la máquina actuó conforme a su lógica de diseño.",
+        "La redistribución automática de carga puede inducir sobrecargas temporales en unidades remanentes.",
+        "No estimar FS hasta normalización completa cuando el reporte no registra la hora de restablecimiento por unidad."
+      ],
+      "indicadores": {
+        "horas_indisponibles": 0.38,
+        "energia_no_generada": "≈ 1.730 kWh (1,73 MWh) — estimación: 4.520 kW × 0,383 h",
+        "falla_repetitiva": false
+      },
+      "notas_pendientes": [
+        "Si Horas FS se contabilizan hasta recuperación completa de carga nominal, tomar registros Axiom o histórico CCM.",
+        "Confirmar con totalizadores la energía no generada oficial si se requiere valor contractual.",
+        "Continuar seguimiento a eventos externos de la red de 34,5 kV.",
+        "Mantener coordinación con el operador del sistema eléctrico / CCM."
+      ],
+      "relacionados": [
+        "CPW-01",
+        "CPW-02",
+        "CPW-03",
+        "CPW-05",
+        "CPW-06",
+        "CPW-07",
+        "Sistema MRU + Chiller",
+        "Protección por salida de la máquina",
+        "Línea 34,5 kV Mocoa–Villagarzón"
+      ],
+      "fuente": "FO-GE-033 — Evento 28-jun-2026 (cronología, DEIF, evidencias). FS = 0,38 h (07:10–07:33) y ≈1.730 kWh (4.520 kW × 0,383 h); sin estimar normalización completa."
     },
     {
       "id": "EVT-2026-06-XX-BLANK",
@@ -530,33 +1162,76 @@
       "resumen_ejecutivo": "Página completamente vacía en Notion, sin fecha, equipo ni descripción. No es posible inferir causa. Estructura lista para llenar; evaluar si es duplicado a eliminar.",
       "cronologia": [],
       "descripcion_tecnica": "PENDIENTE",
-      "clasificacion": {"tipo": "PENDIENTE", "modo_falla": "PENDIENTE", "componente_afectado": "PENDIENTE", "criticidad": "PENDIENTE", "falla_repetitiva": null},
-      "causa": {"inmediata": "PENDIENTE", "basica": "PENDIENTE", "raiz": "PENDIENTE"},
+      "clasificacion": {
+        "tipo": "PENDIENTE",
+        "modo_falla": "PENDIENTE",
+        "componente_afectado": "PENDIENTE",
+        "criticidad": "PENDIENTE",
+        "falla_repetitiva": null
+      },
+      "causa": {
+        "inmediata": "PENDIENTE",
+        "basica": "PENDIENTE",
+        "raiz": "PENDIENTE"
+      },
       "cinco_porques": [],
       "factores_contribuyentes": [],
       "acciones_correctivas": [],
       "acciones_preventivas": [],
-      "impacto": {"disponibilidad_horas": null, "energia_no_generada_kwh": null, "riesgo_operacion": "PENDIENTE"},
+      "impacto": {
+        "disponibilidad_horas": null,
+        "energia_no_generada_kwh": null,
+        "riesgo_operacion": "PENDIENTE"
+      },
       "validacion": "PENDIENTE",
       "lecciones_aprendidas": [],
-      "indicadores": {"horas_indisponibles": "PENDIENTE", "energia_no_generada": "PENDIENTE", "falla_repetitiva": null},
-      "notas_pendientes": ["Página sin información: completar con datos del evento o eliminar si es duplicado"],
+      "indicadores": {
+        "horas_indisponibles": "PENDIENTE",
+        "energia_no_generada": "PENDIENTE",
+        "falla_repetitiva": null
+      },
+      "notas_pendientes": [
+        "Página sin información: completar con datos del evento o eliminar si es duplicado"
+      ],
       "relacionados": [],
       "fuente": "Notion - Evento de Falla (3)"
     }
   ],
   "analisis_transversal": {
     "patrones_recurrentes": [
-      {"patron": "Contaminación de intercooler por químico secuestrante de H2S", "eventos": ["EVT-2026-06-03-CPW06","EVT-2026-06-11-CPW03-A"], "unidades_afectadas": ["CPW-06","CPW-04","CPW-05","CPW-03","1/2/3 hace ~1 año"]},
-      {"patron": "Potencia inversa / pérdida de referencia de red", "eventos": ["EVT-2026-06-11-CPW03-B","EVT-2026-06-27-SOBRE","EVT-2026-06-28-GOB","EVT-2026-06-22-GENERAL"], "nota": "El RCA del 22-jun explica el mecanismo (rechazo de carga → sobrevelocidad/potencia inversa/sobretensión). Candidato a análisis de causa común de gobernación."}
+      {
+        "patron": "Contaminación de intercooler por químico secuestrante de H2S",
+        "eventos": [
+          "EVT-2026-06-03-CPW06",
+          "EVT-2026-06-11-CPW03-A"
+        ],
+        "unidades_afectadas": [
+          "CPW-06",
+          "CPW-04",
+          "CPW-05",
+          "CPW-03",
+          "1/2/3 hace ~1 año"
+        ],
+        "nota": "CPW-03 11-jun: disturbio 15:12 confirmado por historiador; causa MAT/intercooler sigue como HIPÓTESIS (sin tags térmicos). Pérdida de comunicación 15:23 es hecho distinto."
+      },
+      {
+        "patron": "Potencia inversa / pérdida de referencia de red",
+        "eventos": [
+          "EVT-2026-06-11-CPW03-A",
+          "EVT-2026-06-27-CPW06",
+          "EVT-2026-06-28-RED34KV-A",
+          "EVT-2026-06-22-GENERAL"
+        ],
+        "nota": "El RCA del 22-jun explica el mecanismo (rechazo de carga → sobrevelocidad/potencia inversa/sobretensión). Candidato a análisis de causa común de gobernación."
+      }
     ],
     "problemas_calidad_registro": [
       "Solo 3 de 9 eventos de Notion están bien documentados (3, 5, 7 jun)",
       "Numeración inconsistente en Notion (dos '4', falta '6', dos sin número)",
       "Evento 11-jun COPOWER marcado 'cerrado' sin datos",
-      "Posible duplicado 11-jun (COPOWER vs GTE)",
+      "Duplicado 11-jun consolidado: registro GTE de potencia inversa fusionado en EVT-2026-06-11-CPW03-A",
       "Inconsistencia de cálculo en evento 7-jun (3 h vs energía con 2 h)",
-      "El evento mayor del mes (22-jun Vector Shift) NO estaba en el registro de Notion"
+      "El evento mayor del mes (22-jun salida de la máquina) NO estaba en el registro de Notion"
     ]
   }
 }

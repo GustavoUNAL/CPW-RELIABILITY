@@ -1,5 +1,5 @@
 import { AlertTriangle, Repeat, ShieldAlert } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
   Bar,
   BarChart,
@@ -20,10 +20,15 @@ import {
 } from "./granTierraMonthly";
 import type { ReportKey } from "../types";
 import {
-  classifyEventCategory,
+  buildEventCategoryCatalog,
+  classifyReportEventCategory,
   EVENT_CATEGORIES,
   type EventCategoryCode,
 } from "../events/eventCategories";
+import { enrichEventLog } from "../events/eventLogUtils";
+import { EventCategoryCatalogTable } from "./EventCategoryCatalogTable";
+import { JUNE_2026_IMPUTABLE_EVENTS } from "./juneImputableEvents";
+import { EXEC_JUN } from "./executiveJune2026";
 
 type Mode = "repetitivos" | "badactors";
 
@@ -51,57 +56,6 @@ const CATEGORY_META: Record<string, CategoryMeta> = {
   ...Object.fromEntries(EVENT_CATEGORIES.map((c) => [c.code, { label: c.shortLabel, detail: c.description }])),
 };
 
-function classifyGranTierraJuneByOrigin(input: {
-  cause: string;
-  notes: string;
-  date: string;
-  equipment: string;
-}): { primary: EventCategoryCode; root?: EventCategoryCode } {
-  const text = `${input.cause || ""} ${input.notes || ""}`.toLowerCase();
-
-  if (/tablero de auxiliares|totalizador principal|protecci/.test(text)) {
-    return { primary: "ELEC_PROTECCIONES" };
-  }
-  if (/reconectador|34\.?5\s*kv|disparo de c9|perturbacion en la red|elevacion del voltaje|potencia reactiva|sobrecorriente/.test(text)) {
-    return { primary: "ELEC_RED" };
-  }
-  if (/tuberia de cyc|cyc 19/.test(text)) {
-    return { primary: "INFRA_AUXILIARES" };
-  }
-  if (/magnetiz|pruebas de magnetiz/.test(text)) {
-    return { primary: "OPER_MANIOBRA" };
-  }
-  if (/mantenimiento semanal de mru|mantenimiento cyc|cambio de v[áa]lvula/.test(text)) {
-    return { primary: "MTO_PROGRAMADO" };
-  }
-  if (/mru|ngl|quincy|chiller|secuestrante/.test(text)) {
-    return { primary: "GAS_TRATAMIENTO" };
-  }
-  if (/deton/.test(text)) {
-    if (/presi[oó]n de gas|baja presi[oó]n/.test(text)) {
-      return { primary: "MEC_COMBUSTION", root: "GAS_SUMINISTRO" };
-    }
-    return { primary: "MEC_COMBUSTION" };
-  }
-  if (/intercooler|aceite|enfriamiento/.test(text)) {
-    return { primary: "MEC_ENFRIAMIENTO_LUBRICACION" };
-  }
-  if (/admisi[oó]n|escape|flexible|tren de admision/.test(text)) {
-    return { primary: "MEC_ADMISION_ESCAPE" };
-  }
-  if (/potencia inversa|sobrecarga|gobernaci[oó]n|reparto de carga/.test(text)) {
-    const isJune28Control = input.date === "2026-06-28" && /cpw0[56]/i.test(input.equipment);
-    return isJune28Control
-      ? { primary: "CTRL_GOBERNACION", root: "GAS_TRATAMIENTO" }
-      : { primary: "CTRL_GOBERNACION" };
-  }
-  if (/altas vivraciones|altas vibraciones/.test(text)) {
-    return { primary: "DATOS_INSUFICIENTES" };
-  }
-
-  return { primary: classifyEventCategory(text).code };
-}
-
 function prettyEquipmentName(raw: string) {
   const v = (raw || "").trim();
   if (!v) return "Sin unidad reportada";
@@ -117,23 +71,24 @@ function iioBandLabel(iio: number) {
 }
 
 export function EventInsightsDashboard({ report, month, monthLabel, mode }: Props) {
-  const [showCategoryCatalog, setShowCategoryCatalog] = useState(false);
   const snap = getSnap(report, month);
   if (!snap) return <p className="empty-state">Sin datos para {monthLabel} en esta fuente.</p>;
 
-  const events = snap.eventLog;
+  const events = useMemo(
+    () => enrichEventLog(snap.eventLog, report === "gran_tierra" ? "gran_tierra" : "copower"),
+    [snap.eventLog, report],
+  );
   const classifiedEvents = useMemo(
     () =>
       events.map((e, idx) => {
-        const originClass =
-          report === "gran_tierra" && month === "Jun"
-            ? classifyGranTierraJuneByOrigin({
-              cause: e.cause || "",
-              notes: e.notes || "",
-              date: e.date,
-              equipment: e.equipment || "",
-            })
-            : { primary: classifyEventCategory(e.notes || e.cause || "").code };
+        const originClass = classifyReportEventCategory({
+          report: report === "gran_tierra" ? "gran_tierra" : "copower",
+          month,
+          cause: e.cause || "",
+          notes: e.notes || "",
+          date: e.date,
+          equipment: e.equipment || "",
+        });
         const category = EVENT_CATEGORIES.find((c) => c.code === originClass.primary) ?? EVENT_CATEGORIES[0];
         return {
           id: `${report === "gran_tierra" ? "GTE" : "CPW"}-${month}-${String(idx + 1).padStart(3, "0")}`,
@@ -202,17 +157,9 @@ export function EventInsightsDashboard({ report, month, monthLabel, mode }: Prop
   const failureClassified = classifiedEvents
     .filter((e) => e.eventType === "Falla")
     .sort((a, b) => a.equipment.localeCompare(b.equipment) || a.date.localeCompare(b.date));
-  const categoryCatalog = EVENT_CATEGORIES.map((cat) => {
-    const count = classifiedEvents.filter((ev) => ev.categoryCode === cat.code).length;
-    return {
-      code: cat.code,
-      label: cat.label,
-      shortLabel: cat.shortLabel,
-      description: cat.description,
-      count,
-      share: (count / Math.max(totalEvents, 1)) * 100,
-    };
-  });
+  const categoryCatalog = buildEventCategoryCatalog(
+    classifiedEvents.map((ev) => ev.categoryCode),
+  );
 
   const downtimeByEquipment = classifiedEvents.reduce((acc, ev) => {
     const key = ev.equipment || "N/D";
@@ -220,19 +167,35 @@ export function EventInsightsDashboard({ report, month, monthLabel, mode }: Prop
     return acc;
   }, new Map<string, number>());
 
+  /** Horas PF_contr oficiales por equipo (más fiable que downtime de filas consolidadas multi-unidad). */
+  const pfContrByEquipment = new Map(
+    (snap.generationByEquipment ?? []).map((row) => [
+      prettyEquipmentName(row.equipo),
+      Number(row.horasPFContr) || 0,
+    ]),
+  );
+
   const badActorBase = machine
-    .filter((m) => m.fallas > 0)
+    .filter((m) => m.fallas > 0 && !/excluida|estabilizaci/i.test(m.campo || ""))
     .map((m) => {
       const equipment = prettyEquipmentName(m.unidad);
       const dispGapPct = m.disponibilidadPct == null ? 0 : Math.max(0, 98 - m.disponibilidadPct);
       const mttrHours = m.mttrHours == null ? 0 : m.mttrHours;
-      const outageHours = downtimeByEquipment.get(equipment) ?? 0;
+      const fromPf = pfContrByEquipment.get(equipment);
+      const fromEvents = downtimeByEquipment.get(equipment);
+      const outageHours =
+        fromPf != null && fromPf > 0
+          ? fromPf
+          : fromEvents != null && fromEvents > 0
+            ? fromEvents
+            : mttrHours * Math.max(m.fallas, 1);
       return {
         ...m,
         equipment,
         dispGapPct,
         mttrHoursScore: mttrHours,
         outageHours,
+        detalle: m.detalle || "",
       };
     })
     .slice(0, 20);
@@ -287,6 +250,10 @@ export function EventInsightsDashboard({ report, month, monthLabel, mode }: Prop
     (best, row) => (best == null || row.iio > best.iio ? row : best),
     null as (typeof badActors)[number] | null,
   );
+  const totalFallasPeriodo = badActors.reduce((sum, row) => sum + row.fallas, 0);
+  const totalPfContrPeriodo = badActors.reduce((sum, row) => sum + row.outageHours, 0);
+  const gteJuneFailures =
+    report === "gran_tierra" && month === "Jun" ? JUNE_2026_IMPUTABLE_EVENTS : [];
   if (mode === "repetitivos") {
     return (
       <div className="panel">
@@ -296,15 +263,7 @@ export function EventInsightsDashboard({ report, month, monthLabel, mode }: Prop
             <h3>{monthLabel}</h3>
             <span className={`source-badge ${badgeClass}`}>{badgeLabel}</span>
           </div>
-          <div style={{ marginTop: "0.55rem", display: "flex", justifyContent: "flex-end" }}>
-            <button
-              type="button"
-              className="open-popup-btn"
-              onClick={() => setShowCategoryCatalog(true)}
-            >
-              Ver categorías
-            </button>
-          </div>
+
           <div className="exec-kpi-row">
             <div className="exec-kpi">
               <Repeat size={16} />
@@ -420,7 +379,16 @@ export function EventInsightsDashboard({ report, month, monthLabel, mode }: Prop
                 </table>
               </div>
             </section>
+          </div>
 
+          <EventCategoryCatalogTable
+            rows={categoryCatalog}
+            totalEvents={totalEvents}
+            title="Clasificación por categoría"
+            subtitle={`${totalEvents} evento(s) · distribución % sobre la bitácora del periodo`}
+          />
+
+          <div className="event-insights-grid">
             <section className="event-insights-block event-insights-block--wide">
               <h4>Pares equipo-categoría más repetidos</h4>
               <div className="table-wrap event-insights-scroll event-insights-scroll--tall">
@@ -515,42 +483,6 @@ export function EventInsightsDashboard({ report, month, monthLabel, mode }: Prop
               </tbody>
             </table>
           </div>
-
-          {showCategoryCatalog ? (
-            <div className="modal-overlay" role="dialog" aria-modal="true" onClick={() => setShowCategoryCatalog(false)}>
-              <article className="modal-card modal-card--xl" onClick={(e) => e.stopPropagation()}>
-                <header className="modal-header">
-                  <h3>Categorías ({categoryCatalog.length})</h3>
-                  <button type="button" className="open-popup-btn" onClick={() => setShowCategoryCatalog(false)}>
-                    Cerrar
-                  </button>
-                </header>
-                <div className="table-wrap category-modal-table" style={{ marginTop: "0.65rem" }}>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Código</th>
-                        <th>Categoría</th>
-                        <th>Eventos</th>
-                        <th>%</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {categoryCatalog.map((cat) => (
-                        <tr key={cat.code}>
-                          <td><strong>{cat.code}</strong></td>
-                          <td>{cat.label}</td>
-                          <td>{cat.count}</td>
-                          <td>{pct(cat.share, 1)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </article>
-            </div>
-          ) : null}
-
         </article>
       </div>
     );
@@ -587,19 +519,21 @@ export function EventInsightsDashboard({ report, month, monthLabel, mode }: Prop
           </div>
           <div className="exec-kpi">
             <Repeat size={16} />
-            <span>Fallas acumuladas (top)</span>
-            <strong>{badActors.reduce((sum, row) => sum + row.fallas, 0)}</strong>
+            <span>Fallas COPOWER del periodo</span>
+            <strong>{totalFallasPeriodo}</strong>
             <small>
-              {maxFailuresRow
-                ? `Máxima frecuencia: ${maxFailuresRow.unidad} (${maxFailuresRow.fallas})`
-                : "Sin fallas acumuladas"}
+              {report === "gran_tierra" && month === "Jun"
+                ? `PF_contr ${EXEC_JUN.hoursPfContr.toLocaleString("es-CO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} h · MTTR ${EXEC_JUN.mttrHours.toFixed(2)} h`
+                : maxFailuresRow
+                  ? `Máxima frecuencia: ${maxFailuresRow.unidad} (${maxFailuresRow.fallas}) · PF ${totalPfContrPeriodo.toFixed(2)} h`
+                  : "Sin fallas acumuladas"}
             </small>
           </div>
         </div>
 
         <article className="dash-chart-panel" style={{ marginTop: "0.7rem" }}>
           <h4>Top malos actores por impacto</h4>
-          <p className="muted dash-chart-sub">IIO normalizado (0-1) y número de fallas por unidad</p>
+          <p className="muted dash-chart-sub">IIO normalizado (0-1) y número de fallas por unidad · horas fuera = PF_contr</p>
           <div className="dash-chart">
             <ResponsiveContainer width="100%" height={280}>
               <BarChart data={badActorsChart} margin={{ top: 8, right: 10, left: 0, bottom: 4 }}>
@@ -628,14 +562,15 @@ export function EventInsightsDashboard({ report, month, monthLabel, mode }: Prop
                 <th>Conf. %</th>
                 <th>MTBF</th>
                 <th>MTTR</th>
-                <th>Horas fuera</th>
+                <th>PF_contr</th>
                 <th>Riesgo</th>
-                <th>Índice de Impacto Operacional</th>
+                <th>IIO</th>
+                <th>Detalle</th>
               </tr>
             </thead>
             <tbody>
               {badActors.length === 0 ? (
-                <tr><td colSpan={11}>Sin unidades con fallas en el periodo.</td></tr>
+                <tr><td colSpan={12}>Sin unidades con fallas en el periodo.</td></tr>
               ) : badActors.map((row, idx) => (
                 <tr key={row.unidad} className={row.fallas >= 3 ? "row-repeat" : undefined}>
                   <td>{idx + 1}</td>
@@ -649,11 +584,41 @@ export function EventInsightsDashboard({ report, month, monthLabel, mode }: Prop
                   <td>{row.outageHours.toFixed(2)} h</td>
                   <td>{row.riesgoTecnico}</td>
                   <td>{row.iio.toFixed(3)}</td>
+                  <td className="detalle-cell">{row.detalle || "—"}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+
+        {gteJuneFailures.length > 0 ? (
+          <div className="table-wrap" style={{ marginTop: "0.7rem" }}>
+            <p className="eyebrow" style={{ marginBottom: "0.35rem" }}>
+              Fallas COPOWER · junio 2026 · {gteJuneFailures.length} eventos · {EXEC_JUN.hoursPfContr} h PF_contr
+            </p>
+            <table>
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Equipo</th>
+                  <th>PF_contr</th>
+                  <th>Observación</th>
+                </tr>
+              </thead>
+              <tbody>
+                {gteJuneFailures.map((ev) => (
+                  <tr key={ev.id}>
+                    <td>{ev.date}</td>
+                    <td><strong>{ev.equipment}</strong></td>
+                    <td>{ev.hoursPfContr.toLocaleString("es-CO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} h</td>
+                    <td className="detalle-cell">{ev.observation}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : null}
+
         <article className="dash-chart-panel iio-panel" style={{ marginTop: "0.7rem" }}>
           <p className="eyebrow">IIO · Definición</p>
           <h4 style={{ marginTop: 0 }}>Índice de Impacto Operacional</h4>
@@ -673,7 +638,7 @@ export function EventInsightsDashboard({ report, month, monthLabel, mode }: Prop
             </article>
             <article className="iio-def-card">
               <strong>In · Indisponibilidad normalizada</strong>
-              <p>Horas fuera del equipo / mayor tiempo fuera del periodo.</p>
+              <p>Horas PF_contr del equipo / mayor PF_contr del periodo.</p>
               <small>Peso 30% · Refleja impacto operacional directo.</small>
             </article>
             <article className="iio-def-card">
@@ -696,11 +661,9 @@ export function EventInsightsDashboard({ report, month, monthLabel, mode }: Prop
           </div>
         </article>
         <p className="metric-glossary" role="note" style={{ marginTop: "0.55rem" }}>
-          Disp. % · Disponibilidad de la unidad en el periodo · Conf. % · Confiabilidad de la unidad en el periodo ·
-          MTBF · Tiempo medio entre fallas (horas) · MTTR · Tiempo medio de reparación (horas) · Horas fuera ·
-          Sumatoria de indisponibilidad registrada en la bitácora del periodo · Riesgo · Nivel de criticidad técnica
-          estimada · Índice de Impacto Operacional · Índice normalizado (0-1): 40% frecuencia + 30%
-          indisponibilidad + 20% MTTR + 10% disponibilidad penalizada.
+          Disp. % · Disponibilidad · Conf. % · Confiabilidad · MTBF · tiempo medio entre fallas · MTTR · tiempo medio
+          de reparación · PF_contr · horas de falla imputables al contratista · Riesgo · criticidad técnica · IIO ·
+          índice normalizado (0–1): 40% frecuencia + 30% PF_contr + 20% MTTR + 10% disponibilidad penalizada.
         </p>
       </article>
     </div>

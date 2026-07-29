@@ -45,7 +45,7 @@ import {
   capaFocusFromLeaf,
   generationSectionFromLeaf,
   INTEGRATED_DUAL_LEAVES,
-  planningFocusFromLeaf,
+  planningSectionFromLeaf,
   resolveReport,
   resolveViewContext,
 } from "../nav/resolveContext";
@@ -634,14 +634,19 @@ function PlatformBody({
       return (
         <MaintenanceOptimizationDashboard
           month={month}
-          monthLabel={month === "Jun" ? monthLabel : `${monthLabel} · sábana Putumayo`}
+          monthLabel={month === "Jun" ? `${monthLabel} · Gran Tierra / Costayaco` : `${monthLabel} · sábana Putumayo`}
+          report={month === "Jun" ? "gran_tierra" : report}
         />
       );
     }
     if (leafId === "mto-degradacion" || leafId === "ga-salud") {
       return (
         <DegradationRiskDashboard
-          monthLabel={month === "Jun" ? monthLabel : `${monthLabel} · evaluación junio 2026`}
+          monthLabel={
+            month === "Jun"
+              ? `${monthLabel} · Gran Tierra / Costayaco`
+              : `${monthLabel} · evaluación junio 2026 (GTE)`
+          }
         />
       );
     }
@@ -672,7 +677,7 @@ function PlatformBody({
     leafId === "op-recursos"
   ) {
     return (
-      <OperationalPlanningDashboard monthLabel={monthLabel} focusId={planningFocusFromLeaf(leafId)} />
+      <OperationalPlanningDashboard monthLabel={monthLabel} section={planningSectionFromLeaf(leafId)} />
     );
   }
 

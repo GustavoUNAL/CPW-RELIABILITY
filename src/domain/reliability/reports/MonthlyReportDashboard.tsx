@@ -370,7 +370,7 @@ export function MonthlyReportDashboard({ month, monthLabel, section }: Props) {
                 </p>
                 <p>
                   El foco operativo debe concentrarse en {EXEC_JUN.focalUnit} ({EXEC_JUN.focalUnitFailures}{" "}
-                  fallas en el periodo) y en el evento de Vector Shift / Shutdown Costayaco del
+                  fallas en el periodo) y en el evento de salida de la máquina / Shutdown Costayaco del
                   22-jun, con RCA Sec. 30 ya entregado. Es prioritario validar la efectividad de las
                   acciones derivadas, completar el cierre documental de las fallas imputables y
                   sostener el plan de intervención vinculado para evitar reincidencias.

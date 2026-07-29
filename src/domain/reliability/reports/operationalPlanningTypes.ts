@@ -1,5 +1,14 @@
 import type { AlertPriority, AlertStatus, OperationalAlert, RiskLevel } from "./operationalAlertsTypes";
 
+export type PlanningSection =
+  | "resumen"
+  | "riesgos"
+  | "prioridades"
+  | "accion"
+  | "cronograma"
+  | "compromisos"
+  | "recursos";
+
 export type PlanStatus = "Borrador" | "Activo" | "En ejecución" | "Cerrado";
 
 export type MonthlyOperationalPlan = {
@@ -14,9 +23,26 @@ export type MonthlyOperationalPlan = {
   projectedMttrPct: number;
   projectedImpactPct: number;
   summary: string;
+  /** Puntos ejecutivos derivados de la bitácora GTE del mes base. */
+  summaryBullets: string[];
   status: PlanStatus;
   createdAt: string;
   updatedAt: string;
+};
+
+/** Snapshot del mes base (junio GTE) que alimenta el outlook. */
+export type PlanBaselineSnapshot = {
+  sourceMonth: string;
+  sourceLabel: string;
+  availabilityPct: number;
+  reliabilityPct: number;
+  copowerFailures: number;
+  mtbfHours: number;
+  mttrHours: number;
+  pfContrHours: number;
+  pfCliHours: number;
+  totalEvents: number;
+  meetsAvailability: boolean;
 };
 
 export type OperationalPriority = {
@@ -62,6 +88,7 @@ export type CriticalAssetRank = {
 
 export type OperationalPlanPack = {
   plan: MonthlyOperationalPlan;
+  baseline: PlanBaselineSnapshot;
   priorities: OperationalPriority[];
   risks: OperationalAlert[];
   openRisks: OperationalAlert[];

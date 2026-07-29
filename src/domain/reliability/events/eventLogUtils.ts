@@ -50,7 +50,7 @@ export function normalizeCauseKey(cause: string): string {
 
 /**
  * Consolida filas del mismo incidente (misma fecha + tipo + causa) que
- * aparecen una vez por equipo — p. ej. Vector Shift 22-jun en 10 unidades.
+ * aparecen una vez por equipo — p. ej. salida de la máquina 22-jun en 10 unidades.
  */
 export function collapseRepeatedEvents(events: EventRecord[]): EventRecord[] {
   const order: string[] = [];
@@ -158,7 +158,7 @@ export function computeEventStats(events: EnrichedEvent[]): EventLogStats {
     if (e.parsed.pfContr != null) pfContrHours += e.parsed.pfContr;
     if (e.parsed.pfCli != null) pfCliHours += e.parsed.pfCli;
 
-    if (e.responsible === "COPOWER") imputableCopower += 1;
+    if (e.responsible === "COPOWER" || e.responsible === "GTE + COPOWER") imputableCopower += 1;
     else if (e.responsible === "GTE" || e.responsible === "Externo") clienteExterno += 1;
   }
 
@@ -199,7 +199,7 @@ export function filterEvents(events: EnrichedEvent[], filters: EventFilters): En
 /** Imputables contractuales: tipo Falla + responsable COPOWER o PF_contr > 0. */
 export function isContractualFailure(e: EnrichedEvent): boolean {
   if (e.eventType !== "Falla") return false;
-  if (e.responsible === "COPOWER") return true;
+  if (e.responsible === "COPOWER" || e.responsible === "GTE + COPOWER") return true;
   if ((e.parsed.pfContr ?? 0) > 0) return true;
   return false;
 }

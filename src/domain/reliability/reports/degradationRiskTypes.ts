@@ -38,6 +38,8 @@ export type MonthlyPoint = {
   failures: number;
   operatingHours: number;
   impactIndex: number;
+  /** Horas PF_contr del mes (GTE), si aplica. */
+  pfContrHours?: number;
 };
 
 export type RiskAssessment = {
@@ -91,6 +93,8 @@ export type AssetHealth = {
   linkedPlanIds: string[];
   linkedMsoIds: string[];
   alerts: string[];
+  /** Contexto bitácora / indicadores GTE del mes de evaluación. */
+  juneNotes?: string | null;
   createdAt: string;
   updatedAt: string;
 };

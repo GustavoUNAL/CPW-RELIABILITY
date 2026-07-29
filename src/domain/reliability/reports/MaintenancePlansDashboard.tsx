@@ -12,6 +12,7 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
+  Legend,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -467,6 +468,7 @@ export function MaintenancePlansDashboard({ month, monthLabel }: Props) {
                     formatter={(value, name) => [`${Number(value).toFixed(0)} h`, String(name)]}
                     cursor={{ fill: "color-mix(in oklab, var(--accent) 12%, transparent)" }}
                   />
+                  <Legend wrapperStyle={{ fontSize: 11 }} />
                   <Bar dataKey="plannedHoursMto" name="Planificadas" radius={[3, 3, 0, 0]}>
                     {periodBars.map((row) => (
                       <Cell

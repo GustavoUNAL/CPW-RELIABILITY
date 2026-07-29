@@ -37,42 +37,40 @@ type Props = {
   month: GranTierraMonthKey;
 };
 
-type GteJuneClass = "COPOWER" | "Infraestructura del campo";
+type GteJuneClass = "COPOWER" | "Infraestructura del campo" | "Infraestructura externa";
 
 type GteJuneEventRow = {
   id: string;
   date: string;
   equipment: string;
   eventType: "Falla" | "Causa comun" | "Operativo";
-  responsible: "COPOWER" | "GTE" | "Externo";
+  responsible: "COPOWER" | "GTE" | "GTE + COPOWER" | "Externo";
   notes: string;
   classification: GteJuneClass;
 };
 
 const GTE_JUNE_EVENT_LOG: GteJuneEventRow[] = [
-  { id: "GTE-JUN-001", date: "03-jun", equipment: "CPW06", eventType: "Falla", responsible: "COPOWER", notes: "Cambio de intercooler por exceso de residuo de secuestrante.", classification: "COPOWER" },
-  { id: "GTE-JUN-002", date: "05-jun", equipment: "CPW01", eventType: "Falla", responsible: "COPOWER", notes: "Daño en flexible del múltiple de gases de escape después de mantenimiento.", classification: "COPOWER" },
-  { id: "GTE-JUN-003", date: "11-jun", equipment: "CPW03", eventType: "Falla", responsible: "COPOWER", notes: "Detonación del equipo.", classification: "COPOWER" },
-  { id: "GTE-JUN-004", date: "27-jun", equipment: "CPW06", eventType: "Falla", responsible: "COPOWER", notes: "Perturbación eléctrica; salida de línea de CPW06 (revisar RCA técnico).", classification: "COPOWER" },
-  { id: "GTE-JUN-005", date: "27-jun", equipment: "CPW07", eventType: "Falla", responsible: "COPOWER", notes: "Perturbación eléctrica; salida de línea de CPW07 (revisar RCA técnico).", classification: "COPOWER" },
-  { id: "GTE-JUN-006", date: "28-jun", equipment: "CPW05", eventType: "Falla", responsible: "COPOWER", notes: "Potencia inversa y falla en gobernación (revisar relación con MRU en RCA).", classification: "COPOWER" },
-  { id: "GTE-JUN-007", date: "28-jun", equipment: "CPW06", eventType: "Falla", responsible: "COPOWER", notes: "Salida por sobrecarga (revisar relación con MRU en RCA).", classification: "COPOWER" },
+  { id: "GTE-JUN-001", date: "03-jun", equipment: "CPW06", eventType: "Falla", responsible: "GTE + COPOWER", notes: "Intercooler / secuestrante; PF_contr 4 h.", classification: "COPOWER" },
+  { id: "GTE-JUN-002", date: "05-jun", equipment: "CPW01", eventType: "Falla", responsible: "COPOWER", notes: "Flexible de escape; PF_contr 2 h.", classification: "COPOWER" },
+  { id: "GTE-JUN-012", date: "07-jun", equipment: "CPW01", eventType: "Falla", responsible: "COPOWER", notes: "Detonación relé K4; PF_contr 3 h.", classification: "COPOWER" },
+  { id: "GTE-JUN-003", date: "11-jun", equipment: "CPW03", eventType: "Falla", responsible: "COPOWER", notes: "Perturbación transitoria; FS≈3,92 h; ≈2.620 kWh; causa raíz no determinada.", classification: "COPOWER" },
+  { id: "GTE-JUN-023", date: "23-jun", equipment: "CPW04", eventType: "Falla", responsible: "COPOWER", notes: "FO-44 cascada EEP / RL / 480 V; PF_contr 1 h.", classification: "COPOWER" },
+  { id: "GTE-JUN-024", date: "23-jun", equipment: "CPW05", eventType: "Falla", responsible: "COPOWER", notes: "FO-44 cascada EEP / RL / 480 V; PF_contr 2 h.", classification: "COPOWER" },
+  { id: "GTE-JUN-004", date: "27-jun", equipment: "CPW06", eventType: "Falla", responsible: "COPOWER", notes: "EVT-2026-06-27-CPW06: FO sin horas; FS≈2,30 h y ≈2.420 kWh por tendencia; en investigación.", classification: "COPOWER" },
+  { id: "GTE-JUN-006", date: "28-jun", equipment: "CPW01–03 / CPW05–07", eventType: "Falla", responsible: "Externo", notes: "Externo 34,5 kV (gallinazo / salida de la máquina); FS=0,38 h; ≈1.730 kWh; no imputable COPOWER.", classification: "Infraestructura externa" },
   { id: "GTE-JUN-008", date: "02-jun", equipment: "MRU / CPW01", eventType: "Operativo", responsible: "GTE", notes: "Mantenimiento MRU y detonación posterior al arranque.", classification: "Infraestructura del campo" },
   { id: "GTE-JUN-009", date: "03-jun", equipment: "CPW01", eventType: "Operativo", responsible: "GTE", notes: "Falla en sistema de admisión.", classification: "Infraestructura del campo" },
   { id: "GTE-JUN-010", date: "04-jun", equipment: "CPW01", eventType: "Operativo", responsible: "GTE", notes: "Equipo fuera por daño en tren de admisión.", classification: "Infraestructura del campo" },
   { id: "GTE-JUN-011", date: "06-jun", equipment: "JIN-01", eventType: "Operativo", responsible: "GTE", notes: "Cambio de válvula en JIN-01.", classification: "Infraestructura del campo" },
-  { id: "GTE-JUN-012", date: "07-jun", equipment: "CPW01", eventType: "Falla", responsible: "GTE", notes: "Detonación con evidencia de caída de presión de gas.", classification: "Infraestructura del campo" },
   { id: "GTE-JUN-013", date: "08-jun", equipment: "JIN-10", eventType: "Operativo", responsible: "GTE", notes: "Magnetización de transformador JIN-10.", classification: "Infraestructura del campo" },
   { id: "GTE-JUN-014", date: "09-jun", equipment: "JIN-10", eventType: "Operativo", responsible: "GTE", notes: "Pruebas de magnetización JIN-10.", classification: "Infraestructura del campo" },
   { id: "GTE-JUN-015", date: "10-jun", equipment: "CPW07", eventType: "Operativo", responsible: "GTE", notes: "Parada por altas vibraciones en CPW07.", classification: "Infraestructura del campo" },
-  { id: "GTE-JUN-016", date: "23-jun", equipment: "CPW04 / CPW05", eventType: "Causa comun", responsible: "GTE", notes: "Apertura del tablero de auxiliares 480 V.", classification: "Infraestructura del campo" },
+  { id: "GTE-JUN-016", date: "23–24-jun", equipment: "CPW01–07 / MRU", eventType: "Causa comun", responsible: "GTE + COPOWER", notes: "FO-44: cuatro disparos EEP; descoordinación RL/480 V; ajuste 8×/15× pendiente de validar.", classification: "COPOWER" },
   { id: "GTE-JUN-017", date: "23-jun", equipment: "JIN-02", eventType: "Operativo", responsible: "GTE", notes: "Daño en tubería CYC-19.", classification: "Infraestructura del campo" },
-  { id: "GTE-JUN-018", date: "24-jun", equipment: "RED 34.5 kV", eventType: "Causa comun", responsible: "GTE", notes: "Disparo del reconectador de 34,5 kV.", classification: "Infraestructura del campo" },
   { id: "GTE-JUN-019", date: "24-jun", equipment: "MRU + QUINCY", eventType: "Operativo", responsible: "GTE", notes: "Salida por fuga de aceite del sistema Quincy.", classification: "Infraestructura del campo" },
   { id: "GTE-JUN-020", date: "24-jun", equipment: "JIN-02", eventType: "Operativo", responsible: "GTE", notes: "Mantenimiento CYC-19 (JIN-02).", classification: "Infraestructura del campo" },
   { id: "GTE-JUN-021", date: "25-jun", equipment: "MRU", eventType: "Operativo", responsible: "GTE", notes: "Parada de MRU por alto nivel de NGL.", classification: "Infraestructura del campo" },
   { id: "GTE-JUN-022", date: "26-jun", equipment: "C9 + RX", eventType: "Causa comun", responsible: "GTE", notes: "Disparo de C9 y reconectador RX.", classification: "Infraestructura del campo" },
-  { id: "GTE-JUN-023", date: "28-jun", equipment: "CPW01 / CPW02 / CPW03 / CPW07", eventType: "Operativo", responsible: "GTE", notes: "Salida de equipos por parada de MRU.", classification: "Infraestructura del campo" },
 ];
 
 export function GteResumen({ month }: Props) {
@@ -121,7 +119,7 @@ export function GteResumen({ month }: Props) {
         eventType: e.eventType,
         responsible: e.responsible,
         notes: e.notes || e.cause,
-        classification: (e.responsible === "COPOWER"
+        classification: (e.responsible === "COPOWER" || e.responsible === "GTE + COPOWER"
           ? "COPOWER"
           : "Infraestructura del campo") as GteJuneClass,
       }));

@@ -21,6 +21,10 @@ import {
   INVENTORY_MINIMUMS,
   type InventoryMinItem,
 } from "./inventoryMinimumsData";
+import {
+  getInventoryItemsWithOverrides,
+  getPlanningCriticalSpares,
+} from "./inventoryPlanningCritical";
 
 type Coverage = "bajo" | "en_minimo" | "ok" | "sin_existencia";
 
@@ -78,7 +82,7 @@ export function InventoryMinimumsDashboard() {
 
   const enriched = useMemo(
     () =>
-      INVENTORY_MINIMUMS.items.map((item) => ({
+      getInventoryItemsWithOverrides().map((item) => ({
         ...item,
         family: item.family.trim() || "Sin familia",
         coverage: coverageOf(item),
@@ -86,6 +90,8 @@ export function InventoryMinimumsDashboard() {
       })),
     [],
   );
+
+  const planningCritical = useMemo(() => getPlanningCriticalSpares(), []);
 
   const byFamily = useMemo(() => {
     const map = new Map<string, FamilyStats>();
@@ -191,6 +197,69 @@ export function InventoryMinimumsDashboard() {
           <h3>Mínimos de inventario</h3>
           <span className="source-badge gte">CYC</span>
         </div>
+        <p className="muted" style={{ marginTop: "0.35rem" }}>
+          Catálogo {INVENTORY_MINIMUMS.items.length} ítems · actualizado con consumos críticos junio 2026
+          (escape CPW01, intercooler CPW06, flexibles) · {INVENTORY_MINIMUMS.extractedAt}
+        </p>
+
+        {planningCritical.length > 0 ? (
+          <section className="op-panel" style={{ marginTop: "0.75rem" }}>
+            <div className="op-panel-head">
+              <h4>Críticos del plan julio</h4>
+              <span className="muted">{planningCritical.length} · ligados a RCA/IP GTE</span>
+            </div>
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Urgencia</th>
+                    <th>Repuesto</th>
+                    <th>P/N</th>
+                    <th>Exist. / Mín.</th>
+                    <th>Equipo</th>
+                    <th>Evento</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {planningCritical.map((s) => (
+                    <tr key={s.id}>
+                      <td>
+                        <ToneBadge
+                          label={s.urgency}
+                          color={
+                            s.urgency === "Crítica"
+                              ? "#dc2626"
+                              : s.urgency === "Alta"
+                                ? "#ea580c"
+                                : "#ca8a04"
+                          }
+                        />
+                      </td>
+                      <td>
+                        <strong>{s.description}</strong>
+                        <div className="muted" style={{ fontSize: "0.75rem" }}>
+                          {s.family}
+                        </div>
+                      </td>
+                      <td>
+                        <code style={{ fontSize: "0.78rem" }}>{s.partNumber}</code>
+                      </td>
+                      <td>
+                        <strong style={{ color: s.onHand < s.stockMin ? "#dc2626" : undefined }}>
+                          {s.onHand}/{s.stockMin}
+                        </strong>
+                      </td>
+                      <td>{s.asset}</td>
+                      <td>
+                        <small className="muted">{s.linkedEvent}</small>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        ) : null}
 
         <div className="exec-kpi-row" style={{ marginTop: "0.65rem" }}>
           <div className="exec-kpi">

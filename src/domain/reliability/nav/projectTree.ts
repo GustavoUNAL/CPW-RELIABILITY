@@ -206,6 +206,7 @@ export const PROJECT_NAV_TREE: NavModule[] = [
       { id: "op-accion", label: "Plan de acción" },
       { id: "op-cronograma", label: "Cronograma" },
       { id: "op-compromisos", label: "Compromisos" },
+      { id: "op-recursos", label: "Recursos y repuestos" },
     ],
   },
 ];

@@ -347,8 +347,9 @@ export function evaluateAssetHealth(meta: AssetSeedMeta): AssetHealth {
     linkedPlanIds: meta.linkedPlanIds ?? [],
     linkedMsoIds: meta.linkedMsoIds ?? [],
     alerts,
+    juneNotes: null,
     createdAt: "2026-01-31",
-    updatedAt: "2026-06-30",
+    updatedAt: "2026-07-26",
   };
 }
 

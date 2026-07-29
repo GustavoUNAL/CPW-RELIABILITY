@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { ExternalLink, FilePlus2, X } from "lucide-react";
+import { ExternalLink, FilePlus2, FileSearch, X } from "lucide-react";
 import type { EnrichedEvent } from "../events/eventLogUtils";
+import { shortRcaEventId } from "../rca/data";
+import { findCostayacoRcasForEvent } from "../rca/matchCostayacoRca";
+import type { RcaEventoFalla } from "../rca/types";
 import { buildGteJuneRcaCases, findRcaCasesForEvent, type RcaCaseDetail } from "./gteJuneRcaCases";
 import type { RcaEventDraft } from "./rcaCaseStore";
 
@@ -64,24 +67,32 @@ function isRcaEligibleEvent(event: EnrichedEvent): boolean {
   return false;
 }
 
-function rcasForEvent(event: EnrichedEvent, cases: RcaCaseDetail[]): RcaCaseDetail[] {
+function formalRcasForEvent(event: EnrichedEvent, cases: RcaCaseDetail[]): RcaCaseDetail[] {
   if (!isRcaEligibleEvent(event)) return [];
   return findRcaCasesForEvent(event.date, event.equipment, cases);
+}
+
+function costayacoRcasForEvent(event: EnrichedEvent, events: RcaEventoFalla[]): RcaEventoFalla[] {
+  return findCostayacoRcasForEvent(event.date, event.equipment, events, event.notes ?? "");
 }
 
 function DayDetailBody({
   selected,
   rcaCases,
+  costayacoRcaEvents,
   onCreateRcaFromEvent,
   onOpenRca,
   onCreateRca,
+  onOpenEvent,
   canNavigateRca,
 }: {
   selected: DayBucket;
   rcaCases: RcaCaseDetail[];
+  costayacoRcaEvents: RcaEventoFalla[];
   onCreateRcaFromEvent?: (draft: RcaEventDraft) => void;
   onOpenRca: (rcaId?: string) => void;
   onCreateRca: (event: EnrichedEvent) => void;
+  onOpenEvent?: (event: EnrichedEvent) => void;
   canNavigateRca: boolean;
 }) {
   return (
@@ -92,6 +103,7 @@ function DayDetailBody({
       </h4>
       <p className="muted">
         {selected.events.length} evento(s) · {selected.failures} falla(s) · {selected.downtimeHours.toFixed(1)} h
+        {onOpenEvent ? " · clic en un evento para abrir la ficha RCA" : ""}
       </p>
       {selected.events.length === 0 ? (
         <p className="muted">Día operativo · sin registros en la bitácora.</p>
@@ -104,35 +116,78 @@ function DayDetailBody({
               return rank(a) - rank(b) || a.equipment.localeCompare(b.equipment);
             })
             .map((e) => {
-              const rcas = rcasForEvent(e, rcaCases);
+              const rcas = formalRcasForEvent(e, rcaCases);
+              const costayaco = costayacoRcasForEvent(e, costayacoRcaEvents);
               const canCreate = Boolean(onCreateRcaFromEvent) && isRcaEligibleEvent(e);
+              const canOpen = Boolean(onOpenEvent);
               return (
-                <li key={e.id}>
-                  <div className="ev-cal-event-top">
-                    <strong>{e.equipment}</strong>
-                    <span
-                      className={
-                        e.eventType === "Falla"
-                          ? "badge danger"
-                          : e.eventType === "Causa comun"
-                            ? "badge warning"
-                            : "badge info"
-                      }
-                    >
-                      {e.eventType}
-                    </span>
+                <li key={e.id} className={canOpen ? "ev-cal-event-item--openable" : undefined}>
+                  <div
+                    className={canOpen ? "ev-cal-event-body" : undefined}
+                    role={canOpen ? "button" : undefined}
+                    tabIndex={canOpen ? 0 : undefined}
+                    onClick={canOpen ? () => onOpenEvent?.(e) : undefined}
+                    onKeyDown={
+                      canOpen
+                        ? (ev) => {
+                            if (ev.key === "Enter" || ev.key === " ") {
+                              ev.preventDefault();
+                              onOpenEvent?.(e);
+                            }
+                          }
+                        : undefined
+                    }
+                  >
+                    <div className="ev-cal-event-top">
+                      <strong>{e.equipment}</strong>
+                      <span
+                        className={
+                          e.eventType === "Falla"
+                            ? "badge danger"
+                            : e.eventType === "Causa comun"
+                              ? "badge warning"
+                              : "badge info"
+                        }
+                      >
+                        {e.eventType}
+                      </span>
+                    </div>
+                    <p>{e.cause || "Sin descripción"}</p>
+                    <small>
+                      {e.responsible} · {(e.downtimeHours ?? 0).toFixed(1)} h
+                    </small>
+                    {costayaco.length > 0 ? (
+                      <div className="ev-cal-evt-badges">
+                        {costayaco.map((rca) => (
+                          <span key={rca.id} className="badge info ev-rca-badge" title={rca.id}>
+                            EVT {shortRcaEventId(rca.id)}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
                   </div>
-                  <p>{e.cause || "Sin descripción"}</p>
-                  <small>
-                    {e.responsible} · {(e.downtimeHours ?? 0).toFixed(1)} h
-                  </small>
-                  {(rcas.length > 0 || canCreate) && (
+                  {(rcas.length > 0 || canCreate || (canOpen && costayaco.length > 0)) && (
                     <div className="ev-cal-rca-actions">
+                      {canOpen && costayaco.length > 0 ? (
+                        <button
+                          type="button"
+                          className="ev-rca-link"
+                          onClick={(ev) => {
+                            ev.stopPropagation();
+                            onOpenEvent?.(e);
+                          }}
+                        >
+                          <FileSearch size={11} /> Ver ficha RCA
+                        </button>
+                      ) : null}
                       {canCreate ? (
                         <button
                           type="button"
                           className="ev-rca-link ev-rca-link--create"
-                          onClick={() => onCreateRca(e)}
+                          onClick={(ev) => {
+                            ev.stopPropagation();
+                            onCreateRca(e);
+                          }}
                         >
                           <FilePlus2 size={11} /> {rcas.length > 0 ? "Crear otro RCA" : "Crear RCA"}
                         </button>
@@ -142,7 +197,10 @@ function DayDetailBody({
                           key={rca.id}
                           type="button"
                           className="ev-rca-link"
-                          onClick={() => onOpenRca(rca.id)}
+                          onClick={(ev) => {
+                            ev.stopPropagation();
+                            onOpenRca(rca.id);
+                          }}
                           disabled={!canNavigateRca}
                           title={`${rca.eventLabel} · ${rca.priority} · ${rca.status}`}
                         >
@@ -173,6 +231,10 @@ type Props = {
   onNavigateToRca?: (rcaId?: string) => void;
   rcaCases?: RcaCaseDetail[];
   onCreateRcaFromEvent?: (draft: RcaEventDraft) => void;
+  /** Fichas Costayaco (EVT-…) para badges y exploración desde el día. */
+  costayacoRcaEvents?: RcaEventoFalla[];
+  /** Abre el detalle de bitácora + ficha EditableEventDetail (mismo flujo que la lista). */
+  onSelectEvent?: (event: EnrichedEvent) => void;
 };
 
 export function GteEventCalendarModal({
@@ -187,6 +249,8 @@ export function GteEventCalendarModal({
   onNavigateToRca,
   rcaCases: rcaCasesProp,
   onCreateRcaFromEvent,
+  costayacoRcaEvents = [],
+  onSelectEvent,
 }: Props) {
   const inline = variant === "inline";
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -209,6 +273,11 @@ export function GteEventCalendarModal({
       cause: event.cause,
       responsible: event.responsible,
     });
+  };
+
+  const openEvent = (event: EnrichedEvent) => {
+    closeDayPopup();
+    onSelectEvent?.(event);
   };
 
   const { days, leadingBlanks, summary } = useMemo(() => {
@@ -311,9 +380,11 @@ export function GteEventCalendarModal({
             <DayDetailBody
               selected={selected}
               rcaCases={rcaCases}
+              costayacoRcaEvents={costayacoRcaEvents}
               onCreateRcaFromEvent={onCreateRcaFromEvent}
               onOpenRca={openRca}
               onCreateRca={createRca}
+              onOpenEvent={onSelectEvent ? openEvent : undefined}
               canNavigateRca={Boolean(onNavigateToRca)}
             />
           </div>
@@ -333,7 +404,9 @@ export function GteEventCalendarModal({
       ))}
       {days.map((d) => {
         const active = selectedDate === d.date;
-        const dayRcaCount = d.events.reduce((n, e) => n + rcasForEvent(e, rcaCases).length, 0);
+        const dayRcaCount = d.events.reduce((n, e) => {
+          return n + formalRcasForEvent(e, rcaCases).length + costayacoRcasForEvent(e, costayacoRcaEvents).length;
+        }, 0);
         return (
           <button
             key={d.date}

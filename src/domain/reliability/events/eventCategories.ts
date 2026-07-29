@@ -162,3 +162,109 @@ export function classifyEventCategory(text: string): EventCategory {
 
   return EVENT_CATEGORIES.find((c) => c.code === "OPER_MANIOBRA")!;
 }
+
+export type EventCategoryOrigin = {
+  primary: EventCategoryCode;
+  root?: EventCategoryCode;
+};
+
+/**
+ * Clasificación de origen para bitácora GTE junio (orden: red → control → protecciones → resto).
+ */
+export function classifyGranTierraJuneByOrigin(input: {
+  cause: string;
+  notes: string;
+  date: string;
+  equipment: string;
+}): EventCategoryOrigin {
+  const text = `${input.cause || ""} ${input.notes || ""}`.toLowerCase();
+
+  if (
+    /reconectador|34\.?5\s*kv|disparo de c9|perturbaci[oó]n en la red|elevaci[oó]n del voltaje|vector\s*shift|gallinazo|perturbaci[oó]n transitoria|sobrecorriente/.test(
+      text,
+    )
+  ) {
+    return { primary: "ELEC_RED" };
+  }
+  if (/\bq\s*>|potencia inversa|sobrecarga|gobernaci[oó]n|reparto de carga/.test(text)) {
+    const isJune28Control = input.date === "2026-06-28" && /cpw0[56]/i.test(input.equipment);
+    return isJune28Control
+      ? { primary: "CTRL_GOBERNACION", root: "GAS_TRATAMIENTO" }
+      : { primary: "CTRL_GOBERNACION" };
+  }
+  if (/tablero de auxiliares|totalizador principal|protecci/.test(text)) {
+    return { primary: "ELEC_PROTECCIONES" };
+  }
+  if (/tuber[ií]a de cyc|cyc[- ]?19/.test(text)) {
+    return { primary: "INFRA_AUXILIARES" };
+  }
+  if (/magnetiz|pruebas de magnetiz/.test(text)) {
+    return { primary: "OPER_MANIOBRA" };
+  }
+  if (/mantenimiento semanal de mru|mantenimiento cyc|cambio de v[áa]lvula/.test(text)) {
+    return { primary: "MTO_PROGRAMADO" };
+  }
+  if (/mru|ngl|quincy|chiller|secuestrante/.test(text)) {
+    return { primary: "GAS_TRATAMIENTO" };
+  }
+  if (/deton/.test(text)) {
+    if (/presi[oó]n de gas|baja presi[oó]n/.test(text)) {
+      return { primary: "MEC_COMBUSTION", root: "GAS_SUMINISTRO" };
+    }
+    return { primary: "MEC_COMBUSTION" };
+  }
+  if (/intercooler|fuga de aceite|enfriamiento/.test(text)) {
+    return { primary: "MEC_ENFRIAMIENTO_LUBRICACION" };
+  }
+  if (/admisi[oó]n|escape|flexible|tren de admision/.test(text)) {
+    return { primary: "MEC_ADMISION_ESCAPE" };
+  }
+  if (/altas vivraciones|altas vibraciones/.test(text)) {
+    return { primary: "DATOS_INSUFICIENTES" };
+  }
+  if (/parada manual/.test(text)) {
+    return { primary: "OPER_MANIOBRA" };
+  }
+
+  return { primary: classifyEventCategory(text).code };
+}
+
+export function classifyReportEventCategory(input: {
+  report: "copower" | "gran_tierra";
+  month: string;
+  cause: string;
+  notes: string;
+  date: string;
+  equipment: string;
+}): EventCategoryOrigin {
+  if (input.report === "gran_tierra" && input.month === "Jun") {
+    return classifyGranTierraJuneByOrigin(input);
+  }
+  return { primary: classifyEventCategory(input.notes || input.cause || "").code };
+}
+
+export type EventCategoryCatalogRow = {
+  code: EventCategoryCode;
+  label: string;
+  shortLabel: string;
+  count: number;
+  share: number;
+};
+
+/** Catálogo completo (incluye categorías en 0) a partir de códigos ya clasificados. */
+export function buildEventCategoryCatalog(codes: EventCategoryCode[]): EventCategoryCatalogRow[] {
+  const counts = new Map<EventCategoryCode, number>();
+  for (const cat of EVENT_CATEGORIES) counts.set(cat.code, 0);
+  for (const code of codes) counts.set(code, (counts.get(code) ?? 0) + 1);
+  const total = Math.max(codes.length, 1);
+  return EVENT_CATEGORIES.map((cat) => {
+    const count = counts.get(cat.code) ?? 0;
+    return {
+      code: cat.code,
+      label: cat.label,
+      shortLabel: cat.shortLabel,
+      count,
+      share: (count / total) * 100,
+    };
+  });
+}

@@ -10,6 +10,11 @@ import {
   type EventFilters,
 } from "../events/eventLogUtils";
 import {
+  buildEventCategoryCatalog,
+  classifyReportEventCategory,
+} from "../events/eventCategories";
+import { EventCategoryCatalogTable } from "./EventCategoryCatalogTable";
+import {
   loadEventEdits,
   upsertEventEdit,
   type EventEditMap,
@@ -57,7 +62,7 @@ function typeBadgeClass(type: EnrichedEvent["eventType"]) {
 }
 
 function respBadgeClass(resp: EnrichedEvent["responsible"]) {
-  if (resp === "COPOWER") return "badge danger";
+  if (resp === "COPOWER" || resp === "GTE + COPOWER") return "badge danger";
   if (resp === "GTE") return "badge warn";
   return "badge info";
 }
@@ -130,6 +135,10 @@ function EventStatsRow({ events, label }: { events: EnrichedEvent[]; label?: str
 function relatedRcas(event: EnrichedEvent, cases: RcaCaseDetail[]): RcaCaseDetail[] {
   if (!isRcaEligibleEvent(event)) return [];
   return findRcaCasesForEvent(event.date, event.equipment, cases);
+}
+
+function relatedCostayacoRcas(event: EnrichedEvent, costayaco: RcaEventoFalla[]): RcaEventoFalla[] {
+  return findCostayacoRcasForEvent(event.date, event.equipment, costayaco, event.notes ?? "");
 }
 
 function hasFormalRca(event: EnrichedEvent, cases: RcaCaseDetail[]): boolean {
@@ -422,7 +431,7 @@ function EventDetailModal({
             ) : null}
 
             <EditableEventDetail
-              key={activeRca.id}
+              key={`${activeRca.id}-${activeRca.cronologia?.[0]?.evento?.slice(0, 48) ?? activeRca.resumen_ejecutivo?.slice(0, 40) ?? ""}`}
               event={costayacoRcaEvents.find((e) => e.id === activeRca.id) ?? activeRca}
               compact
               onSave={(next) => onCostayacoRcaChange?.(next)}
@@ -598,6 +607,7 @@ function BitacoraEditFields({
           >
             <option value="COPOWER">COPOWER</option>
             <option value="GTE">GTE</option>
+            <option value="GTE + COPOWER">GTE + COPOWER</option>
             <option value="Externo">Externo</option>
           </select>
         </div>
@@ -677,12 +687,14 @@ function EventList({
   onSelect,
   emptyMessage,
   rcaCases,
+  costayacoRcaEvents = [],
 }: {
   events: EnrichedEvent[];
   selectedId: string | null;
   onSelect: (e: EnrichedEvent) => void;
   emptyMessage: string;
   rcaCases: RcaCaseDetail[];
+  costayacoRcaEvents?: RcaEventoFalla[];
 }) {
   if (events.length === 0) {
     return <p className="empty-state">{emptyMessage}</p>;
@@ -692,6 +704,7 @@ function EventList({
     <ul className="ev-list">
       {events.map((e) => {
         const rcas = relatedRcas(e, rcaCases);
+        const costayaco = relatedCostayacoRcas(e, costayacoRcaEvents);
         return (
           <li key={e.id}>
             <button
@@ -714,6 +727,11 @@ function EventList({
                   <Clock size={12} /> {hours(e.downtimeHours)}
                 </span>
                 <span className={respBadgeClass(e.responsible)}>{e.responsible}</span>
+                {costayaco.length > 0 ? (
+                  <span className="badge info ev-rca-badge" title={costayaco.map((r) => r.id).join(" · ")}>
+                    EVT {costayaco.map((r) => shortRcaEventId(r.id)).join(" · ")}
+                  </span>
+                ) : null}
                 {rcas.length > 0 ? (
                   <span className="badge info ev-rca-badge">{rcas.map((r) => r.id).join(" · ")}</span>
                 ) : null}
@@ -732,12 +750,14 @@ function FormalRcaEventsSection({
   selectedId,
   onSelect,
   rcaCases,
+  costayacoRcaEvents,
   onNavigateToRca,
 }: {
   events: EnrichedEvent[];
   selectedId: string | null;
   onSelect: (e: EnrichedEvent) => void;
   rcaCases: RcaCaseDetail[];
+  costayacoRcaEvents: RcaEventoFalla[];
   onNavigateToRca?: (rcaId?: string) => void;
 }) {
   if (events.length === 0) return null;
@@ -765,6 +785,7 @@ function FormalRcaEventsSection({
         selectedId={selectedId}
         onSelect={onSelect}
         rcaCases={rcaCases}
+        costayacoRcaEvents={costayacoRcaEvents}
         emptyMessage="Sin eventos con RCA formal para los filtros actuales."
       />
     </section>
@@ -776,11 +797,13 @@ function BitacoraEventsSection({
   selectedId,
   onSelect,
   rcaCases,
+  costayacoRcaEvents,
 }: {
   events: EnrichedEvent[];
   selectedId: string | null;
   onSelect: (e: EnrichedEvent) => void;
   rcaCases: RcaCaseDetail[];
+  costayacoRcaEvents: RcaEventoFalla[];
 }) {
   const [typeFilter, setTypeFilter] = useState<"all" | EnrichedEvent["eventType"]>("all");
   const visible = useMemo(
@@ -819,6 +842,7 @@ function BitacoraEventsSection({
         selectedId={selectedId}
         onSelect={onSelect}
         rcaCases={rcaCases}
+        costayacoRcaEvents={costayacoRcaEvents}
         emptyMessage="Ningún evento coincide con el filtro de tipo."
       />
     </section>
@@ -831,6 +855,8 @@ function SourceColumn({
   filters,
   onNavigateToRca,
   rcaCases,
+  costayacoRcaEvents,
+  onSelectEvent,
   calendar,
 }: {
   source: ReportKey;
@@ -838,6 +864,8 @@ function SourceColumn({
   filters: EventFilters;
   onNavigateToRca?: (rcaId?: string) => void;
   rcaCases: RcaCaseDetail[];
+  costayacoRcaEvents: RcaEventoFalla[];
+  onSelectEvent?: (event: EnrichedEvent) => void;
   calendar?: {
     month: string;
     monthLabel: string;
@@ -884,6 +912,8 @@ function SourceColumn({
             onNavigateToRca={onNavigateToRca}
             rcaCases={rcaCases}
             onCreateRcaFromEvent={calendar.onCreateRcaFromEvent}
+            costayacoRcaEvents={costayacoRcaEvents}
+            onSelectEvent={onSelectEvent}
           />
         ) : null}
       </div>
@@ -970,6 +1000,28 @@ export function FailureEventsView({
   const allEvents = useMemo(() => [...cpwEvents, ...gteEvents], [cpwEvents, gteEvents]);
   const selected = selectedId ? allEvents.find((e) => e.id === selectedId) ?? null : null;
 
+  const categoryCatalog = useMemo(() => {
+    if (mode === "dual") return null;
+    const pool = mode === "gte" ? gteEvents : cpwEvents;
+    const report: ReportKey = mode === "gte" ? "gran_tierra" : "copower";
+    const codes = pool.map(
+      (e) =>
+        classifyReportEventCategory({
+          report,
+          month,
+          cause: e.cause || "",
+          notes: e.notes || "",
+          date: e.date,
+          equipment: e.equipment || "",
+        }).primary,
+    );
+    return {
+      rows: buildEventCategoryCatalog(codes),
+      total: pool.length,
+      label: mode === "gte" ? "Gran Tierra" : "COPOWER",
+    };
+  }, [mode, gteEvents, cpwEvents, month]);
+
   function handleSelect(event: EnrichedEvent) {
     setSelectedId(event.id);
   }
@@ -1005,6 +1057,15 @@ export function FailureEventsView({
         </div>
       ) : null}
 
+      {categoryCatalog ? (
+        <EventCategoryCatalogTable
+          rows={categoryCatalog.rows}
+          totalEvents={categoryCatalog.total}
+          title={`Clasificación por categoría · ${categoryCatalog.label}`}
+          subtitle={`${categoryCatalog.total} evento(s) consolidados del periodo · catálogo técnico`}
+        />
+      ) : null}
+
       <div className="ev-layout">
         <div className={`ev-columns${mode === "dual" ? " ev-columns--dual" : ""}`}>
           {showCpw ? (
@@ -1014,6 +1075,8 @@ export function FailureEventsView({
               filters={filters}
               onNavigateToRca={onNavigateToRca}
               rcaCases={rcaCases}
+              costayacoRcaEvents={costayacoRcaEvents}
+              onSelectEvent={handleSelect}
               calendar={mode === "copower" ? calendarProps : undefined}
             />
           ) : null}
@@ -1024,6 +1087,8 @@ export function FailureEventsView({
               filters={filters}
               onNavigateToRca={onNavigateToRca}
               rcaCases={rcaCases}
+              costayacoRcaEvents={costayacoRcaEvents}
+              onSelectEvent={handleSelect}
               calendar={mode === "gte" ? calendarProps : undefined}
             />
           ) : null}
@@ -1035,6 +1100,7 @@ export function FailureEventsView({
         selectedId={selectedId}
         onSelect={handleSelect}
         rcaCases={rcaCases}
+        costayacoRcaEvents={costayacoRcaEvents}
       />
 
       <FormalRcaEventsSection
@@ -1042,6 +1108,7 @@ export function FailureEventsView({
         selectedId={selectedId}
         onSelect={handleSelect}
         rcaCases={rcaCases}
+        costayacoRcaEvents={costayacoRcaEvents}
         onNavigateToRca={onNavigateToRca}
       />
 

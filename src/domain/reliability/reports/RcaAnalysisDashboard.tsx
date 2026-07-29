@@ -225,10 +225,11 @@ export function RcaAnalysisDashboard({
         <section className="panel" style={{ marginTop: "0.75rem" }}>
           <article className="card">
             <p className="eyebrow">Documentos en {RCA_FOLDER_LABEL}</p>
-            <h3>RCA PDF · Secuencial 30 · Vector Shift</h3>
-            <p className="muted" style={{ marginTop: "0.25rem" }}>
-              {RCA_DELIVERED_COUNT} RCA formales · elaboró Daniel Durán · aprobó Wilson Oliveros · vinculados a bitácora.
-            </p>
+            <h3>RCA PDF · Secuencial 30 · salida de la máquina</h3>
+          <p className="muted" style={{ marginTop: "0.25rem" }}>
+            Cobertura analítica: 7 fallas COPOWER (18,22 h) + externo 28-jun + FO-44 + MRU + PDF Sec. 30
+            (22-jun). Solo RCA-030 tiene PDF formal en {RCA_FOLDER_LABEL}.
+          </p>
             <div className="table-wrap" style={{ marginTop: "0.55rem" }}>
               <table>
                 <thead>

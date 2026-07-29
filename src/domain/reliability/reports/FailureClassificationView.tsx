@@ -19,15 +19,19 @@ import {
   type GranTierraMonthKey,
 } from "./granTierraMonthly";
 import {
-  classifyEventCategory,
-  EVENT_CATEGORIES,
+  buildEventCategoryCatalog,
+  classifyReportEventCategory,
   type EventCategoryCode,
 } from "../events/eventCategories";
+import { enrichEventLog } from "../events/eventLogUtils";
+import { EventCategoryCatalogTable } from "./EventCategoryCatalogTable";
 import type { ReportKey } from "../types";
 
 type Props = {
   month: string;
   monthLabel: string;
+  /** Por defecto dual (COPOWER + GTE). En eventos GTE se puede pasar gran_tierra. */
+  report?: ReportKey | "dual";
 };
 
 const CHART_COLORS = [
@@ -46,76 +50,35 @@ function getSnap(report: ReportKey, month: string) {
   return COPOWER_MONTHLY_DATA[month as CopowerMonthKey] ?? null;
 }
 
-/** Misma lógica de origen GTE-junio que EventInsightsDashboard. */
-function classifyGranTierraJuneByOrigin(input: {
-  cause: string;
-  notes: string;
-  date: string;
-  equipment: string;
-}): EventCategoryCode {
-  const text = `${input.cause || ""} ${input.notes || ""}`.toLowerCase();
+export function FailureClassificationView({ month, monthLabel, report = "dual" }: Props) {
+  const { rows, chartData, totalEvents, activeCats, topCat, top3Share, emptyCats, sourceLabel } = useMemo(() => {
+    const sources: ReportKey[] =
+      report === "dual" ? ["copower", "gran_tierra"] : report === "gran_tierra" ? ["gran_tierra"] : ["copower"];
 
-  if (/tablero de auxiliares|totalizador principal|protecci/.test(text)) return "ELEC_PROTECCIONES";
-  if (/reconectador|34\.?5\s*kv|disparo de c9|perturbacion en la red|elevacion del voltaje|potencia reactiva|sobrecorriente/.test(text)) {
-    return "ELEC_RED";
-  }
-  if (/tuberia de cyc|cyc 19/.test(text)) return "INFRA_AUXILIARES";
-  if (/magnetiz|pruebas de magnetiz/.test(text)) return "OPER_MANIOBRA";
-  if (/mantenimiento semanal de mru|mantenimiento cyc|cambio de v[áa]lvula/.test(text)) return "MTO_PROGRAMADO";
-  if (/mru|ngl|quincy|chiller|secuestrante/.test(text)) return "GAS_TRATAMIENTO";
-  if (/deton/.test(text)) return "MEC_COMBUSTION";
-  if (/intercooler|aceite|enfriamiento/.test(text)) return "MEC_ENFRIAMIENTO_LUBRICACION";
-  if (/admisi[oó]n|escape|flexible|tren de admision/.test(text)) return "MEC_ADMISION_ESCAPE";
-  if (/potencia inversa|sobrecarga|gobernaci[oó]n|reparto de carga/.test(text)) return "CTRL_GOBERNACION";
-  if (/altas vivraciones|altas vibraciones/.test(text)) return "DATOS_INSUFICIENTES";
-
-  return classifyEventCategory(text).code;
-}
-
-function classifyEvent(
-  report: ReportKey,
-  month: string,
-  cause: string,
-  notes: string,
-  date: string,
-  equipment: string,
-): EventCategoryCode {
-  if (report === "gran_tierra" && month === "Jun") {
-    return classifyGranTierraJuneByOrigin({ cause, notes, date, equipment });
-  }
-  return classifyEventCategory(notes || cause || "").code;
-}
-
-export function FailureClassificationView({ month, monthLabel }: Props) {
-  const { rows, chartData, totalEvents, activeCats, topCat, top3Share, emptyCats } = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const cat of EVENT_CATEGORIES) counts.set(cat.code, 0);
-
-    let total = 0;
-    for (const report of ["copower", "gran_tierra"] as const) {
-      const snap = getSnap(report, month);
+    const codes: EventCategoryCode[] = [];
+    for (const src of sources) {
+      const snap = getSnap(src, month);
       if (!snap) continue;
-      for (const e of snap.eventLog) {
-        const code = classifyEvent(report, month, e.cause || "", e.notes || "", e.date, e.equipment || "");
-        counts.set(code, (counts.get(code) ?? 0) + 1);
-        total += 1;
+      const events = enrichEventLog(snap.eventLog, src);
+      for (const e of events) {
+        codes.push(
+          classifyReportEventCategory({
+            report: src,
+            month,
+            cause: e.cause || "",
+            notes: e.notes || "",
+            date: e.date,
+            equipment: e.equipment || "",
+          }).primary,
+        );
       }
     }
 
-    const mapped = EVENT_CATEGORIES.map((cat) => {
-      const count = counts.get(cat.code) ?? 0;
-      return {
-        code: cat.code,
-        label: cat.label,
-        shortLabel: cat.shortLabel,
-        count,
-        share: total > 0 ? (count / total) * 100 : 0,
-      };
-    }).sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
-
-    const withEvents = mapped.filter((r) => r.count > 0);
+    const mapped = buildEventCategoryCatalog(codes);
+    const withEvents = [...mapped].filter((r) => r.count > 0).sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
     const top3 = withEvents.slice(0, 3);
     const top3Sum = top3.reduce((s, r) => s + r.count, 0);
+    const total = codes.length;
 
     return {
       rows: mapped,
@@ -131,8 +94,10 @@ export function FailureClassificationView({ month, monthLabel }: Props) {
       topCat: withEvents[0] ?? null,
       top3Share: total > 0 ? (top3Sum / total) * 100 : 0,
       emptyCats: mapped.length - withEvents.length,
+      sourceLabel:
+        report === "gran_tierra" ? "Gran Tierra" : report === "copower" ? "COPOWER" : "Integrado",
     };
-  }, [month]);
+  }, [month, report]);
 
   const chartHeight = Math.max(180, Math.min(320, 36 + chartData.length * 34));
 
@@ -142,10 +107,12 @@ export function FailureClassificationView({ month, monthLabel }: Props) {
         <div className="fc-header-copy">
           <div className="fc-title-row">
             <h2>Clasificación de fallas</h2>
-            <span className="source-badge dual">Integrado</span>
+            <span className={`source-badge ${report === "dual" ? "dual" : report === "gran_tierra" ? "gte" : "cpw"}`}>
+              {sourceLabel}
+            </span>
           </div>
           <p className="muted">
-            Taxonomía de causa · {monthLabel} · {totalEvents} evento(s)
+            Taxonomía de causa · {monthLabel} · {totalEvents} evento(s) consolidados
           </p>
         </div>
       </header>
@@ -187,40 +154,12 @@ export function FailureClassificationView({ month, monthLabel }: Props) {
       </section>
 
       <div className="fc-body">
-        <section className="fc-table-panel">
-          <div className="fc-panel-head">
-            <h3>Catálogo</h3>
-            <p className="muted">{rows.length} categorías</p>
-          </div>
-          <div className="fc-table-scroll">
-            <table className="fc-table">
-              <thead>
-                <tr>
-                  <th>Código</th>
-                  <th>Categoría</th>
-                  <th className="fc-col-num">N</th>
-                  <th className="fc-col-pct">%</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((cat) => (
-                  <tr key={cat.code} className={cat.count === 0 ? "fc-row--empty" : undefined}>
-                    <td>
-                      <code className="fc-code">{cat.code}</code>
-                    </td>
-                    <td>
-                      <span className="fc-cat-label" title={cat.label}>
-                        {cat.shortLabel}
-                      </span>
-                    </td>
-                    <td className="fc-col-num">{cat.count}</td>
-                    <td className="fc-col-pct">{cat.share.toFixed(1)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+        <EventCategoryCatalogTable
+          rows={rows}
+          totalEvents={totalEvents}
+          title="Catálogo"
+          subtitle={`${rows.length} categorías`}
+        />
 
         <section className="fc-chart-panel">
           <div className="fc-panel-head">
@@ -270,3 +209,4 @@ export function FailureClassificationView({ month, monthLabel }: Props) {
     </div>
   );
 }
+

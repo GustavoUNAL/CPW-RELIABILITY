@@ -118,7 +118,7 @@ export function ComparativeAnalysis({ month, monthLabel }: Props) {
     if (month !== "Jun") {
       return {
         available: false as const,
-        note: "Estimación de kWh perdidos solo documentada con horas PF oficiales de junio (PF_contr 20 h · PF_cli 189 h).",
+        note: "Estimación de kWh perdidos solo documentada con horas PF de junio (PF_contr 18,22 h · PF_cli 179,38 h).",
       };
     }
     const units = snap.generationByEquipment.filter((u) => u.campo === "COSTAYACO" && u.horasOperacion > 0);
@@ -290,7 +290,7 @@ export function ComparativeAnalysis({ month, monthLabel }: Props) {
                 </div>
               </div>
               <p className="muted">{losses.note}</p>
-              <p className="source-tag">Fuente: PDF/anexo junio (20 h / 189 h) + Excel generación</p>
+              <p className="source-tag">Fuente: bitácora consolidada junio (18,22 h PF_contr / 179,38 h PF_cli) + Excel generación</p>
             </>
           )}
         </article>
@@ -355,7 +355,7 @@ export function ComparativeAnalysis({ month, monthLabel }: Props) {
                   </tbody>
                 </table>
               </div>
-              <p className="source-tag">Referencia de fallas asociadas: {JUNE_2026_IMPUTABLE_EVENTS.length} eventos · Σ PF_contr = 20 h</p>
+              <p className="source-tag">Referencia de fallas asociadas: {JUNE_2026_IMPUTABLE_EVENTS.length} eventos · Σ PF_contr = 25 h</p>
             </>
           ) : (
             <p className="muted">Pulse «Validar consolidado» para cruzar las cifras oficiales de junio.</p>

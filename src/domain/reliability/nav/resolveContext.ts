@@ -9,6 +9,7 @@ import {
   granTierraMonthLabel,
   type GranTierraMonthKey,
 } from "../reports/granTierraMonthly";
+import type { PlanningSection } from "../reports/operationalPlanningTypes";
 
 export type ViewContext = {
   /** Fuente de datos inferida del nodo del árbol. */
@@ -374,23 +375,25 @@ export function capaFocusFromLeaf(leafId: string): string | undefined {
   }
 }
 
-/** Ancla de sección Planeación según hoja del menú. */
-export function planningFocusFromLeaf(leafId: string): string | undefined {
+/** Sección de Planeación operacional según hoja del menú. */
+export function planningSectionFromLeaf(leafId: string): PlanningSection {
   switch (leafId) {
     case "op-tablero":
-      return "op-sec-resumen";
+      return "resumen";
     case "op-riesgos":
     case "op-alertas":
-      return "op-sec-riesgos";
+      return "riesgos";
     case "op-prioridades":
-      return "op-sec-prioridades";
+      return "prioridades";
     case "op-accion":
-      return "op-sec-accion";
+      return "accion";
     case "op-cronograma":
-      return "op-sec-cronograma";
+      return "cronograma";
     case "op-compromisos":
-      return "op-sec-compromisos";
+      return "compromisos";
+    case "op-recursos":
+      return "recursos";
     default:
-      return undefined;
+      return "resumen";
   }
 }

@@ -15,6 +15,7 @@ import { type CopowerMonthKey, COPOWER_MONTHLY_DATA } from "./copowerMonthly";
 import { type GranTierraMonthKey, GRAN_TIERRA_MONTHLY_DATA } from "./granTierraMonthly";
 import { classifyEventCategory } from "../events/eventCategories";
 import {
+  GTE_JUNE_INTERVENTION_SEED,
   initialPlansFor,
   type ActionStatus,
   type ActionType,
@@ -63,17 +64,31 @@ export function InterventionPlansDashboard({ report, month, monthLabel }: Props)
     setPlans(seed);
     setSelectedId(null);
     setValidationMessage("");
-  }, [report, month]);
+  }, [report, month, GTE_JUNE_INTERVENTION_SEED]);
+
+  // Remount key forces UI to drop stale in-memory plan rows after seed updates.
+  const plansTableKey = `${report}-${month}-${GTE_JUNE_INTERVENTION_SEED}`;
 
   const candidates = useMemo(() => {
     if (!snap) return [];
+    const pfByEq = new Map(
+      (snap.generationByEquipment ?? []).map((row) => [row.equipo, Number(row.horasPFContr) || 0]),
+    );
     const downtimeByEq = snap.eventLog.reduce((acc, ev) => {
       acc.set(ev.equipment, (acc.get(ev.equipment) ?? 0) + (ev.downtimeHours ?? 0));
       return acc;
     }, new Map<string, number>());
-    const rows = snap.machineIndicators.filter((m) => m.unidad !== "SISTEMA N" && m.fallas > 0);
+    const rows = snap.machineIndicators.filter(
+      (m) => m.unidad !== "SISTEMA N" && m.fallas > 0 && !/excluida|estabilizaci/i.test(m.campo || ""),
+    );
     const maxF = Math.max(...rows.map((r) => r.fallas), 1);
-    const maxH = Math.max(...rows.map((r) => downtimeByEq.get(r.unidad) ?? 0), 1);
+    const maxH = Math.max(
+      ...rows.map((r) => {
+        const pf = pfByEq.get(r.unidad);
+        return pf != null && pf > 0 ? pf : downtimeByEq.get(r.unidad) ?? 0;
+      }),
+      1,
+    );
     const maxR = Math.max(...rows.map((r) => r.mttrHours ?? 0), 1);
     const minDisp = Math.min(
       ...rows.map((r) => (r.disponibilidadPct == null ? 100 : r.disponibilidadPct)),
@@ -83,15 +98,17 @@ export function InterventionPlansDashboard({ report, month, monthLabel }: Props)
 
     return rows
       .map((r) => {
+        const pf = pfByEq.get(r.unidad);
+        const outageHours = pf != null && pf > 0 ? pf : downtimeByEq.get(r.unidad) ?? 0;
         const fn = r.fallas / maxF;
-        const inn = (downtimeByEq.get(r.unidad) ?? 0) / maxH;
+        const inn = outageHours / maxH;
         const rn = (r.mttrHours ?? 0) / maxR;
         const dn = Math.max(
           0,
           Math.min(1, (100 - (r.disponibilidadPct == null ? 100 : r.disponibilidadPct)) / dispDen),
         );
         const iio = 0.4 * fn + 0.3 * inn + 0.2 * rn + 0.1 * dn;
-        const topCause = snap.eventLog.find((ev) => ev.equipment === r.unidad)?.cause ?? "Sin causa reportada";
+        const topCause = snap.eventLog.find((ev) => ev.equipment === r.unidad)?.cause ?? r.detalle ?? "Sin causa reportada";
         const cat = classifyEventCategory(topCause).shortLabel;
         return {
           unidad: r.unidad,
@@ -104,7 +121,7 @@ export function InterventionPlansDashboard({ report, month, monthLabel }: Props)
           mtbf: Number.parseFloat(r.mtbfLabel),
           mttr: r.mttrHours,
           fallas: r.fallas,
-          outageHours: downtimeByEq.get(r.unidad) ?? 0,
+          outageHours,
         };
       })
       .sort((a, b) => b.iio - a.iio || b.fallas - a.fallas);
@@ -292,7 +309,8 @@ export function InterventionPlansDashboard({ report, month, monthLabel }: Props)
         </div>
         {report === "gran_tierra" && month === "Jun" ? (
           <p className="muted" style={{ marginTop: "0.35rem" }}>
-            Estado al cierre de julio 2026 · Avance = acciones ejecutadas · Efectividad = verificación de que las fallas no reinciden.
+            Cobertura 1:1 con bitácora: 7 fallas COPOWER (18,22 h PF_contr) · MTTR 2,60 h · MTBF 986,71 h · 28-jun
+            externo excluido. Orden cronológico de eventos · Avance = acciones · Efectividad = no reincidencia.
           </p>
         ) : null}
 
@@ -351,7 +369,7 @@ export function InterventionPlansDashboard({ report, month, monthLabel }: Props)
           </article>
         ) : null}
 
-        <div className="table-wrap" style={{ marginTop: "0.7rem" }}>
+        <div key={plansTableKey} className="table-wrap intervention-plans-table" style={{ marginTop: "0.7rem" }}>
           <table>
             <thead>
               <tr>
@@ -367,7 +385,7 @@ export function InterventionPlansDashboard({ report, month, monthLabel }: Props)
                 <th>Fecha cierre</th>
                 <th>Avance %</th>
                 <th>Efectividad</th>
-                <th>Resultado esperado</th>
+                <th>Resultado</th>
               </tr>
             </thead>
             <tbody>

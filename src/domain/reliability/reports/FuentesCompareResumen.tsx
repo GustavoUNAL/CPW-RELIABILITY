@@ -24,6 +24,7 @@ import {
   GRAN_TIERRA_MONTH_ORDER,
   type GranTierraMonthKey,
 } from "./granTierraMonthly";
+import { JUNE_2026_IMPUTABLE_EVENTS } from "./juneImputableEvents";
 import { MetricGlossary } from "../ui/metricDefs";
 
 const COLOR_GTE = "#3d7ea6";
@@ -36,6 +37,9 @@ const kwh = (v: number | null | undefined) =>
   v == null || Number.isNaN(v) ? "N/D" : `${Math.round(v).toLocaleString("es-CO")} kWh`;
 const hours = (v: number | null | undefined) =>
   v == null || Number.isNaN(v) ? "N/D" : `${v.toLocaleString("es-CO", { maximumFractionDigits: 1 })} h`;
+
+const formatEventDate = (iso: string) =>
+  new Date(`${iso}T12:00:00`).toLocaleDateString("es-CO", { day: "2-digit", month: "short" }).replace(".", "");
 
 function kpiTone(v: number | null | undefined): "ok" | "warn" | "bad" | "na" {
   if (v == null) return "na";
@@ -117,6 +121,15 @@ export function FuentesCompareResumen({ month, monthLabel }: Props) {
   const gte = GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey] ?? null;
   const cpw = COPOWER_MONTHLY_DATA[month as CopowerMonthKey] ?? null;
   const trend = useMemo(() => buildTrend(month), [month]);
+  const imputableEvents = month === "Jun" ? JUNE_2026_IMPUTABLE_EVENTS : [];
+  const pfContrImputable = imputableEvents.reduce((s, e) => s + e.hoursPfContr, 0);
+  const sistemaN = gte?.machineIndicators.find(
+    (m) => m.unidad === "SISTEMA N" && m.campo === "COSTAYACO",
+  );
+  const gteUnitsWithFailures = useMemo(
+    () => (gte?.machineIndicators ?? []).filter((m) => m.fallas > 0 && m.unidad !== "SISTEMA N"),
+    [gte],
+  );
 
   const pctBars = useMemo(
     () => [
@@ -148,7 +161,7 @@ export function FuentesCompareResumen({ month, monthLabel }: Props) {
       },
       {
         name: "Eventos",
-        gte: gte?.eventLog.length ?? null,
+        gte: gte?.summary.totalEvents ?? gte?.eventLog.length ?? null,
         cpw: cpw?.eventLog.length ?? null,
       },
     ],
@@ -182,6 +195,11 @@ export function FuentesCompareResumen({ month, monthLabel }: Props) {
         name: "FS COPOWER",
         gte: gte?.summary.hoursFailureCopower ?? null,
         cpw: cpw?.summary.hoursFailureCopower ?? null,
+      },
+      {
+        name: "FS cliente",
+        gte: gte?.summary.hoursFailureClient ?? null,
+        cpw: cpw?.summary.hoursFailureClient ?? null,
       },
     ],
     [gte, cpw],
@@ -218,7 +236,8 @@ export function FuentesCompareResumen({ month, monthLabel }: Props) {
           <p className="eyebrow">Confiabilidad · Resumen</p>
           <h2>Comparativo Gran Tierra vs COPOWER</h2>
           <p className="muted">
-            Indicadores del periodo · {monthLabel} · GTE (contractual) y COPOWER (operación diaria)
+            Indicadores del periodo · {monthLabel} · GTE (bitácora contractual / SISTEMA N) vs COPOWER
+            (reporte diario Resumen OP)
           </p>
         </div>
         <div className="dash-source-badges">
@@ -274,7 +293,158 @@ export function FuentesCompareResumen({ month, monthLabel }: Props) {
           gteValue={hours(gte?.summary.hoursFailureCopower)}
           cpwValue={hours(cpw?.summary.hoursFailureCopower)}
         />
+        <DualCard
+          label="FS cliente"
+          gteValue={hours(gte?.summary.hoursFailureClient)}
+          cpwValue={hours(cpw?.summary.hoursFailureClient)}
+        />
+        <DualCard
+          label="Eventos bitácora"
+          gteValue={gte ? String(gte.summary.totalEvents ?? gte.eventLog.length) : "N/D"}
+          cpwValue={cpw ? String(cpw.eventLog.length) : "N/D"}
+        />
       </section>
+
+      {gte && month === "Jun" && imputableEvents.length > 0 ? (
+        <section className="panel fuentes-gte-anchor">
+          <article className="card">
+            <p className="eyebrow">Gran Tierra · Bitácora junio 2026</p>
+            <h3>SISTEMA N Costayaco — referencia contractual</h3>
+            <div className="exec-kpi-row">
+              <div className="exec-kpi">
+                <span>Disponibilidad</span>
+                <strong>{sistemaN?.disponibilidadPct != null ? `${sistemaN.disponibilidadPct}%` : pct(gte.kpi.availability)}</strong>
+                <small>Meta contractual ≥ 98%</small>
+              </div>
+              <div className="exec-kpi">
+                <span>Fallas COPOWER</span>
+                <strong>{gte.summary.copowerFailures}</strong>
+                <small>Σ PF_contr {hours(gte.summary.hoursFailureCopower)}</small>
+              </div>
+              <div className="exec-kpi">
+                <span>MTBF / MTTR</span>
+                <strong>{hours(gte.summary.mtbfHours)}</strong>
+                <small>MTTR {hours(gte.summary.mttrHours)}</small>
+              </div>
+              <div className="exec-kpi">
+                <span>PF cliente</span>
+                <strong>{hours(gte.summary.hoursFailureClient)}</strong>
+                <small>{gte.summary.totalEvents ?? gte.eventLog.length} eventos en bitácora</small>
+              </div>
+            </div>
+            <p className="muted" style={{ marginTop: "0.5rem" }}>
+              {imputableEvents.length} fallas imputables a COPOWER (Σ PF_contr{" "}
+              {hours(pfContrImputable)}). El evento externo del 28-jun (FS 0,38 h) no se imputa a
+              COPOWER. El reporte diario CPW cuenta eventos operativos con criterio distinto (
+              {cpw?.summary.copowerFailures ?? "N/D"} fallas · FS{" "}
+              {hours(cpw?.summary.hoursFailureCopower)}).
+            </p>
+          </article>
+        </section>
+      ) : null}
+
+      {gte && month === "Jun" && imputableEvents.length > 0 ? (
+        <section className="panel">
+          <article className="card">
+            <p className="eyebrow">Bitácora GTE · fallas imputables</p>
+            <h3>7 eventos COPOWER — junio 2026</h3>
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Equipo</th>
+                    <th>PF_contr</th>
+                    <th>Observación</th>
+                    <th>Fuente</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {imputableEvents.map((ev) => (
+                    <tr key={ev.id}>
+                      <td>{formatEventDate(ev.date)}</td>
+                      <td>
+                        <strong>{ev.equipment}</strong>
+                      </td>
+                      <td>{hours(ev.hoursPfContr)}</td>
+                      <td>{ev.observation}</td>
+                      <td>
+                        <small className="muted">{ev.source}</small>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colSpan={2}>
+                      <strong>Total imputable</strong>
+                    </td>
+                    <td>
+                      <strong>{hours(pfContrImputable)}</strong>
+                    </td>
+                    <td colSpan={2}>
+                      <small className="muted">
+                        Alineado a Eventos de falla → Gran Tierra ({monthLabel})
+                      </small>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </article>
+        </section>
+      ) : null}
+
+      {gte && gteUnitsWithFailures.length > 0 ? (
+        <section className="panel">
+          <article className="card">
+            <p className="eyebrow">Gran Tierra · unidades con fallas</p>
+            <h3>Desglose por equipo — {monthLabel}</h3>
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Unidad</th>
+                    <th>Campo</th>
+                    <th>Fallas</th>
+                    <th>MTTR</th>
+                    <th>Cumple</th>
+                    <th>Detalle</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {gteUnitsWithFailures.map((u) => (
+                    <tr key={`${u.unidad}-${u.campo}`}>
+                      <td>
+                        <strong>{u.unidad}</strong>
+                      </td>
+                      <td>{u.campo}</td>
+                      <td>{u.fallas}</td>
+                      <td>{u.mttrHours != null ? hours(u.mttrHours) : "N/D"}</td>
+                      <td>
+                        <span
+                          className={`badge ${
+                            u.cumplimiento === "CUMPLE"
+                              ? "success"
+                              : u.cumplimiento === "NO CUMPLE"
+                                ? "danger"
+                                : "info"
+                          }`}
+                        >
+                          {u.cumplimiento}
+                        </span>
+                      </td>
+                      <td>
+                        <small className="muted">{u.detalle}</small>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+      ) : null}
 
       <MetricGlossary />
       <p className="metric-glossary fuentes-compare-legend" role="note">
@@ -365,7 +535,7 @@ export function FuentesCompareResumen({ month, monthLabel }: Props) {
 
         <article className="dash-chart-panel">
           <h4>Horas por estado</h4>
-          <p className="muted dash-chart-sub">OP · Stand-by · MTO · FS COPOWER</p>
+          <p className="muted dash-chart-sub">OP · Stand-by · MTO · FS COPOWER · FS cliente</p>
           <div className="dash-chart" style={{ height: 260 }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={hoursBars} margin={{ top: 8, right: 8, left: 0, bottom: 4 }}>

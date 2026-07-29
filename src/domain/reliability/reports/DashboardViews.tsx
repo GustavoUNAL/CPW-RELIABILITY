@@ -1036,7 +1036,7 @@ export function DashboardMantenimiento({ month, monthLabel }: MonthProps) {
     .sort((a, b) => b.fallas - a.fallas || (b.mttrHours ?? 0) - (a.mttrHours ?? 0));
 
   const maintEvents = cpw.eventLog
-    .filter((e) => e.eventType !== "Falla" || e.responsible === "COPOWER")
+    .filter((e) => e.eventType !== "Falla" || e.responsible === "COPOWER" || e.responsible === "GTE + COPOWER")
     .slice(0, 8);
 
   return (

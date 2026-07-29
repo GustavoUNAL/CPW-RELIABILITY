@@ -36,8 +36,8 @@ export const EXEC_JUN = {
   availability: 0.9792,
   reliability: 0.9792,
   failures: 7,
-  mtbfHours: 711.57,
-  mttrHours: 2.86,
+  mtbfHours: 986.71,
+  mttrHours: 2.6,
   vonuAvailability: 1,
   vonuReliability: 1,
   generationTotalKwh: 4_110_144,
@@ -47,14 +47,14 @@ export const EXEC_JUN = {
   hoursOperated: 6907,
   hoursStandby: 3128,
   hoursPp: 28,
-  hoursPfContr: 20,
-  hoursPfCli: 189,
-  /** Casos RCA formales con PDF en data/RCA (1 caso · 2 revisiones del 22-jun Vector Shift). */
+  hoursPfContr: 18.22,
+  hoursPfCli: 179.38,
+  /** Casos RCA formales con PDF en data/RCA (1 caso · 2 revisiones del 22-jun salida de la máquina). */
   rcaDelivered: 1,
   rcaRequired: 7,
   excelFailureRows: 10,
   focalUnit: "CPW06",
-  focalUnitFailures: 3,
+  focalUnitFailures: 2,
 } as const;
 
 export type ExecUnitRow = {
@@ -71,13 +71,13 @@ export type ExecUnitRow = {
 
 /** Unidades del consolidado (sin JIN-11/12). */
 export const EXEC_JUN_UNITS: ExecUnitRow[] = [
-  { unidad: "CPW01", campo: "COSTAYACO", disponibilidadPct: 99.72, confiabilidadPct: 99.72, fallas: 1, mtbfLabel: "572", mttrHours: 2, riesgoTecnico: "RIESGO BAJO" },
+  { unidad: "CPW01", campo: "COSTAYACO", disponibilidadPct: 99.72, confiabilidadPct: 99.72, fallas: 2, mtbfLabel: "286", mttrHours: 2.5, riesgoTecnico: "RIESGO BAJO" },
   { unidad: "CPW02", campo: "COSTAYACO", disponibilidadPct: 100, confiabilidadPct: 100, fallas: 0, mtbfLabel: "Sin Fallas", mttrHours: 0, riesgoTecnico: "RIESGO BAJO" },
-  { unidad: "CPW03", campo: "COSTAYACO", disponibilidadPct: 98.75, confiabilidadPct: 99.31, fallas: 1, mtbfLabel: "607", mttrHours: 5, riesgoTecnico: "RIESGO BAJO" },
-  { unidad: "CPW04", campo: "COSTAYACO", disponibilidadPct: 100, confiabilidadPct: 100, fallas: 0, mtbfLabel: "Sin Fallas", mttrHours: 0, riesgoTecnico: "RIESGO BAJO" },
-  { unidad: "CPW05", campo: "COSTAYACO", disponibilidadPct: 98.89, confiabilidadPct: 99.86, fallas: 1, mtbfLabel: "699", mttrHours: 1, riesgoTecnico: "RIESGO BAJO" },
-  { unidad: "CPW06", campo: "COSTAYACO", disponibilidadPct: 99.03, confiabilidadPct: 99.03, fallas: 3, mtbfLabel: "222.33", mttrHours: 2, riesgoTecnico: "RIESGO MEDIO", highlight: true },
-  { unidad: "CPW07", campo: "COSTAYACO", disponibilidadPct: 99.31, confiabilidadPct: 99.31, fallas: 1, mtbfLabel: "605", mttrHours: 5, riesgoTecnico: "RIESGO BAJO" },
+  { unidad: "CPW03", campo: "COSTAYACO", disponibilidadPct: 98.75, confiabilidadPct: 99.31, fallas: 1, mtbfLabel: "607", mttrHours: 3.92, riesgoTecnico: "RIESGO BAJO" },
+  { unidad: "CPW04", campo: "COSTAYACO", disponibilidadPct: 100, confiabilidadPct: 100, fallas: 1, mtbfLabel: "708", mttrHours: 1, riesgoTecnico: "RIESGO BAJO" },
+  { unidad: "CPW05", campo: "COSTAYACO", disponibilidadPct: 98.89, confiabilidadPct: 99.86, fallas: 1, mtbfLabel: "699", mttrHours: 2, riesgoTecnico: "RIESGO BAJO" },
+  { unidad: "CPW06", campo: "COSTAYACO", disponibilidadPct: 99.03, confiabilidadPct: 99.03, fallas: 2, mtbfLabel: "333.5", mttrHours: 3.15, riesgoTecnico: "RIESGO MEDIO", highlight: true },
+  { unidad: "CPW07", campo: "COSTAYACO", disponibilidadPct: 99.31, confiabilidadPct: 99.31, fallas: 0, mtbfLabel: "Sin Fallas", mttrHours: 0, riesgoTecnico: "RIESGO BAJO" },
   { unidad: "JIN-10", campo: "COSTAYACO", disponibilidadPct: 99.44, confiabilidadPct: 100, fallas: 0, mtbfLabel: "Sin Fallas", mttrHours: 0, riesgoTecnico: "RIESGO BAJO" },
   { unidad: "G101V", campo: "COSTAYACO", disponibilidadPct: 100, confiabilidadPct: 100, fallas: 0, mtbfLabel: "Sin Fallas", mttrHours: 0, riesgoTecnico: "RIESGO BAJO" },
   { unidad: "G102J", campo: "COSTAYACO", disponibilidadPct: 100, confiabilidadPct: 100, fallas: 0, mtbfLabel: "Sin Fallas", mttrHours: 0, riesgoTecnico: "RIESGO BAJO" },

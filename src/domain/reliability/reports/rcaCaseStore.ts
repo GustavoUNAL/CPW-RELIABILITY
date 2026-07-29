@@ -1,6 +1,11 @@
-import { buildGteJuneRcaCases, type RcaCaseDetail } from "./gteJuneRcaCases";
+import {
+  buildGteJuneRcaCases,
+  GTE_JUNE_RCA_SEED,
+  type RcaCaseDetail,
+} from "./gteJuneRcaCases";
 
-const STORAGE_KEY = "cpw-rca-cases-v3";
+const STORAGE_KEY = "cpw-rca-cases-v4";
+const SEED_KEY = "cpw-rca-cases-seed";
 
 export type RcaEventDraft = {
   date: string;
@@ -12,6 +17,12 @@ export type RcaEventDraft = {
 export function loadRcaCases(): RcaCaseDetail[] {
   const seed = buildGteJuneRcaCases();
   try {
+    const storedSeed = localStorage.getItem(SEED_KEY);
+    if (storedSeed !== GTE_JUNE_RCA_SEED) {
+      localStorage.setItem(SEED_KEY, GTE_JUNE_RCA_SEED);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(seed));
+      return seed;
+    }
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return seed;
     const stored = JSON.parse(raw) as RcaCaseDetail[];
@@ -19,13 +30,9 @@ export function loadRcaCases(): RcaCaseDetail[] {
     const byId = new Map(seed.map((c) => [c.id, c]));
     for (const c of stored) {
       if (!c?.id) continue;
-      const base = byId.get(c.id);
-      // Conserva PDF del seed si el guardado local no trae adjuntos.
-      byId.set(c.id, {
-        ...base,
-        ...c,
-        pdfUrls: c.pdfUrls?.length ? c.pdfUrls : base?.pdfUrls,
-      });
+      // Casos del seed canónico: preferir seed (corrige IDs/fechas/planes).
+      if (byId.has(c.id)) continue;
+      byId.set(c.id, c);
     }
     return [...byId.values()].sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
   } catch {
@@ -57,7 +64,8 @@ export function createRcaDraftFromEvent(input: RcaEventDraft & { existing: RcaCa
     .split(/[,;/|]+/)
     .map((s) => s.trim())
     .filter(Boolean);
-  const company = input.responsible === "GTE" || input.responsible === "Externo" ? "GTE" : "COPOWER";
+  const company =
+    input.responsible === "GTE" || input.responsible === "Externo" ? "GTE" : "COPOWER";
 
   return {
     id,

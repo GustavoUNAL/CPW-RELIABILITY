@@ -1518,7 +1518,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "date": "2026-03-27",
         "equipment": "CPW04",
         "eventType": "Falla",
-        "cause": "sd parcial de campo por apertura de RL, salida por vector shift. Determinar si este tipo de falla es atribuible a GTE o CPW, no debería protegerse!",
+        "cause": "sd parcial de campo por apertura de RL, salida por salida de la máquina. Determinar si este tipo de falla es atribuible a GTE o CPW, no debería protegerse!",
         "downtimeHours": 2.0,
         "responsible": "COPOWER",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 2.0 h | PF_cli 0.0 h | Falla_evento 1"
@@ -1527,7 +1527,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "date": "2026-03-27",
         "equipment": "CPW05",
         "eventType": "Falla",
-        "cause": "sd parcial de campo por apertura de RL, salida por vector shift. Determinar si este tipo de falla es atribuible a GTE o CPW, no debería protegerse!",
+        "cause": "sd parcial de campo por apertura de RL, salida por salida de la máquina. Determinar si este tipo de falla es atribuible a GTE o CPW, no debería protegerse!",
         "downtimeHours": 3.0,
         "responsible": "COPOWER",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 3.0 h | PF_cli 0.0 h | Falla_evento 1"
@@ -2875,17 +2875,17 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
     "sourceFile": "data/GTE/Junio/Data Soporte Cálculo Copower PUTN Junio 2026 (1).xlsx",
     "summary": {
       "copowerFailures": 7,
-      "totalEvents": 38,
-      "mtbfHours": 711.57,
-      "mttrHours": 2.86,
+      "totalEvents": 42,
+      "mtbfHours": 986.71,
+      "mttrHours": 2.6,
       "actionsOverdue": null,
       "rcaPending": null,
       "hoursOperated": 6907.0,
       "hoursStandby": 3128.0,
       "hoursPreventive": 28.0,
       "hoursCorrective": 20.0,
-      "hoursFailureCopower": 20.0,
-      "hoursFailureClient": 189.0,
+      "hoursFailureCopower": 18.22,
+      "hoursFailureClient": 179.38,
       "energyGasKwh": 3499840.246,
       "energyDieselKwh": 119716
     },
@@ -2909,8 +2909,8 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "horasOperacion": 572.0,
         "horasStandBy": 60.0,
         "horasPP": 0.0,
-        "horasPFContr": 2.0,
-        "horasPFCli": 86.0,
+        "horasPFContr": 5.0,
+        "horasPFCli": 83.0,
         "horasCalDia": 720.0,
         "fallaEvento": 2
       },
@@ -2933,7 +2933,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "horasOperacion": 607.0,
         "horasStandBy": 83.0,
         "horasPP": 4.0,
-        "horasPFContr": 5.0,
+        "horasPFContr": 3.92,
         "horasPFCli": 21.0,
         "horasCalDia": 672.0,
         "fallaEvento": 1
@@ -2945,8 +2945,8 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "horasOperacion": 708.0,
         "horasStandBy": 7.0,
         "horasPP": 0.0,
-        "horasPFContr": 0.0,
-        "horasPFCli": 5.0,
+        "horasPFContr": 1.0,
+        "horasPFCli": 4.0,
         "horasCalDia": 672.0,
         "fallaEvento": 1
       },
@@ -2957,10 +2957,10 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "horasOperacion": 699.0,
         "horasStandBy": 8.0,
         "horasPP": 7.0,
-        "horasPFContr": 1.0,
-        "horasPFCli": 5.0,
+        "horasPFContr": 2.0,
+        "horasPFCli": 3.0,
         "horasCalDia": 672.0,
-        "fallaEvento": 2
+        "fallaEvento": 1
       },
       {
         "equipo": "CPW06",
@@ -2969,10 +2969,10 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "horasOperacion": 667.0,
         "horasStandBy": 45.0,
         "horasPP": 0.0,
-        "horasPFContr": 7.0,
+        "horasPFContr": 6.3,
         "horasPFCli": 1.0,
         "horasCalDia": 720.0,
-        "fallaEvento": 3
+        "fallaEvento": 2
       },
       {
         "equipo": "CPW07",
@@ -2981,10 +2981,10 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "horasOperacion": 605.0,
         "horasStandBy": 90.0,
         "horasPP": 0.0,
-        "horasPFContr": 5.0,
+        "horasPFContr": 0.0,
         "horasPFCli": 20.0,
         "horasCalDia": 672.0,
-        "fallaEvento": 1
+        "fallaEvento": 0
       },
       {
         "equipo": "G101V",
@@ -3091,12 +3091,12 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "horasStandBy": 146,
         "disponibilidadPct": 99.72,
         "confiabilidadPct": 99.72,
-        "fallas": 1,
-        "mtbfLabel": "572.00",
-        "mttrHours": 2,
+        "fallas": 2,
+        "mtbfLabel": "286.00",
+        "mttrHours": 2.5,
         "riesgoTecnico": "RIESGO BAJO",
         "cumplimiento": "CUMPLE",
-        "detalle": "Tuvo 2 salidas en el Excel; 1 fue imputada al cliente (6/07) y no cuenta"
+        "detalle": "2 fallas COPOWER: fuga junta de escape (6/05) y detonación por relé K4 (6/07), 5 h PF_contr"
       },
       {
         "unidad": "CPW02",
@@ -3119,10 +3119,10 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "confiabilidadPct": 99.31,
         "fallas": 1,
         "mtbfLabel": "607.00",
-        "mttrHours": 5,
+        "mttrHours": 3.92,
         "riesgoTecnico": "RIESGO BAJO",
         "cumplimiento": "CUMPLE",
-        "detalle": "Evento único, mayor MTTR del grupo de un evento"
+        "detalle": "Evento único (6/11): perturbación transitoria; FS≈3,92 h (15:12→19:25); ≈2.620 kWh estimados. Causa raíz no determinada"
       },
       {
         "unidad": "CPW04",
@@ -3130,12 +3130,12 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "horasStandBy": 12,
         "disponibilidadPct": 100,
         "confiabilidadPct": 100,
-        "fallas": 0,
-        "mtbfLabel": "Sin Fallas",
-        "mttrHours": 0,
+        "fallas": 1,
+        "mtbfLabel": "708.00",
+        "mttrHours": 1,
         "riesgoTecnico": "RIESGO BAJO",
         "cumplimiento": "CUMPLE",
-        "detalle": "Tuvo 1 salida en el Excel (6/23) pero fue imputada al cliente, no cuenta"
+        "detalle": "Familia 23–24/jun: iniciador EEP externo + descoordinación RL/480 V interna; 4 disparos. Efectividad del reajuste pendiente"
       },
       {
         "unidad": "CPW05",
@@ -3145,10 +3145,10 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "confiabilidadPct": 99.86,
         "fallas": 1,
         "mtbfLabel": "699.00",
-        "mttrHours": 1,
+        "mttrHours": 2,
         "riesgoTecnico": "RIESGO BAJO",
         "cumplimiento": "CUMPLE",
-        "detalle": "Tuvo 2 salidas en el Excel; 1 fue imputada al cliente (6/23) y no cuenta"
+        "detalle": "1 falla COPOWER: cascada EEP + descoordinación RL/480 V (23–24/jun). El evento 6/28 fue externo a los grupos"
       },
       {
         "unidad": "CPW06",
@@ -3156,12 +3156,12 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "horasStandBy": 46,
         "disponibilidadPct": 99.03,
         "confiabilidadPct": 99.03,
-        "fallas": 3,
-        "mtbfLabel": "222.33",
-        "mttrHours": 2,
+        "fallas": 2,
+        "mtbfLabel": "333.50",
+        "mttrHours": 3.15,
         "riesgoTecnico": "RIESGO MEDIO",
         "cumplimiento": "CUMPLE",
-        "detalle": "Activo dominante del mes: 3 fallas asociadas a COPOWER (6/03, 6/27, 6/28), todas contractuales"
+        "detalle": "2 fallas COPOWER: intercooler/secuestrante (6/03, 4 h) y protección Q> 6/27 (EVT-2026-06-27-CPW06; FS≈2,30 h; ≈2.420 kWh). El 6/28 fue externo"
       },
       {
         "unidad": "CPW07",
@@ -3169,12 +3169,12 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "horasStandBy": 110,
         "disponibilidadPct": 99.31,
         "confiabilidadPct": 99.31,
-        "fallas": 1,
-        "mtbfLabel": "605.00",
-        "mttrHours": 5,
+        "fallas": 0,
+        "mtbfLabel": "Sin Fallas",
+        "mttrHours": 0,
         "riesgoTecnico": "RIESGO BAJO",
         "cumplimiento": "CUMPLE",
-        "detalle": "Evento del 6/27, mismo incidente de red que afectó a CPW06"
+        "detalle": "Salida 6/27 consolidada en EVT-2026-06-27-CPW06 (protección Q>); no se cuenta como falla separada"
       },
       {
         "unidad": "JIN-10",
@@ -3287,11 +3287,11 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "disponibilidadPct": 97.92,
         "confiabilidadPct": 97.92,
         "fallas": 7,
-        "mtbfLabel": "711.57",
-        "mttrHours": 2.86,
+        "mtbfLabel": "986.71",
+        "mttrHours": 2.6,
         "riesgoTecnico": "RIESGO MEDIO",
         "cumplimiento": "NO CUMPLE",
-        "detalle": "Mejora vs. mayo (+5.04pp Disp., +3.87pp Conf.), mismos 7 eventos que mayo pero menor severidad · Cumplimiento vs ≥98% contractual"
+        "detalle": "7 fallas COPOWER (18,22 h PF_contr). 28-jun externo FS=0,38 h no imputable · Cumplimiento vs ≥98% contractual"
       },
       {
         "unidad": "SISTEMA N",
@@ -3312,7 +3312,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "date": "2026-06-22",
         "equipment": "CPW01",
         "eventType": "Causa comun",
-        "cause": "03:49 Shutdown general Costayaco por Vector Shift — falla reconectador EEP 34.5 kV circuito Puerto Limón. Protecciones I>> etapa 2; origen externo red EEP. RCA formal Sec. 30.",
+        "cause": "03:49 Shutdown general Costayaco por salida de la máquina — falla reconectador EEP 34.5 kV circuito Puerto Limón. Protecciones I>> etapa 2; origen externo red EEP. RCA formal Sec. 30.",
         "downtimeHours": 0,
         "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 0.0 h | Falla_evento 0 | RCA-030 | EVT-2026-06-22-GENERAL"
@@ -3321,7 +3321,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "date": "2026-06-22",
         "equipment": "CPW02",
         "eventType": "Causa comun",
-        "cause": "03:49 Shutdown general Costayaco por Vector Shift — falla reconectador EEP 34.5 kV circuito Puerto Limón. Protecciones I>> etapa 2; origen externo red EEP. RCA formal Sec. 30.",
+        "cause": "03:49 Shutdown general Costayaco por salida de la máquina — falla reconectador EEP 34.5 kV circuito Puerto Limón. Protecciones I>> etapa 2; origen externo red EEP. RCA formal Sec. 30.",
         "downtimeHours": 0,
         "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 0.0 h | Falla_evento 0 | RCA-030 | EVT-2026-06-22-GENERAL"
@@ -3330,7 +3330,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "date": "2026-06-22",
         "equipment": "CPW03",
         "eventType": "Causa comun",
-        "cause": "03:49 Shutdown general Costayaco por Vector Shift — falla reconectador EEP 34.5 kV circuito Puerto Limón. Protecciones I>> etapa 2; origen externo red EEP. RCA formal Sec. 30.",
+        "cause": "03:49 Shutdown general Costayaco por salida de la máquina — falla reconectador EEP 34.5 kV circuito Puerto Limón. Protecciones I>> etapa 2; origen externo red EEP. RCA formal Sec. 30.",
         "downtimeHours": 0,
         "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 0.0 h | Falla_evento 0 | RCA-030 | EVT-2026-06-22-GENERAL"
@@ -3339,7 +3339,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "date": "2026-06-22",
         "equipment": "CPW04",
         "eventType": "Causa comun",
-        "cause": "03:49 Shutdown general Costayaco por Vector Shift — falla reconectador EEP 34.5 kV circuito Puerto Limón. Origen externo red EEP. RCA formal Sec. 30.",
+        "cause": "03:49 Shutdown general Costayaco por salida de la máquina — falla reconectador EEP 34.5 kV circuito Puerto Limón. Origen externo red EEP. RCA formal Sec. 30.",
         "downtimeHours": 0,
         "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 0.0 h | Falla_evento 0 | RCA-030 | EVT-2026-06-22-GENERAL"
@@ -3348,7 +3348,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "date": "2026-06-22",
         "equipment": "CPW05",
         "eventType": "Causa comun",
-        "cause": "03:49 Shutdown general Costayaco por Vector Shift — falla reconectador EEP 34.5 kV circuito Puerto Limón. Origen externo red EEP. RCA formal Sec. 30.",
+        "cause": "03:49 Shutdown general Costayaco por salida de la máquina — falla reconectador EEP 34.5 kV circuito Puerto Limón. Origen externo red EEP. RCA formal Sec. 30.",
         "downtimeHours": 0,
         "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 0.0 h | Falla_evento 0 | RCA-030 | EVT-2026-06-22-GENERAL"
@@ -3357,7 +3357,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "date": "2026-06-22",
         "equipment": "CPW06",
         "eventType": "Causa comun",
-        "cause": "03:49 Shutdown general Costayaco por Vector Shift — falla reconectador EEP 34.5 kV. MAINS FAILURE / DAVR Trip. Origen externo red EEP. RCA formal Sec. 30.",
+        "cause": "03:49 Shutdown general Costayaco por salida de la máquina — falla reconectador EEP 34.5 kV. MAINS FAILURE / DAVR Trip. Origen externo red EEP. RCA formal Sec. 30.",
         "downtimeHours": 0,
         "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 0.0 h | Falla_evento 0 | RCA-030 | EVT-2026-06-22-GENERAL"
@@ -3366,7 +3366,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "date": "2026-06-22",
         "equipment": "CPW07",
         "eventType": "Causa comun",
-        "cause": "03:49 Shutdown general Costayaco por Vector Shift — falla reconectador EEP 34.5 kV circuito Puerto Limón. Origen externo red EEP. RCA formal Sec. 30.",
+        "cause": "03:49 Shutdown general Costayaco por salida de la máquina — falla reconectador EEP 34.5 kV circuito Puerto Limón. Origen externo red EEP. RCA formal Sec. 30.",
         "downtimeHours": 0,
         "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 0.0 h | Falla_evento 0 | RCA-030 | EVT-2026-06-22-GENERAL"
@@ -3375,7 +3375,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "date": "2026-06-22",
         "equipment": "CPW12",
         "eventType": "Causa comun",
-        "cause": "03:49 Shutdown general Costayaco por Vector Shift — falla reconectador EEP 34.5 kV circuito Puerto Limón. Origen externo red EEP. RCA formal Sec. 30.",
+        "cause": "03:49 Shutdown general Costayaco por salida de la máquina — falla reconectador EEP 34.5 kV circuito Puerto Limón. Origen externo red EEP. RCA formal Sec. 30.",
         "downtimeHours": 0,
         "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 0.0 h | Falla_evento 0 | RCA-030 | EVT-2026-06-22-GENERAL"
@@ -3384,7 +3384,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "date": "2026-06-22",
         "equipment": "JIN-01",
         "eventType": "Causa comun",
-        "cause": "03:49 Shutdown general Costayaco por Vector Shift — falla reconectador EEP 34.5 kV circuito Puerto Limón. Origen externo red EEP. RCA formal Sec. 30.",
+        "cause": "03:49 Shutdown general Costayaco por salida de la máquina — falla reconectador EEP 34.5 kV circuito Puerto Limón. Origen externo red EEP. RCA formal Sec. 30.",
         "downtimeHours": 0,
         "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 0.0 h | Falla_evento 0 | RCA-030 | EVT-2026-06-22-GENERAL"
@@ -3393,82 +3393,28 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "date": "2026-06-22",
         "equipment": "JIN-02",
         "eventType": "Causa comun",
-        "cause": "03:49 Shutdown general Costayaco por Vector Shift — falla reconectador EEP 34.5 kV circuito Puerto Limón. Origen externo red EEP. RCA formal Sec. 30.",
+        "cause": "03:49 Shutdown general Costayaco por salida de la máquina — falla reconectador EEP 34.5 kV circuito Puerto Limón. Origen externo red EEP. RCA formal Sec. 30.",
         "downtimeHours": 0,
         "responsible": "GTE",
         "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 0.0 h | Falla_evento 0 | RCA-030 | EVT-2026-06-22-GENERAL"
       },
       {
         "date": "2026-06-28",
-        "equipment": "CPW01",
-        "eventType": "Operativo",
-        "cause": "7:14hr sale de linea equipo cpw01 por salida MRU. 8:28 hr ingresa a linea modo reparto de carga",
-        "downtimeHours": 1.0,
-        "responsible": "GTE",
-        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 1.0 h | Falla_evento 0"
-      },
-      {
-        "date": "2026-06-28",
-        "equipment": "CPW02",
-        "eventType": "Operativo",
-        "cause": "7:14hr sale de linea equipo cpw02 por salida MRU. 8:26 hr ingresa a linea modo reparto de carga",
-        "downtimeHours": 1.0,
-        "responsible": "GTE",
-        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 1.0 h | Falla_evento 0"
-      },
-      {
-        "date": "2026-06-28",
-        "equipment": "CPW03",
-        "eventType": "Operativo",
-        "cause": "7:14hr sale de linea equipo cpw03 por salida MRU. 8:23 hr ingresa a linea modo reparto de carga",
-        "downtimeHours": 1.0,
-        "responsible": "GTE",
-        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 1.0 h | Falla_evento 0"
-      },
-      {
-        "date": "2026-06-28",
-        "equipment": "CPW05",
+        "equipment": "CPW01 / CPW02 / CPW03 / CPW05 / CPW06 / CPW07",
         "eventType": "Falla",
-        "cause": "7:33 hr sale de línea CPW05 por parada manual: entra en potencia inversa y falla en la gobernación. 8:09 hr ingresa a línea en reparto de carga. (SUPUESTO) Misma familia de gobernación / pérdida de referencia de red.",
-        "downtimeHours": 1.0,
-        "responsible": "COPOWER",
-        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 1.0 h | PF_cli 0.0 h | Falla_evento 1 | EVT-2026-06-28-GOB"
-      },
-      {
-        "date": "2026-06-28",
-        "equipment": "CPW06",
-        "eventType": "Falla",
-        "cause": "7:31hr sale de linea equipo cpw06  sale de linea por sobrecarga.  7:46 hr ingresa a linea modo reparto de carga",
-        "downtimeHours": 1.0,
-        "responsible": "COPOWER",
-        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 1.0 h | PF_cli 0.0 h | Falla_evento 1"
-      },
-      {
-        "date": "2026-06-28",
-        "equipment": "CPW07",
-        "eventType": "Operativo",
-        "cause": "7:14hr sale de linea equipo cpw07 por salida MRU. 8:20 hr ingresa a linea modo reparto de carga",
-        "downtimeHours": 1.0,
-        "responsible": "GTE",
-        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 1.0 h | Falla_evento 0"
+        "cause": "Perturbación externa 34,5 kV (gallinazo) → salida de la máquina → pérdida MRU+Chiller y salida de unidades; sobrecarga CPW-06 y parada manual CPW-05. Sin fallas propias. FS=0,38 h (07:10–07:33); ≈1.730 kWh estimados. Normalización completa posterior (hora no registrada).",
+        "downtimeHours": 0.38,
+        "responsible": "Externo",
+        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 0.38 h | Falla_evento 1 | EVT-2026-06-28-RED34KV-A | FO-GE-033 · externo · FS=0,38 h (23 min contingencia) · ≈1.730 kWh (4.520 kW×0,383 h) · sin estimar normalización completa"
       },
       {
         "date": "2026-06-27",
         "equipment": "CPW06",
         "eventType": "Falla",
-        "cause": "FDL equipos G56 & 57,  se presenta perturbacion en la red generando elevacion del voltaje y potencia reactiva de los generadores CPW06 & 07, los cuales salen de linea, el voltaje l",
-        "downtimeHours": 2.0,
+        "cause": "Salida CPW-06 por protección Q> tras salida MRU. FO sin horas oficiales; FS≈2,30 h (03:17–05:35 aprox. por tendencia); ≈2.420 kWh (1.051 kW nom.). Causa raíz / responsabilidad en investigación.",
+        "downtimeHours": 2.3,
         "responsible": "COPOWER",
-        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 2.0 h | PF_cli 0.0 h | Falla_evento 1 | EVT-2026-06-27-SOBRE"
-      },
-      {
-        "date": "2026-06-27",
-        "equipment": "CPW07",
-        "eventType": "Falla",
-        "cause": "FDL equipos G56 & 57,  se presenta perturbacion en la red generando elevacion del voltaje y potencia reactiva de los generadores CPW06 & 07, los cuales salen de linea, el voltaje l",
-        "downtimeHours": 5.0,
-        "responsible": "COPOWER",
-        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 5.0 h | PF_cli 0.0 h | Falla_evento 1 | EVT-2026-06-27-SOBRE"
+        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 2.3 h | PF_cli 0.0 h | Falla_evento 1 | EVT-2026-06-27-CPW06 | FO-GE-033 sin horas · tendencia ≈03:17→05:35 · FS≈2,30 h · ≈2.420 kWh nom. (con kW promedio pre-disparo ≈2,1–2,2 MWh) · RCA en investigación"
       },
       {
         "date": "2026-06-26",
@@ -3558,7 +3504,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "cause": "05:13 EEP reporta disparo de reconectador línea 34.5 Kv Jauno - Piamonte, FDL generación CPW. FDL manual sistema inyección para control de cargas,  8:16 hrs equipo cpw01 en coordin",
         "downtimeHours": 6.0,
         "responsible": "GTE",
-        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 6.0 h | Falla_evento 0"
+        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 6.0 h | Falla_evento 0 | EVT-2026-06-23-CPW04 | 4ª operación EEP 05:13 (cascada FO-44)"
       },
       {
         "date": "2026-06-24",
@@ -3567,7 +3513,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "cause": "05:13 EEP reporta disparo de reconectador línea 34.5 Kv Jauno - Piamonte, FDL generación CPW. FDL manual sistema inyección para control de cargas,  8:11 hrs equipo cpw02 en coordin",
         "downtimeHours": 11.0,
         "responsible": "GTE",
-        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 11.0 h | Falla_evento 0"
+        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 11.0 h | Falla_evento 0 | EVT-2026-06-23-CPW04 | 4ª operación EEP 05:13 (cascada FO-44)"
       },
       {
         "date": "2026-06-24",
@@ -3576,7 +3522,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "cause": "05:13 EEP reporta disparo de reconectador línea 34.5 Kv Jauno - Piamonte, FDL generación CPW. FDL manual sistema inyección para control de cargas,  8:16 hrs equipo cpw01 en coordin",
         "downtimeHours": 6.0,
         "responsible": "GTE",
-        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 6.0 h | Falla_evento 0"
+        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 6.0 h | Falla_evento 0 | EVT-2026-06-23-CPW04 | 4ª operación EEP 05:13 (cascada FO-44)"
       },
       {
         "date": "2026-06-24",
@@ -3585,7 +3531,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "cause": "05:13 EEP reporta disparo de reconectador línea 34.5 Kv Jauno - Piamonte, FDL generación CPW. FDL manual sistema inyección para control de cargas",
         "downtimeHours": 1.0,
         "responsible": "GTE",
-        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 1.0 h | Falla_evento 0"
+        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 1.0 h | Falla_evento 0 | EVT-2026-06-23-CPW04 | 4ª operación EEP 05:13 (cascada FO-44)"
       },
       {
         "date": "2026-06-24",
@@ -3594,7 +3540,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "cause": "05:13 EEP reporta disparo de reconectador línea 34.5 Kv Jauno - Piamonte, FDL generación CPW. FDL manual sistema inyección para control de cargas",
         "downtimeHours": 1.0,
         "responsible": "GTE",
-        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 1.0 h | Falla_evento 0"
+        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 1.0 h | Falla_evento 0 | EVT-2026-06-23-CPW04 | 4ª operación EEP 05:13 (cascada FO-44)"
       },
       {
         "date": "2026-06-24",
@@ -3618,19 +3564,19 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "date": "2026-06-23",
         "equipment": "CPW04",
         "eventType": "Falla",
-        "cause": "Dos salidas por apertura del totalizador principal del tablero de auxiliares 480 V. (SUPUESTO) Ajuste/coordinación de protecciones del tablero. Pendiente verificar reporte de configuración de protecciones.",
+        "cause": "FO-GE-033 No. 44: cuatro operaciones del reconectador EEP Jauno–Piamonte (23-jun 15:24/16:59/22:06 y 24-jun 05:13) se propagaron porque RL no operó selectivamente y los interruptores 480 V estaban en Isd/Ii=1,5×. SD CPW-04/05; luego CPW-06/07 y auxiliares CPW-01/02/03. Ajuste final Isd=8×Ir, Ii=15×In; efectividad pendiente de estudio/verificación.",
         "downtimeHours": 1.0,
-        "responsible": "GTE",
-        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 1.0 h | Falla_evento 1 | EVT-2026-06-23-CPW04"
+        "responsible": "COPOWER",
+        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 1.0 h | PF_cli 0.0 h | Falla_evento 1 | EVT-2026-06-23-CPW04 | Iniciador EEP externo + habilitante interno COPOWER (selectividad RL/480 V)"
       },
       {
         "date": "2026-06-23",
         "equipment": "CPW05",
         "eventType": "Falla",
-        "cause": "Dos salidas por apertura del totalizador principal del tablero de auxiliares 480 V. (SUPUESTO) Ajuste/coordinación de protecciones del tablero. Pendiente verificar reporte de configuración de protecciones.",
+        "cause": "FO-GE-033 No. 44: cuatro operaciones del reconectador EEP Jauno–Piamonte (23-jun 15:24/16:59/22:06 y 24-jun 05:13) se propagaron porque RL no operó selectivamente y los interruptores 480 V estaban en Isd/Ii=1,5×. SD CPW-04/05; luego CPW-06/07 y auxiliares CPW-01/02/03. Ajuste final Isd=8×Ir, Ii=15×In; efectividad pendiente de estudio/verificación.",
         "downtimeHours": 2.0,
-        "responsible": "GTE",
-        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 2.0 h | Falla_evento 1 | EVT-2026-06-23-CPW04"
+        "responsible": "COPOWER",
+        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 2.0 h | PF_cli 0.0 h | Falla_evento 1 | EVT-2026-06-23-CPW04 | Iniciador EEP externo + habilitante interno COPOWER (selectividad RL/480 V)"
       },
       {
         "date": "2026-06-23",
@@ -3645,19 +3591,10 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "date": "2026-06-11",
         "equipment": "CPW03",
         "eventType": "Falla",
-        "cause": "Detonación con alta temperatura del MAT y pérdida de HMI durante el evento. (SUPUESTO) Enfriamiento insuficiente de la mezcla — posible restricción del intercooler o deriva del sensor MAT. Pendiente reporte de falla.",
-        "downtimeHours": 5.0,
+        "cause": "Durante la operación del grupo electrógeno se presentó una perturbación transitoria que ocasionó la salida automática de la unidad. Se realizaron las verificaciones técnicas correspondientes y el equipo retornó a operación normal el mismo día (19:25), sin evidenciar daños físicos ni requerir reemplazo de componentes.",
+        "downtimeHours": 3.92,
         "responsible": "COPOWER",
-        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 5.0 h | PF_cli 0.0 h | Falla_evento 1 | EVT-2026-06-11-CPW03-A"
-      },
-      {
-        "date": "2026-06-11",
-        "equipment": "CPW03",
-        "eventType": "Falla",
-        "cause": "15:13 Apagado del generador por potencia inversa (relé 32). (SUPUESTO) Pérdida de referencia de red / respuesta de gobernación al rechazo de carga. Pendiente confirmar con registros del controlador.",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 0.0 h | Falla_evento 0 | EVT-2026-06-11-CPW03-B | Registro inferido desde bitácora GTE"
+        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 3.92 h | PF_cli 0.0 h | Falla_evento 1 | EVT-2026-06-11-CPW03-A | FS≈3,92 h (15:12→19:25); energía no generada ≈2.620 kWh (estimado); causa raíz no determinada"
       },
       {
         "date": "2026-06-10",
@@ -3692,8 +3629,8 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Falla",
         "cause": "Shutdown por detonación asociada a señal errónea del relé K4: caída de presión de gas en tendencias por corte de la válvula shutoff. Se cambia base y relé K4 y se restablece la alimentación de la válvula.",
         "downtimeHours": 3.0,
-        "responsible": "GTE",
-        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 0.0 h | PF_cli 3.0 h | Falla_evento 1 | EVT-2026-06-07-CPW01"
+        "responsible": "COPOWER",
+        "notes": "PP 0.0 h | SB 0.0 h | PF_contr 3.0 h | PF_cli 0.0 h | Falla_evento 1 | EVT-2026-06-07-CPW01"
       },
       {
         "date": "2026-06-06",
@@ -3737,7 +3674,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
         "eventType": "Falla",
         "cause": "Pérdida de potencia por obstrucción del intercooler (900 → 680 kW desde el 31-may; delta de presión ~200 mbar). Contaminación por secuestrante de H2S; se cambia el interno y se rediseñan aletas. Respaldo diésel G102J ~5 h.",
         "downtimeHours": 4.0,
-        "responsible": "COPOWER",
+        "responsible": "GTE + COPOWER",
         "notes": "PP 0.0 h | SB 6.0 h | PF_contr 4.0 h | PF_cli 0.0 h | Falla_evento 1 | EVT-2026-06-03-CPW06"
       },
       {

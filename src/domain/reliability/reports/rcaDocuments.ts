@@ -24,13 +24,13 @@ export type RcaDeliveredDocument = {
 
 /**
  * Documentos formales en data/RCA.
- * Ambos PDF = mismo evento Sec. 30 (22-jun-2026 · Vector Shift / Shutdown Costayaco).
+ * Ambos PDF = mismo evento Sec. 30 (22-jun-2026 · salida de la máquina / Shutdown Costayaco).
  */
 export const RCA_DELIVERED_DOCUMENTS: RcaDeliveredDocument[] = [
   {
     id: "DOC-RCA-030",
-    title: "RCA Shutdown General Costayaco — Vector Shift EEP 34.5 kV",
-    eventLabel: "Vector Shift — Falla en reconectador EEP 34.5 kV",
+    title: "RCA Shutdown General Costayaco — salida de la máquina · EEP 34.5 kV",
+    eventLabel: "Salida de la máquina — falla en reconectador EEP 34.5 kV",
     eventDate: "2026-06-22",
     eventTime: "03:49:00",
     equipment: "CPW-01…07, CPW-12, JINAN-01, JINAN-02",
@@ -50,8 +50,8 @@ export const RCA_DELIVERED_DOCUMENTS: RcaDeliveredDocument[] = [
   },
   {
     id: "DOC-RCA-030-REV1",
-    title: "RCA Shutdown General Costayaco — Vector Shift (copia entregada)",
-    eventLabel: "Vector Shift — Falla en reconectador EEP 34.5 kV",
+    title: "RCA Shutdown General Costayaco — salida de la máquina (copia entregada)",
+    eventLabel: "Salida de la máquina — falla en reconectador EEP 34.5 kV",
     eventDate: "2026-06-22",
     eventTime: "03:49:00",
     equipment: "CPW-01…07, CPW-12, JINAN-01, JINAN-02",
