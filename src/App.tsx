@@ -11,6 +11,7 @@ import {
   LogOut,
   MapPin,
   Menu,
+  Shield,
   UserRound,
   X,
   Wrench,
@@ -49,7 +50,6 @@ import {
 import {
   LoginScreen,
   ROLE_LABELS,
-  UsersDirectory,
   clearSession,
   getOrCreateAnalyticsSessionId,
   loadSession,
@@ -72,6 +72,7 @@ const MODULE_ICONS: Record<PageKey, ReactNode> = {
   gestion_activos: <HeartPulse size={16} />,
   gestion_acciones: <ClipboardCheck size={16} />,
   planeacion: <CalendarRange size={16} />,
+  admin: <Shield size={16} />,
 };
 
 const OM_COLOMBIA_URL =
@@ -545,46 +546,41 @@ function App() {
         <div className="tree-panel project-tree">
           <p className="eyebrow">Árbol del proyecto</p>
           <nav className="project-nav" aria-label="Módulos del sistema">
-            {PROJECT_NAV_TREE.map((mod) => {
-              const isActive = activePage === mod.key;
-              const isOpen = openModules[mod.key] ?? isActive;
-              return (
-                <div key={mod.key} className={isActive ? "project-mod active" : "project-mod"}>
-                  <div className="project-mod-row">
-                    <button
-                      type="button"
-                      className="project-mod-toggle"
-                      aria-expanded={isOpen}
-                      onClick={() => toggleModule(mod.key)}
-                      title={isOpen ? "Contraer" : "Expandir"}
-                    >
-                      {isOpen ? "▾" : "▸"}
-                    </button>
-                    <button
-                      type="button"
-                      className={isActive ? "project-mod-btn active" : "project-mod-btn"}
-                      onClick={() => selectModule(mod.key)}
-                      title={mod.description}
-                    >
-                      <span className="project-mod-icon">{MODULE_ICONS[mod.key]}</span>
-                      <span className="project-mod-label">
-                        <strong>{mod.label}</strong>
-                      </span>
-                    </button>
+            {PROJECT_NAV_TREE.filter((mod) => mod.key !== "admin" || session.role === "admin").map(
+              (mod) => {
+                const isActive = activePage === mod.key;
+                const isOpen = openModules[mod.key] ?? isActive;
+                return (
+                  <div key={mod.key} className={isActive ? "project-mod active" : "project-mod"}>
+                    <div className="project-mod-row">
+                      <button
+                        type="button"
+                        className="project-mod-toggle"
+                        aria-expanded={isOpen}
+                        onClick={() => toggleModule(mod.key)}
+                        title={isOpen ? "Contraer" : "Expandir"}
+                      >
+                        {isOpen ? "▾" : "▸"}
+                      </button>
+                      <button
+                        type="button"
+                        className={isActive ? "project-mod-btn active" : "project-mod-btn"}
+                        onClick={() => selectModule(mod.key)}
+                        title={mod.description}
+                      >
+                        <span className="project-mod-icon">{MODULE_ICONS[mod.key]}</span>
+                        <span className="project-mod-label">
+                          <strong>{mod.label}</strong>
+                        </span>
+                      </button>
+                    </div>
+                    {isOpen ? (
+                      <ul className="project-leaves">{renderNavNodes(mod.key, mod.children)}</ul>
+                    ) : null}
                   </div>
-                  {isOpen ? (
-                    <ul className="project-leaves">
-                      {renderNavNodes(
-                        mod.key,
-                        session.role === "admin"
-                          ? mod.children
-                          : mod.children.filter((n) => n.id !== "dash-uso"),
-                      )}
-                    </ul>
-                  ) : null}
-                </div>
-              );
-            })}
+                );
+              },
+            )}
           </nav>
         </div>
         <div className="tree-panel">
@@ -604,11 +600,6 @@ function App() {
             </a>
           </nav>
         </div>
-        {session.role === "admin" ? (
-          <div className="tree-panel">
-            <UsersDirectory />
-          </div>
-        ) : null}
       </aside>
 
       <main className={viewContext.report === "dual" ? "main main-dual" : "main"}>

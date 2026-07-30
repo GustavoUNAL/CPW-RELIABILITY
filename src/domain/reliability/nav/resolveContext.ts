@@ -144,7 +144,8 @@ const DUAL_LEAVES = new Set([
 export const INTEGRATED_DUAL_LEAVES = new Set([
   "conf-dashboard",
   "dash-resumen",
-  "dash-uso",
+  "admin-usuarios",
+  "admin-uso",
   "dash-mto",
   "mto-dashboard",
   "mto-optimizacion",
@@ -247,6 +248,15 @@ const CONCERTACION_LEAVES = new Set([
 ]);
 
 export function resolveViewContext(page: PageKey, leafId: string): ViewContext {
+  if (page === "admin" || leafId.startsWith("admin-")) {
+    return {
+      report: "dual",
+      monthOrder: Array.from(new Set([...GRAN_TIERRA_MONTH_ORDER, ...COPOWER_MONTH_ORDER])),
+      reportLabel: "Administración de la plataforma",
+      reportShort: "Admin",
+      fixedPeriod: true,
+    };
+  }
   if (GEN_LEAVES.has(leafId) && leafId.startsWith("gen-")) {
     return {
       report: "copower",

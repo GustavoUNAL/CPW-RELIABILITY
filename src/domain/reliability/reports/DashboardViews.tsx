@@ -41,6 +41,9 @@ const pct = (v: number | null | undefined, d = 2) =>
   v == null || Number.isNaN(v) ? "N/D" : `${(v * 100).toFixed(d)}%`;
 const kwh = (v: number | null | undefined) =>
   v == null ? "N/D" : `${Math.round(v).toLocaleString("es-CO")} kWh`;
+/** Compacto para tarjetas KPI (evita números de 7+ dígitos en el hero). */
+const mwhHero = (v: number | null | undefined) =>
+  v == null ? "N/D" : `${Math.round(v / 1000).toLocaleString("es-CO")} MWh`;
 const hours = (v: number | null | undefined) =>
   v == null || Number.isNaN(v) ? "N/D" : `${v.toFixed(1)} h`;
 const num = (v: number | null | undefined, d = 0) =>
@@ -258,44 +261,34 @@ function DualValueCard({
   cpwValue,
   toneGte,
   toneCpw,
-  gteCaption,
-  cpwCaption,
+  gteHint,
+  cpwHint,
 }: {
   label: string;
   gteValue: string;
   cpwValue: string;
   toneGte?: "ok" | "warn" | "bad" | "na";
   toneCpw?: "ok" | "warn" | "bad" | "na";
-  gteCaption?: string;
-  cpwCaption?: string;
+  gteHint?: string;
+  cpwHint?: string;
 }) {
   return (
     <article className="dash-dual-card">
       <span className="dash-dual-card-label">{label}</span>
       <div className="dash-dual-values">
         <div className={`dash-dual-val dash-dual-val--gte${toneGte ? ` ${toneGte}` : ""}`}>
-          <small>
-            {gteCaption ? (
-              gteCaption
-            ) : (
-              <>
-                <span className="source-badge gte">GTE</span> Informe oficial
-              </>
-            )}
-          </small>
-          <strong>{gteValue}</strong>
+          <span className="dash-dual-source">
+            <span className="source-badge gte">GTE</span>
+          </span>
+          <strong className="dash-dual-metric">{gteValue}</strong>
+          {gteHint ? <em className="dash-dual-hint">{gteHint}</em> : null}
         </div>
         <div className={`dash-dual-val dash-dual-val--cpw${toneCpw ? ` ${toneCpw}` : ""}`}>
-          <small>
-            {cpwCaption ? (
-              cpwCaption
-            ) : (
-              <>
-                <span className="source-badge cpw">CPW</span> Reporte diario
-              </>
-            )}
-          </small>
-          <strong>{cpwValue}</strong>
+          <span className="dash-dual-source">
+            <span className="source-badge cpw">CPW</span>
+          </span>
+          <strong className="dash-dual-metric">{cpwValue}</strong>
+          {cpwHint ? <em className="dash-dual-hint">{cpwHint}</em> : null}
         </div>
       </div>
     </article>
@@ -585,13 +578,15 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
         />
         <DualValueCard
           label="Generación"
-          gteValue={gte ? kwh(gte.totalGenerationKwh) : "N/D"}
-          cpwValue={cpw ? kwh(cpw.totalGenerationKwh) : "N/D"}
+          gteValue={gte ? mwhHero(gte.totalGenerationKwh) : "N/D"}
+          cpwValue={cpw ? mwhHero(cpw.totalGenerationKwh) : "N/D"}
         />
         <DualValueCard
-          label="Fallas / eventos"
-          gteValue={gte ? `${gte.summary.copowerFailures} asociadas a COPOWER` : "N/D"}
-          cpwValue={cpw ? `${cpw.summary.copowerFailures} registro · ${cpw.eventLog.length} bitácora` : "N/D"}
+          label="Fallas"
+          gteValue={gte ? String(gte.summary.copowerFailures) : "N/D"}
+          cpwValue={cpw ? String(cpw.summary.copowerFailures) : "N/D"}
+          gteHint="asociadas a COPOWER"
+          cpwHint={cpw ? `${cpw.eventLog.length} en bitácora` : undefined}
           toneGte={gte && gte.summary.copowerFailures >= 3 ? "warn" : undefined}
           toneCpw={cpw && cpw.summary.copowerFailures >= 10 ? "warn" : undefined}
         />
@@ -599,12 +594,15 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
           label="Eficiencia de campo"
           gteValue={effCycLabel}
           cpwValue={effVonuLabel}
-          gteCaption={`Costayaco · total ${effPctLabel}`}
-          cpwCaption={`Vonú · ${effCampo.yearMonth}`}
+          gteHint="Costayaco"
+          cpwHint="Vonú"
         />
       </section>
-      <p className="muted" style={{ margin: "0.35rem 0 0.75rem", fontSize: "0.78rem" }}>
-        Eficiencia ({effCampo.yearMonth}
+      <p className="dash-kpi-legend muted">
+        <span className="source-badge gte">GTE</span> informe oficial
+        <span className="source-badge cpw">CPW</span> reporte diario
+        {" · "}
+        Eficiencia total campo {effPctLabel} ({effCampo.yearMonth}
         {effCampo.general.heatRateFt3Kwh != null
           ? ` · HR ${effCampo.general.heatRateFt3Kwh.toFixed(2)} ft³/kWh`
           : ""}

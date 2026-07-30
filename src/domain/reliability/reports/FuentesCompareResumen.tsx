@@ -69,16 +69,16 @@ function DualCard({
       <span className="dash-dual-card-label">{label}</span>
       <div className="dash-dual-values">
         <div className={`dash-dual-val dash-dual-val--gte${toneGte ? ` ${toneGte}` : ""}`}>
-          <small>
+          <span className="dash-dual-source">
             <span className="source-badge gte">GTE</span>
-          </small>
-          <strong>{gteValue}</strong>
+          </span>
+          <strong className="dash-dual-metric">{gteValue}</strong>
         </div>
         <div className={`dash-dual-val dash-dual-val--cpw${toneCpw ? ` ${toneCpw}` : ""}`}>
-          <small>
+          <span className="dash-dual-source">
             <span className="source-badge cpw">CPW</span>
-          </small>
-          <strong>{cpwValue}</strong>
+          </span>
+          <strong className="dash-dual-metric">{cpwValue}</strong>
         </div>
       </div>
     </article>

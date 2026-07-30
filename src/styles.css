@@ -1665,12 +1665,12 @@ th .metric-def {
 
 .dash-integrated-hero {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 0.85rem;
 }
 
 .fuentes-compare .dash-integrated-hero {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
   margin-bottom: 0.55rem;
 }
 
@@ -1689,32 +1689,44 @@ th .metric-def {
 
 @media (max-width: 1100px) {
   .fuentes-compare .dash-integrated-hero {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
   }
 }
 
 .dash-dual-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  min-width: 0;
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 0.75rem;
+  padding: 0.85rem 0.95rem;
   background: var(--panel-soft);
 }
 
 .dash-dual-card-label {
   display: block;
-  font-size: 0.78rem;
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: var(--text-muted);
-  margin-bottom: 0.5rem;
 }
 
 .dash-dual-values {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
+  gap: 0.45rem;
+  min-width: 0;
 }
 
 .dash-dual-val {
-  padding: 0.5rem 0.55rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+  padding: 0.55rem 0.5rem;
   border-radius: 8px;
   border: 1px solid var(--border);
   background: var(--panel);
@@ -1728,20 +1740,38 @@ th .metric-def {
   border-color: color-mix(in oklab, var(--accent) 30%, var(--border));
 }
 
+.dash-dual-source {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
 .dash-dual-val small {
   display: flex;
   align-items: center;
   gap: 0.35rem;
   font-size: 0.62rem;
   color: var(--text-muted);
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.15rem;
 }
 
+.dash-dual-metric,
 .dash-dual-val strong {
-  font-size: 1.05rem;
+  font-size: clamp(0.95rem, 1.6vw, 1.2rem);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  line-height: 1.15;
   overflow-wrap: anywhere;
   word-break: break-word;
-  line-height: 1.2;
+}
+
+.dash-dual-hint {
+  display: block;
+  margin: 0;
+  font-size: 0.65rem;
+  font-style: normal;
+  color: var(--text-muted);
+  line-height: 1.25;
 }
 
 .dash-dual-val.ok {
@@ -1754,6 +1784,16 @@ th .metric-def {
 
 .dash-dual-val.bad {
   background: color-mix(in oklab, #ef4444 8%, var(--panel));
+}
+
+.dash-kpi-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.65rem;
+  margin: 0.45rem 0 0.95rem;
+  font-size: 0.75rem;
+  line-height: 1.4;
 }
 
 .dash-source-strip {
@@ -2054,11 +2094,11 @@ th .metric-def {
   }
 
   .dash-integrated-hero {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
   }
 
   .fuentes-compare .dash-integrated-hero {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
   }
 
   .dash-chart-grid {
@@ -8337,8 +8377,8 @@ tr.row-focal td {
 .exec-kpi-row,
 .dash-integrated-hero {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
-  gap: 0.65rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 0.85rem;
 }
 
 .muted,
@@ -12165,3 +12205,126 @@ tr.row-focal td {
   }
 }
 
+
+/* —— Admin module —— */
+.admin-module {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.admin-lead {
+  margin: 0;
+  max-width: 52rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.admin-user-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 0.85rem;
+}
+
+.admin-user-card {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.95rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel-soft);
+  min-width: 0;
+}
+
+.admin-user-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.45rem;
+}
+
+.admin-user-card-head strong {
+  font-size: 1rem;
+}
+
+.admin-user-email {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
+.admin-user-hint {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+.admin-user-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+  margin: 0.35rem 0 0;
+}
+
+.admin-user-meta dt {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.admin-user-meta dd {
+  margin: 0.1rem 0 0;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.admin-role-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 650;
+  border: 1px solid var(--border);
+  background: var(--panel);
+}
+
+.admin-role-pill--admin {
+  border-color: color-mix(in oklab, #818cf8 45%, var(--border));
+  color: #6366f1;
+}
+
+.admin-panel {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.admin-panel h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 0.55rem 0.65rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.admin-table th {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}

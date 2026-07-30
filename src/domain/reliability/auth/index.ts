@@ -2,6 +2,7 @@ export { APP_USERS, ROLE_LABELS, authenticate, findUserByEmail, type AppUser, ty
 export { clearSession, loadSession, persistSession } from "./session";
 export { LoginScreen } from "./LoginScreen";
 export { UsersDirectory } from "./UsersDirectory";
+export { AdminUsersDashboard } from "./AdminUsersDashboard";
 export { UsageAnalyticsDashboard } from "./UsageAnalyticsDashboard";
 export {
   clearAnalyticsSessionId,

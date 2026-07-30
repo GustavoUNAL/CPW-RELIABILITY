@@ -53,6 +53,7 @@ import {
   resolveReport,
   resolveViewContext,
 } from "../nav/resolveContext";
+import { AdminUsersDashboard } from "../auth/AdminUsersDashboard";
 import { UsageAnalyticsDashboard } from "../auth/UsageAnalyticsDashboard";
 import type { PageKey, ReportKey } from "../types";
 import { METRIC_DEFS } from "../ui/metricDefs";
@@ -380,7 +381,19 @@ function PlatformBody({
   const cpwMonth = (COPOWER_MONTHLY_DATA[month as CopowerMonthKey] ? month : "Jun") as CopowerMonthKey;
   const gteMonthOk = Boolean(GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey]);
 
-  if (leafId === "dash-uso") {
+  if (leafId === "admin-usuarios" || leafId === "cfg-usuarios") {
+    if (!isAdmin) {
+      return (
+        <EmptyScreen
+          detail="La administración de usuarios está disponible solo para administradores."
+          report="dual"
+        />
+      );
+    }
+    return <AdminUsersDashboard />;
+  }
+
+  if (leafId === "admin-uso" || leafId === "dash-uso") {
     if (!isAdmin) {
       return (
         <EmptyScreen
@@ -422,7 +435,6 @@ function PlatformBody({
     leafId === "cfg-empresas-gte" ||
     leafId === "cfg-parametros" ||
     leafId === "cfg-equipos" ||
-    leafId === "cfg-usuarios" ||
     leafId === "cfg-catalogos"
   ) {
     if (leafId === "cfg-empresas-copower") {
@@ -436,7 +448,7 @@ function PlatformBody({
     }
     return (
       <EmptyScreen
-        detail={`${leafId === "cfg-equipos" ? "Catálogo de equipos" : leafId === "cfg-usuarios" ? "Gestión de usuarios" : "Catálogos"} pendiente de configuración administrativa.`}
+        detail={`${leafId === "cfg-equipos" ? "Catálogo de equipos" : "Catálogos"} pendiente de configuración administrativa.`}
         report="dual"
       />
     );
@@ -933,7 +945,19 @@ export function PlatformContent({
 }: Props) {
   const ctx = resolveViewContext(page, leafId);
 
-  if (leafId === "dash-uso") {
+  if (leafId === "admin-usuarios" || leafId === "cfg-usuarios") {
+    if (!isAdmin) {
+      return (
+        <EmptyScreen
+          detail="La administración de usuarios está disponible solo para administradores."
+          report="dual"
+        />
+      );
+    }
+    return <AdminUsersDashboard />;
+  }
+
+  if (leafId === "admin-uso" || leafId === "dash-uso") {
     if (!isAdmin) {
       return (
         <EmptyScreen
