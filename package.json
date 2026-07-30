@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "vite --port 5175 --strictPort",
     "build": "tsc -b && vite build",
+    "start": "node server/opsai-server.mjs",
     "preview": "vite preview --host 127.0.0.1 --port 4173 --strictPort",
-    "start": "vite preview --host 127.0.0.1 --port 4173 --strictPort",
     "deploy:pm2": "npm run build && pm2 startOrReload ecosystem.config.cjs --update-env",
     "etl:operacion": "node scripts/etl-operacion.mjs",
     "etl:inventario": "node scripts/etl-inventario.mjs",

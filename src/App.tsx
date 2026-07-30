@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   CalendarRange,
   ClipboardCheck,
@@ -51,8 +51,13 @@ import {
   ROLE_LABELS,
   UsersDirectory,
   clearSession,
+  getOrCreateAnalyticsSessionId,
   loadSession,
   persistSession,
+  trackHeartbeat,
+  trackLogin,
+  trackLogout,
+  trackPageView,
   type SessionUser,
 } from "./domain/reliability/auth";
 
@@ -96,6 +101,11 @@ function App() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [selectedMonth, setSelectedMonth] = useState<string>("Jun");
   const [navOpen, setNavOpen] = useState(false);
+  const [analyticsSessionId, setAnalyticsSessionId] = useState(() => getOrCreateAnalyticsSessionId());
+  const sessionStartedAtRef = useRef(Date.now());
+  const pageStartedAtRef = useRef(Date.now());
+  const lastHeartbeatPageAtRef = useRef(Date.now());
+  const viewRef = useRef({ page: DEFAULT_MODULE.key as PageKey, leaf: DEFAULT_LEAF, label: "Resumen general" });
 
   useEffect(() => {
     document.body.classList.toggle("theme-light", theme === "light");
@@ -142,6 +152,67 @@ function App() {
   const activeLeafLabel =
     (activeModule ? findLeafLabel(activeModule.children, activeLeafId) : null) ?? activeLeafId;
 
+  useEffect(() => {
+    if (!session) return;
+    viewRef.current = {
+      page: activePage,
+      leaf: activeLeafId,
+      label: activeLeafLabel,
+    };
+  }, [session, activePage, activeLeafId, activeLeafLabel]);
+
+  // Sesión restaurada desde localStorage: registra vista inicial.
+  useEffect(() => {
+    if (!session) return;
+    const sid = analyticsSessionId;
+    void trackPageView(
+      session,
+      sid,
+      { page: activePage, leaf: activeLeafId, leafLabel: activeLeafLabel },
+      null,
+    );
+    // solo al montar / cambiar usuario
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.id]);
+
+  useEffect(() => {
+    if (!session) return;
+    const tick = () => {
+      if (document.visibilityState === "hidden") return;
+      const now = Date.now();
+      const pageDelta = now - lastHeartbeatPageAtRef.current;
+      lastHeartbeatPageAtRef.current = now;
+      void trackHeartbeat(session, analyticsSessionId, {
+        durationMs: now - sessionStartedAtRef.current,
+        page: viewRef.current.page,
+        leaf: viewRef.current.leaf,
+        leafLabel: viewRef.current.label,
+        pageDeltaMs: pageDelta,
+      });
+    };
+    const id = window.setInterval(tick, 30_000);
+    const onVis = () => {
+      if (document.visibilityState === "visible") lastHeartbeatPageAtRef.current = Date.now();
+    };
+    const onUnload = () => {
+      const now = Date.now();
+      void trackHeartbeat(session, analyticsSessionId, {
+        durationMs: now - sessionStartedAtRef.current,
+        page: viewRef.current.page,
+        leaf: viewRef.current.leaf,
+        leafLabel: viewRef.current.label,
+        pageDeltaMs: now - lastHeartbeatPageAtRef.current,
+      });
+    };
+    document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("pagehide", onUnload);
+    return () => {
+      window.clearInterval(id);
+      document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("pagehide", onUnload);
+    };
+  }, [session, analyticsSessionId]);
+
   const [focusRcaId, setFocusRcaId] = useState<string | null>(null);
   const [focusCostayacoRcaId, setFocusCostayacoRcaId] = useState<string | null>(null);
   const [rcaCases, setRcaCases] = useState<RcaCaseDetail[]>(() => loadRcaCases());
@@ -160,17 +231,53 @@ function App() {
   }, [GTE_JUNE_RCA_SEED]);
 
   const handleLogin = (user: SessionUser) => {
+    const sid = getOrCreateAnalyticsSessionId(true);
+    setAnalyticsSessionId(sid);
+    sessionStartedAtRef.current = Date.now();
+    pageStartedAtRef.current = Date.now();
+    lastHeartbeatPageAtRef.current = Date.now();
     persistSession(user);
     setSession(user);
+    void trackLogin(user, sid);
   };
 
   const handleLogout = () => {
+    if (session) {
+      const now = Date.now();
+      void trackLogout(session, analyticsSessionId, {
+        durationMs: now - sessionStartedAtRef.current,
+        page: viewRef.current.page,
+        leaf: viewRef.current.leaf,
+        leafLabel: viewRef.current.label,
+        pageDeltaMs: now - lastHeartbeatPageAtRef.current,
+      });
+    }
     clearSession();
     setSession(null);
     setNavOpen(false);
   };
 
   const selectLeaf = (page: PageKey, leafId: string) => {
+    const mod = PROJECT_NAV_TREE.find((m) => m.key === page);
+    const label = (mod ? findLeafLabel(mod.children, leafId) : null) ?? leafId;
+    if (session) {
+      const now = Date.now();
+      const prev = viewRef.current;
+      void trackPageView(
+        session,
+        analyticsSessionId,
+        { page, leaf: leafId, leafLabel: label },
+        {
+          page: prev.page,
+          leaf: prev.leaf,
+          leafLabel: prev.label,
+          durationMs: now - pageStartedAtRef.current,
+        },
+      );
+      pageStartedAtRef.current = now;
+      lastHeartbeatPageAtRef.current = now;
+      viewRef.current = { page, leaf: leafId, label };
+    }
     setActivePage(page);
     setActiveLeafId(leafId);
     setOpenModules((prev) => ({ ...prev, [page]: true }));
@@ -465,7 +572,16 @@ function App() {
                       </span>
                     </button>
                   </div>
-                  {isOpen ? <ul className="project-leaves">{renderNavNodes(mod.key, mod.children)}</ul> : null}
+                  {isOpen ? (
+                    <ul className="project-leaves">
+                      {renderNavNodes(
+                        mod.key,
+                        session.role === "admin"
+                          ? mod.children
+                          : mod.children.filter((n) => n.id !== "dash-uso"),
+                      )}
+                    </ul>
+                  ) : null}
                 </div>
               );
             })}
@@ -519,6 +635,7 @@ function App() {
           onNavigateToCostayacoRca={navigateToCostayacoRca}
           focusCostayacoRcaId={focusCostayacoRcaId}
           onFocusCostayacoRcaConsumed={() => setFocusCostayacoRcaId(null)}
+          isAdmin={session.role === "admin"}
         />
       </main>
     </div>

@@ -11756,6 +11756,144 @@ tr.row-focal td {
   color: var(--muted);
 }
 
+/* ── Uso de la plataforma (admin) ── */
+.usage-module {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.usage-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.usage-lead {
+  margin: 0;
+  max-width: 64ch;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.usage-meta {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+}
+
+.usage-refresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  padding: 0.45rem 0.8rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.usage-refresh:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.usage-error {
+  margin: 0;
+  padding: 0.65rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--danger) 40%, var(--border));
+  background: color-mix(in srgb, var(--danger) 10%, var(--panel));
+  color: var(--danger);
+  font-size: 0.88rem;
+}
+
+.usage-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+}
+
+.usage-kpi {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.usage-kpi span {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.usage-kpi strong {
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
+
+.usage-kpi small {
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.usage-panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.usage-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.usage-panel h3 {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.usage-chart {
+  width: 100%;
+  min-height: 260px;
+}
+
+.usage-table {
+  width: 100%;
+  font-size: 0.84rem;
+}
+
+.usage-table th,
+.usage-table td {
+  vertical-align: top;
+}
+
+@media (max-width: 430px) {
+  .usage-kpi-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .usage-panels {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ── Detalle por día / máquina ── */
 .conc-toolbar--day {
   justify-content: space-between;

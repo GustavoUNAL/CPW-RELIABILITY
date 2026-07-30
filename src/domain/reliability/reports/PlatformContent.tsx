@@ -53,6 +53,7 @@ import {
   resolveReport,
   resolveViewContext,
 } from "../nav/resolveContext";
+import { UsageAnalyticsDashboard } from "../auth/UsageAnalyticsDashboard";
 import type { PageKey, ReportKey } from "../types";
 import { METRIC_DEFS } from "../ui/metricDefs";
 import { EmptyScreen, ScreenShell } from "../ui/ScreenShell";
@@ -74,6 +75,7 @@ type Props = {
   onNavigateToCostayacoRca?: (evtId?: string) => void;
   focusCostayacoRcaId?: string | null;
   onFocusCostayacoRcaConsumed?: () => void;
+  isAdmin?: boolean;
 };
 
 const pct = (v: number | null | undefined, d = 2) =>
@@ -373,9 +375,22 @@ function PlatformBody({
   onNavigateToCostayacoRca,
   focusCostayacoRcaId,
   onFocusCostayacoRcaConsumed,
+  isAdmin,
 }: Props & { report: ReportKey }) {
   const cpwMonth = (COPOWER_MONTHLY_DATA[month as CopowerMonthKey] ? month : "Jun") as CopowerMonthKey;
   const gteMonthOk = Boolean(GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey]);
+
+  if (leafId === "dash-uso") {
+    if (!isAdmin) {
+      return (
+        <EmptyScreen
+          detail="Esta vista de uso de la plataforma está disponible solo para administradores."
+          report="dual"
+        />
+      );
+    }
+    return <UsageAnalyticsDashboard />;
+  }
 
   if (leafId.startsWith("gen-")) {
     return (
@@ -914,8 +929,21 @@ export function PlatformContent({
   onNavigateToCostayacoRca,
   focusCostayacoRcaId,
   onFocusCostayacoRcaConsumed,
+  isAdmin,
 }: Props) {
   const ctx = resolveViewContext(page, leafId);
+
+  if (leafId === "dash-uso") {
+    if (!isAdmin) {
+      return (
+        <EmptyScreen
+          detail="Esta vista de uso de la plataforma está disponible solo para administradores."
+          report="dual"
+        />
+      );
+    }
+    return <UsageAnalyticsDashboard />;
+  }
 
   if (leafId.startsWith("cmp-")) {
     if (leafId === "cmp-bench") {
@@ -1022,6 +1050,7 @@ export function PlatformContent({
       onNavigateToCostayacoRca={onNavigateToCostayacoRca}
       focusCostayacoRcaId={focusCostayacoRcaId}
       onFocusCostayacoRcaConsumed={onFocusCostayacoRcaConsumed}
+      isAdmin={isAdmin}
     />
   );
 }

@@ -144,6 +144,7 @@ const DUAL_LEAVES = new Set([
 export const INTEGRATED_DUAL_LEAVES = new Set([
   "conf-dashboard",
   "dash-resumen",
+  "dash-uso",
   "dash-mto",
   "mto-dashboard",
   "mto-optimizacion",
