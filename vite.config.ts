@@ -7,7 +7,7 @@ export default defineConfig({
     host: "127.0.0.1",
     port: 4173,
     strictPort: true,
-    // Nginx reenvía Host: opsai.space; sin esto Vite responde 403.
-    allowedHosts: ["opsai.space", "www.opsai.space", "localhost", "127.0.0.1"],
+    // Nginx reenvía el dominio público; sin esto Vite responde 403.
+    allowedHosts: ["opsai.reliability.space", "localhost", "127.0.0.1"],
   },
 });
