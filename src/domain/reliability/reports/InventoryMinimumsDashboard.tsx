@@ -47,6 +47,7 @@ const FAMILY_COLOR: Record<string, string> = {
   J420: "#6366f1",
   JINAN: "#0f766e",
   MATERIALES: "#64748b",
+  "SIN CLASIFICAR": "#94a3b8",
 };
 
 function ToneBadge({ label, color }: { label: string; color: string }) {

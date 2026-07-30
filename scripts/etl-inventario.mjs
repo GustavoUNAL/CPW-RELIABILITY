@@ -70,7 +70,7 @@ for (let i = headerIdx + 1; i < rows.length; i++) {
   if (stockMin == null && onHand == null && !description) continue;
   items.push({
     id: `INV-${String(items.length + 1).padStart(4, "0")}`,
-    family,
+    family: family || "SIN CLASIFICAR",
     description,
     status: str(r[2]) || "—",
     stockMin: stockMin ?? 0,
@@ -81,6 +81,7 @@ for (let i = headerIdx + 1; i < rows.length; i++) {
 
 /** Catálogo operativo: ítems en 0/0 se normalizan a mínimo 1 y existencia 1. */
 for (const item of items) {
+  if (!item.family?.trim()) item.family = "SIN CLASIFICAR";
   if (item.stockMin === 0 && item.onHand === 0) {
     item.stockMin = 1;
     item.onHand = 1;

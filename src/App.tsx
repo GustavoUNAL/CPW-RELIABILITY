@@ -7,8 +7,10 @@ import {
   Gauge,
   HeartPulse,
   LayoutDashboard,
+  LogOut,
   MapPin,
   Menu,
+  UserRound,
   X,
   Wrench,
   Zap,
@@ -43,6 +45,15 @@ import {
   monthOptionLabel,
   resolveViewContext,
 } from "./domain/reliability/nav/resolveContext";
+import {
+  LoginScreen,
+  ROLE_LABELS,
+  UsersDirectory,
+  clearSession,
+  loadSession,
+  persistSession,
+  type SessionUser,
+} from "./domain/reliability/auth";
 
 const MODULE_ICONS: Record<PageKey, ReactNode> = {
   dashboard: <LayoutDashboard size={16} />,
@@ -64,6 +75,7 @@ const DEFAULT_LEAF = "dash-resumen";
 const MOBILE_MQ = "(max-width: 900px)";
 
 function App() {
+  const [session, setSession] = useState<SessionUser | null>(() => loadSession());
   const [activePage, setActivePage] = useState<PageKey>(DEFAULT_MODULE.key);
   const [activeLeafId, setActiveLeafId] = useState(DEFAULT_LEAF);
   const [openModules, setOpenModules] = useState<Partial<Record<PageKey, boolean>>>({
@@ -144,6 +156,17 @@ function App() {
   useEffect(() => {
     setRcaCases(loadRcaCases());
   }, [GTE_JUNE_RCA_SEED]);
+
+  const handleLogin = (user: SessionUser) => {
+    persistSession(user);
+    setSession(user);
+  };
+
+  const handleLogout = () => {
+    clearSession();
+    setSession(null);
+    setNavOpen(false);
+  };
 
   const selectLeaf = (page: PageKey, leafId: string) => {
     setActivePage(page);
@@ -265,6 +288,14 @@ function App() {
       );
     });
 
+  if (!session) {
+    return (
+      <div className={`app-shell ${theme} login-shell`}>
+        <LoginScreen onSuccess={handleLogin} />
+      </div>
+    );
+  }
+
   return (
     <div className={`app-shell ${theme}${navOpen ? " nav-open" : ""}`}>
       <header className="mobile-topbar">
@@ -280,8 +311,10 @@ function App() {
         </button>
         <div className="mobile-topbar-copy">
           <p className="eyebrow">COPOWER</p>
-          <strong>{activeModule?.label ?? "Dashboard"}</strong>
-          <span>{activeLeafLabel}</span>
+          <strong>{session.name}</strong>
+          <span>
+            {activeModule?.label ?? "Dashboard"} · {activeLeafLabel}
+          </span>
         </div>
         {!viewContext.fixedPeriod ? (
           <select
@@ -330,6 +363,28 @@ function App() {
           <h1>Gestión de confiabilidad</h1>
           <p className="brand-sub">{PROJECT_TITLE}</p>
         </div>
+
+        <div className="session-panel">
+          <div className="session-user" title={`${session.email} · ${ROLE_LABELS[session.role]}`}>
+            <span className="session-user-avatar" aria-hidden>
+              <UserRound size={16} />
+            </span>
+            <span className="session-user-meta">
+              <strong className="session-user-name">{session.name}</strong>
+              <span className="session-user-role">{ROLE_LABELS[session.role]}</span>
+            </span>
+            <button
+              type="button"
+              className="session-logout"
+              onClick={handleLogout}
+              title="Cerrar sesión"
+            >
+              <LogOut size={15} />
+              <span>Salir</span>
+            </button>
+          </div>
+        </div>
+
         <div className="sidebar-controls">
           {viewContext.fixedPeriod ? (
             <div className="month-picker month-picker-fixed">
@@ -422,9 +477,20 @@ function App() {
             </a>
           </nav>
         </div>
+        {session.role === "admin" ? (
+          <div className="tree-panel">
+            <UsersDirectory />
+          </div>
+        ) : null}
       </aside>
 
       <main className={viewContext.report === "dual" ? "main main-dual" : "main"}>
+        <div className="main-session-bar" aria-label="Sesión activa">
+          <p className="main-session-greeting">
+            Sesión de <strong>{session.name}</strong>
+            <span className="muted"> · {ROLE_LABELS[session.role]}</span>
+          </p>
+        </div>
         <PlatformContent
           page={activePage}
           leafId={activeLeafId}

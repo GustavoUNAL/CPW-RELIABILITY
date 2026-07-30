@@ -4,3 +4,6 @@ dist
 *.tsbuildinfo
 *.DS_Store
 ~$*.xlsx
+# Excel de inventario (~100MB+) — regenerar con npm run etl:inventario
+**/INVENTARIO*.xlsx
+data/mantenimiento\ /

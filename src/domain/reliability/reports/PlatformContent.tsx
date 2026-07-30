@@ -127,10 +127,12 @@ export function DualCompare({
         {(["gran_tierra", "copower"] as const).map((report) => (
           <section key={report} className="dual-pane">
             <header className="dual-pane-header">
-              <strong>{report === "gran_tierra" ? "Gran Tierra Energy" : "COPOWER"}</strong>
-              <span className={`source-badge ${report === "gran_tierra" ? "gte" : "cpw"}`}>
-                {report === "gran_tierra" ? "GTE" : "CPW"}
-              </span>
+              <div className="dual-pane-header-row">
+                <strong>{report === "gran_tierra" ? "Gran Tierra Energy" : "COPOWER"}</strong>
+                <span className={`source-badge ${report === "gran_tierra" ? "gte" : "cpw"}`}>
+                  {report === "gran_tierra" ? "GTE" : "CPW"}
+                </span>
+              </div>
             </header>
             <div className="dual-pane-body">
               {body ? (

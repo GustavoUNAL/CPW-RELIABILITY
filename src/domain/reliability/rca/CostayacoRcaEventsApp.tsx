@@ -38,6 +38,11 @@ function sortByFecha(a: RcaEventoFalla, b: RcaEventoFalla, dir: SortDir) {
   return dir === "asc" ? cmp : -cmp;
 }
 
+/** Plantilla vacía del seed Notion — no es un evento real. */
+function isTemplateEvent(e: RcaEventoFalla) {
+  return /BLANK|-XX-/i.test(e.id) || e.calidad_dato === "vacio";
+}
+
 export function CostayacoRcaEventsApp({
   events: eventsProp,
   onEventChange,
@@ -81,6 +86,7 @@ export function CostayacoRcaEventsApp({
   const equipoOptions = useMemo(() => {
     const set = new Set<string>();
     for (const e of events) {
+      if (isTemplateEvent(e)) continue;
       for (const eq of equiposList(e.equipo)) set.add(eq);
       if (typeof e.equipo === "string" && e.equipo === "PENDIENTE") set.add("PENDIENTE");
     }
@@ -91,6 +97,15 @@ export function CostayacoRcaEventsApp({
     const q = query.trim().toLowerCase();
     return [...events]
       .filter((e) => {
+        // Oculta plantilla Notion vacía salvo filtro/calidad vacía o búsqueda explícita.
+        if (
+          isTemplateEvent(e) &&
+          calidad !== "vacio" &&
+          !q.includes("blank") &&
+          !q.includes("plantilla")
+        ) {
+          return false;
+        }
         if (estado !== "Todos" && e.estado !== estado) return false;
         if (criticidad !== "Todos" && e.criticidad !== criticidad) return false;
         if (calidad !== "Todos" && e.calidad_dato !== calidad) return false;
@@ -122,7 +137,10 @@ export function CostayacoRcaEventsApp({
       inferido: 0,
       vacio: 0,
     };
-    for (const e of events) counts[e.calidad_dato] += 1;
+    for (const e of events) {
+      if (isTemplateEvent(e)) continue;
+      counts[e.calidad_dato] += 1;
+    }
     return counts;
   }, [events]);
 

@@ -1089,7 +1089,7 @@ export const INVENTORY_MINIMUMS: InventoryMinPack = {
     },
     {
       "id": "INV-0119",
-      "family": "",
+      "family": "SIN CLASIFICAR",
       "description": "MANGUERA DE ALTA PRESION 1.5MTS",
       "status": "BUENO",
       "stockMin": 1,

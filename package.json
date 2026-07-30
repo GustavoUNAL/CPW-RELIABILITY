@@ -9,7 +9,8 @@
     "start": "vite preview --host 0.0.0.0 --port 4173",
     "etl:operacion": "node scripts/etl-operacion.mjs",
     "etl:inventario": "node scripts/etl-inventario.mjs",
-    "etl:mantenimiento": "node scripts/etl-mantenimiento-sabana.mjs"
+    "etl:mantenimiento": "node scripts/etl-mantenimiento-sabana.mjs",
+    "audit:data": "node scripts/audit-data.mjs"
   },
   "keywords": [],
   "author": "",

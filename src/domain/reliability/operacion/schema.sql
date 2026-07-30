@@ -89,3 +89,49 @@ CREATE TABLE IF NOT EXISTS registro_conejo (
 CREATE INDEX IF NOT EXISTS idx_resumen_fecha ON resumen_diario (fecha);
 CREATE INDEX IF NOT EXISTS idx_evento_fecha ON evento_operacion (fecha);
 CREATE INDEX IF NOT EXISTS idx_horario_equipo ON registro_horario (equipo_id, fecha);
+
+-- ─── Extensión plataforma (diseño · la app Vite aún consume TS/JSON) ───
+
+CREATE TABLE IF NOT EXISTS snapshot_mensual (
+  fuente          TEXT NOT NULL CHECK (fuente IN ('copower','gran_tierra')),
+  mes_key         TEXT NOT NULL,
+  anio            SMALLINT NOT NULL,
+  disponibilidad  NUMERIC,
+  confiabilidad   NUMERIC,
+  energia_kwh     NUMERIC,
+  fallas          INTEGER,
+  payload_json    JSONB NOT NULL,
+  PRIMARY KEY (fuente, mes_key)
+);
+
+CREATE TABLE IF NOT EXISTS rca_evento (
+  id              TEXT PRIMARY KEY,
+  fecha           DATE,
+  equipo          TEXT,
+  titulo          TEXT NOT NULL,
+  estado          TEXT,
+  criticidad      TEXT,
+  calidad_dato    TEXT,
+  es_plantilla    BOOLEAN NOT NULL DEFAULT FALSE,
+  payload_json    JSONB NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS inventario_minimo (
+  id              TEXT PRIMARY KEY,
+  familia         TEXT NOT NULL,
+  descripcion     TEXT NOT NULL,
+  stock_min       NUMERIC NOT NULL,
+  existencia      NUMERIC NOT NULL,
+  part_number     TEXT,
+  estado          TEXT
+);
+
+CREATE TABLE IF NOT EXISTS plan_mto_ejecucion (
+  id              TEXT PRIMARY KEY,
+  fecha           DATE,
+  equipo          TEXT NOT NULL,
+  estado          TEXT NOT NULL,
+  horas_mto       NUMERIC,
+  horas_hombre    NUMERIC,
+  notas           TEXT
+);
