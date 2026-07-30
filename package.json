@@ -5,8 +5,9 @@
   "scripts": {
     "dev": "vite --port 5175 --strictPort",
     "build": "tsc -b && vite build",
-    "preview": "vite preview --host 0.0.0.0 --port 4173",
-    "start": "vite preview --host 0.0.0.0 --port 4173",
+    "preview": "vite preview --host 127.0.0.1 --port 4173 --strictPort",
+    "start": "vite preview --host 127.0.0.1 --port 4173 --strictPort",
+    "deploy:pm2": "npm run build && pm2 startOrReload ecosystem.config.cjs --update-env",
     "etl:operacion": "node scripts/etl-operacion.mjs",
     "etl:inventario": "node scripts/etl-inventario.mjs",
     "etl:mantenimiento": "node scripts/etl-mantenimiento-sabana.mjs",
