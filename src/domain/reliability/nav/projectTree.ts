@@ -90,6 +90,18 @@ export const PROJECT_NAV_TREE: NavModule[] = [
     ],
   },
   {
+    key: "concertacion",
+    label: "Concertación de horas",
+    description: "Reconciliación de horas del reporte diario de operaciones",
+    children: [
+      { id: "conc-resumen", label: "Resumen del período" },
+      { id: "conc-unidades", label: "Por unidad" },
+      { id: "conc-diario", label: "Detalle por día" },
+      { id: "conc-paradas", label: "Paradas y observaciones" },
+      { id: "conc-validacion", label: "Validación" },
+    ],
+  },
+  {
     key: "confiabilidad",
     label: "Confiabilidad",
     description: "Eventos, activos críticos, RCA y comparativos",

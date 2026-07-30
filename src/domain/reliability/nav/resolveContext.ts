@@ -237,6 +237,14 @@ const OPERACION_LEAVES = new Set([
   "bd-op-copower",
 ]);
 
+const CONCERTACION_LEAVES = new Set([
+  "conc-resumen",
+  "conc-unidades",
+  "conc-diario",
+  "conc-paradas",
+  "conc-validacion",
+]);
+
 export function resolveViewContext(page: PageKey, leafId: string): ViewContext {
   if (GEN_LEAVES.has(leafId) && leafId.startsWith("gen-")) {
     return {
@@ -244,6 +252,15 @@ export function resolveViewContext(page: PageKey, leafId: string): ViewContext {
       monthOrder: ["YTD2026"],
       reportLabel: "COPOWER · Generación YTD 2026",
       reportShort: "GEN",
+      fixedPeriod: true,
+    };
+  }
+  if (page === "concertacion" || CONCERTACION_LEAVES.has(leafId) || leafId.startsWith("conc-")) {
+    return {
+      report: "copower",
+      monthOrder: ["2026-07"],
+      reportLabel: "Concertación de horas · 12–29 jul 2026",
+      reportShort: "CONC",
       fixedPeriod: true,
     };
   }

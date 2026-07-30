@@ -16,6 +16,7 @@ export function LoginScreen({ onSuccess }: Props) {
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (busy) return;
     setError(null);
     setBusy(true);
     try {
@@ -48,7 +49,12 @@ export function LoginScreen({ onSuccess }: Props) {
             <input
               type="email"
               name="email"
+              inputMode="email"
               autoComplete="username"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              enterKeyHint="next"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="usuario@copower.com"
@@ -62,6 +68,7 @@ export function LoginScreen({ onSuccess }: Props) {
               type="password"
               name="password"
               autoComplete="current-password"
+              enterKeyHint="go"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
@@ -76,8 +83,12 @@ export function LoginScreen({ onSuccess }: Props) {
             </p>
           ) : null}
 
-          <button type="submit" className="login-submit" disabled={busy || !email || !password}>
-            <LogIn size={18} />
+          <button
+            type="submit"
+            className="login-submit"
+            disabled={busy || !email.trim() || !password}
+          >
+            <LogIn size={18} aria-hidden />
             {busy ? "Ingresando…" : "Iniciar sesión"}
           </button>
         </form>

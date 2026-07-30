@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   CalendarRange,
   ClipboardCheck,
+  Clock,
   Database,
   FileText,
   Gauge,
@@ -60,6 +61,7 @@ const MODULE_ICONS: Record<PageKey, ReactNode> = {
   campos: <MapPin size={16} />,
   generacion: <Zap size={16} />,
   operacion: <Database size={16} />,
+  concertacion: <Clock size={16} />,
   confiabilidad: <Gauge size={16} />,
   mantenimiento: <Wrench size={16} />,
   gestion_activos: <HeartPulse size={16} />,
@@ -332,6 +334,15 @@ function App() {
         ) : (
           <span className="mobile-month-fixed">{monthOptionLabel(selectedMonth, viewContext)}</span>
         )}
+        <button
+          type="button"
+          className="mobile-logout-btn"
+          onClick={handleLogout}
+          aria-label="Cerrar sesión"
+          title="Cerrar sesión"
+        >
+          <LogOut size={18} />
+        </button>
       </header>
 
       <button

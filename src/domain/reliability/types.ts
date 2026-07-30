@@ -161,6 +161,7 @@ export type PageKey =
   | "campos"
   | "generacion"
   | "operacion"
+  | "concertacion"
   | "confiabilidad"
   | "mantenimiento"
   | "gestion_activos"

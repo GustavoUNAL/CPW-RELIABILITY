@@ -12,6 +12,10 @@ import { FailureEventsView } from "./FailureEventsView";
 import { FailureClassificationView } from "./FailureClassificationView";
 import { EventInsightsDashboard } from "./EventInsightsDashboard";
 import { OperacionModule, operacionSectionFromLeaf } from "../operacion/OperacionModule";
+import {
+  ConcertacionHorasDashboard,
+} from "../concertacion/ConcertacionHorasDashboard";
+import { concertacionSectionFromLeaf } from "../concertacion/buildConcertacionAnalysis";
 import { InterventionPlansDashboard } from "./InterventionPlansDashboard";
 import { RcaAnalysisDashboard } from "./RcaAnalysisDashboard";
 import { CostayacoRcaEventsApp } from "../rca/CostayacoRcaEventsApp";
@@ -788,6 +792,15 @@ function PlatformBody({
   }
   if (leafId === "bd-historicos-gte") {
     return <SourceMonthCompare report="gran_tierra" month={month} monthLabel={monthLabel} />;
+  }
+
+  if (
+    page === "concertacion" ||
+    leafId.startsWith("conc-")
+  ) {
+    return (
+      <ConcertacionHorasDashboard section={concertacionSectionFromLeaf(leafId)} />
+    );
   }
 
   if (

@@ -11,6 +11,7 @@
     "etl:operacion": "node scripts/etl-operacion.mjs",
     "etl:inventario": "node scripts/etl-inventario.mjs",
     "etl:mantenimiento": "node scripts/etl-mantenimiento-sabana.mjs",
+    "etl:concertacion": "node scripts/etl-concertacion-horas.mjs",
     "audit:data": "node scripts/audit-data.mjs"
   },
   "keywords": [],
