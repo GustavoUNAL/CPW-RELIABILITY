@@ -1,5 +1,5 @@
 /**
- * PM2 — Reliability Analytics (opsai.reliability.space)
+ * PM2 — Reliability Analytics (reliability.opsai.space)
  *
  * Uso en el servidor:
  *   npm ci

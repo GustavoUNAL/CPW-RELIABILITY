@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Deploy en el servidor (opsai.reliability.space + PM2)
+# Deploy en el servidor (reliability.opsai.space + PM2)
 # Uso: bash scripts/deploy-server.sh
 set -euo pipefail
 
@@ -31,4 +31,4 @@ fi
 pm2 save
 pm2 status opsai-reliability
 
-echo "==> Listo · https://opsai.reliability.space"
+echo "==> Listo · https://reliability.opsai.space"

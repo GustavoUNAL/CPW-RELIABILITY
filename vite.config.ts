@@ -8,6 +8,12 @@ export default defineConfig({
     port: 4173,
     strictPort: true,
     // Nginx reenvía el dominio público; sin esto Vite responde 403.
-    allowedHosts: ["opsai.reliability.space", "localhost", "127.0.0.1"],
+    allowedHosts: [
+      "reliability.opsai.space",
+      "opsai.space",
+      "www.opsai.space",
+      "localhost",
+      "127.0.0.1",
+    ],
   },
 });
