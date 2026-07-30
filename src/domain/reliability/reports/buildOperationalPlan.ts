@@ -28,8 +28,10 @@ function baselineFromSourceMonth(sourceMonth: string): PlanBaselineSnapshot {
   const sistemaN = snap?.machineIndicators.find(
     (m) => m.unidad === "SISTEMA N" && m.campo === "COSTAYACO",
   );
-  const availabilityPct = sistemaN?.disponibilidadPct ?? (snap ? snap.kpi.availability * 100 : 0);
-  const reliabilityPct = sistemaN?.confiabilidadPct ?? (snap ? snap.kpi.reliability * 100 : 0);
+  const availabilityPct =
+    sistemaN?.disponibilidadPct ?? (snap?.kpi.availability != null ? snap.kpi.availability * 100 : 0);
+  const reliabilityPct =
+    sistemaN?.confiabilidadPct ?? (snap?.kpi.reliability != null ? snap.kpi.reliability * 100 : 0);
   const pfContr =
     sourceMonth === "Jun"
       ? JUNE_2026_IMPUTABLE_EVENTS.reduce((s, e) => s + e.hoursPfContr, 0)
