@@ -102,6 +102,7 @@ function App() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [selectedMonth, setSelectedMonth] = useState<string>("Jun");
   const [navOpen, setNavOpen] = useState(false);
+  const [isMobileNav, setIsMobileNav] = useState(false);
   const [analyticsSessionId, setAnalyticsSessionId] = useState(() => getOrCreateAnalyticsSessionId());
   const sessionStartedAtRef = useRef(Date.now());
   const pageStartedAtRef = useRef(Date.now());
@@ -127,6 +128,7 @@ function App() {
   useEffect(() => {
     const mq = window.matchMedia(MOBILE_MQ);
     const onChange = () => {
+      setIsMobileNav(mq.matches);
       if (!mq.matches) setNavOpen(false);
     };
     onChange();
@@ -417,31 +419,13 @@ function App() {
           aria-controls="app-sidebar"
           onClick={() => setNavOpen((v) => !v)}
         >
-          {navOpen ? <X size={20} /> : <Menu size={20} />}
+          {navOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
         <div className="mobile-topbar-copy">
           <p className="eyebrow">COPOWER</p>
-          <strong>{session.name}</strong>
-          <span>
-            {activeModule?.label ?? "Dashboard"} · {activeLeafLabel}
-          </span>
+          <strong>{activeModule?.label ?? "Dashboard"}</strong>
+          <span>{activeLeafLabel}</span>
         </div>
-        {!viewContext.fixedPeriod ? (
-          <select
-            className="mobile-month-select"
-            aria-label="Periodo"
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(e.target.value)}
-          >
-            {viewContext.monthOrder.map((month) => (
-              <option key={month} value={month}>
-                {monthOptionLabel(month, viewContext)}
-              </option>
-            ))}
-          </select>
-        ) : (
-          <span className="mobile-month-fixed">{monthOptionLabel(selectedMonth, viewContext)}</span>
-        )}
         <button
           type="button"
           className="mobile-logout-btn"
@@ -458,10 +442,15 @@ function App() {
         className={`nav-backdrop${navOpen ? " open" : ""}`}
         aria-label="Cerrar menú"
         tabIndex={navOpen ? 0 : -1}
+        aria-hidden={!navOpen}
         onClick={() => setNavOpen(false)}
       />
 
-      <aside id="app-sidebar" className={`sidebar${navOpen ? " open" : ""}`}>
+      <aside
+        id="app-sidebar"
+        className={`sidebar${navOpen ? " open" : ""}`}
+        aria-hidden={isMobileNav && !navOpen ? true : undefined}
+      >
         <div className="sidebar-mobile-head">
           <div className="brand">
             <p className="eyebrow">COPOWER</p>
