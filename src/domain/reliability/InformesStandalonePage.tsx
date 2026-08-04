@@ -3,7 +3,9 @@ import { ArrowLeft, Maximize2 } from "lucide-react";
 import {
   LoginScreen,
   ROLE_LABELS,
+  canAccessInformes,
   clearSession,
+  isInformesOnlyRole,
   loadSession,
   persistSession,
   type SessionUser,
@@ -82,14 +84,14 @@ export function InformesStandalonePage({ embedded = false }: Props) {
     );
   }
 
-  if (session && session.role !== "admin") {
+  if (session && !canAccessInformes(session.role)) {
     return (
       <div className={`app-shell ${theme} login-shell`}>
         <div className="login-card">
           <p className="login-brand-mark">COPOWER</p>
           <h1 className="login-brand-title">Informes</h1>
           <p className="login-error" role="alert">
-            Acceso solo para administradores.
+            No tienes permiso para ver Resultados de Gestión.
           </p>
           <a className="login-submit" href="/" style={{ textDecoration: "none" }}>
             <ArrowLeft size={18} />
@@ -201,10 +203,12 @@ export function InformesStandalonePage({ embedded = false }: Props) {
         </div>
 
         <div className="tree-panel informes-standalone-actions">
-          <a className="menu-item" href="/" title="Volver a la plataforma">
-            <ArrowLeft size={16} />
-            <span>Plataforma</span>
-          </a>
+          {session && !isInformesOnlyRole(session.role) ? (
+            <a className="menu-item" href="/" title="Volver a la plataforma">
+              <ArrowLeft size={16} />
+              <span>Plataforma</span>
+            </a>
+          ) : null}
           {session ? (
             <button type="button" className="menu-item session-logout-full" onClick={handleLogout}>
               <span>

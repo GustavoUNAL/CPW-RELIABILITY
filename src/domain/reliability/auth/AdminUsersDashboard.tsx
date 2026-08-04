@@ -6,7 +6,7 @@ const ROLE_HINT: Record<UserRole, string> = {
   innovacion: "Análisis, RCA y módulos de mejora",
   gerencia: "Resúmenes ejecutivos e indicadores",
   operacion: "Operación diaria, eventos y mantenimiento",
-  generacion: "Módulo de generación · energía y unidades",
+  generacion: "Solo Resultados de Gestión (Informes)",
 };
 
 export function AdminUsersDashboard() {

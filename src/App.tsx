@@ -51,8 +51,12 @@ import {
 import {
   LoginScreen,
   ROLE_LABELS,
+  canAccessInformes,
   clearSession,
+  defaultHomeForRole,
+  filterNavForRole,
   getOrCreateAnalyticsSessionId,
+  isInformesOnlyRole,
   loadSession,
   persistSession,
   trackHeartbeat,
@@ -154,12 +158,8 @@ function App() {
 
   const monthLabel = monthOptionLabel(selectedMonth, viewContext);
   const visibleNavTree = useMemo(
-    () =>
-      PROJECT_NAV_TREE.filter(
-        (m) =>
-          (m.key !== "admin" && !m.adminOnly) || session?.role === "admin",
-      ),
-    [session?.role],
+    () => (session ? filterNavForRole(PROJECT_NAV_TREE, session.role) : []),
+    [session],
   );
   const activeModule =
     visibleNavTree.find((m) => m.key === activePage) ??
@@ -167,12 +167,24 @@ function App() {
   const activeLeafLabel =
     (activeModule ? findLeafLabel(activeModule.children, activeLeafId) : null) ?? activeLeafId;
 
+  // Land informes-only users on Resultados de Gestión; keep others out of informes unless allowed.
   useEffect(() => {
-    if (activePage !== "informes") return;
-    if (session?.role === "admin") return;
-    setActivePage(DEFAULT_MODULE.key);
-    setActiveLeafId(DEFAULT_LEAF);
-  }, [activePage, session?.role]);
+    if (!session) return;
+    if (isInformesOnlyRole(session.role)) {
+      if (activePage !== "informes") {
+        const home = defaultHomeForRole(session.role);
+        setActivePage(home.page);
+        setActiveLeafId(home.leaf);
+        setOpenModules((prev) => ({ ...prev, informes: true }));
+      }
+      return;
+    }
+    if (activePage === "informes" && !canAccessInformes(session.role)) {
+      const home = defaultHomeForRole(session.role);
+      setActivePage(home.page);
+      setActiveLeafId(home.leaf);
+    }
+  }, [activePage, session]);
 
   useEffect(() => {
     if (!session) return;
@@ -260,6 +272,10 @@ function App() {
     lastHeartbeatPageAtRef.current = Date.now();
     persistSession(user);
     setSession(user);
+    const home = defaultHomeForRole(user.role);
+    setActivePage(home.page);
+    setActiveLeafId(home.leaf);
+    setOpenModules({ [home.page]: true });
     void trackLogin(user, sid);
   };
 
@@ -602,23 +618,25 @@ function App() {
             })}
           </nav>
         </div>
-        <div className="tree-panel">
-          <p className="eyebrow">Documentación</p>
-          <nav className="menu">
-            <a
-              className="menu-item"
-              href={OM_COLOMBIA_URL}
-              target="_blank"
-              rel="noreferrer"
-              title="Abrir O&M COLOMBIA"
-            >
-              <span>
-                <FileText size={16} />
-              </span>
-              <span>O&amp;M COLOMBIA</span>
-            </a>
-          </nav>
-        </div>
+        {!isInformesOnlyRole(session.role) ? (
+          <div className="tree-panel">
+            <p className="eyebrow">Documentación</p>
+            <nav className="menu">
+              <a
+                className="menu-item"
+                href={OM_COLOMBIA_URL}
+                target="_blank"
+                rel="noreferrer"
+                title="Abrir O&M COLOMBIA"
+              >
+                <span>
+                  <FileText size={16} />
+                </span>
+                <span>O&amp;M COLOMBIA</span>
+              </a>
+            </nav>
+          </div>
+        ) : null}
       </aside>
 
       <main className={viewContext.report === "dual" ? "main main-dual" : "main"}>
