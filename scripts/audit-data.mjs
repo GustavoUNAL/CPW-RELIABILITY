@@ -68,6 +68,8 @@ const required = [
   "src/domain/reliability/nav/projectTree.ts",
   "src/domain/reliability/reports/PlatformContent.tsx",
   "src/domain/reliability/db/catalog.ts",
+  "src/domain/reliability/reports/concertacionHoursData.ts",
+  "src/domain/reliability/reports/InformesResultadosDashboard.tsx",
 ];
 for (const f of required) {
   if (exists(f)) ok("files", `OK ${f}`);
@@ -147,6 +149,17 @@ try {
   for (const id of leaves) {
     let hit = platform.includes(`"${id}"`);
     if (!hit && id.startsWith("gen-")) hit = platform.includes('leafId.startsWith("gen-")');
+    if (!hit && id.startsWith("inf-")) {
+      hit =
+        platform.includes('leafId.startsWith("inf-")') ||
+        platform.includes("InformesResultadosDashboard");
+    }
+    if (!hit && id.startsWith("conc-")) {
+      hit =
+        platform.includes('leafId.startsWith("conc-")') ||
+        platform.includes("ConcertacionHorasDashboard") ||
+        platform.includes("page === \"concertacion\"");
+    }
     if (!hit && id.startsWith("cfg-campos-")) hit = platform.includes("cfg-campos-");
     if (!hit && id.startsWith("capa-")) hit = platform.includes("capa-");
     if (
@@ -181,6 +194,57 @@ try {
   }
 } catch (e) {
   error("months", String(e.message || e));
+}
+
+// --- Concertación (Informes) ---
+try {
+  const src = read("src/domain/reliability/reports/concertacionHoursData.ts");
+  const pack = extractJsonExport(src, "CONCERTACION_HOURS");
+  if (!pack?.months) {
+    error("concertacion", "No se pudo parsear CONCERTACION_HOURS");
+  } else {
+    const months = Object.keys(pack.months);
+    ok("concertacion", `Meses ${months.join(", ")} · fuente Informes`);
+    for (const mk of months) {
+      const p = pack.months[mk];
+      const t = p.totals;
+      const sumKwh = (p.units || []).reduce((s, u) => s + (u.kwh || 0), 0);
+      const dailyKwh = (p.daily || []).reduce((s, r) => s + (r.kwh || 0), 0);
+      const sumOp = (p.units || []).reduce((s, u) => s + (u.op || 0), 0);
+      const sumFail = (p.units || []).reduce((s, u) => s + (u.failures || 0), 0);
+      if (Math.abs(sumKwh - t.kwh) > 1 || Math.abs(dailyKwh - t.kwh) > 1) {
+        error("concertacion", `${mk}: kWh units/daily ≠ totals`);
+      } else if (Math.abs(sumOp - t.op) > 0.1 || sumFail !== t.failures) {
+        error("concertacion", `${mk}: OP/fallas units ≠ totals`);
+      } else {
+        ok(
+          "concertacion",
+          `${mk}: ${Math.round(t.kwh).toLocaleString("es-CO")} kWh · ${t.units} u · ${t.failures} fallas · disp ${t.availabilityPct?.toFixed?.(1) ?? "N/D"}%`,
+        );
+      }
+    }
+    for (const g of pack.generation3m || []) {
+      const p = pack.months[g.month];
+      if (!p) {
+        warn("concertacion", `generation3m ${g.month} sin pack mensual`);
+        continue;
+      }
+      const gas = p.units.filter((u) => u.fuel === "GAS").reduce((s, u) => s + u.kwh, 0);
+      const diesel = p.units.filter((u) => u.fuel === "DIESEL").reduce((s, u) => s + u.kwh, 0);
+      if (Math.abs(gas - g.gasKwh) > 1 || Math.abs(diesel - g.dieselKwh) > 1) {
+        error("concertacion", `generation3m ${g.month} ≠ suma por combustible`);
+      }
+    }
+    if (
+      exists("data/concertacion horas/Horas concertadas con GTE del 01 al 31 julio 2026.xlsx")
+    ) {
+      ok("concertacion", "Excel fuente horas concertadas presente");
+    } else {
+      warn("concertacion", "Falta Excel fuente en data/concertacion horas/");
+    }
+  }
+} catch (e) {
+  error("concertacion", String(e.message || e));
 }
 
 // Report

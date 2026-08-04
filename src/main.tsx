@@ -1,10 +1,13 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
+import { InformesStandalonePage, isInformesPath } from "./domain/reliability/InformesStandalonePage";
 import "./styles.css";
 
-createRoot(document.getElementById("root")!).render(
+const root = createRoot(document.getElementById("root")!);
+
+root.render(
   <StrictMode>
-    <App />
+    {isInformesPath() ? <InformesStandalonePage /> : <App />}
   </StrictMode>,
 );

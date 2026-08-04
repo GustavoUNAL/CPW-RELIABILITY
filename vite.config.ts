@@ -16,4 +16,6 @@ export default defineConfig({
       "127.0.0.1",
     ],
   },
+  // SPA fallback para /informes y otras rutas cliente
+  appType: "spa",
 });

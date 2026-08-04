@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   LogOut,
   MapPin,
+  Maximize2,
   Menu,
   Shield,
   UserRound,
@@ -72,6 +73,7 @@ const MODULE_ICONS: Record<PageKey, ReactNode> = {
   gestion_activos: <HeartPulse size={16} />,
   gestion_acciones: <ClipboardCheck size={16} />,
   planeacion: <CalendarRange size={16} />,
+  informes: <FileText size={16} />,
   admin: <Shield size={16} />,
 };
 
@@ -151,9 +153,26 @@ function App() {
   }, [navOpen]);
 
   const monthLabel = monthOptionLabel(selectedMonth, viewContext);
-  const activeModule = PROJECT_NAV_TREE.find((m) => m.key === activePage);
+  const visibleNavTree = useMemo(
+    () =>
+      PROJECT_NAV_TREE.filter(
+        (m) =>
+          (m.key !== "admin" && !m.adminOnly) || session?.role === "admin",
+      ),
+    [session?.role],
+  );
+  const activeModule =
+    visibleNavTree.find((m) => m.key === activePage) ??
+    PROJECT_NAV_TREE.find((m) => m.key === activePage);
   const activeLeafLabel =
     (activeModule ? findLeafLabel(activeModule.children, activeLeafId) : null) ?? activeLeafId;
+
+  useEffect(() => {
+    if (activePage !== "informes") return;
+    if (session?.role === "admin") return;
+    setActivePage(DEFAULT_MODULE.key);
+    setActiveLeafId(DEFAULT_LEAF);
+  }, [activePage, session?.role]);
 
   useEffect(() => {
     if (!session) return;
@@ -535,41 +554,52 @@ function App() {
         <div className="tree-panel project-tree">
           <p className="eyebrow">Árbol del proyecto</p>
           <nav className="project-nav" aria-label="Módulos del sistema">
-            {PROJECT_NAV_TREE.filter((mod) => mod.key !== "admin" || session.role === "admin").map(
-              (mod) => {
-                const isActive = activePage === mod.key;
-                const isOpen = openModules[mod.key] ?? isActive;
-                return (
-                  <div key={mod.key} className={isActive ? "project-mod active" : "project-mod"}>
-                    <div className="project-mod-row">
-                      <button
-                        type="button"
-                        className="project-mod-toggle"
-                        aria-expanded={isOpen}
-                        onClick={() => toggleModule(mod.key)}
-                        title={isOpen ? "Contraer" : "Expandir"}
+            {visibleNavTree.map((mod) => {
+              const isActive = activePage === mod.key;
+              const isOpen = openModules[mod.key] ?? isActive;
+              return (
+                <div key={mod.key} className={isActive ? "project-mod active" : "project-mod"}>
+                  <div className="project-mod-row">
+                    <button
+                      type="button"
+                      className="project-mod-toggle"
+                      aria-expanded={isOpen}
+                      onClick={() => toggleModule(mod.key)}
+                      title={isOpen ? "Contraer" : "Expandir"}
+                    >
+                      {isOpen ? "▾" : "▸"}
+                    </button>
+                    <button
+                      type="button"
+                      className={isActive ? "project-mod-btn active" : "project-mod-btn"}
+                      onClick={() => selectModule(mod.key)}
+                      title={mod.description}
+                    >
+                      <span className="project-mod-icon">{MODULE_ICONS[mod.key]}</span>
+                      <span className="project-mod-label">
+                        <strong>{mod.label}</strong>
+                      </span>
+                    </button>
+                    {mod.key === "informes" ? (
+                      <a
+                        className="project-mod-fullscreen"
+                        href="/informes"
+                        target="_blank"
+                        rel="noreferrer"
+                        title="Abrir Informes en ventana completa"
+                        aria-label="Abrir Informes en ventana completa"
+                        onClick={(e) => e.stopPropagation()}
                       >
-                        {isOpen ? "▾" : "▸"}
-                      </button>
-                      <button
-                        type="button"
-                        className={isActive ? "project-mod-btn active" : "project-mod-btn"}
-                        onClick={() => selectModule(mod.key)}
-                        title={mod.description}
-                      >
-                        <span className="project-mod-icon">{MODULE_ICONS[mod.key]}</span>
-                        <span className="project-mod-label">
-                          <strong>{mod.label}</strong>
-                        </span>
-                      </button>
-                    </div>
-                    {isOpen ? (
-                      <ul className="project-leaves">{renderNavNodes(mod.key, mod.children)}</ul>
+                        <Maximize2 size={14} />
+                      </a>
                     ) : null}
                   </div>
-                );
-              },
-            )}
+                  {isOpen ? (
+                    <ul className="project-leaves">{renderNavNodes(mod.key, mod.children)}</ul>
+                  ) : null}
+                </div>
+              );
+            })}
           </nav>
         </div>
         <div className="tree-panel">

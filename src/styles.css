@@ -3101,9 +3101,9 @@ tr.row-focal td {
 
 .project-mod-row {
   display: grid;
-  grid-template-columns: 1.6rem minmax(0, 1fr);
+  grid-template-columns: 1.6rem minmax(0, 1fr) auto;
   gap: 0.15rem;
-  align-items: stretch;
+  align-items: center;
 }
 
 .project-mod-toggle {
@@ -3113,6 +3113,13 @@ tr.row-focal td {
   cursor: pointer;
   font-size: 0.75rem;
   padding: 0;
+}
+
+.project-mod-toggle--empty {
+  display: inline-block;
+  width: 0.85rem;
+  flex-shrink: 0;
+  cursor: default;
 }
 
 .project-mod-btn {
@@ -12480,5 +12487,160 @@ tr.row-focal td {
   .dash-source-strip,
   .dash-chart-grid {
     grid-template-columns: 1fr !important;
+  }
+}
+
+.inf-blank-slot {
+  min-height: 14rem;
+  border: 1px dashed color-mix(in srgb, var(--border) 80%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--panel-soft) 70%, transparent);
+}
+
+.inf-resultados .inf-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.1rem;
+}
+
+.inf-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--panel-soft) 85%, transparent);
+}
+
+.inf-kpi span {
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.inf-kpi strong {
+  font-size: 1.05rem;
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.inf-kpi small {
+  font-size: 0.7rem;
+}
+
+.inf-source-note {
+  margin-top: 1rem;
+  font-size: 0.75rem;
+}
+
+.inf-resultados .table-wrap {
+  margin-top: 0.75rem;
+}
+
+.inf-resultados .detalle-cell {
+  max-width: 28rem;
+  white-space: normal;
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+/* Hojas de Informes: títulos largos en el árbol */
+.project-mod[data-key="informes"] .project-leaf,
+.project-leaves .project-leaf {
+  align-items: flex-start;
+}
+
+.project-leaves .project-leaf span {
+  white-space: normal;
+  line-height: 1.25;
+  font-size: 0.78rem;
+}
+
+/* Informes · botón vista completa */
+.project-mod-row .project-mod-btn {
+  min-width: 0;
+}
+
+.project-mod-fullscreen {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  background: var(--panel-soft);
+  text-decoration: none;
+}
+
+.project-mod-fullscreen:hover {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+}
+
+.informes-standalone-sidebar {
+  width: min(280px, 100%);
+}
+
+.informes-standalone-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.85rem;
+}
+
+.informes-standalone-head h2 {
+  margin: 0.2rem 0 0.15rem;
+  font-size: 1.25rem;
+  line-height: 1.25;
+}
+
+.informes-standalone-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 0.72rem;
+  font-weight: 650;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.informes-standalone-actions {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.informes-standalone-actions .menu-item,
+.session-logout-full {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .informes-standalone {
+    grid-template-columns: 1fr;
+  }
+
+  .informes-standalone-sidebar {
+    position: relative;
+    height: auto;
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
   }
 }

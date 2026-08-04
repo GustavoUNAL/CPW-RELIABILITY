@@ -11,6 +11,8 @@ export type NavModule = {
   key: PageKey;
   label: string;
   description: string;
+  /** Si true, solo visible para rol admin. */
+  adminOnly?: boolean;
   children: NavNode[];
 };
 
@@ -219,6 +221,43 @@ export const PROJECT_NAV_TREE: NavModule[] = [
       { id: "op-cronograma", label: "Cronograma" },
       { id: "op-compromisos", label: "Compromisos" },
       { id: "op-recursos", label: "Recursos y repuestos" },
+    ],
+  },
+  {
+    key: "informes",
+    label: "Informes",
+    description: "Resultados de gestión · administración",
+    adminOnly: true,
+    children: [
+      {
+        id: "inf-resultados",
+        label: "Resultados de Gestión",
+        children: [
+          { id: "inf-rg-indisponibilidad", label: "Indisponibilidad" },
+          { id: "inf-rg-desempeno", label: "Desempeño del periodo" },
+          { id: "inf-rg-ops-rendimiento", label: "Rendimiento por unidad" },
+          { id: "inf-rg-ops-gen-gas", label: "Generación 3 meses · Gas" },
+          { id: "inf-rg-ops-gen-diesel", label: "Generación 3 meses · Diésel" },
+          { id: "inf-rg-ops-kwh-top5", label: "kWh generados y Top 5" },
+          { id: "inf-rg-ops-horas", label: "Operación vs stand-by" },
+          { id: "inf-rg-ops-fallas", label: "Análisis de fallas" },
+          { id: "inf-rg-ops-externos", label: "Factores externos" },
+          { id: "inf-rg-ops-externos-eventos", label: "Eventos externos principales" },
+          { id: "inf-rg-ops-maniobras", label: "Maniobras operativas" },
+          { id: "inf-rg-ops-causas", label: "Causas de indisponibilidad" },
+          { id: "inf-rg-ops-criticidad", label: "Criticidad por equipo" },
+          { id: "inf-rg-ops-acciones", label: "Acciones correctivas" },
+          { id: "inf-rg-anexo-gte", label: "Anexo resultados GTE" },
+          { id: "inf-rg-anexo-ops", label: "Anexo operaciones" },
+          { id: "inf-rg-anexo-imagenes", label: "Anexo imágenes" },
+          { id: "inf-rg-gas-mqt", label: "Operación gas MQT" },
+          { id: "inf-rg-inv", label: "Inventarios" },
+          { id: "inf-rg-inv-prev", label: "Inventarios · periodo anterior" },
+          { id: "inf-rg-pruebas-dinamicas", label: "Pruebas dinámicas" },
+          { id: "inf-rg-implementaciones", label: "Implementaciones" },
+          { id: "inf-rg-cargabilidad", label: "Prueba de cargabilidad" },
+        ],
+      },
     ],
   },
   {

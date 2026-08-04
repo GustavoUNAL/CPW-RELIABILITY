@@ -167,6 +167,7 @@ export type PageKey =
   | "gestion_activos"
   | "gestion_acciones"
   | "planeacion"
+  | "informes"
   | "admin";
 
 export type ReportKey = "gran_tierra" | "copower";

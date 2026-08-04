@@ -76,6 +76,22 @@ export const DATASET_CATALOG: readonly DatasetEntry[] = [
     period: "2026",
   },
   {
+    id: "concertacion-horas",
+    label: "Horas concertadas GTE (Informes)",
+    kind: "etl_generated",
+    path: "src/domain/reliability/reports/concertacionHoursData.ts",
+    consumers: [
+      "inf-rg-desempeno",
+      "inf-rg-indisponibilidad",
+      "inf-rg-ops-rendimiento",
+      "inf-rg-ops-gen-gas",
+      "inf-rg-ops-gen-diesel",
+    ],
+    period: "May–Jul 2026",
+    notes:
+      "Fuente propia de Informes. No alinear 1:1 con COPOWER/GTE monthly (criterios y cortes distintos).",
+  },
+  {
     id: "rca-costayaco-junio",
     label: "Fichas RCA Costayaco junio",
     kind: "rca_seed",

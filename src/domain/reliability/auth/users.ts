@@ -1,4 +1,4 @@
-export type UserRole = "admin" | "innovacion" | "gerencia" | "operacion";
+export type UserRole = "admin" | "innovacion" | "gerencia" | "operacion" | "generacion";
 
 export type AppUser = {
   id: string;
@@ -21,6 +21,7 @@ export const ROLE_LABELS: Record<UserRole, string> = {
   innovacion: "Innovación",
   gerencia: "Gerencia",
   operacion: "Operación",
+  generacion: "Generación",
 };
 
 /**
@@ -55,6 +56,13 @@ export const APP_USERS: readonly AppUser[] = [
     email: "operacion@copower.com",
     role: "operacion",
     passwordHash: "2f2d3f374865dad84c9ec01a4c1c867ca73ac9dadfa555d4c239b2fbc25511c9",
+  },
+  {
+    id: "usr-juan-carlos-pabon",
+    name: "Juan Carlos Pabón",
+    email: "juan.carlos.pabon@copower.com",
+    role: "generacion",
+    passwordHash: "0cea4f3a67fde2f1198053ffad21ced52d79dffc072141b6399955331282b8ca",
   },
 ];
 

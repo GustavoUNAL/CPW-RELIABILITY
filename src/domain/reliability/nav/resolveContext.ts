@@ -217,13 +217,13 @@ function isGteLeaf(_page: PageKey, leafId: string) {
 }
 
 function isDualLeaf(page: PageKey, leafId: string) {
-  if (page === "gestion_acciones" || page === "planeacion") return true;
+  if (page === "gestion_acciones" || page === "planeacion" || page === "informes") return true;
   if (page === "mantenimiento" && (leafId === "mto-dashboard" || leafId === "dash-mto")) return true;
   if (page === "gestion_activos" && leafId.startsWith("capa")) return true;
   if (leafId === "cmp-periodo-copower" || leafId === "cmp-periodo-gte") return false;
   if (leafId.startsWith("cmp-")) return true;
   if (leafId.startsWith("cq-")) return true;
-  if (leafId.startsWith("rep-inf-")) return true;
+  if (leafId.startsWith("inf-") || leafId.startsWith("rep-inf-")) return true;
   if (DUAL_LEAVES.has(leafId) || leafId.startsWith("cfg-campos-")) return true;
   return false;
 }

@@ -58,6 +58,7 @@ import { UsageAnalyticsDashboard } from "../auth/UsageAnalyticsDashboard";
 import type { PageKey, ReportKey } from "../types";
 import { METRIC_DEFS } from "../ui/metricDefs";
 import { EmptyScreen, ScreenShell } from "../ui/ScreenShell";
+import { InformesResultadosDashboard } from "./InformesResultadosDashboard";
 
 type Props = {
   page: PageKey;
@@ -403,6 +404,12 @@ function PlatformBody({
       );
     }
     return <UsageAnalyticsDashboard />;
+  }
+
+  if (page === "informes" || leafId.startsWith("inf-")) {
+    return (
+      <InformesResultadosDashboard leafId={leafId} month={month} monthLabel={monthLabel} />
+    );
   }
 
   if (leafId.startsWith("gen-")) {
@@ -967,6 +974,12 @@ export function PlatformContent({
       );
     }
     return <UsageAnalyticsDashboard />;
+  }
+
+  if (page === "informes" || leafId.startsWith("inf-")) {
+    return (
+      <InformesResultadosDashboard leafId={leafId} month={month} monthLabel={monthLabel} />
+    );
   }
 
   if (leafId.startsWith("cmp-")) {
