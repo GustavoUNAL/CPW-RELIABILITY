@@ -335,7 +335,7 @@ function App() {
     setActivePage(next.page);
     setActiveLeafId(next.leaf);
     setOpenModules({ [next.page]: true });
-    replaceAppUrl(next.page, next.leaf, next.focusId);
+    replaceAppUrl(next.page, next.leaf, "focusId" in next ? next.focusId : null);
     void trackLogin(user, sid);
   };
 
