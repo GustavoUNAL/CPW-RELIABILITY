@@ -325,17 +325,18 @@ function App() {
     setSession(user);
     const fromUrl = parsePath();
     const home = defaultHomeForRole(user.role);
-    const next =
-      fromUrl &&
+    const canKeepUrl =
+      Boolean(fromUrl) &&
       (isInformesOnlyRole(user.role)
-        ? fromUrl.page === "informes"
-        : fromUrl.page !== "informes" || canAccessInformes(user.role))
-        ? fromUrl
-        : home;
-    setActivePage(next.page);
-    setActiveLeafId(next.leaf);
-    setOpenModules({ [next.page]: true });
-    replaceAppUrl(next.page, next.leaf, "focusId" in next ? next.focusId : null);
+        ? fromUrl!.page === "informes"
+        : fromUrl!.page !== "informes" || canAccessInformes(user.role));
+    const nextPage = canKeepUrl && fromUrl ? fromUrl.page : home.page;
+    const nextLeaf = canKeepUrl && fromUrl ? fromUrl.leaf : home.leaf;
+    const nextFocus = canKeepUrl && fromUrl ? fromUrl.focusId : null;
+    setActivePage(nextPage);
+    setActiveLeafId(nextLeaf);
+    setOpenModules({ [nextPage]: true });
+    replaceAppUrl(nextPage, nextLeaf, nextFocus);
     void trackLogin(user, sid);
   };
 
