@@ -15,26 +15,33 @@ import {
   type NavNode,
 } from "./nav/projectTree";
 import { defaultMonth, monthOptionLabel, resolveViewContext } from "./nav/resolveContext";
+import {
+  buildInformesPath,
+  parsePath,
+  pushAppUrl,
+  replaceAppUrl,
+} from "./nav/urlRouting";
 import { PlatformContent } from "./reports/PlatformContent";
 
 const INFORMES_MODULE = PROJECT_NAV_TREE.find((m) => m.key === "informes");
 const DEFAULT_LEAF = firstLeafId(INFORMES_MODULE?.children ?? []) ?? "inf-rg-indisponibilidad";
 
-export function isInformesPath(pathname = window.location.pathname) {
-  const clean = pathname.replace(/\/+$/, "") || "/";
-  return clean === "/informes";
+function leafFromLocation(): string {
+  const parsed = parsePath();
+  if (parsed?.page === "informes") return parsed.leaf;
+  return DEFAULT_LEAF;
 }
 
 /**
- * Vista dedicada `/informes`: acceso público (sin login).
- * Se sirve en el mismo dominio (p. ej. https://reliability.opsai.space/informes).
+ * Vista dedicada `/informes/...`: acceso público (sin login).
+ * Se sirve en el mismo dominio (p. ej. https://reliability.opsai.space/informes/indisponibilidad).
  * El resto de la plataforma sigue protegido en `/`.
  */
 export function InformesStandalonePage() {
   const [session, setSession] = useState<SessionUser | null>(() => loadSession());
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [selectedMonth, setSelectedMonth] = useState("Jun");
-  const [activeLeafId, setActiveLeafId] = useState(DEFAULT_LEAF);
+  const [activeLeafId, setActiveLeafId] = useState(leafFromLocation);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     "inf-resultados": true,
   });
@@ -44,6 +51,19 @@ export function InformesStandalonePage() {
     document.body.classList.toggle("theme-dark", theme === "dark");
     document.title = `Informes · ${PROJECT_TITLE}`;
   }, [theme]);
+
+  // Normaliza `/informes` → `/informes/indisponibilidad` y sincroniza URL.
+  useEffect(() => {
+    replaceAppUrl("informes", activeLeafId);
+  }, [activeLeafId]);
+
+  useEffect(() => {
+    const onPop = () => {
+      setActiveLeafId(leafFromLocation());
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
 
   const viewContext = useMemo(
     () => resolveViewContext("informes", activeLeafId),
@@ -59,6 +79,7 @@ export function InformesStandalonePage() {
   const monthLabel = monthOptionLabel(selectedMonth, viewContext);
   const leafLabel =
     (INFORMES_MODULE ? findLeafLabel(INFORMES_MODULE.children, activeLeafId) : null) ?? activeLeafId;
+  const pathLabel = buildInformesPath(activeLeafId);
 
   const handleLogout = () => {
     clearSession();
@@ -71,6 +92,7 @@ export function InformesStandalonePage() {
 
   const selectLeaf = (leafId: string) => {
     setActiveLeafId(leafId);
+    pushAppUrl("informes", leafId);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -167,7 +189,7 @@ export function InformesStandalonePage() {
 
         <div className="tree-panel informes-standalone-actions">
           {session && !isInformesOnlyRole(session.role) ? (
-            <a className="menu-item" href="/" title="Volver a la plataforma">
+            <a className="menu-item" href="/dashboard/resumen" title="Volver a la plataforma">
               <ArrowLeft size={16} />
               <span>Plataforma</span>
             </a>
@@ -186,7 +208,7 @@ export function InformesStandalonePage() {
       <main className="main main-dual">
         <header className="informes-standalone-head">
           <div>
-            <p className="eyebrow">Vista completa · /informes</p>
+            <p className="eyebrow">Vista completa · {pathLabel}</p>
             <h2>{leafLabel}</h2>
             <p className="muted">{monthLabel}</p>
           </div>
