@@ -1,13 +1,10 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { ArrowLeft, Maximize2 } from "lucide-react";
 import {
-  LoginScreen,
   ROLE_LABELS,
-  canAccessInformes,
   clearSession,
   isInformesOnlyRole,
   loadSession,
-  persistSession,
   type SessionUser,
 } from "./auth";
 import {
@@ -28,15 +25,12 @@ export function isInformesPath(pathname = window.location.pathname) {
   return clean === "/informes";
 }
 
-type Props = {
-  /** Si true, omite el shell de login (solo cuando App ya autenticó). */
-  embedded?: boolean;
-};
-
 /**
- * Vista dedicada `/informes`: solo Resultados de Gestión + selector de mes.
+ * Vista dedicada `/informes`: acceso público (sin login).
+ * Se sirve en el mismo dominio (p. ej. https://reliability.opsai.space/informes).
+ * El resto de la plataforma sigue protegido en `/`.
  */
-export function InformesStandalonePage({ embedded = false }: Props) {
+export function InformesStandalonePage() {
   const [session, setSession] = useState<SessionUser | null>(() => loadSession());
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [selectedMonth, setSelectedMonth] = useState("Jun");
@@ -66,41 +60,10 @@ export function InformesStandalonePage({ embedded = false }: Props) {
   const leafLabel =
     (INFORMES_MODULE ? findLeafLabel(INFORMES_MODULE.children, activeLeafId) : null) ?? activeLeafId;
 
-  const handleLogin = (user: SessionUser) => {
-    persistSession(user);
-    setSession(user);
-  };
-
   const handleLogout = () => {
     clearSession();
     setSession(null);
   };
-
-  if (!session && !embedded) {
-    return (
-      <div className={`app-shell ${theme} login-shell`}>
-        <LoginScreen onSuccess={handleLogin} />
-      </div>
-    );
-  }
-
-  if (session && !canAccessInformes(session.role)) {
-    return (
-      <div className={`app-shell ${theme} login-shell`}>
-        <div className="login-card">
-          <p className="login-brand-mark">COPOWER</p>
-          <h1 className="login-brand-title">Informes</h1>
-          <p className="login-error" role="alert">
-            No tienes permiso para ver Resultados de Gestión.
-          </p>
-          <a className="login-submit" href="/" style={{ textDecoration: "none" }}>
-            <ArrowLeft size={18} />
-            Volver a la plataforma
-          </a>
-        </div>
-      </div>
-    );
-  }
 
   const toggleGroup = (id: string) => {
     setOpenGroups((prev) => ({ ...prev, [id]: !(prev[id] ?? true) }));
