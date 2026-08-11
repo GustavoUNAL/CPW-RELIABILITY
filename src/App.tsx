@@ -106,7 +106,7 @@ function App() {
     "capa-root": true,
   });
   const [theme, setTheme] = useState<"light" | "dark">("light");
-  const [selectedMonth, setSelectedMonth] = useState<string>("Jun");
+  const [selectedMonth, setSelectedMonth] = useState<string>("Jul");
   const [navOpen, setNavOpen] = useState(false);
   const [isMobileNav, setIsMobileNav] = useState(false);
   const [analyticsSessionId, setAnalyticsSessionId] = useState(() => getOrCreateAnalyticsSessionId());

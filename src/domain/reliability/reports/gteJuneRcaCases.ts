@@ -25,7 +25,7 @@ export type RcaCaseDetail = {
 };
 
 /** Bump para forzar rehidratación desde seed (localStorage). */
-export const GTE_JUNE_RCA_SEED = "2026-07-26-rca-r6";
+export const GTE_JUNE_RCA_SEED = "2026-08-11-julio-fo";
 
 function normAsset(id: string) {
   return id.toUpperCase().replace(/[^A-Z0-9]/g, "");
@@ -69,6 +69,8 @@ export function findRcaCasesForEvent(
  * RCA-001 ↔ IP-GTE-001 (K4) · RCA-002 ↔ IP-GTE-002 (escape) · RCA-003 ↔ IP-GTE-003 (intercooler)
  * RCA-004 ↔ IP-GTE-004 (Q>) · RCA-005 ↔ IP-GTE-005 (externo) · RCA-006 ↔ IP-GTE-006 (MRU)
  * RCA-007 ↔ IP-GTE-007 (FO-44) · RCA-008 ↔ IP-GTE-009 (CPW03) · RCA-030 = PDF formal 22-jun
+ * Julio FO-GE-033: RCA-070 (12-jul Quincy) · RCA-071 (21-jul CPW04) · RCA-072 (21-jul GLP)
+ * RCA-073 (24-jul EEP) · RCA-074 (25-jul manifold)
  */
 export function buildGteJuneRcaCases(): RcaCaseDetail[] {
   return [
@@ -345,6 +347,146 @@ export function buildGteJuneRcaCases(): RcaCaseDetail[] {
         "/rca/RCA-Costayaco-2026-06-22-Vector-Shift.pdf",
         "/rca/RCA-Costayaco-2026-06-22-Vector-Shift-rev1.pdf",
       ],
+    },
+    {
+      id: "RCA-070",
+      title: "Cascada MRU — baja presión aceite Quincy",
+      eventLabel: "FO-GE-033 No. 58 · salida MRU Quincy · EVT-2026-07-12-MRU",
+      status: "Cerrado",
+      priority: "Alta",
+      equipment: "CPW-01, CPW-03, CPW-07, JIN-10, JIN-11, JIN-12",
+      linkedAssets: ["CPW01", "CPW03", "CPW07", "JIN10", "JIN11", "JIN12"],
+      eventDate: "2026-07-12",
+      problem:
+        "12-jul-2026 05:28: la MRU salió por baja presión de lubricación del Quincy. Cascada de 6 unidades a gas tratado. Soenergy reinició Chiller+MRU a las 06:28. Reingreso 07:16–08:00. FS máx. 2,53 h (CPW-07).",
+      immediateCause: "Salida automática de la MRU por baja presión de aceite del compresor Quincy.",
+      rootCause:
+        "Dependencia de una sola cadena MRU/Chiller (Soenergy). Falla externa a los grupos; protecciones actuaron de forma correcta.",
+      actions: [
+        "Reinicio Chiller + MRU por Soenergy (06:28).",
+        "Verificación de alarmas y reingreso coordinado con CCM.",
+        "Seguimiento al MP semanal de la MRU.",
+      ],
+      result:
+        "FO-GE-033 No. 58. Energía no generada ≈6.936 kWh. Elaboró Jose Luis Alvarez · Revisó David Cornejo.",
+      linkedPlanId: null,
+      category: "Externa / Proceso de gas",
+      responsible: "Jose Luis Alvarez · David Cornejo",
+      company: "COPOWER",
+      closeDate: "2026-07-12",
+      pdfUrls: ["/rca/FO-GE-033-2026-07-12-MRU-58.pdf"],
+    },
+    {
+      id: "RCA-071",
+      title: "Detonación CPW-04 en gas MQT",
+      eventLabel: "FO-GE-033 No. 60 · detonación CPW-04 · EVT-2026-07-21-CPW04",
+      status: "En curso",
+      priority: "Alta",
+      equipment: "CPW-04",
+      linkedAssets: ["CPW04"],
+      eventDate: "2026-07-21",
+      problem:
+        "21-jul-2026 15:16: CPW-04 (J420, gas MQT, ~850 kW) salió por detonación alta en un cilindro. Stand-by hasta 20:21 (5,08 h). Deslastre 1040→850 kW y ajuste de mezcla MQT. Respaldo CPW-06.",
+      immediateCause: "Detonación por encima del umbral de protección Jenbacher en un cilindro.",
+      rootCause:
+        "Inestabilidad de gas MQT desde el 17-jul (arranques/paradas y vibraciones) sin recálculo oportuno de mezcla.",
+      actions: [
+        "Deslastre de carga nominal a 850 kW.",
+        "Solicitud de ajuste de mezcla a toda la flota MQT.",
+        "Respaldo con CPW-06; no retornar a 1040 kW hasta validar mezcla.",
+      ],
+      result:
+        "FO-GE-033 No. 60 (archivo #54). Reingreso 20:21 (horas concertadas). ≈4.318 kWh. Concertación imputó PF_cli, no falla COPOWER.",
+      linkedPlanId: null,
+      category: "Combustión / calidad de gas",
+      responsible: "Javier Montes · David Cornejo",
+      company: "COPOWER",
+      closeDate: null,
+      pdfUrls: ["/rca/FO-GE-033-2026-07-21-CPW04-60.pdf"],
+    },
+    {
+      id: "RCA-072",
+      title: "Cascada MRU — alto nivel GLP en recipiente",
+      eventLabel: "FO-GE-033 No. 61 · salida MRU GLP · EVT-2026-07-21-MRU",
+      status: "En curso",
+      priority: "Alta",
+      equipment: "CPW-01, CPW-02, CPW-03, CPW-07, JIN-10",
+      linkedAssets: ["CPW01", "CPW02", "CPW03", "CPW07", "JIN10"],
+      eventDate: "2026-07-21",
+      problem:
+        "21-jul-2026 17:55: segunda salida MRU del día. Soenergy reportó FDL por alto nivel de GLP; causa formal por definir. Cascada CPW-01/02/03/07 y JIN-10. Reingreso 21:11–22:32. FS máx. 4,62 h.",
+      immediateCause: "Salida automática de la MRU por alto nivel de GLP en el recipiente (FDL Soenergy).",
+      rootCause:
+        "Causa formal de la MRU aún abierta en el FO. Recurrencia de trips MRU en julio sobre la misma cadena de gas tratado.",
+      actions: [
+        "Reinicio Chiller + MRU (19:36).",
+        "Reingreso coordinado con CCM.",
+        "Cerrar causa raíz con Soenergy (nivel GLP).",
+      ],
+      result:
+        "FO-GE-033 No. 61. Energía ≈11.872 kWh. Elaboró Jose Luis Alvarez · Revisó David Cornejo. Causa MRU pendiente.",
+      linkedPlanId: null,
+      category: "Externa / Proceso de gas (NGL/GLP)",
+      responsible: "Jose Luis Alvarez · David Cornejo",
+      company: "COPOWER",
+      closeDate: null,
+      pdfUrls: ["/rca/FO-GE-033-2026-07-21-MRU-61.pdf"],
+    },
+    {
+      id: "RCA-073",
+      title: "Cascada MRU por disparo reconectador EEP 34.5 kV",
+      eventLabel: "FO-GE-033 No. 62 · EEP Junín–Mocoa · EVT-2026-07-24-MRU",
+      status: "Cerrado",
+      priority: "Alta",
+      equipment: "CPW-01, CPW-02, CPW-03, CPW-07, JIN-10",
+      linkedAssets: ["CPW01", "CPW02", "CPW03", "CPW07", "JIN10"],
+      eventDate: "2026-07-24",
+      problem:
+        "24-jul-2026 07:08: disparo del reconectador EEP 34.5 kV Junín–Mocoa, apertura del RL y salida de la MRU. Cascada de 5 unidades. Reingreso CPW 08:40–09:00; JIN-10 a las 19:09 (12,02 h).",
+      immediateCause: "Disparo del reconectador EEP y apertura del RL; la MRU sale ante la perturbación eléctrica.",
+      rootCause:
+        "Exposición del parque a transitorios EEP 34.5 kV sin selectividad suficiente (mismo patrón de junio).",
+      actions: [
+        "Verificación de alarmas y lógica de protección.",
+        "Stand By Disponible hasta MRU en línea y autorización CCM.",
+        "Retomar coordinación de protecciones con EEP.",
+      ],
+      result:
+        "FO-GE-033 No. 62 (app.pdf). Energía ≈8.104 kWh. Elaboró Javier Alberto Montes Losada · Revisó David Cornejo.",
+      linkedPlanId: null,
+      category: "Externa / Red eléctrica",
+      responsible: "Javier Alberto Montes Losada · David Cornejo",
+      company: "COPOWER",
+      closeDate: "2026-07-24",
+      pdfUrls: ["/rca/FO-GE-033-2026-07-24-MRU-62.pdf"],
+    },
+    {
+      id: "RCA-074",
+      title: "Cascada MRU por sobrepresión manifold CYC",
+      eventLabel: "FO-GE-033 No. 63 · manifold CYC · EVT-2026-07-25-MRU",
+      status: "Cerrado",
+      priority: "Alta",
+      equipment: "CPW-01, CPW-02, CPW-03, CPW-07, JIN-10, JIN-11",
+      linkedAssets: ["CPW01", "CPW02", "CPW03", "CPW07", "JIN10", "JIN11"],
+      eventDate: "2026-07-25",
+      problem:
+        "25-jul-2026 12:58: la MRU salió por sobrepresión en el manifold CYC. Cascada de 6 unidades. Reingreso CPW 14:39–15:13 y JIN-10 15:23; JIN-11 sin hora explícita (SB 11 h). Cuarta salida MRU de julio.",
+      immediateCause: "Sobrepresión en manifold Costayaco reportada por Soenergy.",
+      rootCause:
+        "Inestabilidad del sistema de gas/MRU en julio (4.ª recurrencia: Quincy, GLP, EEP, manifold) sobre una sola cadena de gas tratado.",
+      actions: [
+        "Verificación de alarmas e historial.",
+        "Stand By Disponible hasta MRU en línea.",
+        "Análisis conjunto Soenergy/GTE de presión de manifold.",
+      ],
+      result:
+        "FO-GE-033 No. 63 (archivo #55). Energía ≈10.704 kWh. Elaboró Javier Alberto Montes Losada · Revisó David Cornejo.",
+      linkedPlanId: null,
+      category: "Externa / Proceso de gas",
+      responsible: "Javier Alberto Montes Losada · David Cornejo",
+      company: "COPOWER",
+      closeDate: "2026-07-25",
+      pdfUrls: ["/rca/FO-GE-033-2026-07-25-MRU-63.pdf"],
     },
   ];
 }

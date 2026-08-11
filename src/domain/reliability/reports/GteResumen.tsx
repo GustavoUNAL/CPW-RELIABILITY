@@ -18,6 +18,7 @@ import { CONTRACTUAL_KPI_TARGETS } from "../contracts/gteOrders";
 import { loadOperacionPack } from "../operacion/api";
 import { EFICIENCIA_FORMULA, eficienciaCampoSnapshot } from "../operacion/eficiencia";
 import { MetricGlossary, MetricLabel } from "../ui/metricDefs";
+import { RCA_COSTAYACO_EVENTOS } from "../rca/data";
 import {
   GRAN_TIERRA_MONTH_ORDER,
   GRAN_TIERRA_MONTHLY_DATA,
@@ -33,8 +34,12 @@ const kwh = (value: number) => `${Math.round(value).toLocaleString("es-CO")} kWh
 const hours = (value: number | null | undefined) =>
   value == null || Number.isNaN(value) ? "N/D" : `${value.toFixed(1)} h`;
 
+export type GteResumenSection = "sistemicos" | "horas";
+
 type Props = {
   month: GranTierraMonthKey;
+  /** Si se pasa, solo pinta esas tarjetas (p. ej. Informes · Confiabilidad). */
+  only?: GteResumenSection[];
 };
 
 type GteJuneClass = "COPOWER" | "Infraestructura del campo" | "Infraestructura externa";
@@ -73,7 +78,10 @@ const GTE_JUNE_EVENT_LOG: GteJuneEventRow[] = [
   { id: "GTE-JUN-022", date: "26-jun", equipment: "C9 + RX", eventType: "Causa comun", responsible: "GTE", notes: "Disparo de C9 y reconectador RX.", classification: "Infraestructura del campo" },
 ];
 
-export function GteResumen({ month }: Props) {
+export function GteResumen({ month, only }: Props) {
+  const showAll = !only?.length;
+  const showSistemicos = showAll || only.includes("sistemicos");
+  const showHoras = showAll || only.includes("horas");
   const data = GRAN_TIERRA_MONTHLY_DATA[month];
   if (!data) {
     return (
@@ -132,6 +140,14 @@ export function GteResumen({ month }: Props) {
     }
     return summary;
   }, [gteEventLog]);
+  const reportedFoCount = useMemo(() => {
+    const ym =
+      month === "Jul" ? "2026-07" : month === "Jun" ? "2026-06" : null;
+    if (!ym) return 0;
+    return RCA_COSTAYACO_EVENTOS.filter(
+      (e) => e.fecha?.startsWith(ym) && !/BLANK|-XX-/i.test(e.id),
+    ).length;
+  }, [month]);
   const failureEvents = gteEventLog.filter((e) => e.eventType === "Falla");
   const units = data.machineIndicators.filter((m) => m.unidad !== "SISTEMA N");
   const monthIdx = GRAN_TIERRA_MONTH_ORDER.indexOf(month);
@@ -219,6 +235,7 @@ export function GteResumen({ month }: Props) {
 
   return (
     <div className="exec-dashboard">
+      {showAll ? (
       <header className="exec-header">
         <div>
           <p className="eyebrow">Gran Tierra Energy · Informe mensual</p>
@@ -227,10 +244,12 @@ export function GteResumen({ month }: Props) {
         </div>
         <span className="source-badge gte">GTE</span>
       </header>
+      ) : null}
 
+      {showAll ? (
       <section className="panel">
         <article className="card">
-          <p className="eyebrow">0 · KPI del periodo Junio</p>
+          <p className="eyebrow">0 · KPI del periodo {data.label}</p>
           <div className="exec-kpi-row">
             <div className="exec-kpi">
               <span>Disponibilidad</span>
@@ -248,9 +267,19 @@ export function GteResumen({ month }: Props) {
               <small>Informe oficial</small>
             </div>
             <div className="exec-kpi">
-              <span>Fallas / eventos</span>
-              <strong>{`${eventSummary.copower} asociadas a COPOWER · ${eventSummary.infrastructure} a la infraestructura del campo`}</strong>
-              <small>{`Total ${gteEventLog.length}`}</small>
+              {month === "Jul" ? (
+                <>
+                  <span>Eventos reportados</span>
+                  <strong>{reportedFoCount || 5}</strong>
+                  <small>FO-GE-033 oficiales del mes</small>
+                </>
+              ) : (
+                <>
+                  <span>Fallas / eventos</span>
+                  <strong>{`${eventSummary.copower} asociadas a COPOWER · ${eventSummary.infrastructure} a la infraestructura del campo`}</strong>
+                  <small>{`Total ${gteEventLog.length}`}</small>
+                </>
+              )}
             </div>
             <div className="exec-kpi">
               <span>Eficiencia estimada</span>
@@ -263,7 +292,9 @@ export function GteResumen({ month }: Props) {
           </p>
         </article>
       </section>
+      ) : null}
 
+      {showAll ? (
       <section className="dash-chart-grid">
         <article className="dash-chart-panel dash-chart-panel--wide">
           <h4>Tendencia disponibilidad y confiabilidad</h4>
@@ -364,7 +395,9 @@ export function GteResumen({ month }: Props) {
           </div>
         </article>
       </section>
+      ) : null}
 
+      {showSistemicos ? (
       <section className="panel">
         <article className="card">
           <p className="eyebrow">1 · Indicadores sistémicos</p>
@@ -452,7 +485,9 @@ export function GteResumen({ month }: Props) {
           </div>
         </article>
       </section>
+      ) : null}
 
+      {showHoras ? (
       <section className="panel">
         <article className="card">
           <p className="eyebrow">2 · Horas y eventos</p>
@@ -508,7 +543,10 @@ export function GteResumen({ month }: Props) {
           </div>
         </article>
       </section>
+      ) : null}
 
+      {showAll ? (
+      <>
       <section className="panel two-col">
         <article className="card">
           <p className="eyebrow">3 · Generación por activo</p>
@@ -712,6 +750,8 @@ export function GteResumen({ month }: Props) {
           No incluye consumos de lubricantes (solo disponibles en reporte diario COPOWER).
         </p>
       </aside>
+      </>
+      ) : null}
     </div>
   );
 }

@@ -163,7 +163,7 @@ export function buildSabanaMaintenanceOptimization(month: string): MaintenanceOp
   const gteSnap =
     monthKey && GRAN_TIERRA_MONTHLY_DATA[monthKey as GranTierraMonthKey]
       ? GRAN_TIERRA_MONTHLY_DATA[monthKey as GranTierraMonthKey]
-      : GRAN_TIERRA_MONTHLY_DATA.Jun;
+      : GRAN_TIERRA_MONTHLY_DATA.Jul;
 
   const gteByUnit = new Map(
     (gteSnap?.machineIndicators ?? [])

@@ -33,6 +33,8 @@ export const DATASET_CATALOG: readonly DatasetEntry[] = [
     path: "src/domain/reliability/reports/copowerMonthly.ts",
     consumers: ["dash-operacion", "bd-ev-copower", "an-repetitivos-copower", "cmp-periodo-copower"],
     period: "Ene–Jul 2026",
+    notes:
+      "Julio: horas concertadas 01–31 (3 fallas COPOWER imputadas) + 5 FO-GE-033 oficiales en data/Julio/RCA.",
   },
   {
     id: "gte-monthly",
@@ -40,8 +42,8 @@ export const DATASET_CATALOG: readonly DatasetEntry[] = [
     kind: "monthly_snapshot",
     path: "src/domain/reliability/reports/granTierraMonthly.ts",
     consumers: ["dash-operacion-gte", "bd-ev-gte", "dash-contrato", "an-repetitivos-gte"],
-    period: "Ene–Jun 2026",
-    notes: "Julio aún no cargado en fuente GTE.",
+    period: "Ene–Jul 2026",
+    notes: "Julio: PDF Análisis Indicadores PUTN JUL 2026 + Data Soporte. Disp. Costayaco 80.65% oficial.",
   },
   {
     id: "operacion-pack",
@@ -65,7 +67,9 @@ export const DATASET_CATALOG: readonly DatasetEntry[] = [
     kind: "etl_generated",
     path: "src/domain/reliability/reports/maintenancePlansData.ts",
     consumers: ["mto-dashboard", "mto-optimizacion"],
-    period: "2026",
+    period: "2026 · julio ejecutado",
+    notes:
+      "Sábana anual + overlay data/Julio/SABANA MMTOS GEN PUTUMAYO Julio 2026. Planes y optimización leen MAINTENANCE_PLANS.",
   },
   {
     id: "inventory-minimums",
@@ -101,12 +105,22 @@ export const DATASET_CATALOG: readonly DatasetEntry[] = [
     notes: "Plantilla BLANK excluida de listados; ediciones en localStorage.",
   },
   {
+    id: "rca-costayaco-julio",
+    label: "Fichas RCA Costayaco julio (FO-GE-033)",
+    kind: "rca_seed",
+    path: "src/domain/reliability/rca/eventos_falla_costayaco_julio_2026.json",
+    consumers: ["an-rca-gte", "an-rca-casos"],
+    period: "Jul 2026",
+    notes: "5 FO oficiales: MRU 12/21/24/25 + detonación CPW-04 21-jul. Se fusionan con el pack de junio.",
+  },
+  {
     id: "rca-cases-junio",
-    label: "Casos RCA + PDF junio",
+    label: "Casos RCA + PDF junio–julio",
     kind: "derived",
     path: "src/domain/reliability/reports/gteJuneRcaCases.ts",
     consumers: ["an-rca-casos"],
-    period: "Jun 2026",
+    period: "Jun–Jul 2026",
+    notes: "RCA-030 junio + RCA-070…074 julio (FO-GE-033 en public/rca).",
   },
   {
     id: "intervention-junio",
@@ -129,7 +143,7 @@ export const DATASET_CATALOG: readonly DatasetEntry[] = [
     label: "Metas contractuales Orden 1",
     kind: "contract",
     path: "src/domain/reliability/contracts/gteOrders.ts",
-    consumers: ["dash-contrato", "cmp-fuentes"],
+    consumers: ["dash-contrato", "cmp-fuentes", "conf-formulas", "conf-formulas-revision"],
     period: "vigente",
   },
   {

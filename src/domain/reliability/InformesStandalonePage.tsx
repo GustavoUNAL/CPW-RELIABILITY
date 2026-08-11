@@ -39,10 +39,11 @@ type Props = {
 export function InformesStandalonePage({ embedded = false }: Props) {
   const [session, setSession] = useState<SessionUser | null>(() => loadSession());
   const [theme, setTheme] = useState<"light" | "dark">("light");
-  const [selectedMonth, setSelectedMonth] = useState("Jun");
+  const [selectedMonth, setSelectedMonth] = useState("Jul");
   const [activeLeafId, setActiveLeafId] = useState(DEFAULT_LEAF);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     "inf-resultados": true,
+    "inf-confiabilidad": true,
   });
 
   useEffect(() => {
@@ -190,14 +191,10 @@ export function InformesStandalonePage({ embedded = false }: Props) {
         </div>
 
         <div className="tree-panel project-tree">
-          <p className="eyebrow">Resultados de Gestión</p>
+          <p className="eyebrow">Informes</p>
           <nav className="project-nav" aria-label="Secciones de informes">
             <ul className="project-leaves">
-              {renderNodes(
-                INFORMES_MODULE?.children?.find((n) => n.id === "inf-resultados")?.children ??
-                  INFORMES_MODULE?.children ??
-                  [],
-              )}
+              {renderNodes(INFORMES_MODULE?.children ?? [])}
             </ul>
           </nav>
         </div>

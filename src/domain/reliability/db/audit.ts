@@ -110,8 +110,13 @@ export function runDataAudit(): AuditReport {
   }
   const real = rca.filter((e) => !isBlankRca(e.id));
   const blanks = rca.filter((e) => isBlankRca(e.id));
-  if (real.length < 9) {
-    push("warn", "rca", "rca-count-low", `Solo ${real.length} fichas RCA reales (esperado ≥ 9 en junio).`);
+  if (real.length < 14) {
+    push(
+      "warn",
+      "rca",
+      "rca-count-low",
+      `Solo ${real.length} fichas RCA reales (esperado ≥ 14: junio + 5 FO julio).`,
+    );
   } else {
     push("ok", "rca", "rca-count", `${real.length} fichas RCA reales · ${blanks.length} plantilla(s).`);
   }

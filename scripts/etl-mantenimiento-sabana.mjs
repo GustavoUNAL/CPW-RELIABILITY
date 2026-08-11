@@ -21,6 +21,13 @@ if (!xlsxName) {
   process.exit(1);
 }
 const XLSX_PATH = path.join(dataRoot, maintDir, xlsxName);
+const JULIO_PATH = [
+  path.join(dataRoot, "Julio", "SABANA MMTOS GEN PUTUMAYO Julio 2026 Mes de Julio.xlsx"),
+  ...fs
+    .readdirSync(path.join(dataRoot, "Julio"))
+    .filter((f) => /SABANA|MMTOS/i.test(f) && f.endsWith(".xlsx") && !f.startsWith("~$"))
+    .map((f) => path.join(dataRoot, "Julio", f)),
+].find((p) => fs.existsSync(p));
 const OUT = path.join(ROOT, "src/domain/reliability/reports/maintenancePlansData.ts");
 
 const MONTH_MAP = {
@@ -85,9 +92,124 @@ function isYes(v) {
   return s === "sí" || s === "si" || s === "yes";
 }
 
-const wb = XLSX.readFile(XLSX_PATH, { cellDates: true });
-const sheetName = wb.SheetNames.find((n) => /PUTUMAYO|GENERACI/i.test(n)) ?? wb.SheetNames[0];
-const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], { header: 1, defval: null, raw: false });
+const MONTH_KEYS = ["", "Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+const MONTH_LABELS = {
+  Ene: "Enero",
+  Feb: "Febrero",
+  Mar: "Marzo",
+  Abr: "Abril",
+  May: "Mayo",
+  Jun: "Junio",
+  Jul: "Julio",
+  Ago: "Agosto",
+  Sep: "Septiembre",
+  Oct: "Octubre",
+  Nov: "Noviembre",
+  Dic: "Diciembre",
+};
+
+function monthKeyFromIso(dateIso) {
+  const mm = Number(dateIso.slice(5, 7));
+  return MONTH_KEYS[mm] ?? null;
+}
+
+function loadSheetRows(filePath) {
+  const wb = XLSX.readFile(filePath, { cellDates: true });
+  const sheetName = wb.SheetNames.find((n) => /PUTUMAYO|GENERACI/i.test(n)) ?? wb.SheetNames[0];
+  const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], { header: 1, defval: null, raw: false });
+  return { sheetName, rows };
+}
+
+function unitsFromRows(rows) {
+  const header = rows[2] ?? [];
+  const modelRow = rows[1] ?? [];
+  const units = [];
+  for (let c = 4; c <= 48; c += 2) {
+    const name = str(header[c]);
+    if (!name) continue;
+    units.push({
+      col: c,
+      hhCol: c + 1,
+      equipment: name,
+      model: str(modelRow[c]) || "—",
+    });
+  }
+  return units;
+}
+
+function extractCalendar(rows, units) {
+  const days = [];
+  const calendarSlots = [];
+  const executions = [];
+
+  for (let i = 3; i < rows.length; i++) {
+    const r = rows[i] ?? [];
+    const dateIso = toIsoDate(r[2]);
+    if (!dateIso) continue;
+
+    const monthKey = monthKeyFromIso(dateIso);
+    const weekday = str(r[1]);
+    const totalManHoursDay = num(r[3]) ?? 0;
+
+    const daySlots = [];
+    for (const u of units) {
+      const mark = str(r[u.col]);
+      if (!mark) continue;
+      const hoursMto = num(mark);
+      const manHours = num(r[u.hhCol]);
+      const slot = {
+        equipment: u.equipment,
+        model: u.model,
+        mark,
+        hoursMto: hoursMto ?? null,
+        manHours: manHours ?? null,
+        isRun: /^run$/i.test(mark),
+      };
+      daySlots.push(slot);
+      calendarSlots.push({
+        date: dateIso,
+        monthKey,
+        ...slot,
+      });
+    }
+
+    const programmedRaw = str(r[57]);
+    const equipmentPlanned = str(r[58]);
+    const executedRaw = str(r[59]);
+    const statusRaw = str(r[60]);
+    const execParsed = toIsoDate(r[61]);
+    const execDate = execParsed || str(r[61]) || null;
+    const notes = str(r[62]);
+
+    days.push({
+      date: dateIso,
+      weekday,
+      monthKey,
+      totalManHours: totalManHoursDay,
+      slotCount: daySlots.length,
+    });
+
+    if (programmedRaw || statusRaw || equipmentPlanned) {
+      executions.push({
+        date: dateIso,
+        monthKey,
+        programmed: isYes(programmedRaw),
+        programmedLabel: programmedRaw || "—",
+        equipment: equipmentPlanned || (daySlots.map((s) => s.equipment).join(", ") || "—"),
+        executed: isYes(executedRaw),
+        status: normStatus(statusRaw),
+        statusLabel: statusRaw || "—",
+        executionDate: execDate && String(execDate).includes("-") ? execDate : execDate,
+        notes: notes || null,
+        plannedManHours: totalManHoursDay,
+      });
+    }
+  }
+
+  return { days, calendarSlots, executions };
+}
+
+const { sheetName, rows } = loadSheetRows(XLSX_PATH);
 
 const header = rows[2] ?? [];
 const modelRow = rows[1] ?? [];
@@ -146,93 +268,79 @@ for (let i = 30; i < 45; i++) {
   }
 }
 
-const MONTH_KEYS = ["", "Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
-const MONTH_LABELS = {
-  Ene: "Enero",
-  Feb: "Febrero",
-  Mar: "Marzo",
-  Abr: "Abril",
-  May: "Mayo",
-  Jun: "Junio",
-  Jul: "Julio",
-  Ago: "Agosto",
-  Sep: "Septiembre",
-  Oct: "Octubre",
-  Nov: "Noviembre",
-  Dic: "Diciembre",
-};
+let { days, calendarSlots, executions } = extractCalendar(rows, units);
 
-function monthKeyFromIso(dateIso) {
-  const mm = Number(dateIso.slice(5, 7));
-  return MONTH_KEYS[mm] ?? null;
+if (JULIO_PATH) {
+  const julio = loadSheetRows(JULIO_PATH);
+  const julioUnits = unitsFromRows(julio.rows);
+  const overlay = extractCalendar(julio.rows, julioUnits.length ? julioUnits : units);
+  const keep = (row) => row.monthKey !== "Jul" && !(row.date ?? "").startsWith("2026-07");
+  days = [...days.filter(keep), ...overlay.days];
+  calendarSlots = [...calendarSlots.filter(keep), ...overlay.calendarSlots];
+  executions = [...executions.filter(keep), ...overlay.executions];
+  console.log(
+    `overlay julio ${path.relative(ROOT, JULIO_PATH)} · ${overlay.executions.length} ejecuciones · ${overlay.calendarSlots.length} slots`,
+  );
 }
 
-const days = [];
-const calendarSlots = [];
-const executions = [];
+/**
+ * Periodicidad 350 h OP: si el MTO quedó pendiente porque el equipo no cumplió
+ * horas (stand-by), no incumple el mes — se diferirá al siguiente.
+ */
+const UNMET_HOURS_RE = /no cumple horas|stand\s*-?\s*by/i;
+const deferredFromJul = [];
+executions = executions.map((e) => {
+  if (e.monthKey !== "Jul" || !e.programmed || e.status !== "pendiente") return e;
+  if (!UNMET_HOURS_RE.test(`${e.notes ?? ""} ${e.statusLabel ?? ""}`)) return e;
+  deferredFromJul.push(e);
+  return {
+    ...e,
+    programmed: false,
+    programmedLabel: "Diferido",
+    executed: false,
+    status: "no_aplica",
+    statusLabel: "Diferido a agosto · sin 350 h OP",
+    notes: [
+      e.notes,
+      "Reprogramado a agosto: periodicidad 350 h de operación; equipo en stand-by.",
+    ]
+      .filter(Boolean)
+      .join(" · "),
+  };
+});
 
-for (let i = 3; i < rows.length; i++) {
-  const r = rows[i] ?? [];
-  const dateIso = toIsoDate(r[2]);
-  if (!dateIso) continue;
-
-  const monthKey = monthKeyFromIso(dateIso);
-  const weekday = str(r[1]);
-  const totalManHoursDay = num(r[3]) ?? 0;
-
-  const daySlots = [];
-  for (const u of units) {
-    const mark = str(r[u.col]);
-    if (!mark) continue;
-    const hoursMto = num(mark);
-    const manHours = num(r[u.hhCol]);
-    const slot = {
-      equipment: u.equipment,
-      model: u.model,
-      mark,
-      hoursMto: hoursMto ?? null,
-      manHours: manHours ?? null,
-      isRun: /^run$/i.test(mark),
-    };
-    daySlots.push(slot);
-    calendarSlots.push({
-      date: dateIso,
-      monthKey,
-      ...slot,
-    });
-  }
-
-  const programmedRaw = str(r[57]);
-  const equipmentPlanned = str(r[58]);
-  const executedRaw = str(r[59]);
-  const statusRaw = str(r[60]);
-  const execParsed = toIsoDate(r[61]);
-  const execDate = execParsed || str(r[61]) || null;
-  const notes = str(r[62]);
-
-  days.push({
-    date: dateIso,
-    weekday,
-    monthKey,
-    totalManHours: totalManHoursDay,
-    slotCount: daySlots.length,
-  });
-
-  if (programmedRaw || statusRaw || equipmentPlanned) {
+for (const d of deferredFromJul) {
+  const eqRe = new RegExp(d.equipment.replace(/\s+/g, "\\s*"), "i");
+  const ago = executions.find((e) => e.monthKey === "Ago" && e.programmed && eqRe.test(e.equipment));
+  const note = `Incluye MTO diferido de ${d.date} (${d.equipment}): no cumplía 350 h OP (stand-by).`;
+  if (ago) {
+    ago.notes = [ago.notes, note].filter(Boolean).join(" ");
+  } else {
     executions.push({
-      date: dateIso,
-      monthKey,
-      programmed: isYes(programmedRaw),
-      programmedLabel: programmedRaw || "—",
-      equipment: equipmentPlanned || (daySlots.map((s) => s.equipment).join(", ") || "—"),
-      executed: isYes(executedRaw),
-      status: normStatus(statusRaw),
-      statusLabel: statusRaw || "—",
-      executionDate: execDate && String(execDate).includes("-") ? execDate : execDate,
-      notes: notes || null,
-      plannedManHours: totalManHoursDay,
+      date: "2026-08-01",
+      monthKey: "Ago",
+      programmed: true,
+      programmedLabel: "Sí",
+      equipment: d.equipment,
+      executed: false,
+      status: "pendiente",
+      statusLabel: "Programado pendiente",
+      executionDate: null,
+      notes: note,
+      plannedManHours: d.plannedManHours,
     });
   }
+  calendarSlots = calendarSlots.map((s) => {
+    if (s.monthKey === "Jul" && s.date === d.date && eqRe.test(s.equipment)) {
+      return { ...s, deferredTo: "Ago" };
+    }
+    return s;
+  });
+}
+if (deferredFromJul.length) {
+  console.log(
+    `diferidos a agosto (sin 350 h OP): ${deferredFromJul.map((d) => `${d.date} ${d.equipment}`).join(" · ")}`,
+  );
 }
 
 /** Resumen mensual recalculado desde calendario + control de ejecución (no el panel Excel). */
@@ -257,7 +365,7 @@ const executedDates = new Set(
 );
 
 for (const slot of calendarSlots) {
-  if (!slot.monthKey || slot.isRun) continue;
+  if (!slot.monthKey || slot.isRun || slot.deferredTo) continue;
   const row = monthlyMap.get(slot.monthKey);
   if (!row) continue;
   row.plannedHoursMto += slot.hoursMto ?? 0;
@@ -315,12 +423,15 @@ const statusCounts = { ejecutado: 0, pendiente: 0, no_aplica: 0, otro: 0, sin_da
 for (const e of executions) statusCounts[e.status] = (statusCounts[e.status] ?? 0) + 1;
 
 const payload = {
-  sourceFile: path.relative(ROOT, XLSX_PATH).replace(/\\/g, "/"),
+  sourceFile: JULIO_PATH
+    ? path.relative(ROOT, JULIO_PATH).replace(/\\/g, "/")
+    : path.relative(ROOT, XLSX_PATH).replace(/\\/g, "/"),
   sheet: sheetName.trim(),
   extractedAt: new Date().toISOString().slice(0, 10),
   title: "Sábana de mantenimientos · Generación Putumayo",
-  notes:
-    "Calendario diario 2026, control de ejecución y catálogo de periodicidad.",
+  notes: JULIO_PATH
+    ? "Julio 2026 ejecutado desde sábana oficial del mes. Ene–Jun y Ago–Dic desde sábana anual data/Mantenimiento. CPW-10 del 02-jul diferido a agosto: no cumplía 350 h OP (stand-by)."
+    : "Calendario diario 2026, control de ejecución y catálogo de periodicidad.",
   fleet: units.map((u) => ({ equipment: u.equipment, model: u.model })),
   catalog,
   periodicityNotes,
@@ -383,6 +494,8 @@ export type MaintenanceCalendarSlot = {
   hoursMto: number | null;
   manHours: number | null;
   isRun: boolean;
+  /** Mes al que se diferió (p. ej. sin 350 h OP). */
+  deferredTo?: string;
 };
 
 export type MaintenanceExecution = {

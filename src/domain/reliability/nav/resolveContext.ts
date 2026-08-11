@@ -110,6 +110,8 @@ const DUAL_LEAVES = new Set([
   "cmp-bench",
   "cmp-periodo",
   "cmp-fuentes",
+  "conf-formulas",
+  "conf-formulas-revision",
   "capa-tablero",
   "capa-resumen",
   "capa-acciones",
@@ -143,6 +145,10 @@ const DUAL_LEAVES = new Set([
 /** Vista única con mes dual — no usar DualCompare lado a lado. */
 export const INTEGRATED_DUAL_LEAVES = new Set([
   "conf-dashboard",
+  "conf-formulas",
+  "conf-formulas-revision",
+  "inf-conf-resumen",
+  "inf-conf-conciliacion",
   "dash-resumen",
   "admin-usuarios",
   "admin-uso",
@@ -359,8 +365,12 @@ export function monthOptionLabel(month: string, ctx: ViewContext): string {
 
 export function defaultMonth(ctx: ViewContext): string {
   if (ctx.monthOrder.includes("YTD2026")) return "YTD2026";
-  const preferred = ctx.monthOrder.includes("Jun") ? "Jun" : ctx.monthOrder[ctx.monthOrder.length - 1];
-  return preferred ?? "Jun";
+  const preferred = ctx.monthOrder.includes("Jul")
+    ? "Jul"
+    : ctx.monthOrder.includes("Jun")
+      ? "Jun"
+      : ctx.monthOrder[ctx.monthOrder.length - 1];
+  return preferred ?? "Jul";
 }
 
 export type GenerationSection = "dashboard" | "diaria" | "mensual" | "equipos" | "utilizacion" | "horas";

@@ -1,13 +1,13 @@
 import type { ReportDataset } from "../types";
-import { COPOWER_KPI_FROM_MONTHS, COPOWER_MONTHLY_DATA, COPOWER_SOURCE_FILE } from "./copowerMonthly";
+import { COPOWER_KPI_FROM_MONTHS, COPOWER_MONTHLY_DATA } from "./copowerMonthly";
 
-const jun = COPOWER_MONTHLY_DATA.Jun;
+const jul = COPOWER_MONTHLY_DATA.Jul;
 
 export const copowerReport: ReportDataset = {
   title: "COPOWER",
   subtitle:
-    "Reporte diario de operaciones Costayaco / Vonú. Fuente: Resumen OP, Eventos de Generación y Consumos.",
-  source: COPOWER_SOURCE_FILE,
+    "Horas concertadas GTE 01–31 julio 2026 (eventos e indicadores). Meses previos: reporte diario Costayaco/Vonú.",
+  source: COPOWER_MONTHLY_DATA.Jul.sourceFile,
   kpiData: COPOWER_KPI_FROM_MONTHS,
   kpiTargets: {
     availability: 0.98,
@@ -27,7 +27,7 @@ export const copowerReport: ReportDataset = {
   commonCauseEvents: [],
   maintenancePlan: [],
   actionPlan: [],
-  summary: jun.summary,
+  summary: jul.summary,
   reliabilityTrend: COPOWER_KPI_FROM_MONTHS.map((row) => ({
     month: row.month,
     availability: row.availability ?? 0,
@@ -37,13 +37,13 @@ export const copowerReport: ReportDataset = {
   })),
   causePareto: [],
   analysisHighlights: [
-    "Datos operativos COPOWER desde el reporte diario Costayaco/Vonú 2026.",
-    "Disponibilidad calculada con horas OP+SB sobre OP+SB+MTO+FS (Resumen OP).",
-    "Eventos tomados de la hoja Eventos de Generación (disponibles con mayor detalle desde mayo).",
+    "Julio: 5 FO-GE-033 oficiales (MRU 12/21/24/25 + detonación CPW-04 21-jul). Concertación imputa 3 fallas COPOWER (CPW06×2 el 04 y 09; CPW07 el 04). MTBF 2.410,67 h.",
+    "Energía julio 4.131.917 kWh · OP 7.232 h · SB 3.676 h · PP 253 h · paradas externas 547 h.",
+    "Disp. COPOWER (OP+SB)/calendario = 97,73%. GTE publica 80,65% con la misma fórmula; falta el desglose de horas no disponibles (AGC4 no cierra solo la brecha).",
   ],
-  generationByAsset: jun.generationByAsset,
-  generationByEquipment: jun.generationByEquipment,
-  totalGenerationKwh: jun.totalGenerationKwh,
-  eventLog: jun.eventLog,
-  machineIndicators: jun.machineIndicators,
+  generationByAsset: jul.generationByAsset,
+  generationByEquipment: jul.generationByEquipment,
+  totalGenerationKwh: jul.totalGenerationKwh,
+  eventLog: jul.eventLog,
+  machineIndicators: jul.machineIndicators,
 };

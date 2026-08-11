@@ -1,0 +1,418 @@
+{
+  "meta": {
+    "proyecto": "Registro de Eventos de Falla - Campo Costayaco",
+    "cliente": "GTE",
+    "operador": "COPOWER LTDA.",
+    "periodo": "julio 2026",
+    "fuente": "data/Julio/RCA · FO-GE-033 No. 58, 60, 61, 62 y 63",
+    "generado": "2026-08-11-julio-fo",
+    "flota": {
+      "unidades": ["CPW-01", "CPW-02", "CPW-03", "CPW-04", "CPW-07", "JIN-10", "JIN-11", "JIN-12"],
+      "marca_modelo": "Jenbacher J320 – J420",
+      "ubicacion": "Campo Costayaco (CYC)",
+      "tipos_gas": ["Gas MRU + Chiller", "Gas Moqueta"]
+    }
+  },
+  "eventos": [
+    {
+      "id": "EVT-2026-07-12-MRU",
+      "titulo": "Cascada por salida MRU — baja presión aceite Quincy",
+      "fecha": "2026-07-12",
+      "hora": "05:28",
+      "equipo": ["CPW-01", "CPW-03", "CPW-07", "JIN-10", "JIN-11", "JIN-12"],
+      "sistema": "Acondicionamiento de gas MRU / Chiller (Soenergy)",
+      "duracion_horas": 2.53,
+      "responsable": "GTE",
+      "estado": "cerrado",
+      "criticidad": "alta",
+      "calidad_dato": "completo",
+      "es_supuesto": false,
+      "resumen_ejecutivo": "El 12-jul-2026 a las 05:28 la MRU salió por baja presión de lubricación del compresor Quincy. Se interrumpió el gas tratado y dispararon en cascada CPW-01, CPW-03, CPW-07, JIN-10/11/12. Soenergy reinició Chiller+MRU a las 06:28. Retorno a línea entre 07:16 y 08:00. FO-GE-033 No. 58 clasifica la falla como externa a los grupos. FS máximo 2,53 h (CPW-07).",
+      "cronologia": [
+        { "hora": "05:28", "evento": "MRU sale por baja presión de aceite Quincy; disparo en cascada de 6 unidades", "origen": "FO-GE-033 No. 58" },
+        { "hora": "06:28", "evento": "Soenergy reinicia Chiller + MRU en fase de pruebas", "origen": "FO-GE-033" },
+        { "hora": "07:16", "evento": "CPW-03 ingresa a línea (carga pre-evento 650 kW)", "origen": "FO-GE-033" },
+        { "hora": "07:33", "evento": "CPW-01 ingresa a línea", "origen": "FO-GE-033" },
+        { "hora": "07:36", "evento": "JIN-10 ingresa a línea (390 kW)", "origen": "FO-GE-033" },
+        { "hora": "07:56", "evento": "JIN-11 ingresa a línea", "origen": "FO-GE-033" },
+        { "hora": "07:58", "evento": "JIN-12 ingresa a línea", "origen": "FO-GE-033" },
+        { "hora": "08:00", "evento": "CPW-07 ingresa a línea", "origen": "FO-GE-033" }
+      ],
+      "descripcion_tecnica": "Pérdida del acondicionamiento de gas (MRU+Chiller) por falla de lubricación del compresor Quincy. Las protecciones de los Jenbacher actuaron de forma correcta ante pérdida de condiciones de gas. No hay daño reportado en los grupos. Equipos quedaron Stand By Disponible tras verificación de alarmas y lógica de protección.",
+      "clasificacion": {
+        "tipo": "Externa / Proceso de gas",
+        "modo_falla": "Pérdida de suministro de gas tratado (cascada de protecciones)",
+        "componente_afectado": "MRU · Compresor Quincy (lubricación)",
+        "criticidad": "alta",
+        "falla_repetitiva": true
+      },
+      "causa": {
+        "inmediata": "Salida automática de la MRU por baja presión de lubricación del Quincy.",
+        "basica": "Interrupción del gas acondicionado hacia los grupos asociados a MRU.",
+        "raiz": "Dependencia de una sola cadena MRU/Chiller (Soenergy) sin exclusión contractual de cascada; evento externo a COPOWER."
+      },
+      "cinco_porques": [
+        { "n": 1, "pregunta": "¿Por qué salieron los grupos?", "respuesta": "Actuación de protecciones ante pérdida de gas tratado" },
+        { "n": 2, "pregunta": "¿Por qué se perdió el gas tratado?", "respuesta": "La MRU salió de operación" },
+        { "n": 3, "pregunta": "¿Por qué salió la MRU?", "respuesta": "Baja presión de lubricación del compresor Quincy" },
+        { "n": 4, "pregunta": "¿Por qué falló la lubricación?", "respuesta": "Condición reportada por Soenergy (detalle interno MRU no adjunto)" },
+        { "n": 5, "pregunta": "¿Por qué impactó a 6 unidades?", "respuesta": "Todas alimentadas por la misma MRU sin respaldo de gas acondicionado" }
+      ],
+      "factores_contribuyentes": [
+        "Alimentación común MRU → flota J320/Jinan",
+        "Mantenimiento preventivo semanal de MRU (seguimiento)"
+      ],
+      "acciones_correctivas": [
+        "Reinicio Chiller + MRU por Soenergy (06:28)",
+        "Verificación de alarmas y parámetros en cada grupo",
+        "Coordinación CCM para reingreso según demanda"
+      ],
+      "acciones_preventivas": [
+        "Seguimiento al MP semanal de la MRU",
+        "Confirmar lógica de protección post-shutdown",
+        "Protocolo de Stand By Disponible hasta autorización CCM"
+      ],
+      "impacto": {
+        "disponibilidad_horas": 2.53,
+        "energia_no_generada_kwh": 6936,
+        "riesgo_operacion": "Pérdida simultánea de 6 unidades a gas MRU; resto del parque y diésel como respaldo"
+      },
+      "validacion": "Horas de parada/arranque tomadas del FO-GE-033 No. 58. Energía ≈ 650 kW×(2,08+1,80+2,53) + 390 kW×(2,13+2,47+2,50) ≈ 6.936 kWh.",
+      "lecciones_aprendidas": [
+        "Una falla de lubricación en Quincy tumba toda la flota MRU",
+        "Las protecciones de los grupos actuaron de forma selectiva y correcta"
+      ],
+      "indicadores": {
+        "horas_indisponibles": "FS máx. 2,53 h (CPW-07 05:28–08:00)",
+        "energia_no_generada": "≈6.936 kWh (estimado con carga pre-evento)",
+        "falla_repetitiva": true
+      },
+      "notas_pendientes": [
+        "Solicitar SOE/informe Soenergy del Quincy"
+      ],
+      "relacionados": ["EVT-2026-07-21-MRU", "EVT-2026-07-24-MRU", "EVT-2026-07-25-MRU"],
+      "fuente": "FO-GE-033 No. 58 · 12-jul-2026 · Jose Luis Alvarez / David Cornejo · data/Julio/RCA"
+    },
+    {
+      "id": "EVT-2026-07-21-CPW04",
+      "titulo": "Detonación CPW-04 en gas MQT — queda en stand-by",
+      "fecha": "2026-07-21",
+      "hora": "15:16",
+      "equipo": "CPW-04",
+      "sistema": "Combustión / control de detonación (Jenbacher J420, gas MQT)",
+      "duracion_horas": 5.08,
+      "responsable": "GTE + COPOWER",
+      "estado": "en_seguimiento",
+      "criticidad": "media-alta",
+      "calidad_dato": "completo",
+      "es_supuesto": false,
+      "resumen_ejecutivo": "El 21-jul-2026 a las 15:16 CPW-04 (J420, ~850 kW, gas MQT) salió automáticamente por detonación alta en un cilindro. Quedó en stand-by hasta las 20:21, cuando reingresó a solicitud del CCM (5,08 h). Se deslastró la nominal de 1040 a 850 kW y se pidió ajuste de mezcla a todos los equipos MQT. Ingresó CPW-06 como respaldo. FO-GE-033 No. 60 (archivo #54). Antecedente: arranques/paradas frecuentes y aumento de vibraciones desde el 17-jul.",
+      "cronologia": [
+        { "hora": "17-jul", "evento": "Condición en gas MQT: arranques/paradas frecuentes e incremento de vibraciones en la flota MQT", "origen": "FO-GE-033 No. 60" },
+        { "hora": "15:16", "evento": "Salida automática CPW-04 por detonación alta; carga cae a 0 kW; queda en stand-by", "origen": "FO-GE-033" },
+        { "hora": "15:25", "evento": "CPW-06 ingresa como respaldo por salida de CPW-04", "origen": "Horas concertadas" },
+        { "hora": "20:21", "evento": "CPW-04 reingresa a solicitud del CCM por estabilidad de gas Moqueta", "origen": "Horas concertadas" },
+        { "hora": "post", "evento": "Deslastre de nominal 1040→850 kW; solicitud de ajuste de mezcla MQT", "origen": "FO-GE-033" }
+      ],
+      "descripcion_tecnica": "Detonación por encima del umbral del control Jenbacher en un cilindro, con altas vibraciones en todos los cilindros. El equipo operaba en gas Moqueta. La flota MQT venía con ciclado frecuente desde el 17-jul, condición que favorece detonación (mezcla/temperatura). No se reportan partes cambiadas.",
+      "clasificacion": {
+        "tipo": "Combustión / calidad de gas",
+        "modo_falla": "Detonación (knock) fuera de límite de control",
+        "componente_afectado": "Cámara de combustión / control de detonación CPW-04",
+        "criticidad": "media-alta",
+        "falla_repetitiva": false
+      },
+      "causa": {
+        "inmediata": "Detonación alta en un cilindro que superó el límite de protección.",
+        "basica": "Ciclado frecuente y vibraciones elevadas en equipos a gas MQT desde el 17-jul; mezcla no ajustada a la condición.",
+        "raiz": "Inestabilidad del suministro/calidad de gas MQT (arranques-paradas) sin recálculo oportuno de mezcla; exposición del J420 a knock."
+      },
+      "cinco_porques": [
+        { "n": 1, "pregunta": "¿Por qué salió CPW-04?", "respuesta": "Protección por detonación alta" },
+        { "n": 2, "pregunta": "¿Por qué detonó?", "respuesta": "Condición de combustión fuera de ventana (mezcla/vibración)" },
+        { "n": 3, "pregunta": "¿Por qué la combustión se degradó?", "respuesta": "Arranques y paradas repetidos en gas MQT desde el 17-jul" },
+        { "n": 4, "pregunta": "¿Por qué el ciclado?", "respuesta": "Condición de campo/gas MQT (no detallada en el FO)" },
+        { "n": 5, "pregunta": "¿Por qué no se evitó?", "respuesta": "Nominal 1040 kW sin ajuste de mezcla previo al evento" }
+      ],
+      "factores_contribuyentes": [
+        "Gas MQT post evento 17-jul",
+        "Altas vibraciones en cilindros",
+        "Carga nominal previa 1040 kW"
+      ],
+      "acciones_correctivas": [
+        "Deslastre de carga nominal a 850 kW",
+        "Solicitud de ajuste/revisión de mezcla a control (todos los MQT)",
+        "Respaldo con CPW-06"
+      ],
+      "acciones_preventivas": [
+        "Monitoreo de detonación y vibraciones en flota MQT",
+        "No retornar a 1040 kW hasta validar mezcla"
+      ],
+        "impacto": {
+        "disponibilidad_horas": 5.08,
+        "energia_no_generada_kwh": 4318,
+        "riesgo_operacion": "CPW-04 fuera 15:16–20:21; respaldo CPW-06. Concertación imputó PF_cli 5 h (no falla COPOWER)."
+      },
+      "validacion": "Reingreso 20:21 tomado de horas concertadas (FO solo decía stand-by). Horas de equipo 3.743. Responsable mant. Javier Montes / David Cornejo.",
+      "lecciones_aprendidas": [
+        "Tras perturbaciones de gas MQT hay que revisar mezcla antes de cargar a nominal",
+        "La detonación en un cilindro se acompañó de vibración generalizada"
+      ],
+      "indicadores": {
+        "horas_indisponibles": "5,08 h (15:16–20:21)",
+        "energia_no_generada": "≈4.318 kWh (850 kW × 5,08 h)",
+        "falla_repetitiva": false
+      },
+      "notas_pendientes": [
+        "Confirmar si el No. de reporte es 60 (cuerpo) o 54 (nombre de archivo)"
+      ],
+      "relacionados": ["EVT-2026-07-21-MRU"],
+      "fuente": "FO-GE-033 No. 60 (archivo CPW 04 #54) · 21-jul-2026 15:16 · data/Julio/RCA"
+    },
+    {
+      "id": "EVT-2026-07-21-MRU",
+      "titulo": "Cascada por salida MRU — alto nivel GLP en recipiente",
+      "fecha": "2026-07-21",
+      "hora": "17:55",
+      "equipo": ["CPW-01", "CPW-02", "CPW-03", "CPW-07", "JIN-10"],
+      "sistema": "Acondicionamiento de gas MRU / Chiller",
+      "duracion_horas": 4.62,
+      "responsable": "GTE",
+      "estado": "en_seguimiento",
+      "criticidad": "alta",
+      "calidad_dato": "completo",
+      "es_supuesto": false,
+      "resumen_ejecutivo": "El mismo 21-jul a las 17:55 la MRU volvió a salir (FO No. 61). Soenergy reportó FDL MRU por alto nivel de GLP en el recipiente; la causa formal quedó por definir. Disparo en cascada de CPW-01/02/03/07 y JIN-10 (CPW-10). MRU/Chiller en pruebas a las 19:36. Reingreso de grupos entre 21:11 y 22:32. FS máximo 4,62 h (JIN-10).",
+      "cronologia": [
+        { "hora": "17:55", "evento": "MRU sale; cascada CPW-01/02/03/07 y JIN-10", "origen": "FO-GE-033 No. 61" },
+        { "hora": "19:36", "evento": "Soenergy reinicia Chiller + MRU en pruebas", "origen": "FO-GE-033" },
+        { "hora": "21:11", "evento": "CPW-03 ingresa (700 kW pre-evento)", "origen": "FO-GE-033" },
+        { "hora": "21:23", "evento": "CPW-01 ingresa", "origen": "FO-GE-033" },
+        { "hora": "21:25", "evento": "CPW-07 ingresa", "origen": "FO-GE-033" },
+        { "hora": "22:00", "evento": "CPW-02 ingresa", "origen": "FO-GE-033" },
+        { "hora": "22:32", "evento": "JIN-10 ingresa (400 kW)", "origen": "FO-GE-033" }
+      ],
+      "descripcion_tecnica": "Segundo evento MRU del 21-jul (el primero fue detonación CPW-04 a las 15:16). Causa operativa citada: alto nivel de GLP en recipiente (FDL). Protecciones de grupos actuaron correctamente. Falla clasificada externa a los grupos.",
+      "clasificacion": {
+        "tipo": "Externa / Proceso de gas (NGL/GLP)",
+        "modo_falla": "Pérdida de MRU por alto nivel de GLP",
+        "componente_afectado": "MRU · recipiente de GLP",
+        "criticidad": "alta",
+        "falla_repetitiva": true
+      },
+      "causa": {
+        "inmediata": "Salida automática de la MRU; Soenergy reporta alto nivel de GLP.",
+        "basica": "Pérdida de gas acondicionado y disparo en cascada.",
+        "raiz": "Causa formal de la MRU aún por definir (FO). Recurrencia de salidas MRU en julio."
+      },
+      "cinco_porques": [
+        { "n": 1, "pregunta": "¿Por qué salieron 5 grupos?", "respuesta": "Protecciones ante pérdida de gas MRU" },
+        { "n": 2, "pregunta": "¿Por qué salió la MRU?", "respuesta": "FDL por alto nivel de GLP (reporte Soenergy)" },
+        { "n": 3, "pregunta": "¿Por qué hay alto GLP?", "respuesta": "Condición de proceso NGL/recipiente (pendiente Soenergy)" },
+        { "n": 4, "pregunta": "¿Por qué se repite en el mismo día?", "respuesta": "MRU inestable el 21-jul (segundo trip)" },
+        { "n": 5, "pregunta": "¿Por qué impacta al parque?", "respuesta": "Alimentación común sin respaldo de gas tratado" }
+      ],
+      "factores_contribuyentes": [
+        "Ya había habido detonación CPW-04 tres horas antes",
+        "Causa MRU no cerrada en el FO"
+      ],
+      "acciones_correctivas": [
+        "Reinicio Chiller + MRU (19:36)",
+        "Verificación de alarmas y reingreso coordinado con CCM"
+      ],
+      "acciones_preventivas": [
+        "Cerrar causa raíz con Soenergy (nivel GLP)",
+        "MP semanal MRU"
+      ],
+      "impacto": {
+        "disponibilidad_horas": 4.62,
+        "energia_no_generada_kwh": 11872,
+        "riesgo_operacion": "Cinco unidades fuera ~3,3–4,6 h; coincidencia con evento CPW-04 del mismo día"
+      },
+      "validacion": "Horas FO No. 61. Energía ≈ 700 kW×(3,47+4,08+3,27+3,50) + 400 kW×4,62 ≈ 11.872 kWh.",
+      "lecciones_aprendidas": [
+        "Dos perturbaciones el mismo día (MQT 15:16 y MRU 17:55)",
+        "JIN-10 fue la última en recuperar (22:32)"
+      ],
+      "indicadores": {
+        "horas_indisponibles": "FS máx. 4,62 h (JIN-10 17:55–22:32)",
+        "energia_no_generada": "≈11.872 kWh",
+        "falla_repetitiva": true
+      },
+      "notas_pendientes": [
+        "Causa MRU 'aún por definir' — pedir informe Soenergy"
+      ],
+      "relacionados": ["EVT-2026-07-21-CPW04", "EVT-2026-07-12-MRU", "EVT-2026-07-24-MRU", "EVT-2026-07-25-MRU"],
+      "fuente": "FO-GE-033 No. 61 · 21-jul-2026 17:55 · Jose Luis Alvarez / David Cornejo · data/Julio/RCA"
+    },
+    {
+      "id": "EVT-2026-07-24-MRU",
+      "titulo": "Cascada MRU por disparo reconectador EEP 34.5 kV Junín–Mocoa",
+      "fecha": "2026-07-24",
+      "hora": "07:08",
+      "equipo": ["CPW-01", "CPW-02", "CPW-03", "CPW-07", "JIN-10"],
+      "sistema": "Red 34.5 kV EEP / RL / MRU",
+      "duracion_horas": 12.02,
+      "responsable": "Externo",
+      "estado": "cerrado",
+      "criticidad": "alta",
+      "calidad_dato": "completo",
+      "es_supuesto": false,
+      "resumen_ejecutivo": "El 24-jul-2026 a las 07:08–07:10 CCM informa disparo del reconectador EEP línea 34.5 kV subestación Junín–Mocoa, con apertura del RL y salida de la MRU. Soenergy lo describe como comportamiento típico ante perturbación eléctrica. Cascada de CPW-01/02/03/07 y JIN-10. Reingreso de grupos 08:40–09:00; JIN-10 recién a las 19:09 (FS máx. 12,02 h). FO-GE-033 No. 62 (app.pdf). Falla externa a los grupos.",
+      "cronologia": [
+        { "hora": "07:08", "evento": "Salida imprevista de línea CPW-01/02/03/07 y JIN-10", "origen": "FO-GE-033 No. 62" },
+        { "hora": "07:10", "evento": "CCM: EEP reporta disparo reconectador 34.5 kV Junín–Mocoa → apertura RL → sale MRU", "origen": "FO-GE-033" },
+        { "hora": "07:10", "evento": "Soenergy: salida MRU por perturbación eléctrica típica", "origen": "FO-GE-033" },
+        { "hora": "08:40", "evento": "CPW-07 reingresa con gas MRU", "origen": "Horas concertadas" },
+        { "hora": "08:44", "evento": "CPW-02 reingresa con gas MRU", "origen": "Horas concertadas" },
+        { "hora": "08:52", "evento": "CPW-01 reingresa con gas MRU", "origen": "Horas concertadas" },
+        { "hora": "09:00", "evento": "CPW-03 reingresa con gas MRU", "origen": "Horas concertadas" },
+        { "hora": "19:09", "evento": "JIN-10 reingresa a petición de CCM", "origen": "Horas concertadas" }
+      ],
+      "descripcion_tecnica": "Perturbación de red EEP 34.5 kV que abre el reconectador y el RL, tumba la MRU y dispara la flota asociada. Mismo patrón de junio (reconectador EEP). No hay tiempos de recuperación en el reporte.",
+      "clasificacion": {
+        "tipo": "Externa / Red eléctrica",
+        "modo_falla": "Disparo de reconectador + pérdida de MRU",
+        "componente_afectado": "Reconectador EEP 34.5 kV Junín–Mocoa / RL / MRU",
+        "criticidad": "alta",
+        "falla_repetitiva": true
+      },
+      "causa": {
+        "inmediata": "Disparo del reconectador EEP y apertura del RL.",
+        "basica": "Salida de MRU ante la perturbación eléctrica.",
+        "raiz": "Exposición del parque a transitorios EEP 34.5 kV sin selectividad suficiente (patrón ya visto en junio)."
+      },
+      "cinco_porques": [
+        { "n": 1, "pregunta": "¿Por qué salieron los grupos?", "respuesta": "Protecciones al perder gas MRU" },
+        { "n": 2, "pregunta": "¿Por qué salió la MRU?", "respuesta": "Perturbación eléctrica (reporte Soenergy)" },
+        { "n": 3, "pregunta": "¿Qué inició la perturbación?", "respuesta": "Disparo reconectador EEP Junín–Mocoa 34.5 kV" },
+        { "n": 4, "pregunta": "¿Por qué se abre el RL?", "respuesta": "Propagación del transitorio desde EEP" },
+        { "n": 5, "pregunta": "¿Por qué es recurrente?", "respuesta": "Misma familia de eventos que junio (EEP/RL/MRU)" }
+      ],
+      "factores_contribuyentes": [
+        "Coordinación EEP–RL–MRU",
+        "JIN-10 reingresó 12 h después (19:09)"
+      ],
+      "acciones_correctivas": [
+        "Verificación de alarmas y lógica de protección",
+        "Stand By Disponible a la espera de MRU y autorización CCM"
+      ],
+      "acciones_preventivas": [
+        "Retomar coordinación de protecciones con EEP (lección junio)",
+        "Registrar SOE con hora de reingreso en el FO (completado vía concertación)"
+      ],
+      "impacto": {
+        "disponibilidad_horas": 12.02,
+        "energia_no_generada_kwh": 8104,
+        "riesgo_operacion": "Cinco unidades fuera; JIN-10 tardó 12,02 h en reingresar"
+      },
+      "validacion": "Iniciador EEP confirmado por CCM. Horas de reingreso desde horas concertadas 24-jul.",
+      "lecciones_aprendidas": [
+        "El modo EEP 34.5 kV → RL → MRU → cascada sigue activo en julio"
+      ],
+      "indicadores": {
+        "horas_indisponibles": "FS máx. 12,02 h (JIN-10 07:08–19:09); grupos CPW 1,53–1,87 h",
+        "energia_no_generada": "≈8.104 kWh (700 kW×6,73 h + 400 kW×12,02 h)",
+        "falla_repetitiva": true
+      },
+      "notas_pendientes": [
+        "El archivo fuente se llama app.pdf (FO No. 62)"
+      ],
+      "relacionados": ["EVT-2026-07-12-MRU", "EVT-2026-07-21-MRU", "EVT-2026-07-25-MRU"],
+      "fuente": "FO-GE-033 No. 62 · 24-jul-2026 · Javier Alberto Montes Losada / David Cornejo · data/Julio/RCA/app.pdf"
+    },
+    {
+      "id": "EVT-2026-07-25-MRU",
+      "titulo": "Cascada MRU por sobrepresión manifold CYC",
+      "fecha": "2026-07-25",
+      "hora": "12:58",
+      "equipo": ["CPW-01", "CPW-02", "CPW-03", "CPW-07", "JIN-10", "JIN-11"],
+      "sistema": "Acondicionamiento de gas MRU / manifold Costayaco",
+      "duracion_horas": 11,
+      "responsable": "GTE",
+      "estado": "cerrado",
+      "criticidad": "alta",
+      "calidad_dato": "completo",
+      "es_supuesto": false,
+      "resumen_ejecutivo": "El 25-jul-2026 a las 12:58 la MRU salió por sobrepresión en el manifold CYC (reporte Soenergy). Cascada de CPW-01/02/03/07, JIN-10 y JIN-11. Reingreso CPW 14:39–15:13 y JIN-10 15:23; JIN-11 sin hora explícita (SB 11 h). FO-GE-033 No. 63 (archivo #55). Cuarta salida MRU del mes. Falla externa a los grupos.",
+      "cronologia": [
+        { "hora": "12:58", "evento": "MRU sale por sobrepresión manifold CYC; cascada de 6 unidades", "origen": "FO-GE-033 No. 63" },
+        { "hora": "14:39", "evento": "CPW-02 reingresa con gas MRU", "origen": "Horas concertadas" },
+        { "hora": "14:42", "evento": "CPW-07 reingresa con gas MRU", "origen": "Horas concertadas" },
+        { "hora": "15:05", "evento": "CPW-03 reingresa con gas MRU", "origen": "Horas concertadas" },
+        { "hora": "15:13", "evento": "CPW-01 reingresa con gas MRU", "origen": "Horas concertadas" },
+        { "hora": "15:23", "evento": "JIN-10 reingresa", "origen": "Horas concertadas" }
+      ],
+      "descripcion_tecnica": "Sobrepresión en manifold de Costayaco detiene el acondicionamiento de gas. Protecciones de grupos actúan. Evidencias: logs de alarmas/eventos CPW-01/02/03/07/10/11 adjuntos en el PDF.",
+      "clasificacion": {
+        "tipo": "Externa / Proceso de gas",
+        "modo_falla": "Sobrepresión de manifold → trip MRU → cascada",
+        "componente_afectado": "Manifold CYC / MRU",
+        "criticidad": "alta",
+        "falla_repetitiva": true
+      },
+      "causa": {
+        "inmediata": "Sobrepresión en manifold CYC reportada por Soenergy.",
+        "basica": "Salida de MRU y pérdida de gas tratado.",
+        "raiz": "Inestabilidad del sistema de gas/MRU en julio (4.ª recurrencia); causa de la sobrepresión no desglosada en el FO."
+      },
+      "cinco_porques": [
+        { "n": 1, "pregunta": "¿Por qué salieron 6 grupos?", "respuesta": "Protecciones ante pérdida de MRU" },
+        { "n": 2, "pregunta": "¿Por qué salió la MRU?", "respuesta": "Sobrepresión manifold CYC" },
+        { "n": 3, "pregunta": "¿Por qué hubo sobrepresión?", "respuesta": "No documentado en el FO (Soenergy)" },
+        { "n": 4, "pregunta": "¿Por qué es el 4.º trip MRU del mes?", "respuesta": "Varios iniciadores (Quincy, GLP, EEP, manifold) sobre la misma cadena" },
+        { "n": 5, "pregunta": "¿Por qué el parque es tan sensible?", "respuesta": "Una sola MRU alimenta la flota de gas tratado" }
+      ],
+      "factores_contribuyentes": [
+        "Recurrencia MRU julio (12, 21, 24 y 25)",
+        "JIN-11 sin hora de reingreso explícita (SB 11 h en concertación)"
+      ],
+      "acciones_correctivas": [
+        "Verificación de alarmas e historial",
+        "Stand By Disponible hasta MRU en línea y autorización CCM"
+      ],
+      "acciones_preventivas": [
+        "Análisis conjunto Soenergy/GTE de presión de manifold",
+        "Tablero de recurrencia MRU en comité"
+      ],
+      "impacto": {
+        "disponibilidad_horas": 11,
+        "energia_no_generada_kwh": 10704,
+        "riesgo_operacion": "Seis unidades fuera; 4.ª cascada MRU de julio. JIN-11 SB 11 h."
+      },
+      "validacion": "Iniciador Soenergy: sobrepresión manifold CYC. Horas de reingreso desde horas concertadas 25-jul.",
+      "lecciones_aprendidas": [
+        "Julio concentra cuatro modos distintos de trip MRU (aceite, GLP, EEP, manifold)"
+      ],
+      "indicadores": {
+        "horas_indisponibles": "FS máx. 11 h (JIN-11 SB); grupos CPW 1,68–2,25 h; JIN-10 2,42 h",
+        "energia_no_generada": "≈10.704 kWh (700 kW×7,78 h + 400 kW×2,42 h + 390 kW×11 h)",
+        "falla_repetitiva": true
+      },
+      "notas_pendientes": [
+        "Nombre de archivo #55 vs No. 63 en el cuerpo del FO"
+      ],
+      "relacionados": ["EVT-2026-07-12-MRU", "EVT-2026-07-21-MRU", "EVT-2026-07-24-MRU"],
+      "fuente": "FO-GE-033 No. 63 (archivo MRU #55) · 25-jul-2026 12:58 · Javier Alberto Montes Losada / David Cornejo · data/Julio/RCA"
+    }
+  ],
+  "analisis_transversal": {
+    "patrones_recurrentes": [
+      {
+        "patron": "Salidas de MRU con cascada de grupos a gas tratado (julio)",
+        "eventos": [
+          "EVT-2026-07-12-MRU",
+          "EVT-2026-07-21-MRU",
+          "EVT-2026-07-24-MRU",
+          "EVT-2026-07-25-MRU"
+        ],
+        "unidades_afectadas": ["CPW-01", "CPW-02", "CPW-03", "CPW-07", "JIN-10", "JIN-11", "JIN-12"],
+        "nota": "Cuatro iniciadores distintos (Quincy, GLP, EEP 34.5 kV, manifold CYC) sobre la misma vulnerabilidad: dependencia de una sola MRU."
+      }
+    ],
+    "problemas_calidad_registro": [
+      "FO 62 y 63 no traían hora de reingreso (completado con horas concertadas)",
+      "Numeración de archivo (#54/#55) no coincide con No. de reporte (60/63)"
+    ]
+  }
+}

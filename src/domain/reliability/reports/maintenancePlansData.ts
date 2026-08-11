@@ -48,6 +48,8 @@ export type MaintenanceCalendarSlot = {
   hoursMto: number | null;
   manHours: number | null;
   isRun: boolean;
+  /** Mes al que se diferió (p. ej. sin 350 h OP). */
+  deferredTo?: string;
 };
 
 export type MaintenanceExecution = {
@@ -100,11 +102,11 @@ export type MaintenancePlansPack = {
 };
 
 export const MAINTENANCE_PLANS: MaintenancePlansPack = {
-  "sourceFile": "data/Mantenimiento/SABANA MMTOS GEN PUTUMAYO 1 (1) - copia (1).xlsx",
+  "sourceFile": "data/Julio/SABANA MMTOS GEN PUTUMAYO Julio 2026 Mes de Julio.xlsx",
   "sheet": "GENERACIÓN PUTUMAYO",
-  "extractedAt": "2026-07-26",
+  "extractedAt": "2026-08-11",
   "title": "Sábana de mantenimientos · Generación Putumayo",
-  "notes": "Calendario diario 2026, control de ejecución y catálogo de periodicidad.",
+  "notes": "Julio 2026 ejecutado desde sábana oficial del mes. Ene–Jun y Ago–Dic desde sábana anual data/Mantenimiento. CPW-10 del 02-jul diferido a agosto: no cumplía 350 h OP (stand-by).",
   "fleet": [
     {
       "equipment": "CPW02",
@@ -434,28 +436,28 @@ export const MAINTENANCE_PLANS: MaintenancePlansPack = {
       "monthLabel": "Junio",
       "plannedHoursMto": 226,
       "plannedManHours": 448,
-      "executedHoursMto": 226,
-      "executedManHours": 448,
+      "executedHoursMto": 160,
+      "executedManHours": 316,
       "programmedCount": 15,
-      "executedCount": 15,
-      "pendingCount": 0,
-      "kind": "ejecutado",
+      "executedCount": 9,
+      "pendingCount": 6,
+      "kind": "mixto",
       "totalHoursMto": 226,
       "totalManHours": 448
     },
     {
       "monthKey": "Jul",
       "monthLabel": "Julio",
-      "plannedHoursMto": 268,
-      "plannedManHours": 512,
-      "executedHoursMto": 134,
-      "executedManHours": 256,
-      "programmedCount": 20,
-      "executedCount": 9,
-      "pendingCount": 11,
-      "kind": "mixto",
-      "totalHoursMto": 268,
-      "totalManHours": 512
+      "plannedHoursMto": 382,
+      "plannedManHours": 688,
+      "executedHoursMto": 372,
+      "executedManHours": 668,
+      "programmedCount": 19,
+      "executedCount": 19,
+      "pendingCount": 0,
+      "kind": "ejecutado",
+      "totalHoursMto": 382,
+      "totalManHours": 688
     },
     {
       "monthKey": "Ago",
@@ -609,9 +611,9 @@ export const MAINTENANCE_PLANS: MaintenancePlansPack = {
     }
   ],
   "statusCounts": {
-    "ejecutado": 83,
-    "pendiente": 127,
-    "no_aplica": 154,
+    "ejecutado": 87,
+    "pendiente": 122,
+    "no_aplica": 155,
     "otro": 0,
     "sin_dato": 0
   },
@@ -619,16 +621,9 @@ export const MAINTENANCE_PLANS: MaintenancePlansPack = {
     {
       "equipment": "JINAN 01",
       "model": "600GFT",
-      "interventions": 25,
-      "hoursMto": 248,
-      "manHours": 496
-    },
-    {
-      "equipment": "JINAN 02",
-      "model": "600GFT",
-      "interventions": 25,
-      "hoursMto": 248,
-      "manHours": 496
+      "interventions": 27,
+      "hoursMto": 262,
+      "manHours": 476
     },
     {
       "equipment": "G 101 V",
@@ -652,6 +647,13 @@ export const MAINTENANCE_PLANS: MaintenancePlansPack = {
       "manHours": 480
     },
     {
+      "equipment": "JINAN 02",
+      "model": "600GFT",
+      "interventions": 24,
+      "hoursMto": 238,
+      "manHours": 476
+    },
+    {
       "equipment": "JINAN 03/JN 10",
       "model": "600GFT",
       "interventions": 24,
@@ -661,16 +663,30 @@ export const MAINTENANCE_PLANS: MaintenancePlansPack = {
     {
       "equipment": "CPW 10",
       "model": "600GFT",
-      "interventions": 19,
-      "hoursMto": 156,
-      "manHours": 312
+      "interventions": 20,
+      "hoursMto": 168,
+      "manHours": 336
     },
     {
       "equipment": "CPW12",
       "model": "600GFT",
-      "interventions": 13,
-      "hoursMto": 156,
-      "manHours": 264
+      "interventions": 12,
+      "hoursMto": 142,
+      "manHours": 244
+    },
+    {
+      "equipment": "CPW01",
+      "model": "J320",
+      "interventions": 11,
+      "hoursMto": 138,
+      "manHours": 276
+    },
+    {
+      "equipment": "CPW02",
+      "model": "J320",
+      "interventions": 11,
+      "hoursMto": 136,
+      "manHours": 256
     },
     {
       "equipment": "CPW11",
@@ -680,25 +696,11 @@ export const MAINTENANCE_PLANS: MaintenancePlansPack = {
       "manHours": 224
     },
     {
-      "equipment": "CPW01",
-      "model": "J320",
-      "interventions": 9,
-      "hoursMto": 90,
-      "manHours": 180
-    },
-    {
-      "equipment": "CPW02",
-      "model": "J320",
-      "interventions": 9,
-      "hoursMto": 90,
-      "manHours": 180
-    },
-    {
       "equipment": "CPW03",
       "model": "J320",
-      "interventions": 9,
-      "hoursMto": 90,
-      "manHours": 180
+      "interventions": 10,
+      "hoursMto": 128,
+      "manHours": 256
     },
     {
       "equipment": "G 102 A",
@@ -743,13 +745,6 @@ export const MAINTENANCE_PLANS: MaintenancePlansPack = {
       "manHours": 136
     },
     {
-      "equipment": "CPW07",
-      "model": "J320",
-      "interventions": 6,
-      "hoursMto": 72,
-      "manHours": 132
-    },
-    {
       "equipment": "CYC",
       "model": "FILTRO COALESCENTE COSTAYACO SIN TRATAR",
       "interventions": 6,
@@ -769,6 +764,13 @@ export const MAINTENANCE_PLANS: MaintenancePlansPack = {
       "interventions": 6,
       "hoursMto": 24,
       "manHours": 48
+    },
+    {
+      "equipment": "CPW07",
+      "model": "J320",
+      "interventions": 5,
+      "hoursMto": 60,
+      "manHours": 112
     },
     {
       "equipment": "SWG",
@@ -2047,223 +2049,6 @@ export const MAINTENANCE_PLANS: MaintenancePlansPack = {
       "slotCount": 1
     },
     {
-      "date": "2026-07-01",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 20,
-      "slotCount": 2
-    },
-    {
-      "date": "2026-07-02",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 20,
-      "slotCount": 2
-    },
-    {
-      "date": "2026-07-03",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 0,
-      "slotCount": 1
-    },
-    {
-      "date": "2026-07-04",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 0,
-      "slotCount": 0
-    },
-    {
-      "date": "2026-07-05",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 20,
-      "slotCount": 1
-    },
-    {
-      "date": "2026-07-06",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 20,
-      "slotCount": 1
-    },
-    {
-      "date": "2026-07-07",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 20,
-      "slotCount": 1
-    },
-    {
-      "date": "2026-07-08",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 20,
-      "slotCount": 1
-    },
-    {
-      "date": "2026-07-09",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 0,
-      "slotCount": 0
-    },
-    {
-      "date": "2026-07-10",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 0,
-      "slotCount": 0
-    },
-    {
-      "date": "2026-07-11",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 0,
-      "slotCount": 0
-    },
-    {
-      "date": "2026-07-12",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 20,
-      "slotCount": 1
-    },
-    {
-      "date": "2026-07-13",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 0,
-      "slotCount": 0
-    },
-    {
-      "date": "2026-07-14",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 20,
-      "slotCount": 1
-    },
-    {
-      "date": "2026-07-15",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 20,
-      "slotCount": 1
-    },
-    {
-      "date": "2026-07-16",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 20,
-      "slotCount": 2
-    },
-    {
-      "date": "2026-07-17",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 20,
-      "slotCount": 2
-    },
-    {
-      "date": "2026-07-18",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 20,
-      "slotCount": 1
-    },
-    {
-      "date": "2026-07-19",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 20,
-      "slotCount": 1
-    },
-    {
-      "date": "2026-07-20",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 0,
-      "slotCount": 1
-    },
-    {
-      "date": "2026-07-21",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 20,
-      "slotCount": 1
-    },
-    {
-      "date": "2026-07-22",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 20,
-      "slotCount": 1
-    },
-    {
-      "date": "2026-07-23",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 20,
-      "slotCount": 1
-    },
-    {
-      "date": "2026-07-24",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 0,
-      "slotCount": 0
-    },
-    {
-      "date": "2026-07-25",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 0,
-      "slotCount": 0
-    },
-    {
-      "date": "2026-07-26",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 0,
-      "slotCount": 0
-    },
-    {
-      "date": "2026-07-27",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 0,
-      "slotCount": 0
-    },
-    {
-      "date": "2026-07-28",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 0,
-      "slotCount": 0
-    },
-    {
-      "date": "2026-07-29",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 0,
-      "slotCount": 0
-    },
-    {
-      "date": "2026-07-30",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 40,
-      "slotCount": 2
-    },
-    {
-      "date": "2026-07-31",
-      "weekday": "",
-      "monthKey": "Jul",
-      "totalManHours": 20,
-      "slotCount": 2
-    },
-    {
       "date": "2026-08-01",
       "weekday": "",
       "monthKey": "Ago",
@@ -3333,6 +3118,223 @@ export const MAINTENANCE_PLANS: MaintenancePlansPack = {
       "monthKey": "Dic",
       "totalManHours": 0,
       "slotCount": 0
+    },
+    {
+      "date": "2026-07-01",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 20,
+      "slotCount": 4
+    },
+    {
+      "date": "2026-07-02",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 20,
+      "slotCount": 2
+    },
+    {
+      "date": "2026-07-03",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 0,
+      "slotCount": 1
+    },
+    {
+      "date": "2026-07-04",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 0,
+      "slotCount": 0
+    },
+    {
+      "date": "2026-07-05",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 0,
+      "slotCount": 0
+    },
+    {
+      "date": "2026-07-06",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 40,
+      "slotCount": 2
+    },
+    {
+      "date": "2026-07-07",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 68,
+      "slotCount": 2
+    },
+    {
+      "date": "2026-07-08",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 68,
+      "slotCount": 2
+    },
+    {
+      "date": "2026-07-09",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 0,
+      "slotCount": 0
+    },
+    {
+      "date": "2026-07-10",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 48,
+      "slotCount": 1
+    },
+    {
+      "date": "2026-07-11",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 48,
+      "slotCount": 1
+    },
+    {
+      "date": "2026-07-12",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 0,
+      "slotCount": 0
+    },
+    {
+      "date": "2026-07-13",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 48,
+      "slotCount": 1
+    },
+    {
+      "date": "2026-07-14",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 68,
+      "slotCount": 2
+    },
+    {
+      "date": "2026-07-15",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 20,
+      "slotCount": 1
+    },
+    {
+      "date": "2026-07-16",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 20,
+      "slotCount": 2
+    },
+    {
+      "date": "2026-07-17",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 20,
+      "slotCount": 1
+    },
+    {
+      "date": "2026-07-18",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 0,
+      "slotCount": 0
+    },
+    {
+      "date": "2026-07-19",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 0,
+      "slotCount": 0
+    },
+    {
+      "date": "2026-07-20",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 0,
+      "slotCount": 1
+    },
+    {
+      "date": "2026-07-21",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 20,
+      "slotCount": 1
+    },
+    {
+      "date": "2026-07-22",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 20,
+      "slotCount": 1
+    },
+    {
+      "date": "2026-07-23",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 20,
+      "slotCount": 2
+    },
+    {
+      "date": "2026-07-24",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 0,
+      "slotCount": 0
+    },
+    {
+      "date": "2026-07-25",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 0,
+      "slotCount": 0
+    },
+    {
+      "date": "2026-07-26",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 0,
+      "slotCount": 0
+    },
+    {
+      "date": "2026-07-27",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 0,
+      "slotCount": 1
+    },
+    {
+      "date": "2026-07-28",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 0,
+      "slotCount": 0
+    },
+    {
+      "date": "2026-07-29",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 0,
+      "slotCount": 0
+    },
+    {
+      "date": "2026-07-30",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 20,
+      "slotCount": 1
+    },
+    {
+      "date": "2026-07-31",
+      "weekday": "",
+      "monthKey": "Jul",
+      "totalManHours": 0,
+      "slotCount": 2
     }
   ],
   "calendarSlots": [
@@ -4797,266 +4799,6 @@ export const MAINTENANCE_PLANS: MaintenancePlansPack = {
       "isRun": false
     },
     {
-      "date": "2026-07-01",
-      "monthKey": "Jul",
-      "equipment": "CPW12",
-      "model": "600GFT",
-      "mark": "12",
-      "hoursMto": 12,
-      "manHours": 20,
-      "isRun": false
-    },
-    {
-      "date": "2026-07-01",
-      "monthKey": "Jul",
-      "equipment": "JINAN 02",
-      "model": "600GFT",
-      "mark": "10",
-      "hoursMto": 10,
-      "manHours": 20,
-      "isRun": false
-    },
-    {
-      "date": "2026-07-02",
-      "monthKey": "Jul",
-      "equipment": "CPW 10",
-      "model": "600GFT",
-      "mark": "8",
-      "hoursMto": 8,
-      "manHours": 16,
-      "isRun": false
-    },
-    {
-      "date": "2026-07-02",
-      "monthKey": "Jul",
-      "equipment": "JINAN 03/JN 10",
-      "model": "600GFT",
-      "mark": "10",
-      "hoursMto": 10,
-      "manHours": 20,
-      "isRun": false
-    },
-    {
-      "date": "2026-07-03",
-      "monthKey": "Jul",
-      "equipment": "CPW11",
-      "model": "600GFT",
-      "mark": "12",
-      "hoursMto": 12,
-      "manHours": 20,
-      "isRun": false
-    },
-    {
-      "date": "2026-07-05",
-      "monthKey": "Jul",
-      "equipment": "CPW07",
-      "model": "J320",
-      "mark": "12",
-      "hoursMto": 12,
-      "manHours": 20,
-      "isRun": false
-    },
-    {
-      "date": "2026-07-06",
-      "monthKey": "Jul",
-      "equipment": "G 101 V",
-      "model": "KTA 19",
-      "mark": "10",
-      "hoursMto": 10,
-      "manHours": 20,
-      "isRun": false
-    },
-    {
-      "date": "2026-07-07",
-      "monthKey": "Jul",
-      "equipment": "G102 J",
-      "model": "KTA 38",
-      "mark": "10",
-      "hoursMto": 10,
-      "manHours": 20,
-      "isRun": false
-    },
-    {
-      "date": "2026-07-08",
-      "monthKey": "Jul",
-      "equipment": "G102K",
-      "model": "KTA 38",
-      "mark": "10",
-      "hoursMto": 10,
-      "manHours": 20,
-      "isRun": false
-    },
-    {
-      "date": "2026-07-12",
-      "monthKey": "Jul",
-      "equipment": "CPW03",
-      "model": "J320",
-      "mark": "10",
-      "hoursMto": 10,
-      "manHours": 20,
-      "isRun": false
-    },
-    {
-      "date": "2026-07-14",
-      "monthKey": "Jul",
-      "equipment": "CPW01",
-      "model": "J320",
-      "mark": "10",
-      "hoursMto": 10,
-      "manHours": 20,
-      "isRun": false
-    },
-    {
-      "date": "2026-07-15",
-      "monthKey": "Jul",
-      "equipment": "JINAN 01",
-      "model": "600GFT",
-      "mark": "10",
-      "hoursMto": 10,
-      "manHours": 20,
-      "isRun": false
-    },
-    {
-      "date": "2026-07-16",
-      "monthKey": "Jul",
-      "equipment": "CPW12",
-      "model": "600GFT",
-      "mark": "12",
-      "hoursMto": 12,
-      "manHours": 20,
-      "isRun": false
-    },
-    {
-      "date": "2026-07-16",
-      "monthKey": "Jul",
-      "equipment": "JINAN 02",
-      "model": "600GFT",
-      "mark": "10",
-      "hoursMto": 10,
-      "manHours": 20,
-      "isRun": false
-    },
-    {
-      "date": "2026-07-17",
-      "monthKey": "Jul",
-      "equipment": "CPW 10",
-      "model": "600GFT",
-      "mark": "8",
-      "hoursMto": 8,
-      "manHours": 16,
-      "isRun": false
-    },
-    {
-      "date": "2026-07-17",
-      "monthKey": "Jul",
-      "equipment": "JINAN 03/JN 10",
-      "model": "600GFT",
-      "mark": "10",
-      "hoursMto": 10,
-      "manHours": 20,
-      "isRun": false
-    },
-    {
-      "date": "2026-07-18",
-      "monthKey": "Jul",
-      "equipment": "CPW04",
-      "model": "J420",
-      "mark": "10",
-      "hoursMto": 10,
-      "manHours": 20,
-      "isRun": false
-    },
-    {
-      "date": "2026-07-19",
-      "monthKey": "Jul",
-      "equipment": "CPW05",
-      "model": "J420",
-      "mark": "10",
-      "hoursMto": 10,
-      "manHours": 20,
-      "isRun": false
-    },
-    {
-      "date": "2026-07-20",
-      "monthKey": "Jul",
-      "equipment": "CPW11",
-      "model": "600GFT",
-      "mark": "12",
-      "hoursMto": 12,
-      "manHours": 20,
-      "isRun": false
-    },
-    {
-      "date": "2026-07-21",
-      "monthKey": "Jul",
-      "equipment": "G 101 V",
-      "model": "KTA 19",
-      "mark": "10",
-      "hoursMto": 10,
-      "manHours": 20,
-      "isRun": false
-    },
-    {
-      "date": "2026-07-22",
-      "monthKey": "Jul",
-      "equipment": "G102 J",
-      "model": "KTA 38",
-      "mark": "10",
-      "hoursMto": 10,
-      "manHours": 20,
-      "isRun": false
-    },
-    {
-      "date": "2026-07-23",
-      "monthKey": "Jul",
-      "equipment": "G102K",
-      "model": "KTA 38",
-      "mark": "10",
-      "hoursMto": 10,
-      "manHours": 20,
-      "isRun": false
-    },
-    {
-      "date": "2026-07-30",
-      "monthKey": "Jul",
-      "equipment": "CPW02",
-      "model": "J320",
-      "mark": "10",
-      "hoursMto": 10,
-      "manHours": 20,
-      "isRun": false
-    },
-    {
-      "date": "2026-07-30",
-      "monthKey": "Jul",
-      "equipment": "JINAN 01",
-      "model": "600GFT",
-      "mark": "10",
-      "hoursMto": 10,
-      "manHours": 20,
-      "isRun": false
-    },
-    {
-      "date": "2026-07-31",
-      "monthKey": "Jul",
-      "equipment": "CPW12",
-      "model": "600GFT",
-      "mark": "12",
-      "hoursMto": 12,
-      "manHours": 20,
-      "isRun": false
-    },
-    {
-      "date": "2026-07-31",
-      "monthKey": "Jul",
-      "equipment": "JINAN 02",
-      "model": "600GFT",
-      "mark": "10",
-      "hoursMto": 10,
-      "manHours": 20,
-      "isRun": false
-    },
-    {
       "date": "2026-08-01",
       "monthKey": "Ago",
       "equipment": "CPW 10",
@@ -6294,6 +6036,317 @@ export const MAINTENANCE_PLANS: MaintenancePlansPack = {
       "mark": "12",
       "hoursMto": 12,
       "manHours": 24,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-01",
+      "monthKey": "Jul",
+      "equipment": "CPW02",
+      "model": "J320 - CPW02",
+      "mark": "8",
+      "hoursMto": 8,
+      "manHours": null,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-01",
+      "monthKey": "Jul",
+      "equipment": "CPW12",
+      "model": "600GFT - CPW 12",
+      "mark": "12",
+      "hoursMto": 12,
+      "manHours": 20,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-01",
+      "monthKey": "Jul",
+      "equipment": "JINAN 01",
+      "model": "600GFT - JINAN 01",
+      "mark": "8",
+      "hoursMto": 8,
+      "manHours": null,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-01",
+      "monthKey": "Jul",
+      "equipment": "JINAN 02",
+      "model": "600GFT - JINAN 02",
+      "mark": "10",
+      "hoursMto": 10,
+      "manHours": 20,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-02",
+      "monthKey": "Jul",
+      "equipment": "CPW 10",
+      "model": "600GFT - CPW 10",
+      "mark": "8",
+      "hoursMto": 8,
+      "manHours": 16,
+      "isRun": false,
+      "deferredTo": "Ago"
+    },
+    {
+      "date": "2026-07-02",
+      "monthKey": "Jul",
+      "equipment": "JINAN 03/JN 10",
+      "model": "600GFT - CPW 10",
+      "mark": "10",
+      "hoursMto": 10,
+      "manHours": 20,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-03",
+      "monthKey": "Jul",
+      "equipment": "CPW11",
+      "model": "600GFT - CPW 11",
+      "mark": "12",
+      "hoursMto": 12,
+      "manHours": 20,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-06",
+      "monthKey": "Jul",
+      "equipment": "CPW04",
+      "model": "J420 - CPW04",
+      "mark": "10",
+      "hoursMto": 10,
+      "manHours": 20,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-06",
+      "monthKey": "Jul",
+      "equipment": "G 101 V",
+      "model": "KTA 19",
+      "mark": "10",
+      "hoursMto": 10,
+      "manHours": 20,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-07",
+      "monthKey": "Jul",
+      "equipment": "CPW01",
+      "model": "J320 - CPW01",
+      "mark": "24",
+      "hoursMto": 24,
+      "manHours": 48,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-07",
+      "monthKey": "Jul",
+      "equipment": "G102 J",
+      "model": "KTA 38",
+      "mark": "10",
+      "hoursMto": 10,
+      "manHours": 20,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-08",
+      "monthKey": "Jul",
+      "equipment": "CPW01",
+      "model": "J320 - CPW01",
+      "mark": "24",
+      "hoursMto": 24,
+      "manHours": 48,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-08",
+      "monthKey": "Jul",
+      "equipment": "G102K",
+      "model": "KTA 38",
+      "mark": "10",
+      "hoursMto": 10,
+      "manHours": 20,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-10",
+      "monthKey": "Jul",
+      "equipment": "CPW02",
+      "model": "J320 - CPW02",
+      "mark": "24",
+      "hoursMto": 24,
+      "manHours": 48,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-11",
+      "monthKey": "Jul",
+      "equipment": "CPW02",
+      "model": "J320 - CPW02",
+      "mark": "24",
+      "hoursMto": 24,
+      "manHours": 48,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-13",
+      "monthKey": "Jul",
+      "equipment": "CPW03",
+      "model": "J320 - CPW03",
+      "mark": "24",
+      "hoursMto": 24,
+      "manHours": 48,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-14",
+      "monthKey": "Jul",
+      "equipment": "CPW01",
+      "model": "J320 - CPW01",
+      "mark": "10",
+      "hoursMto": 10,
+      "manHours": 20,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-14",
+      "monthKey": "Jul",
+      "equipment": "CPW03",
+      "model": "J320 - CPW03",
+      "mark": "24",
+      "hoursMto": 24,
+      "manHours": 48,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-15",
+      "monthKey": "Jul",
+      "equipment": "JINAN 01",
+      "model": "600GFT - JINAN 01",
+      "mark": "10",
+      "hoursMto": 10,
+      "manHours": 20,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-16",
+      "monthKey": "Jul",
+      "equipment": "JINAN 01",
+      "model": "600GFT - JINAN 01",
+      "mark": "8",
+      "hoursMto": 8,
+      "manHours": null,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-16",
+      "monthKey": "Jul",
+      "equipment": "JINAN 02",
+      "model": "600GFT - JINAN 02",
+      "mark": "10",
+      "hoursMto": 10,
+      "manHours": 20,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-17",
+      "monthKey": "Jul",
+      "equipment": "JINAN 03/JN 10",
+      "model": "600GFT - CPW 10",
+      "mark": "10",
+      "hoursMto": 10,
+      "manHours": 20,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-20",
+      "monthKey": "Jul",
+      "equipment": "CPW11",
+      "model": "600GFT - CPW 11",
+      "mark": "12",
+      "hoursMto": 12,
+      "manHours": 20,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-21",
+      "monthKey": "Jul",
+      "equipment": "G 101 V",
+      "model": "KTA 19",
+      "mark": "10",
+      "hoursMto": 10,
+      "manHours": 20,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-22",
+      "monthKey": "Jul",
+      "equipment": "G102 J",
+      "model": "KTA 38",
+      "mark": "10",
+      "hoursMto": 10,
+      "manHours": 20,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-23",
+      "monthKey": "Jul",
+      "equipment": "CPW 10",
+      "model": "600GFT - CPW 10",
+      "mark": "10",
+      "hoursMto": 10,
+      "manHours": 20,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-23",
+      "monthKey": "Jul",
+      "equipment": "G102K",
+      "model": "KTA 38",
+      "mark": "10",
+      "hoursMto": 10,
+      "manHours": 20,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-27",
+      "monthKey": "Jul",
+      "equipment": "CPW12",
+      "model": "600GFT - CPW 12",
+      "mark": "10",
+      "hoursMto": 10,
+      "manHours": 20,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-30",
+      "monthKey": "Jul",
+      "equipment": "CPW05",
+      "model": "J420 - CPW05",
+      "mark": "10",
+      "hoursMto": 10,
+      "manHours": 20,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-31",
+      "monthKey": "Jul",
+      "equipment": "CPW 10",
+      "model": "600GFT - CPW 10",
+      "mark": "10",
+      "hoursMto": 10,
+      "manHours": 20,
+      "isRun": false
+    },
+    {
+      "date": "2026-07-31",
+      "monthKey": "Jul",
+      "equipment": "JINAN 01",
+      "model": "600GFT - JINAN 01",
+      "mark": "8",
+      "hoursMto": 8,
+      "manHours": null,
       "isRun": false
     }
   ],
@@ -8267,10 +8320,10 @@ export const MAINTENANCE_PLANS: MaintenancePlansPack = {
       "programmed": true,
       "programmedLabel": "Sí",
       "equipment": "JINAN 02",
-      "executed": true,
-      "status": "ejecutado",
-      "statusLabel": "Ejecutado",
-      "executionDate": "2026-06-01",
+      "executed": false,
+      "status": "pendiente",
+      "statusLabel": "Programado pendiente",
+      "executionDate": null,
       "notes": "no cumple horas de mantenimiento",
       "plannedManHours": 20
     },
@@ -8345,11 +8398,11 @@ export const MAINTENANCE_PLANS: MaintenancePlansPack = {
       "programmed": true,
       "programmedLabel": "Sí",
       "equipment": "G102 J",
-      "executed": true,
-      "status": "ejecutado",
-      "statusLabel": "Ejecutado",
-      "executionDate": "2026-06-07",
-      "notes": "Ejecutado según plan junio 2026",
+      "executed": false,
+      "status": "pendiente",
+      "statusLabel": "Programado pendiente",
+      "executionDate": null,
+      "notes": null,
       "plannedManHours": 20
     },
     {
@@ -8358,11 +8411,11 @@ export const MAINTENANCE_PLANS: MaintenancePlansPack = {
       "programmed": true,
       "programmedLabel": "Sí",
       "equipment": "G102K",
-      "executed": true,
-      "status": "ejecutado",
-      "statusLabel": "Ejecutado",
-      "executionDate": "2026-06-08",
-      "notes": "Ejecutado según plan junio 2026",
+      "executed": false,
+      "status": "pendiente",
+      "statusLabel": "Programado pendiente",
+      "executionDate": null,
+      "notes": null,
       "plannedManHours": 20
     },
     {
@@ -8527,11 +8580,11 @@ export const MAINTENANCE_PLANS: MaintenancePlansPack = {
       "programmed": true,
       "programmedLabel": "Sí",
       "equipment": "G 101 V",
-      "executed": true,
-      "status": "ejecutado",
-      "statusLabel": "Ejecutado",
-      "executionDate": "2026-06-21",
-      "notes": "Ejecutado según plan junio 2026",
+      "executed": false,
+      "status": "pendiente",
+      "statusLabel": "Programado pendiente",
+      "executionDate": null,
+      "notes": null,
       "plannedManHours": 20
     },
     {
@@ -8553,11 +8606,11 @@ export const MAINTENANCE_PLANS: MaintenancePlansPack = {
       "programmed": true,
       "programmedLabel": "Sí",
       "equipment": "CPW06, G102K",
-      "executed": true,
-      "status": "ejecutado",
-      "statusLabel": "Ejecutado",
-      "executionDate": "2026-06-23",
-      "notes": "Ejecutado según plan junio 2026",
+      "executed": false,
+      "status": "pendiente",
+      "statusLabel": "Programado pendiente",
+      "executionDate": null,
+      "notes": null,
       "plannedManHours": 44
     },
     {
@@ -8579,11 +8632,11 @@ export const MAINTENANCE_PLANS: MaintenancePlansPack = {
       "programmed": true,
       "programmedLabel": "Sí",
       "equipment": "CYC",
-      "executed": true,
-      "status": "ejecutado",
-      "statusLabel": "Ejecutado",
-      "executionDate": "2026-06-25",
-      "notes": "Ejecutado según plan junio 2026",
+      "executed": false,
+      "status": "pendiente",
+      "statusLabel": "Programado pendiente",
+      "executionDate": null,
+      "notes": null,
       "plannedManHours": 0
     },
     {
@@ -8652,409 +8705,6 @@ export const MAINTENANCE_PLANS: MaintenancePlansPack = {
       "plannedManHours": 20
     },
     {
-      "date": "2026-07-01",
-      "monthKey": "Jul",
-      "programmed": true,
-      "programmedLabel": "Sí",
-      "equipment": "CPW12, JINAN 02",
-      "executed": true,
-      "status": "ejecutado",
-      "statusLabel": "Ejecutado",
-      "executionDate": "1-07-2026 5/07/2026",
-      "notes": "SE EJECUTA MANTENIMIENTO M0 SE EJECUTA MANTENIMIENTO M2",
-      "plannedManHours": 20
-    },
-    {
-      "date": "2026-07-02",
-      "monthKey": "Jul",
-      "programmed": true,
-      "programmedLabel": "Sí",
-      "equipment": "CPW 10, JINAN 03/JN 10",
-      "executed": false,
-      "status": "pendiente",
-      "statusLabel": "Programado pendiente",
-      "executionDate": null,
-      "notes": "NO CUMPLE HORAS DE MANTENIMIENTO",
-      "plannedManHours": 20
-    },
-    {
-      "date": "2026-07-03",
-      "monthKey": "Jul",
-      "programmed": true,
-      "programmedLabel": "Sí",
-      "equipment": "CPW11",
-      "executed": true,
-      "status": "ejecutado",
-      "statusLabel": "Ejecutado",
-      "executionDate": "2026-07-02",
-      "notes": "SE REALIZA UN M0 CAMBIO DE ACEITE",
-      "plannedManHours": 0
-    },
-    {
-      "date": "2026-07-04",
-      "monthKey": "Jul",
-      "programmed": false,
-      "programmedLabel": "No",
-      "equipment": "—",
-      "executed": false,
-      "status": "no_aplica",
-      "statusLabel": "No aplica",
-      "executionDate": null,
-      "notes": null,
-      "plannedManHours": 0
-    },
-    {
-      "date": "2026-07-05",
-      "monthKey": "Jul",
-      "programmed": true,
-      "programmedLabel": "Sí",
-      "equipment": "CPW07",
-      "executed": false,
-      "status": "pendiente",
-      "statusLabel": "Programado pendiente",
-      "executionDate": null,
-      "notes": null,
-      "plannedManHours": 20
-    },
-    {
-      "date": "2026-07-06",
-      "monthKey": "Jul",
-      "programmed": true,
-      "programmedLabel": "Sí",
-      "equipment": "G 101 V",
-      "executed": false,
-      "status": "pendiente",
-      "statusLabel": "Programado pendiente",
-      "executionDate": null,
-      "notes": null,
-      "plannedManHours": 20
-    },
-    {
-      "date": "2026-07-07",
-      "monthKey": "Jul",
-      "programmed": true,
-      "programmedLabel": "Sí",
-      "equipment": "G102 J",
-      "executed": false,
-      "status": "pendiente",
-      "statusLabel": "Programado pendiente",
-      "executionDate": null,
-      "notes": null,
-      "plannedManHours": 20
-    },
-    {
-      "date": "2026-07-08",
-      "monthKey": "Jul",
-      "programmed": true,
-      "programmedLabel": "Sí",
-      "equipment": "G102K",
-      "executed": false,
-      "status": "pendiente",
-      "statusLabel": "Programado pendiente",
-      "executionDate": null,
-      "notes": null,
-      "plannedManHours": 20
-    },
-    {
-      "date": "2026-07-09",
-      "monthKey": "Jul",
-      "programmed": false,
-      "programmedLabel": "No",
-      "equipment": "—",
-      "executed": false,
-      "status": "no_aplica",
-      "statusLabel": "No aplica",
-      "executionDate": null,
-      "notes": null,
-      "plannedManHours": 0
-    },
-    {
-      "date": "2026-07-10",
-      "monthKey": "Jul",
-      "programmed": false,
-      "programmedLabel": "No",
-      "equipment": "—",
-      "executed": false,
-      "status": "no_aplica",
-      "statusLabel": "No aplica",
-      "executionDate": null,
-      "notes": null,
-      "plannedManHours": 0
-    },
-    {
-      "date": "2026-07-11",
-      "monthKey": "Jul",
-      "programmed": false,
-      "programmedLabel": "No",
-      "equipment": "—",
-      "executed": false,
-      "status": "no_aplica",
-      "statusLabel": "No aplica",
-      "executionDate": null,
-      "notes": null,
-      "plannedManHours": 0
-    },
-    {
-      "date": "2026-07-12",
-      "monthKey": "Jul",
-      "programmed": true,
-      "programmedLabel": "Sí",
-      "equipment": "CPW03",
-      "executed": true,
-      "status": "ejecutado",
-      "statusLabel": "Ejecutado",
-      "executionDate": "2026-07-13",
-      "notes": "SE CORRE DIA DE MANTENIMIENTO",
-      "plannedManHours": 20
-    },
-    {
-      "date": "2026-07-13",
-      "monthKey": "Jul",
-      "programmed": false,
-      "programmedLabel": "No",
-      "equipment": "—",
-      "executed": false,
-      "status": "no_aplica",
-      "statusLabel": "No aplica",
-      "executionDate": null,
-      "notes": null,
-      "plannedManHours": 0
-    },
-    {
-      "date": "2026-07-14",
-      "monthKey": "Jul",
-      "programmed": true,
-      "programmedLabel": "Sí",
-      "equipment": "CPW01",
-      "executed": true,
-      "status": "ejecutado",
-      "statusLabel": "Ejecutado",
-      "executionDate": "2026-07-08",
-      "notes": "SE REALIZA MANTENIMIENTO POR CAMBIO DE CONTROL AGC 4 M10",
-      "plannedManHours": 20
-    },
-    {
-      "date": "2026-07-15",
-      "monthKey": "Jul",
-      "programmed": true,
-      "programmedLabel": "Sí",
-      "equipment": "JINAN 01",
-      "executed": true,
-      "status": "ejecutado",
-      "statusLabel": "Ejecutado",
-      "executionDate": "2026-07-03",
-      "notes": "M2 Se ejecuta mantenimiento",
-      "plannedManHours": 20
-    },
-    {
-      "date": "2026-07-16",
-      "monthKey": "Jul",
-      "programmed": true,
-      "programmedLabel": "Sí",
-      "equipment": "CPW12, JINAN 02",
-      "executed": true,
-      "status": "ejecutado",
-      "statusLabel": "Ejecutado",
-      "executionDate": "2026-07-21",
-      "notes": "SE PROGRAM MANTENIMIENTO M1//SE POSTERGA MANTENIMIENTO, NO CUMPLE CON HORAS DE MANTENIMIENTO",
-      "plannedManHours": 20
-    },
-    {
-      "date": "2026-07-17",
-      "monthKey": "Jul",
-      "programmed": true,
-      "programmedLabel": "Sí",
-      "equipment": "CPW 10, JINAN 03/JN 10",
-      "executed": true,
-      "status": "ejecutado",
-      "statusLabel": "Ejecutado",
-      "executionDate": "2026-07-15",
-      "notes": "M2 SE EJECUTA MANTENIMIENTO.",
-      "plannedManHours": 20
-    },
-    {
-      "date": "2026-07-18",
-      "monthKey": "Jul",
-      "programmed": true,
-      "programmedLabel": "Sí",
-      "equipment": "CPW04",
-      "executed": true,
-      "status": "ejecutado",
-      "statusLabel": "Ejecutado",
-      "executionDate": "2026-07-06",
-      "notes": "SE ADELANTA MANTENIMIENTO",
-      "plannedManHours": 20
-    },
-    {
-      "date": "2026-07-19",
-      "monthKey": "Jul",
-      "programmed": true,
-      "programmedLabel": "Sí",
-      "equipment": "CPW05",
-      "executed": false,
-      "status": "pendiente",
-      "statusLabel": "Programado pendiente",
-      "executionDate": null,
-      "notes": null,
-      "plannedManHours": 20
-    },
-    {
-      "date": "2026-07-20",
-      "monthKey": "Jul",
-      "programmed": true,
-      "programmedLabel": "Sí",
-      "equipment": "CPW11",
-      "executed": false,
-      "status": "pendiente",
-      "statusLabel": "Programado pendiente",
-      "executionDate": null,
-      "notes": null,
-      "plannedManHours": 0
-    },
-    {
-      "date": "2026-07-21",
-      "monthKey": "Jul",
-      "programmed": true,
-      "programmedLabel": "Sí",
-      "equipment": "G 101 V",
-      "executed": false,
-      "status": "pendiente",
-      "statusLabel": "Programado pendiente",
-      "executionDate": null,
-      "notes": null,
-      "plannedManHours": 20
-    },
-    {
-      "date": "2026-07-22",
-      "monthKey": "Jul",
-      "programmed": true,
-      "programmedLabel": "Sí",
-      "equipment": "G102 J",
-      "executed": false,
-      "status": "pendiente",
-      "statusLabel": "Programado pendiente",
-      "executionDate": null,
-      "notes": null,
-      "plannedManHours": 20
-    },
-    {
-      "date": "2026-07-23",
-      "monthKey": "Jul",
-      "programmed": true,
-      "programmedLabel": "Sí",
-      "equipment": "G102K",
-      "executed": false,
-      "status": "pendiente",
-      "statusLabel": "Programado pendiente",
-      "executionDate": null,
-      "notes": null,
-      "plannedManHours": 20
-    },
-    {
-      "date": "2026-07-24",
-      "monthKey": "Jul",
-      "programmed": false,
-      "programmedLabel": "No",
-      "equipment": "—",
-      "executed": false,
-      "status": "no_aplica",
-      "statusLabel": "No aplica",
-      "executionDate": null,
-      "notes": null,
-      "plannedManHours": 0
-    },
-    {
-      "date": "2026-07-25",
-      "monthKey": "Jul",
-      "programmed": false,
-      "programmedLabel": "No",
-      "equipment": "—",
-      "executed": false,
-      "status": "no_aplica",
-      "statusLabel": "No aplica",
-      "executionDate": null,
-      "notes": null,
-      "plannedManHours": 0
-    },
-    {
-      "date": "2026-07-26",
-      "monthKey": "Jul",
-      "programmed": false,
-      "programmedLabel": "No",
-      "equipment": "—",
-      "executed": false,
-      "status": "no_aplica",
-      "statusLabel": "No aplica",
-      "executionDate": null,
-      "notes": null,
-      "plannedManHours": 0
-    },
-    {
-      "date": "2026-07-27",
-      "monthKey": "Jul",
-      "programmed": false,
-      "programmedLabel": "No",
-      "equipment": "—",
-      "executed": false,
-      "status": "no_aplica",
-      "statusLabel": "No aplica",
-      "executionDate": null,
-      "notes": null,
-      "plannedManHours": 0
-    },
-    {
-      "date": "2026-07-28",
-      "monthKey": "Jul",
-      "programmed": false,
-      "programmedLabel": "No",
-      "equipment": "—",
-      "executed": false,
-      "status": "no_aplica",
-      "statusLabel": "No aplica",
-      "executionDate": null,
-      "notes": null,
-      "plannedManHours": 0
-    },
-    {
-      "date": "2026-07-29",
-      "monthKey": "Jul",
-      "programmed": false,
-      "programmedLabel": "No",
-      "equipment": "—",
-      "executed": false,
-      "status": "no_aplica",
-      "statusLabel": "No aplica",
-      "executionDate": null,
-      "notes": null,
-      "plannedManHours": 0
-    },
-    {
-      "date": "2026-07-30",
-      "monthKey": "Jul",
-      "programmed": true,
-      "programmedLabel": "Sí",
-      "equipment": "CPW02, JINAN 01",
-      "executed": true,
-      "status": "ejecutado",
-      "statusLabel": "Ejecutado",
-      "executionDate": "11/07/2026 16-07-2026",
-      "notes": "M10 SE ADELANTA MANTENIMIENTO PREVENTIVO POR CUMPLIMIENTO DE HORAS M3 SE EJECUTA MANTENIMIENTO",
-      "plannedManHours": 40
-    },
-    {
-      "date": "2026-07-31",
-      "monthKey": "Jul",
-      "programmed": true,
-      "programmedLabel": "Sí",
-      "equipment": "CPW12, JINAN 02",
-      "executed": false,
-      "status": "pendiente",
-      "statusLabel": "Programado pendiente",
-      "executionDate": null,
-      "notes": null,
-      "plannedManHours": 20
-    },
-    {
       "date": "2026-08-01",
       "monthKey": "Ago",
       "programmed": true,
@@ -9064,7 +8714,7 @@ export const MAINTENANCE_PLANS: MaintenancePlansPack = {
       "status": "pendiente",
       "statusLabel": "Programado pendiente",
       "executionDate": null,
-      "notes": null,
+      "notes": "Incluye MTO diferido de 2026-07-02 (CPW 10): no cumplía 350 h OP (stand-by).",
       "plannedManHours": 20
     },
     {
@@ -11028,6 +10678,409 @@ export const MAINTENANCE_PLANS: MaintenancePlansPack = {
       "statusLabel": "No aplica",
       "executionDate": null,
       "notes": null,
+      "plannedManHours": 0
+    },
+    {
+      "date": "2026-07-01",
+      "monthKey": "Jul",
+      "programmed": true,
+      "programmedLabel": "Sí",
+      "equipment": "CPW02 , CPW12, JINAN 01, JINAN 02",
+      "executed": true,
+      "status": "ejecutado",
+      "statusLabel": "Ejecutado",
+      "executionDate": "1-07-2026 5/07/2026",
+      "notes": "SE EJECUTA MANTENIMIENTO M0 SE EJECUTA MANTENIMIENTO M2(JINAN 02 SE APLAZA POR CIERRE DE VIA VUELTA CICLÍSTICA Y SE EJECUTA EL DOMINGO)",
+      "plannedManHours": 20
+    },
+    {
+      "date": "2026-07-02",
+      "monthKey": "Jul",
+      "programmed": false,
+      "programmedLabel": "Diferido",
+      "equipment": "CPW 10",
+      "executed": false,
+      "status": "no_aplica",
+      "statusLabel": "Diferido a agosto · sin 350 h OP",
+      "executionDate": null,
+      "notes": "NO CUMPLE HORAS DE MANTENIMIENTO, ESQUIPO ESTUVO EN STAND BY · Reprogramado a agosto: periodicidad 350 h de operación; equipo en stand-by.",
+      "plannedManHours": 20
+    },
+    {
+      "date": "2026-07-03",
+      "monthKey": "Jul",
+      "programmed": true,
+      "programmedLabel": "Sí",
+      "equipment": "CPW11",
+      "executed": true,
+      "status": "ejecutado",
+      "statusLabel": "Ejecutado",
+      "executionDate": "2026-07-02",
+      "notes": "SE REALIZA UN M0 CAMBIO DE ACEITE , SE CORRE FECHA POR CRONOGRAMA",
+      "plannedManHours": 0
+    },
+    {
+      "date": "2026-07-04",
+      "monthKey": "Jul",
+      "programmed": false,
+      "programmedLabel": "No",
+      "equipment": "—",
+      "executed": false,
+      "status": "no_aplica",
+      "statusLabel": "No aplica",
+      "executionDate": null,
+      "notes": null,
+      "plannedManHours": 0
+    },
+    {
+      "date": "2026-07-05",
+      "monthKey": "Jul",
+      "programmed": false,
+      "programmedLabel": "No",
+      "equipment": "—",
+      "executed": false,
+      "status": "no_aplica",
+      "statusLabel": "No aplica",
+      "executionDate": null,
+      "notes": null,
+      "plannedManHours": 0
+    },
+    {
+      "date": "2026-07-06",
+      "monthKey": "Jul",
+      "programmed": true,
+      "programmedLabel": "Sí",
+      "equipment": "CPW04 , G 101 V",
+      "executed": true,
+      "status": "ejecutado",
+      "statusLabel": "Ejecutado",
+      "executionDate": "2026-07-06",
+      "notes": "SE EJECUTA MANTENIMIENTO M2",
+      "plannedManHours": 40
+    },
+    {
+      "date": "2026-07-07",
+      "monthKey": "Jul",
+      "programmed": true,
+      "programmedLabel": "Sí",
+      "equipment": "CPW01, G102 J",
+      "executed": true,
+      "status": "ejecutado",
+      "statusLabel": "Ejecutado",
+      "executionDate": "2026-07-07",
+      "notes": "DESCARBONIZACIÓN DEL EQUIPO",
+      "plannedManHours": 68
+    },
+    {
+      "date": "2026-07-08",
+      "monthKey": "Jul",
+      "programmed": true,
+      "programmedLabel": "Sí",
+      "equipment": "CPW01, G102K",
+      "executed": true,
+      "status": "ejecutado",
+      "statusLabel": "Ejecutado",
+      "executionDate": "2026-07-08",
+      "notes": "DESCARBONIZACIÓN DEL EQUIPO",
+      "plannedManHours": 68
+    },
+    {
+      "date": "2026-07-09",
+      "monthKey": "Jul",
+      "programmed": false,
+      "programmedLabel": "No",
+      "equipment": "—",
+      "executed": false,
+      "status": "no_aplica",
+      "statusLabel": "No aplica",
+      "executionDate": null,
+      "notes": null,
+      "plannedManHours": 0
+    },
+    {
+      "date": "2026-07-10",
+      "monthKey": "Jul",
+      "programmed": true,
+      "programmedLabel": "Sí",
+      "equipment": "CPW02",
+      "executed": true,
+      "status": "ejecutado",
+      "statusLabel": "Ejecutado",
+      "executionDate": "2026-07-10",
+      "notes": "DESCARBONIZACIÓN DEL EQUIPO",
+      "plannedManHours": 48
+    },
+    {
+      "date": "2026-07-11",
+      "monthKey": "Jul",
+      "programmed": true,
+      "programmedLabel": "Sí",
+      "equipment": "CPW02",
+      "executed": true,
+      "status": "ejecutado",
+      "statusLabel": "Ejecutado",
+      "executionDate": "2026-07-11",
+      "notes": "DESCARBONIZACIÓN DEL EQUIPO",
+      "plannedManHours": 48
+    },
+    {
+      "date": "2026-07-12",
+      "monthKey": "Jul",
+      "programmed": false,
+      "programmedLabel": "No",
+      "equipment": "—",
+      "executed": true,
+      "status": "no_aplica",
+      "statusLabel": "No aplica",
+      "executionDate": "2026-07-13",
+      "notes": "SE CORRE DIA DE MANTENIMIENTO",
+      "plannedManHours": 0
+    },
+    {
+      "date": "2026-07-13",
+      "monthKey": "Jul",
+      "programmed": true,
+      "programmedLabel": "Sí",
+      "equipment": "CPW03",
+      "executed": true,
+      "status": "ejecutado",
+      "statusLabel": "Ejecutado",
+      "executionDate": "2026-07-13",
+      "notes": "SE REALIZA MANTENIMIENTO POR CAMBIO DE CONTROL AGC 4 M10",
+      "plannedManHours": 48
+    },
+    {
+      "date": "2026-07-14",
+      "monthKey": "Jul",
+      "programmed": true,
+      "programmedLabel": "Sí",
+      "equipment": "CPW01, CPW03",
+      "executed": true,
+      "status": "ejecutado",
+      "statusLabel": "Ejecutado",
+      "executionDate": "2026-07-14",
+      "notes": "SE REALIZA MANTENIMIENTO POR CAMBIO DE CONTROL AGC 4 M10",
+      "plannedManHours": 68
+    },
+    {
+      "date": "2026-07-15",
+      "monthKey": "Jul",
+      "programmed": true,
+      "programmedLabel": "Sí",
+      "equipment": "JINAN 01",
+      "executed": true,
+      "status": "ejecutado",
+      "statusLabel": "Ejecutado",
+      "executionDate": "2026-07-03",
+      "notes": "M2 Se ejecuta mantenimiento",
+      "plannedManHours": 20
+    },
+    {
+      "date": "2026-07-16",
+      "monthKey": "Jul",
+      "programmed": true,
+      "programmedLabel": "Sí",
+      "equipment": "JINAN 01, JINAN 02",
+      "executed": true,
+      "status": "ejecutado",
+      "statusLabel": "Ejecutado",
+      "executionDate": "2026-07-21",
+      "notes": "SE PROGRAM MANTENIMIENTO M1//SE POSTERGA MANTENIMIENTO, NO CUMPLE CON HORAS DE MANTENIMIENTO",
+      "plannedManHours": 20
+    },
+    {
+      "date": "2026-07-17",
+      "monthKey": "Jul",
+      "programmed": true,
+      "programmedLabel": "Sí",
+      "equipment": "JINAN 03/JN 10",
+      "executed": true,
+      "status": "ejecutado",
+      "statusLabel": "Ejecutado",
+      "executionDate": "2026-07-15",
+      "notes": "M2 SE EJECUTA MANTENIMIENTO.",
+      "plannedManHours": 20
+    },
+    {
+      "date": "2026-07-18",
+      "monthKey": "Jul",
+      "programmed": false,
+      "programmedLabel": "No",
+      "equipment": "—",
+      "executed": false,
+      "status": "no_aplica",
+      "statusLabel": "No aplica",
+      "executionDate": null,
+      "notes": null,
+      "plannedManHours": 0
+    },
+    {
+      "date": "2026-07-19",
+      "monthKey": "Jul",
+      "programmed": false,
+      "programmedLabel": "No",
+      "equipment": "—",
+      "executed": false,
+      "status": "no_aplica",
+      "statusLabel": "No aplica",
+      "executionDate": null,
+      "notes": null,
+      "plannedManHours": 0
+    },
+    {
+      "date": "2026-07-20",
+      "monthKey": "Jul",
+      "programmed": true,
+      "programmedLabel": "Sí",
+      "equipment": "CPW11",
+      "executed": true,
+      "status": "ejecutado",
+      "statusLabel": "Ejecutado",
+      "executionDate": null,
+      "notes": null,
+      "plannedManHours": 0
+    },
+    {
+      "date": "2026-07-21",
+      "monthKey": "Jul",
+      "programmed": true,
+      "programmedLabel": "Sí",
+      "equipment": "G 101 V",
+      "executed": true,
+      "status": "ejecutado",
+      "statusLabel": "Ejecutado",
+      "executionDate": "2026-10-21",
+      "notes": "EQUIPO PERMANECE EN STAND BY",
+      "plannedManHours": 20
+    },
+    {
+      "date": "2026-07-22",
+      "monthKey": "Jul",
+      "programmed": true,
+      "programmedLabel": "Sí",
+      "equipment": "G102 J",
+      "executed": true,
+      "status": "ejecutado",
+      "statusLabel": "Ejecutado",
+      "executionDate": "2026-07-22",
+      "notes": "SE EJECUTA MANTENIMIENTO M1",
+      "plannedManHours": 20
+    },
+    {
+      "date": "2026-07-23",
+      "monthKey": "Jul",
+      "programmed": true,
+      "programmedLabel": "Sí",
+      "equipment": "CPW 10, G102K",
+      "executed": true,
+      "status": "ejecutado",
+      "statusLabel": "Ejecutado",
+      "executionDate": null,
+      "notes": null,
+      "plannedManHours": 20
+    },
+    {
+      "date": "2026-07-24",
+      "monthKey": "Jul",
+      "programmed": false,
+      "programmedLabel": "No",
+      "equipment": "—",
+      "executed": false,
+      "status": "no_aplica",
+      "statusLabel": "No aplica",
+      "executionDate": null,
+      "notes": null,
+      "plannedManHours": 0
+    },
+    {
+      "date": "2026-07-25",
+      "monthKey": "Jul",
+      "programmed": false,
+      "programmedLabel": "No",
+      "equipment": "—",
+      "executed": false,
+      "status": "no_aplica",
+      "statusLabel": "No aplica",
+      "executionDate": null,
+      "notes": null,
+      "plannedManHours": 0
+    },
+    {
+      "date": "2026-07-26",
+      "monthKey": "Jul",
+      "programmed": false,
+      "programmedLabel": "No",
+      "equipment": "—",
+      "executed": false,
+      "status": "no_aplica",
+      "statusLabel": "No aplica",
+      "executionDate": null,
+      "notes": null,
+      "plannedManHours": 0
+    },
+    {
+      "date": "2026-07-27",
+      "monthKey": "Jul",
+      "programmed": true,
+      "programmedLabel": "Sí",
+      "equipment": "CPW12",
+      "executed": true,
+      "status": "ejecutado",
+      "statusLabel": "Ejecutado",
+      "executionDate": "2026-07-27",
+      "notes": "SE REALIZA MANTENIMIENTO PREVEVENTIVO M1",
+      "plannedManHours": 0
+    },
+    {
+      "date": "2026-07-28",
+      "monthKey": "Jul",
+      "programmed": false,
+      "programmedLabel": "No",
+      "equipment": "—",
+      "executed": false,
+      "status": "no_aplica",
+      "statusLabel": "No aplica",
+      "executionDate": null,
+      "notes": null,
+      "plannedManHours": 0
+    },
+    {
+      "date": "2026-07-29",
+      "monthKey": "Jul",
+      "programmed": false,
+      "programmedLabel": "No",
+      "equipment": "—",
+      "executed": false,
+      "status": "no_aplica",
+      "statusLabel": "No aplica",
+      "executionDate": null,
+      "notes": null,
+      "plannedManHours": 0
+    },
+    {
+      "date": "2026-07-30",
+      "monthKey": "Jul",
+      "programmed": true,
+      "programmedLabel": "Sí",
+      "equipment": "CPW05",
+      "executed": true,
+      "status": "ejecutado",
+      "statusLabel": "Ejecutado",
+      "executionDate": "2026-07-30",
+      "notes": "M10 SE ADELANTA MANTENIMIENTO PREVENTIVO POR CUMPLIMIENTO DE HORAS M3 SE EJECUTA MANTENIMIENTO",
+      "plannedManHours": 20
+    },
+    {
+      "date": "2026-07-31",
+      "monthKey": "Jul",
+      "programmed": true,
+      "programmedLabel": "Sí",
+      "equipment": "CPW 10, JINAN 01",
+      "executed": true,
+      "status": "ejecutado",
+      "statusLabel": "Ejecutado",
+      "executionDate": "2026-07-31",
+      "notes": "SE EJECUTA MANTENIMIENTO M3",
       "plannedManHours": 0
     }
   ]

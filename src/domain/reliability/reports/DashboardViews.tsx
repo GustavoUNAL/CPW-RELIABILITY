@@ -31,6 +31,7 @@ import {
   type GranTierraMonthKey,
 } from "./granTierraMonthly";
 import type { MachineIndicatorRow } from "../types";
+import { MAINTENANCE_PLANS } from "./maintenancePlansData";
 
 const META = CONTRACTUAL_KPI_TARGETS.reliability;
 const META_PCT = META * 100;
@@ -1023,7 +1024,7 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
 
 export function DashboardMantenimiento({ month, monthLabel }: MonthProps) {
   const gte = GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey] ?? null;
-  const cpwKey = (COPOWER_MONTHLY_DATA[month as CopowerMonthKey] ? month : "Jun") as CopowerMonthKey;
+  const cpwKey = (COPOWER_MONTHLY_DATA[month as CopowerMonthKey] ? month : "Jul") as CopowerMonthKey;
   const cpw = COPOWER_MONTHLY_DATA[cpwKey];
 
   const oilTotal = cpw.consumos.reduce((acc, r) => acc + r.adicionAceite + r.cambioAceite, 0);
@@ -1037,13 +1038,16 @@ export function DashboardMantenimiento({ month, monthLabel }: MonthProps) {
     .filter((e) => e.eventType !== "Falla" || e.responsible === "COPOWER" || e.responsible === "GTE + COPOWER")
     .slice(0, 8);
 
+  const sabanaMonth = MAINTENANCE_PLANS.monthlySummary.find((m) => m.monthKey === month);
+  const sabanaExec = MAINTENANCE_PLANS.executions.filter((e) => e.programmed && e.monthKey === month);
+
   return (
     <div className="dash-module exec-dashboard">
       <header className="exec-header dash-hero">
         <div>
           <p className="eyebrow">Dashboard · Mantenimiento</p>
           <h2>{monthLabel}</h2>
-          <p className="muted">Horas PP/FS, consumos y priorización por fallas · COPOWER + contexto GTE</p>
+          <p className="muted">Horas PP/FS, sábana Putumayo, consumos y priorización por fallas</p>
         </div>
         <Wrench size={22} className="muted" />
       </header>
@@ -1065,6 +1069,37 @@ export function DashboardMantenimiento({ month, monthLabel }: MonthProps) {
             <p className="dash-side-note muted">Datos COPOWER de {cpw.label}.</p>
           ) : null}
         </article>
+        {sabanaMonth ? (
+          <article className="card">
+            <p className="eyebrow">Sábana Putumayo · {sabanaMonth.monthLabel}</p>
+            <div className="dash-core-grid">
+              <CoreCard
+                label="Programados"
+                value={String(sabanaMonth.programmedCount)}
+                hint={`${sabanaMonth.executedCount} ejecutados · ${sabanaMonth.pendingCount} pendientes`}
+              />
+              <CoreCard
+                label="Horas MTO plan"
+                value={hours(sabanaMonth.plannedHoursMto)}
+                hint={`Ejec. ${hours(sabanaMonth.executedHoursMto)}`}
+              />
+              <CoreCard
+                label="H/H plan"
+                value={hours(sabanaMonth.plannedManHours)}
+                hint={`Ejec. ${hours(sabanaMonth.executedManHours)}`}
+              />
+            </div>
+            {sabanaExec.some((e) => e.status === "pendiente") ? (
+              <p className="dash-side-note muted">
+                Pendiente:{" "}
+                {sabanaExec
+                  .filter((e) => e.status === "pendiente")
+                  .map((e) => `${e.date.slice(8, 10)} ${e.equipment}`)
+                  .join(" · ")}
+              </p>
+            ) : null}
+          </article>
+        ) : null}
       </section>
 
       <section className="panel two-col">
@@ -1157,7 +1192,8 @@ export function DashboardMantenimiento({ month, monthLabel }: MonthProps) {
       <aside className="exec-source-note">
         <p>
           <strong>Fuentes:</strong> {cpw.sourceFile}
-          {gte ? ` · ${gte.sourceFile}` : ""}. Plan MTO formal y stock de repuestos no vienen en fuentes actuales.
+          {gte ? ` · ${gte.sourceFile}` : ""}
+          {sabanaMonth ? ` · ${MAINTENANCE_PLANS.sourceFile}` : ""}.
         </p>
       </aside>
     </div>

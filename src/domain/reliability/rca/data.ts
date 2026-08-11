@@ -1,7 +1,40 @@
-import packJson from "./eventos_falla_costayaco_junio_2026.json";
-import type { RcaEventoFalla, RcaEventosPack } from "./types";
+import junioJson from "./eventos_falla_costayaco_junio_2026.json";
+import julioJson from "./eventos_falla_costayaco_julio_2026.json";
+import type { RcaAnalisisTransversal, RcaEventoFalla, RcaEventosPack } from "./types";
 
-export const RCA_COSTAYACO_PACK = packJson as RcaEventosPack;
+const junio = junioJson as RcaEventosPack;
+const julio = julioJson as {
+  meta: { periodo: string; fuente: string; generado: string; flota?: { unidades?: string[] } };
+  eventos: RcaEventoFalla[];
+  analisis_transversal?: RcaAnalisisTransversal;
+};
+
+const julioUnidades = julio.meta.flota?.unidades ?? [];
+
+export const RCA_COSTAYACO_PACK: RcaEventosPack = {
+  ...junio,
+  meta: {
+    ...junio.meta,
+    periodo: "junio–julio 2026",
+    fuente: `${junio.meta.fuente} + ${julio.meta.fuente}`,
+    generado: julio.meta.generado,
+    flota: {
+      ...junio.meta.flota,
+      unidades: [...new Set([...junio.meta.flota.unidades, ...julioUnidades])],
+    },
+  },
+  eventos: [...junio.eventos, ...julio.eventos],
+  analisis_transversal: {
+    patrones_recurrentes: [
+      ...(junio.analisis_transversal?.patrones_recurrentes ?? []),
+      ...(julio.analisis_transversal?.patrones_recurrentes ?? []),
+    ],
+    problemas_calidad_registro: [
+      ...(junio.analisis_transversal?.problemas_calidad_registro ?? []),
+      ...(julio.analisis_transversal?.problemas_calidad_registro ?? []),
+    ],
+  },
+};
 
 export const RCA_COSTAYACO_EVENTOS: RcaEventoFalla[] = RCA_COSTAYACO_PACK.eventos;
 

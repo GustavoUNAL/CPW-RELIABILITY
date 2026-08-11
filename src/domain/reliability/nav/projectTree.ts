@@ -109,6 +109,14 @@ export const PROJECT_NAV_TREE: NavModule[] = [
     description: "Eventos, activos críticos, RCA y comparativos",
     children: [
       { id: "cmp-fuentes", label: "Resumen" },
+      {
+        id: "conf-formulas-sec",
+        label: "Fórmulas de indicadores",
+        children: [
+          { id: "conf-formulas", label: "Catálogo Orden 1" },
+          { id: "conf-formulas-revision", label: "Revisión de resultados" },
+        ],
+      },
       { id: "proc-clasif", label: "Clasificación de fallas" },
       {
         id: "conf-eventos",
@@ -256,6 +264,14 @@ export const PROJECT_NAV_TREE: NavModule[] = [
           { id: "inf-rg-pruebas-dinamicas", label: "Pruebas dinámicas" },
           { id: "inf-rg-implementaciones", label: "Implementaciones" },
           { id: "inf-rg-cargabilidad", label: "Prueba de cargabilidad" },
+        ],
+      },
+      {
+        id: "inf-confiabilidad",
+        label: "Confiabilidad",
+        children: [
+          { id: "inf-conf-resumen", label: "Indicadores y eventos" },
+          { id: "inf-conf-conciliacion", label: "Slide conciliación Disp." },
         ],
       },
     ],

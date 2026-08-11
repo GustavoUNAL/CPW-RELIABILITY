@@ -32,6 +32,7 @@ import { OperationalPlanningDashboard } from "./OperationalPlanningDashboard";
 import { MonthlyReportDashboard } from "./MonthlyReportDashboard";
 import { DashboardMantenimiento, DashboardOverview } from "./DashboardViews";
 import { FuentesCompareResumen } from "./FuentesCompareResumen";
+import { IndicatorFormulasDashboard } from "./IndicatorFormulasDashboard";
 import { GenerationDashboard } from "./GenerationDashboard";
 import { CopowerCompanyView, GteCompanyView } from "./CompanyViews";
 import { FieldAssetsView, FieldsOverviewView } from "./FieldAssetsView";
@@ -379,7 +380,7 @@ function PlatformBody({
   onFocusCostayacoRcaConsumed,
   isAdmin,
 }: Props & { report: ReportKey }) {
-  const cpwMonth = (COPOWER_MONTHLY_DATA[month as CopowerMonthKey] ? month : "Jun") as CopowerMonthKey;
+  const cpwMonth = (COPOWER_MONTHLY_DATA[month as CopowerMonthKey] ? month : "Jul") as CopowerMonthKey;
   const gteMonthOk = Boolean(GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey]);
 
   if (leafId === "admin-usuarios" || leafId === "cfg-usuarios") {
@@ -608,7 +609,13 @@ function PlatformBody({
     if (leafId === "an-rca-casos" || leafId === "an-rca") {
       return (
         <RcaAnalysisDashboard
-          monthLabel={month === "Jun" ? monthLabel : `${monthLabel} · RCA junio 2026`}
+          monthLabel={
+            month === "Jul"
+              ? `${monthLabel} · FO-GE-033 julio`
+              : month === "Jun"
+                ? monthLabel
+                : `${monthLabel} · RCA junio–julio 2026`
+          }
           focusRcaId={focusRcaId}
           onFocusRcaConsumed={onFocusRcaConsumed}
           cases={rcaCases}
@@ -621,7 +628,7 @@ function PlatformBody({
       return <FailureClassificationView month={month} monthLabel={monthLabel} />;
     }
     if (leafId === "an-criticos") {
-      const snap = getSnap(report, month) ?? getSnap("copower", month) ?? getSnap("gran_tierra", "Jun");
+      const snap = getSnap(report, month) ?? getSnap("copower", month) ?? getSnap("gran_tierra", "Jul");
       const ranked = [...(snap?.machineIndicators ?? [])]
         .filter((m) => m.unidad !== "SISTEMA N" && m.fallas > 0)
         .sort((a, b) => b.fallas - a.fallas);
@@ -674,7 +681,13 @@ function PlatformBody({
       return (
         <MaintenanceOptimizationDashboard
           month={month}
-          monthLabel={month === "Jun" ? `${monthLabel} · Gran Tierra / Costayaco` : `${monthLabel} · sábana Putumayo`}
+          monthLabel={
+            month === "Jul"
+              ? `${monthLabel} · sábana Putumayo julio`
+              : month === "Jun"
+                ? `${monthLabel} · Gran Tierra / Costayaco`
+                : `${monthLabel} · sábana Putumayo`
+          }
           report={month === "Jun" ? "gran_tierra" : report}
         />
       );
@@ -718,6 +731,16 @@ function PlatformBody({
   ) {
     return (
       <OperationalPlanningDashboard monthLabel={monthLabel} section={planningSectionFromLeaf(leafId)} />
+    );
+  }
+
+  if (leafId === "conf-formulas" || leafId === "conf-formulas-revision") {
+    return (
+      <IndicatorFormulasDashboard
+        month={month}
+        monthLabel={monthLabel}
+        section={leafId === "conf-formulas-revision" ? "revision" : "catalogo"}
+      />
     );
   }
 
@@ -900,7 +923,7 @@ function PlatformBody({
     }
     if (leafId === "dash-operacion") return <CopowerResumen month={cpwMonth} />;
     if (leafId === "dash-operacion-gte") {
-      const gteMonth = (GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey] ? month : "Jun") as GranTierraMonthKey;
+      const gteMonth = (GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey] ? month : "Jul") as GranTierraMonthKey;
       return <GteResumen month={gteMonth} />;
     }
     if (leafId === "dash-mto") {

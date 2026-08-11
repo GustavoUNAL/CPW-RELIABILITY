@@ -3,8 +3,8 @@ import type { ReportDataset } from "../types";
 export const granTierraReport: ReportDataset = {
   title: "Reporte Gran Tierra Energy",
   subtitle:
-    "Indicadores oficiales solo donde hay fuente (junio PDF/DOCX; mayo sistémico citado en informe de junio). Ene–Abr: solo horas/fallas/energía del Excel Data Soporte.",
-  source: "Carpeta data/GTE (XLSX Ene–Jun; PDF+DOCX solo Junio 2026)",
+    "Indicadores oficiales donde hay fuente (julio y junio PDF; mayo sistémico citado en informe de junio). Ene–Abr: horas/fallas/energía del Excel Data Soporte.",
+  source: "data/GTE (Ene–Jun) + data/Julio/GTE (XLSX Data Soporte + PDF Análisis Indicadores JUL 2026)",
   // kpiData es fallback; la app GTE usa GRAN_TIERRA_KPI_FROM_MONTHS.
   kpiData: [
     { month: "Ene", availability: null, reliability: null, maintainability: null, generationMwh: 0, operationalLossesMwh: null, contractualCompliance: null },
@@ -13,6 +13,7 @@ export const granTierraReport: ReportDataset = {
     { month: "Abr", availability: null, reliability: null, maintainability: null, generationMwh: 3649.33, operationalLossesMwh: null, contractualCompliance: null },
     { month: "May", availability: 0.9288, reliability: 0.9405, maintainability: null, generationMwh: 3955.182, operationalLossesMwh: null, contractualCompliance: null },
     { month: "Jun", availability: 0.9792, reliability: 0.9792, maintainability: null, generationMwh: 4110.144, operationalLossesMwh: null, contractualCompliance: null },
+    { month: "Jul", availability: 0.8065, reliability: 1, maintainability: null, generationMwh: 4131.917, operationalLossesMwh: null, contractualCompliance: 0.8065 },
   ],
   kpiTargets: {
     availability: 0.98,
@@ -23,11 +24,11 @@ export const granTierraReport: ReportDataset = {
     contractualCompliance: 0.98,
   },
   analysisHighlights: [
-    "Fuente oficial de Disp/Conf: informe junio (PDF/DOCX). Costayaco 97.92%/97.92% — bajo umbral contractual Orden 1 (≥98%). Vonú 100%/100%.",
-    "7 fallas COPOWER en bitácora consolidada: MTBF 986.71 h y MTTR 2.60 h (18,22 h PF_contr / 7). Anexo PDF aún cita MTBF 711.57 / MTTR 2.86.",
-    "La recurrencia se traslada de CPW04 (mayo) a CPW06 (junio, 2 eventos, RIESGO MEDIO, MTBF 333.50 h).",
-    "MRU, SIN y presión CYC concentran más horas PF-cliente que las fallas propias (DOCX §4).",
-    "Bitácora junio: 42 eventos; 7 fallas COPOWER (18,22 h PF_contr) + 179,38 h PF_cli; 28-jun externo FS=0,38 h no imputable.",
+    "Julio oficial (PDF): Costayaco Disp. 80.65% / Conf. 100% — no cumple meta ≥98%. Vonú Disp. 98.79% / Conf. 100% (cumple ≥90%). 5 FO-GE-033 (4 cascadas MRU + detonación CPW-04).",
+    "La caída de disponibilidad en Costayaco (−17.27 pp vs jun) se atribuye a cambio de controles AGC4 (CPW01/03 registrados en sábana julio como M10 el 13–14; CPW02 en descarbonización 10–11), no a fallas.",
+    "Energía julio Data Soporte: 4.131.917 kWh (gas CYC 3.515.954 = PDF Sistema CPW; diésel 133.081; Vonú 482.882). El PDF mezcla kWh diésel/Vonú en el anexo.",
+    "Junio (referencia): Costayaco 97.92%/97.92%, 7 fallas COPOWER, MTBF 986.71 h / MTTR 2.60 h.",
+    "CPW01/02/03 cierran julio en RIESGO ALTO / NO CUMPLE por disponibilidad (91.9–94.5%) pese a confiabilidad plena.",
   ],
   badActors: [
     {
@@ -152,6 +153,7 @@ export const granTierraReport: ReportDataset = {
     { month: "Abr", availability: null, reliability: null, mtbfHours: null, mttrHours: null },
     { month: "May", availability: 0.9288, reliability: 0.9405, mtbfHours: 500.39, mttrHours: 5.32 },
     { month: "Jun", availability: 0.9792, reliability: 0.9792, mtbfHours: 986.71, mttrHours: 2.6 },
+    { month: "Jul", availability: 0.8065, reliability: 1, mtbfHours: null, mttrHours: 0 },
   ],
   /** Pareto DOCX junio §4 — solo válido para mes Jun. */
   causePareto: [

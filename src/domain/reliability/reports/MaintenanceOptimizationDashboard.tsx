@@ -91,8 +91,8 @@ function MphiCell({ mphi, band }: { mphi: number; band: PlanHealthBand }) {
   );
 }
 
-export function MaintenanceOptimizationDashboard({ month, monthLabel, report }: Props) {
-  const useGteCanon = month === "Jun" || report === "gran_tierra";
+export function MaintenanceOptimizationDashboard({ month, monthLabel }: Props) {
+  const useGteCanon = month === "Jun";
   const seed = useMemo(
     () => (useGteCanon ? buildGteJuneMaintenanceOptimization() : buildSabanaMaintenanceOptimization(month)),
     [month, useGteCanon, GTE_JUNE_MSO_SEED],

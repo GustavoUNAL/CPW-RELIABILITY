@@ -5546,2079 +5546,2632 @@ export const COPOWER_MONTHLY_DATA: Record<CopowerMonthKey, CopowerMonthlySnapsho
     }
   },
   "Jul": {
-    "label": "Julio 2026",
-    "sourceFile": "data/Datos COPOWER/Reporte_Diario_Costayaco_Vonu 2026 actualizado 34.xlsx",
-    "summary": {
-      "copowerFailures": 53,
-      "totalEvents": 174,
-      "mtbfHours": 39.32,
-      "mttrHours": null,
-      "actionsOverdue": null,
-      "rcaPending": null,
-      "hoursOperated": 4365,
-      "hoursStandby": 1796,
-      "hoursPreventive": 219,
-      "hoursCorrective": 0,
-      "hoursFailureCopower": 0,
-      "hoursFailureClient": 0,
-      "energyGasKwh": 2403700,
-      "energyDieselKwh": 99083
-    },
-    "generationByAsset": [
-      {
-        "asset": "Costayaco",
-        "gasKwh": 2141999,
-        "dieselKwh": 99083
+      "label": "Julio 2026",
+      "sourceFile": "data/Julio/Horas concertadas con GTE (del 01 al 31 julio 2026).xlsx",
+      "summary": {
+          "copowerFailures": 3,
+          "totalEvents": 233,
+          "mtbfHours": 2410.67,
+          "mttrHours": 0,
+          "actionsOverdue": null,
+          "rcaPending": null,
+          "hoursOperated": 7232,
+          "hoursStandby": 3676,
+          "hoursPreventive": 253,
+          "hoursCorrective": 0,
+          "hoursFailureCopower": 0,
+          "hoursFailureClient": 547,
+          "energyGasKwh": 3998836,
+          "energyDieselKwh": 133081
       },
-      {
-        "asset": "Vonu",
-        "gasKwh": 261701,
-        "dieselKwh": 0
+      "generationByAsset": [
+          {
+              "asset": "Costayaco",
+              "gasKwh": 3515954,
+              "dieselKwh": 133081
+          },
+          {
+              "asset": "Vonu",
+              "gasKwh": 482882,
+              "dieselKwh": 0
+          }
+      ],
+      "generationByEquipment": [
+          {
+              "equipo": "CPW01",
+              "campo": "COSTAYACO",
+              "energiaKwh": 435240,
+              "horasOperacion": 664,
+              "horasStandBy": 38,
+              "horasPP": 42,
+              "horasPFContr": 0,
+              "horasPFCli": 18,
+              "horasCalDia": 744,
+              "fallaEvento": 0
+          },
+          {
+              "equipo": "CPW02",
+              "campo": "COSTAYACO",
+              "energiaKwh": 397129,
+              "horasOperacion": 605,
+              "horasStandBy": 96,
+              "horasPP": 43,
+              "horasPFContr": 0,
+              "horasPFCli": 19,
+              "horasCalDia": 744,
+              "fallaEvento": 0
+          },
+          {
+              "equipo": "CPW03",
+              "campo": "COSTAYACO",
+              "energiaKwh": 409861,
+              "horasOperacion": 638,
+              "horasStandBy": 46,
+              "horasPP": 60,
+              "horasPFContr": 0,
+              "horasPFCli": 23,
+              "horasCalDia": 744,
+              "fallaEvento": 0
+          },
+          {
+              "equipo": "CPW04",
+              "campo": "COSTAYACO",
+              "energiaKwh": 438156,
+              "horasOperacion": 574,
+              "horasStandBy": 152,
+              "horasPP": 18,
+              "horasPFContr": 0,
+              "horasPFCli": 73,
+              "horasCalDia": 744,
+              "fallaEvento": 0
+          },
+          {
+              "equipo": "CPW05",
+              "campo": "COSTAYACO",
+              "energiaKwh": 431557,
+              "horasOperacion": 544,
+              "horasStandBy": 200,
+              "horasPP": 0,
+              "horasPFContr": 0,
+              "horasPFCli": 65,
+              "horasCalDia": 744,
+              "fallaEvento": 0
+          },
+          {
+              "equipo": "CPW06",
+              "campo": "COSTAYACO",
+              "energiaKwh": 457101,
+              "horasOperacion": 554,
+              "horasStandBy": 190,
+              "horasPP": 0,
+              "horasPFContr": 0,
+              "horasPFCli": 116,
+              "horasCalDia": 744,
+              "fallaEvento": 2
+          },
+          {
+              "equipo": "CPW07",
+              "campo": "COSTAYACO",
+              "energiaKwh": 439734,
+              "horasOperacion": 686,
+              "horasStandBy": 58,
+              "horasPP": 0,
+              "horasPFContr": 0,
+              "horasPFCli": 19,
+              "horasCalDia": 744,
+              "fallaEvento": 1
+          },
+          {
+              "equipo": "G101V",
+              "campo": "COSTAYACO",
+              "energiaKwh": 14043,
+              "horasOperacion": 41,
+              "horasStandBy": 703,
+              "horasPP": 0,
+              "horasPFContr": 0,
+              "horasPFCli": 0,
+              "horasCalDia": 744,
+              "fallaEvento": 0
+          },
+          {
+              "equipo": "G102J",
+              "campo": "COSTAYACO",
+              "energiaKwh": 78853,
+              "horasOperacion": 104,
+              "horasStandBy": 640,
+              "horasPP": 0,
+              "horasPFContr": 0,
+              "horasPFCli": 0,
+              "horasCalDia": 744,
+              "fallaEvento": 0
+          },
+          {
+              "equipo": "G102K",
+              "campo": "COSTAYACO",
+              "energiaKwh": 40185,
+              "horasOperacion": 55,
+              "horasStandBy": 684,
+              "horasPP": 6,
+              "horasPFContr": 0,
+              "horasPFCli": 0,
+              "horasCalDia": 745,
+              "fallaEvento": 0
+          },
+          {
+              "equipo": "JIN-01",
+              "campo": "VONU",
+              "energiaKwh": 256282,
+              "horasOperacion": 731,
+              "horasStandBy": 0,
+              "horasPP": 13,
+              "horasPFContr": 0,
+              "horasPFCli": 0,
+              "horasCalDia": 744,
+              "fallaEvento": 0
+          },
+          {
+              "equipo": "JIN-02",
+              "campo": "VONU",
+              "energiaKwh": 226600,
+              "horasOperacion": 723,
+              "horasStandBy": 0,
+              "horasPP": 21,
+              "horasPFContr": 0,
+              "horasPFCli": 0,
+              "horasCalDia": 744,
+              "fallaEvento": 0
+          },
+          {
+              "equipo": "JIN-10",
+              "campo": "COSTAYACO",
+              "energiaKwh": 224679,
+              "horasOperacion": 571,
+              "horasStandBy": 149,
+              "horasPP": 24,
+              "horasPFContr": 0,
+              "horasPFCli": 52,
+              "horasCalDia": 744,
+              "fallaEvento": 0
+          },
+          {
+              "equipo": "JIN-11",
+              "campo": "COSTAYACO",
+              "energiaKwh": 132155,
+              "horasOperacion": 346,
+              "horasStandBy": 382,
+              "horasPP": 16,
+              "horasPFContr": 0,
+              "horasPFCli": 134,
+              "horasCalDia": 744,
+              "fallaEvento": 0
+          },
+          {
+              "equipo": "JIN-12",
+              "campo": "COSTAYACO",
+              "energiaKwh": 150342,
+              "horasOperacion": 396,
+              "horasStandBy": 338,
+              "horasPP": 10,
+              "horasPFContr": 0,
+              "horasPFCli": 28,
+              "horasCalDia": 744,
+              "fallaEvento": 0
+          }
+      ],
+      "totalGenerationKwh": 4131917,
+      "machineIndicators": [
+          {
+              "unidad": "CPW01",
+              "campo": "COSTAYACO",
+              "horasStandBy": 38,
+              "disponibilidadPct": 94.35,
+              "confiabilidadPct": 94.35,
+              "fallas": 0,
+              "mtbfLabel": "Sin Fallas",
+              "mttrHours": null,
+              "riesgoTecnico": "RIESGO ALTO",
+              "cumplimiento": "N/A",
+              "detalle": "Horas concertadas GTE 01–31 jul · OP 664 h · ext 18 h · fallas 0"
+          },
+          {
+              "unidad": "CPW02",
+              "campo": "COSTAYACO",
+              "horasStandBy": 96,
+              "disponibilidadPct": 94.22,
+              "confiabilidadPct": 94.22,
+              "fallas": 0,
+              "mtbfLabel": "Sin Fallas",
+              "mttrHours": null,
+              "riesgoTecnico": "RIESGO ALTO",
+              "cumplimiento": "N/A",
+              "detalle": "Horas concertadas GTE 01–31 jul · OP 605 h · ext 19 h · fallas 0"
+          },
+          {
+              "unidad": "CPW03",
+              "campo": "COSTAYACO",
+              "horasStandBy": 46,
+              "disponibilidadPct": 91.94,
+              "confiabilidadPct": 91.94,
+              "fallas": 0,
+              "mtbfLabel": "Sin Fallas",
+              "mttrHours": null,
+              "riesgoTecnico": "RIESGO ALTO",
+              "cumplimiento": "N/A",
+              "detalle": "Horas concertadas GTE 01–31 jul · OP 638 h · ext 23 h · fallas 0"
+          },
+          {
+              "unidad": "CPW04",
+              "campo": "COSTAYACO",
+              "horasStandBy": 152,
+              "disponibilidadPct": 97.58,
+              "confiabilidadPct": 97.58,
+              "fallas": 0,
+              "mtbfLabel": "Sin Fallas",
+              "mttrHours": null,
+              "riesgoTecnico": "RIESGO MEDIO",
+              "cumplimiento": "N/A",
+              "detalle": "Horas concertadas GTE 01–31 jul · OP 574 h · ext 73 h · fallas 0"
+          },
+          {
+              "unidad": "CPW05",
+              "campo": "COSTAYACO",
+              "horasStandBy": 200,
+              "disponibilidadPct": 100,
+              "confiabilidadPct": 100,
+              "fallas": 0,
+              "mtbfLabel": "Sin Fallas",
+              "mttrHours": null,
+              "riesgoTecnico": "RIESGO BAJO",
+              "cumplimiento": "N/A",
+              "detalle": "Horas concertadas GTE 01–31 jul · OP 544 h · ext 65 h · fallas 0"
+          },
+          {
+              "unidad": "CPW06",
+              "campo": "COSTAYACO",
+              "horasStandBy": 190,
+              "disponibilidadPct": 100,
+              "confiabilidadPct": 100,
+              "fallas": 2,
+              "mtbfLabel": "277.00",
+              "mttrHours": 0,
+              "riesgoTecnico": "RIESGO MEDIO",
+              "cumplimiento": "N/A",
+              "detalle": "Horas concertadas GTE 01–31 jul · OP 554 h · ext 116 h · fallas 2"
+          },
+          {
+              "unidad": "CPW07",
+              "campo": "COSTAYACO",
+              "horasStandBy": 58,
+              "disponibilidadPct": 100,
+              "confiabilidadPct": 100,
+              "fallas": 1,
+              "mtbfLabel": "686.00",
+              "mttrHours": 0,
+              "riesgoTecnico": "RIESGO MEDIO",
+              "cumplimiento": "N/A",
+              "detalle": "Horas concertadas GTE 01–31 jul · OP 686 h · ext 19 h · fallas 1"
+          },
+          {
+              "unidad": "G101V",
+              "campo": "COSTAYACO",
+              "horasStandBy": 703,
+              "disponibilidadPct": 100,
+              "confiabilidadPct": 100,
+              "fallas": 0,
+              "mtbfLabel": "Sin Fallas",
+              "mttrHours": null,
+              "riesgoTecnico": "RIESGO BAJO",
+              "cumplimiento": "N/A",
+              "detalle": "Horas concertadas GTE 01–31 jul · OP 41 h · ext 0 h · fallas 0"
+          },
+          {
+              "unidad": "G102J",
+              "campo": "COSTAYACO",
+              "horasStandBy": 640,
+              "disponibilidadPct": 100,
+              "confiabilidadPct": 100,
+              "fallas": 0,
+              "mtbfLabel": "Sin Fallas",
+              "mttrHours": null,
+              "riesgoTecnico": "RIESGO BAJO",
+              "cumplimiento": "N/A",
+              "detalle": "Horas concertadas GTE 01–31 jul · OP 104 h · ext 0 h · fallas 0"
+          },
+          {
+              "unidad": "G102K",
+              "campo": "COSTAYACO",
+              "horasStandBy": 684,
+              "disponibilidadPct": 99.19,
+              "confiabilidadPct": 99.19,
+              "fallas": 0,
+              "mtbfLabel": "Sin Fallas",
+              "mttrHours": null,
+              "riesgoTecnico": "RIESGO BAJO",
+              "cumplimiento": "N/A",
+              "detalle": "Horas concertadas GTE 01–31 jul · OP 55 h · ext 0 h · fallas 0"
+          },
+          {
+              "unidad": "JIN-01",
+              "campo": "VONU",
+              "horasStandBy": 0,
+              "disponibilidadPct": 98.25,
+              "confiabilidadPct": 98.25,
+              "fallas": 0,
+              "mtbfLabel": "Sin Fallas",
+              "mttrHours": null,
+              "riesgoTecnico": "RIESGO BAJO",
+              "cumplimiento": "N/A",
+              "detalle": "Horas concertadas GTE 01–31 jul · OP 731 h · ext 0 h · fallas 0"
+          },
+          {
+              "unidad": "JIN-02",
+              "campo": "VONU",
+              "horasStandBy": 0,
+              "disponibilidadPct": 97.18,
+              "confiabilidadPct": 97.18,
+              "fallas": 0,
+              "mtbfLabel": "Sin Fallas",
+              "mttrHours": null,
+              "riesgoTecnico": "RIESGO MEDIO",
+              "cumplimiento": "N/A",
+              "detalle": "Horas concertadas GTE 01–31 jul · OP 723 h · ext 0 h · fallas 0"
+          },
+          {
+              "unidad": "JIN-10",
+              "campo": "COSTAYACO",
+              "horasStandBy": 149,
+              "disponibilidadPct": 96.77,
+              "confiabilidadPct": 96.77,
+              "fallas": 0,
+              "mtbfLabel": "Sin Fallas",
+              "mttrHours": null,
+              "riesgoTecnico": "RIESGO MEDIO",
+              "cumplimiento": "N/A",
+              "detalle": "Horas concertadas GTE 01–31 jul · OP 571 h · ext 52 h · fallas 0"
+          },
+          {
+              "unidad": "JIN-11",
+              "campo": "COSTAYACO",
+              "horasStandBy": 382,
+              "disponibilidadPct": 97.85,
+              "confiabilidadPct": 97.85,
+              "fallas": 0,
+              "mtbfLabel": "Sin Fallas",
+              "mttrHours": null,
+              "riesgoTecnico": "RIESGO MEDIO",
+              "cumplimiento": "N/A",
+              "detalle": "Horas concertadas GTE 01–31 jul · OP 346 h · ext 134 h · fallas 0"
+          },
+          {
+              "unidad": "JIN-12",
+              "campo": "COSTAYACO",
+              "horasStandBy": 338,
+              "disponibilidadPct": 98.66,
+              "confiabilidadPct": 98.66,
+              "fallas": 0,
+              "mtbfLabel": "Sin Fallas",
+              "mttrHours": null,
+              "riesgoTecnico": "RIESGO BAJO",
+              "cumplimiento": "N/A",
+              "detalle": "Horas concertadas GTE 01–31 jul · OP 396 h · ext 28 h · fallas 0"
+          }
+      ],
+      "eventLog": [
+          {
+              "date": "2026-07-31",
+              "equipment": "CPW02",
+              "eventType": "Operativo",
+              "cause": "24 hotas de stand by por trabajos en linea de gas moqueta",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 24 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-31",
+              "equipment": "CPW04",
+              "eventType": "Operativo",
+              "cause": "24 hotas de stand by por trabajos en linea de gas moqueta",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 24 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-31",
+              "equipment": "CPW05",
+              "eventType": "Operativo",
+              "cause": "24 hotas de stand by por trabajos en linea de gas moqueta",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 24 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-31",
+              "equipment": "JIN-10",
+              "eventType": "Operativo",
+              "cause": "9:00 hrs. Equipo Jinan-10, entra a mantenimiento preventivo programado, se termina a las 15:00 hrs. Equipo queda disponible.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 18 h | SB 0 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-31",
+              "equipment": "JIN-11",
+              "eventType": "Operativo",
+              "cause": "06:06 Se ingresa en linea equipo Jinan-11, en coordinacion con el CCM se realiza rotacion de operación del equipo con el Jinan 12.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 6 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-31",
+              "equipment": "JIN-12",
+              "eventType": "Operativo",
+              "cause": "6:06 Sale de linea y se realiza rotacion con equipo jinan 11",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 18 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-30",
+              "equipment": "CPW02",
+              "eventType": "Operativo",
+              "cause": "00:36 Sale de linea equipo CPW-02 por maniobras encampo Moqueta cierre total de las lineas",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 23 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-30",
+              "equipment": "CPW04",
+              "eventType": "Operativo",
+              "cause": "00:45 Sale de linea equipo CPW-04 por maniobras encampo Moqueta cierre total de las lineas",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 23 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-30",
+              "equipment": "CPW05",
+              "eventType": "Operativo",
+              "cause": "00:00 hrs. EQUIPO:CPW-05, A solicitud de CCM, ingresa en linea con presión de gas Moqueta, 137 PSI. Sale de linea a las 00:36 hrs maniobras en campo moqueta",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 23 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-30",
+              "equipment": "JIN-10",
+              "eventType": "Operativo",
+              "cause": "18;30 Sale de linea jinan 10 por peticion de operador de CCM fuertes lluvias en la zona control del presio CYC 10PSI",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 6 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-29",
+              "equipment": "CPW05",
+              "eventType": "Operativo",
+              "cause": "11:46 hrs. EQUIPO:CPW-05, A solicitud de CCM, ingresa en linea equipo CPW-05, 175 PSI Moqueta---14:55 hrs. EQUIPO:CPW-05, A solicitud de CCM, FDL para recuperar presión en gas Moqueta, 110 PSI. Inicia a las 16:54 hrs.------ 22:34 A solicitud de CCM, Sale de linea CPW05 por estabilidad en presión de gas Moqueta, 114 PSI",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 15 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-29",
+              "equipment": "JIN-10",
+              "eventType": "Operativo",
+              "cause": "08:57 hrs. EQUIPO:Jinan-10, FDL A solicitud de CCM, por caída de presión de gas CYC 22 PSI, ingresa en linea a las 11:08 hrs.--12:13 hrs. EQUIPO:Jinan-10, A solicitud de CCM, FDL por caída en presión de gas CYC. Inicia en linea a las 18:00 hrs.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 8 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-28",
+              "equipment": "CPW01",
+              "eventType": "Operativo",
+              "cause": "09:40 salen progresivamente equipos con gas tratado, CPW01,03,06,07 y Jinan-12, 10:30 Ingresa en linea equipo CPW-01 con gas MQT , 16:47 Se realiza cambio de gas suministro a equipo CPW01 de gas moqueta a gas tratado Mru.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 1 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-28",
+              "equipment": "CPW03",
+              "eventType": "Operativo",
+              "cause": "09:40 salen progresivamente equipos con gas tratado, CPW01,03,06,07 y Jinan-12, 15:50 Ingresa en linea equipo CPW-03 con gas MRU",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 6 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-28",
+              "equipment": "CPW05",
+              "eventType": "Operativo",
+              "cause": "00:19 hrs A solicitud de CCM, sale de linea equipo CPW-05 por baja presión linea gas MQT 110 psi, 04:32 A solicitud de CCM, ingresa en linea equipo CPW-05, se estabiliza presión linea gas MQT 170 psi. 19:14 A solicitud de CCM, ingresa en linea equipo CPW-05, se estabiliza presión linea gas MQT 170 psi. 21:34 A solicitud de CCM, Sale de linea equipo CPW-05, por caida de presión gas MQT 105 psi.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 18 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-28",
+              "equipment": "CPW06",
+              "eventType": "Operativo",
+              "cause": "09:40 salen progresivamente equipos con gas tratado, CPW01,03,06,07 y Jinan-12, 15:50 Ingresa en linea equipo CPW-03 con gas MRU , 16:20Ingresa en linea equipo CPW-06 con gas MRU",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 6 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-28",
+              "equipment": "CPW07",
+              "eventType": "Operativo",
+              "cause": "15:45 Ingresa en linea equipo CPW-07 con gas MRU",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 6 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-28",
+              "equipment": "G102J",
+              "eventType": "Operativo",
+              "cause": "09:30 Ingresa en linea equipos Diesel G102J y K para respaldar salida de equipos con gas tratado MRU",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 16 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-28",
+              "equipment": "G102K",
+              "eventType": "Operativo",
+              "cause": "09:30 Ingresa en linea equipos Diesel G102J y K para respaldar salida de equipos con gas tratado MRU",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 17 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-28",
+              "equipment": "JIN-11",
+              "eventType": "Operativo",
+              "cause": "17:40 Se realiza salida de equipo CPW-11 con gas CYC por baja presion 18 psi e ingresa equipo CPW-12 con gas tratado",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 17 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-28",
+              "equipment": "JIN-12",
+              "eventType": "Operativo",
+              "cause": "00:16 hrs Ingresa en linea equipo CPW-12 por solicitud de CCM. 09:40 salen progresivamente equipos con gas tratado, CPW01,03,06,07 y Jinan-12, 14:00 SLD equipo Jinan-12 por solicitud de operador de CCM para estabilizar presion.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 4 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-27",
+              "equipment": "CPW05",
+              "eventType": "Operativo",
+              "cause": "02:57 hrs En coordinación con CCM, sale de linea Parada manual equipo CPW-05 por caída de presión de gas MQT 110 psi. 12:08 sale de linea equipo CPW-05 a petición de CCM para recuperar presión de gas MQT 120 psi, 15:33 a 16:33 Se realiza prueba a maxima carga equipo CPw-05, 17:25 sale de linea equipo CPW05 por baja presion de gas CYC 120 psi, 21:05 hrs En coordinación con CCM, ingresa en linea equipo CPW-05 se estabiliza presión de gas MQT 170 psi.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 10 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-27",
+              "equipment": "CPW06",
+              "eventType": "Operativo",
+              "cause": "10:56 a 11:56 se realiza prueba de maxima carga equipo CPW-06",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 0 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-27",
+              "equipment": "JIN-10",
+              "eventType": "Operativo",
+              "cause": "12:50 sale de linea equipo CPW-10 a peticion de CCM por lluvias en la zona presion de gas CYC 20 psi, 12:51 a 13:51 se realiza prueba de maxima carga a equipo CPW-11",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 1 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-27",
+              "equipment": "JIN-11",
+              "eventType": "Operativo",
+              "cause": "08:17 Ingresa en linea CPW-11 en respaldo de equipo CPW-12",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 17 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-27",
+              "equipment": "JIN-12",
+              "eventType": "Operativo",
+              "cause": "08:13 Sale de linea equipo Cpw-12 para mantenimiento preventivo M1, 17:05 a 18:05 Se realiza prueba a maxima carga equipo CPw-12. 23:29 hrs sale de linea equipo cpw-12 parada manual por baja carga del campo por apertura del RL.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 7 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-26",
+              "equipment": "CPW05",
+              "eventType": "Operativo",
+              "cause": "02:37 hrs ingresa en linea equipo CPW05 por petición de CCM, se estabiliza presión linea gas MQT 182 PSI. 10:30 hrs A solicitud de CCM parada manual generador CPW05 por baja presion gas MQT 117 psi, 14:00 hrs Ingresa en linea a solicitud de CCM por estabilidad de presión linea gas MQT 180 psi, 19:49 hrs Parada manual en coordinación con CCM equipo CPW05 por caída de presión de gas MQT 115 psi. 22:41 hrs Revisión y puesta en marcha equipo CPW05, se estabiliza presión de gas MQT 180 psi.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 8 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-26",
+              "equipment": "JIN-10",
+              "eventType": "Operativo",
+              "cause": "11:15 hrs Parada manual del generaedor cpw10 en coordinación con CCM para realizar puesta en marcha de la nueva tubería de gas tratado. 13:50 hrs ingresa a linea generador CPW010 a solicitud de CCM ingresa con gas MRU",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 2 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-26",
+              "equipment": "JIN-12",
+              "eventType": "Operativo",
+              "cause": "12:07 hrs Ingresa generador CPW012 solicitud de CCM, alimentado con gas MRU por la nueva tubería",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 12 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-25",
+              "equipment": "CPW01",
+              "eventType": "Causa comun",
+              "cause": "12:58 hrs sale de linea generaedor cpw01 por salida MRU, 15:13 hrs a solicitud de CCM ingresa a linea con gas MRU",
+              "downtimeHours": 0,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 2 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0 · EVT-2026-07-25-MRU · FO-GE-033 No. 63"
+          },
+          {
+              "date": "2026-07-25",
+              "equipment": "CPW02",
+              "eventType": "Causa comun",
+              "cause": "12:58 hrs sale de linea generaedor cpw02 por salida MRU, 014:39 hrs a solicitud de CCM ingresa a linea con gas MRU 16:55 hrs parada manual a solicitud de CCM generador CPW02 por cambio de gas MRU a gas MQT, 16:59 hrs ingresa a linea con gas MQT",
+              "downtimeHours": 0,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 2 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0 · EVT-2026-07-25-MRU · FO-GE-033 No. 63"
+          },
+          {
+              "date": "2026-07-25",
+              "equipment": "CPW03",
+              "eventType": "Causa comun",
+              "cause": "12:58 hrs sale de linea generaedor cpw03 por salida MRU, 15:05 hrs a solicitud de CCM ingresa a linea con gas MRU",
+              "downtimeHours": 0,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 2 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0 · EVT-2026-07-25-MRU · FO-GE-033 No. 63"
+          },
+          {
+              "date": "2026-07-25",
+              "equipment": "CPW04",
+              "eventType": "Operativo",
+              "cause": "04:12 hrs a solicitud de CCM ingresa en lineal Equipo CPW04 por estabilidad de presión gas MQT 180 psi.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 4 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-25",
+              "equipment": "CPW05",
+              "eventType": "Operativo",
+              "cause": "07:25 hrs A solicitud de CCM parada manual generador CPW05 por baja presion gas MQT 120 psi, 11:10 hrs Ingresa en linea a solicitud de CCM por estabilidad de presión linea gas MQT 200 psi. 20:23 hrs Parada manual EQUIPO CPW-05, en coordinación con CCM por caída de presión de gas MQT 120 psi.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 8 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-25",
+              "equipment": "CPW06",
+              "eventType": "Operativo",
+              "cause": "11:08 hrs Ingresa en linea a solicitud de CCM generador CPW06 por estabilidad de presión linea gas MQT 200 psi, 12:45 hrs sale de linea por estabilidad gas MQT presion 170 psi. 17:04 hrs ingresa a linea a solicitud de CCM generador CPW06 con gas MRU",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 14 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-25",
+              "equipment": "CPW07",
+              "eventType": "Causa comun",
+              "cause": "12:58 hrs sale de linea generaedor cpw07 por salida MRU, 14:42 hrs a solicitud de CCM ingresa a linea con gas MRU",
+              "downtimeHours": 0,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 2 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0 · EVT-2026-07-25-MRU · FO-GE-033 No. 63"
+          },
+          {
+              "date": "2026-07-25",
+              "equipment": "G102J",
+              "eventType": "Operativo",
+              "cause": "13:08 hrs a solicitud de CCM ingresa generador G102J como respaldo por salida generación asociada a MRU, 15:20 hrs sale de linea a solicitud de CCM",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 22 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-25",
+              "equipment": "G102K",
+              "eventType": "Operativo",
+              "cause": "13:12 hrs a solicitud de CCM ingresa generador G102K como respaldo por salida generación asociada a MRU, 15:05hrs sale de linea a solicitud de CCM",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 22 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-25",
+              "equipment": "JIN-10",
+              "eventType": "Causa comun",
+              "cause": "2:58 hrs sale de linea generaedor cpw10 por salida MRU, 15:23 hrs a solicitud de CCM ingresa en linea",
+              "downtimeHours": 0,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 3 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0 · EVT-2026-07-25-MRU · FO-GE-033 No. 63"
+          },
+          {
+              "date": "2026-07-25",
+              "equipment": "JIN-11",
+              "eventType": "Causa comun",
+              "cause": "12:58 hrs sale de linea generaedor cpw11 por salida MRU",
+              "downtimeHours": 0,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 11 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0 · EVT-2026-07-25-MRU · FO-GE-033 No. 63"
+          },
+          {
+              "date": "2026-07-25",
+              "equipment": "JIN-12",
+              "eventType": "Operativo",
+              "cause": "15:29 hrs a solicitud de CCM ingresa a linea generador CPW012 con gas MRU, 16:53 hrs a solicitud de CCM sale de linea por ingreso de generador CPW06",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 22 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-24",
+              "equipment": "CPW01",
+              "eventType": "Causa comun",
+              "cause": "07:08 hrs sale de linea generaedor cpw01 por salida MRU, 08:52 hrs a solicitud de CCM ingresa a linea con gas MRU",
+              "downtimeHours": 0,
+              "responsible": "Externo",
+              "notes": "PP 0 h | SB 2 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0 · EVT-2026-07-24-MRU · FO-GE-033 No. 62"
+          },
+          {
+              "date": "2026-07-24",
+              "equipment": "CPW02",
+              "eventType": "Causa comun",
+              "cause": "07:08 hrs sale de linea generaedor cpw02 por salida MRU, 08:44 hrs a solicitud de CCM ingresa a linea con gas MRU",
+              "downtimeHours": 0,
+              "responsible": "Externo",
+              "notes": "PP 0 h | SB 1 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0 · EVT-2026-07-24-MRU · FO-GE-033 No. 62"
+          },
+          {
+              "date": "2026-07-24",
+              "equipment": "CPW03",
+              "eventType": "Causa comun",
+              "cause": "07:08 hrs sale de linea generaedor cpw03 por salida MRU, 09:00 hrs a solicitud de CCM ingresa a linea con gas MRU",
+              "downtimeHours": 0,
+              "responsible": "Externo",
+              "notes": "PP 0 h | SB 1 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0 · EVT-2026-07-24-MRU · FO-GE-033 No. 62"
+          },
+          {
+              "date": "2026-07-24",
+              "equipment": "CPW04",
+              "eventType": "Operativo",
+              "cause": "23:22 hrs En coordinación con CCM sale de lineal Equipo CPW04 por caída de presión gas MQT 115 psi.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 1 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-24",
+              "equipment": "CPW05",
+              "eventType": "Operativo",
+              "cause": "06:57 hrs A solicitud de CCM parada manual generador CPW05 por baja presion gas MQT 120 psi, 13:05 hrs Ingresa en linea a solicitud de CCM por estabilidad de presión linea gas MQT 160 psi - 17:20 hrs A solicitud de CCM parada manual generador CPW05 por baja presion gas MQT 120 psi 20:19 hrs A solicitud de CCM ingresa en linea equipo CPW-05 por estabilidad presión gas MQT 180 psi.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 11 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-24",
+              "equipment": "CPW07",
+              "eventType": "Causa comun",
+              "cause": "07:08 hrs sale de linea generaedor cpw07 por salida MRU, 08:40 hrs a solicitud de CCM ingresa a linea con gas MRU",
+              "downtimeHours": 0,
+              "responsible": "Externo",
+              "notes": "PP 0 h | SB 1 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0 · EVT-2026-07-24-MRU · FO-GE-033 No. 62"
+          },
+          {
+              "date": "2026-07-24",
+              "equipment": "G101V",
+              "eventType": "Operativo",
+              "cause": "07:40 hrs a solicitud de CCM ingresa generador G101V como respaldo por salida generación asociada a MRU, 10:40 hrs sale de linea a solicitud de CCM",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 21 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-24",
+              "equipment": "G102J",
+              "eventType": "Operativo",
+              "cause": "07:19 hrs a solicitud de CCM ingresa generador G102J como respaldo por salida generación asociada a MRU, 10:34 hrs sale de linea a solicitud de CCM",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 21 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-24",
+              "equipment": "G102K",
+              "eventType": "Operativo",
+              "cause": "07:30 hrs a solicitud de CCM ingresa generador G102K como respaldo por salida generación asociada a MRU, 10:30 hrs sale de linea a solicitud de CCM",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 21 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-24",
+              "equipment": "JIN-10",
+              "eventType": "Causa comun",
+              "cause": "07:08 hrs sale de linea generaedor cpw10 por salida MRU, 19:09 hrs Equipo CPW 10 ingresa en linea por peticion de CCM",
+              "downtimeHours": 0,
+              "responsible": "Externo",
+              "notes": "PP 0 h | SB 12 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0 · EVT-2026-07-24-MRU · FO-GE-033 No. 62"
+          },
+          {
+              "date": "2026-07-24",
+              "equipment": "JIN-11",
+              "eventType": "Operativo",
+              "cause": "09:32 hrs a solicitud de CCM generador CPW011 ingresa a linea con gas MRU",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 10 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-24",
+              "equipment": "JIN-12",
+              "eventType": "Operativo",
+              "cause": "06:59 hrs A solicitud de CCM parada manual generador CPW012 por estabilidad gas MRU, 09:32 hrs a solicitud de CCM ingresa a linea con gas MRU 16:52 hrs Parada manual generador CPW012 a solicitud de CCM por estabilidad gas MRU",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 10 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-23",
+              "equipment": "CPW05",
+              "eventType": "Operativo",
+              "cause": "02:37 hrs A solicitud de CCM, equipo CPW05 ingresa en linea por estabilidad de presión linea gas MQT 180 psi. 06:03 hrs A solicitud de CCM parada manual generador CPW05 por baja presion gas MQT 100psi, 10:38 hrs ingresa a linea por estabilidad gas MQT 160 psi 12:35 hrs A solicitud de CCM parada manual generador CPW05 por baja presion gas MQT 120 psi, 15:33 hrs Ingresa en linea a solicitud de CCM por estabilidad de presión linea gas MQT 160 psi 18:28 CPW-05 sale a solicitud de CCM por baja presión linea gas MQT 119 PS equipo CPW-05 ingresa en linea a las 21:23 por peticion de CCM estabilidad en presion linea gas MQT 164psi",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 13 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-23",
+              "equipment": "G101V",
+              "eventType": "Operativo",
+              "cause": "12:38 hrs A solicitud de CCM ingresa generador G101V como respaldo por salida del generador CPW05, 14:48 hrs parada manual a solicitud de CCM",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 22 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-23",
+              "equipment": "JIN-11",
+              "eventType": "Operativo",
+              "cause": "08:30 hrs inicia mantenimiento programado generador CPW011 se finaliza mantenimiento programado a las 16:30 equipo queda en stby",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 7 h | SB 15 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-23",
+              "equipment": "JIN-12",
+              "eventType": "Operativo",
+              "cause": "14:04 hrs ingresa a solicitud de CCM generador CPW012 con gas MRU",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 15 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-22",
+              "equipment": "CPW01",
+              "eventType": "Operativo",
+              "cause": "08:48 hrs Parada manual generador CPW01 a solicitud de CCM por mantenimiento programado MRU,18:37 hrs A solicitud del CCM ingresan en linea por finalización de mantenimiento programado MRU.",
+              "downtimeHours": 3,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 9 h | PF_contr 0 h | PF_cli 3 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-22",
+              "equipment": "CPW02",
+              "eventType": "Operativo",
+              "cause": "08:48 hrs Parada manual generador CPW02 a solicitud de CCM por mantenimiento programado MRU,18:07 hrs A solicitud del CCM ingresan en linea por finalización de mantenimiento programado MRU.",
+              "downtimeHours": 4,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 9 h | PF_contr 0 h | PF_cli 4 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-22",
+              "equipment": "CPW03",
+              "eventType": "Operativo",
+              "cause": "08:48 hrs Parada manual generador CPW03 a solicitud de CCM por mantenimiento programado MRU,17:17 hrs A solicitud del CCM ingresan en linea por finalización de mantenimiento programado MRU.",
+              "downtimeHours": 3,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 11 h | PF_contr 0 h | PF_cli 3 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-22",
+              "equipment": "CPW04",
+              "eventType": "Operativo",
+              "cause": "04:01 hrs. EQUIPO CPW04- FDL a solicitud del CCM, para recuperar presión en gas Moqueta.",
+              "downtimeHours": 5,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 0 h | PF_contr 0 h | PF_cli 5 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-22",
+              "equipment": "CPW05",
+              "eventType": "Operativo",
+              "cause": "07:09 hrs Ingresa en linea genetrador CPW05 a solicitud de CCM por estabilidad de presión linea gas MQT 160 psi, 09:24 parada manual por baja presion de gas MQT 120 PSI 11:58 hrs Ingresa en linea genetrador CPW05 a solicitud de CCM por estabilidad de presión linea gas MQT 160 psi, 14:43 parada manual por baja presion de gas MQT 118 PSI 17:35 hrs Ingresa en linea genetrador CPW05 a solicitud de CCM por estabilidad de presión linea gas MQT 160 psi, 22:51 CPW-05 parada manual por peticion de CCM caida de presion linea gas MQT 102",
+              "downtimeHours": 10,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 11 h | PF_contr 0 h | PF_cli 10 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-22",
+              "equipment": "CPW06",
+              "eventType": "Operativo",
+              "cause": "Parada externa (horas concertadas)",
+              "downtimeHours": 18,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 24 h | PF_contr 0 h | PF_cli 18 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-22",
+              "equipment": "CPW07",
+              "eventType": "Operativo",
+              "cause": "02:47 hrs. FDL equipo CPW07, a solicitud del CCM, por caida de presion en gas tratado. Ingresa a las 03:52 hrs. 08:41 hrs Parada manual generador CPW07 a solicitud de CCM por mantenimiento programado MRU, 18:12 hrs A solicitud del CCM ingresan en linea por finalización de mantenimiento programado MRU.",
+              "downtimeHours": 3,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 11 h | PF_contr 0 h | PF_cli 3 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-22",
+              "equipment": "G102J",
+              "eventType": "Operativo",
+              "cause": "16:29 hrs Ingresa a linea generador G102J como respaldo por salida generadores Jinan, 18:22 sale de liea a solicitud de CCM",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 22 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-22",
+              "equipment": "JIN-10",
+              "eventType": "Operativo",
+              "cause": "02:43 hrs. FDL equipo CPW10, a solicitud del CCM, por caida de presion en gas tratado. Ingresa a las 04:43 hrs. 08:43 hrs Parada manual generador CPW10 a solicitud de CCM por mantenimiento programado MRU, 08:54 hrs ingresa a linea a solicitud de CCM con gas CYC 16:33 hrs A solicitud del CCM parada manual del generador CPW010 por estabilidad gas CYC, 18:01 hrs A solicitud del CCM ingresan en linea por finalización de mantenimiento programado MRU.",
+              "downtimeHours": 14,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 3 h | PF_contr 0 h | PF_cli 14 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-22",
+              "equipment": "JIN-11",
+              "eventType": "Operativo",
+              "cause": "09:01 hrs ingresa a linea generador cpw011 a solicitud de CCM con gas CYC, 16:31 hrs sale de linea a solicitud de CCM por estabilidad de gas CYC",
+              "downtimeHours": 22,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 17 h | PF_contr 0 h | PF_cli 22 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-22",
+              "equipment": "JIN-12",
+              "eventType": "Operativo",
+              "cause": "09:02 hrs ingresa a linea generador cpw012 a solicitud de CCM con gas CYC, 16:24 hrs sale de linea a solicitud de CCM por estabilidad de gas CYC",
+              "downtimeHours": 11,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 17 h | PF_contr 0 h | PF_cli 11 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-21",
+              "equipment": "CPW01",
+              "eventType": "Causa comun",
+              "cause": "13:49 hrs Sale de linea generador CPW01 por alta temperatura en el MAT, ingresa a linea a las 16:56 hrs 17:55 hrs Sale de linea generador CPW01 por salida de la MRU, ingresa a las 21:23 hrs.",
+              "downtimeHours": 3,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 3 h | PF_contr 0 h | PF_cli 3 h | Falla_evento 0 · EVT-2026-07-21-MRU · FO-GE-033 No. 61"
+          },
+          {
+              "date": "2026-07-21",
+              "equipment": "CPW02",
+              "eventType": "Causa comun",
+              "cause": "17:55 hrs Sale de linea generador CPW02 por salida de la MRU, ingresa a las 22:00 hrs.",
+              "downtimeHours": 4,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 4 h | PF_contr 0 h | PF_cli 4 h | Falla_evento 0 · EVT-2026-07-21-MRU · FO-GE-033 No. 61"
+          },
+          {
+              "date": "2026-07-21",
+              "equipment": "CPW03",
+              "eventType": "Causa comun",
+              "cause": "17:55 hrs Sale de linea generador CPW03 por salida de la MRU, ingresa a las 21:11 hrs.",
+              "downtimeHours": 3,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 3 h | PF_contr 0 h | PF_cli 3 h | Falla_evento 0 · EVT-2026-07-21-MRU · FO-GE-033 No. 61"
+          },
+          {
+              "date": "2026-07-21",
+              "equipment": "CPW04",
+              "eventType": "Falla",
+              "cause": "15:16 hrs Sale de linea generador CPW04 por alta detonacion en un cilindro equipo se restablece y queda disponible 20:21 hrs, EQUIPO CPW04. ingresa en linea a solicitud del CCM, por estabilidad de presion de gas Moqueta.",
+              "downtimeHours": 5,
+              "responsible": "GTE + COPOWER",
+              "notes": "PP 0 h | SB 5 h | PF_contr 0 h | PF_cli 5 h | Falla_evento 0 · EVT-2026-07-21-CPW04 · FO-GE-033 No. 60"
+          },
+          {
+              "date": "2026-07-21",
+              "equipment": "CPW05",
+              "eventType": "Operativo",
+              "cause": "00:04 hrs. EQUIPO: CPW05 A solicitud del CCM, entra en linea por estabilidad en presión en gas Moqueta 170 PSI 04:09 hrs. EQUIPO: CPW05 FDL. A solicitud de CCM, para recuperar presión en gas Moqueta, 100 PSI. 14:08 hrs ingresa a linea generador CPW05 a solicitud de CCM por estabilidad gas MQT 18:00 hrs Sale de linea generador CPW05 por salida de la MRU Y TURBINA, 18:14 hrs ingresa equipo a solicitud de CCM con gas MQT",
+              "downtimeHours": 10,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 10 h | PF_contr 0 h | PF_cli 10 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-21",
+              "equipment": "CPW06",
+              "eventType": "Operativo",
+              "cause": "09:06 hrs A solicitud de CCM equipo cpw06 ingresa en línea se estabiliza presion de gas MQT 160 PSI. 12:02 hrs Parada manual a solicitud de CCM por baja presion de gas MQT 120 PSI 15:25 hrs ingresa a linea generador CPW06 por salida de generador CPW04, 17:51 hrs parada manual por baja presion de gas MQT 110 PSI",
+              "downtimeHours": 18,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 18 h | PF_contr 0 h | PF_cli 18 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-21",
+              "equipment": "CPW07",
+              "eventType": "Causa comun",
+              "cause": "17:55 hrs Sale de linea generador CPW07 por salida de la MRU, ingresa a las 21:25 hrs.",
+              "downtimeHours": 3,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 3 h | PF_contr 0 h | PF_cli 3 h | Falla_evento 0 · EVT-2026-07-21-MRU · FO-GE-033 No. 61"
+          },
+          {
+              "date": "2026-07-21",
+              "equipment": "G101V",
+              "eventType": "Operativo",
+              "cause": "19:51 hrs. EQUIPO: G101V, ingresa como respaldo por salida de equipos Jinan, para recuperar gas Costayaco, FDL a las 21:45 hrs.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 22 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-21",
+              "equipment": "G102J",
+              "eventType": "Operativo",
+              "cause": "18:04 hrs Ingresa a linea generador G102J como respaldo por SD campo CYC, FDL a las 21:45 hrs",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 20 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-21",
+              "equipment": "G102K",
+              "eventType": "Operativo",
+              "cause": "18:04 hrs Ingresa a linea generador G102K como respaldo por SD campo CYC, FDL a las 21:45 hrs",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 20 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-21",
+              "equipment": "JIN-02",
+              "eventType": "Operativo",
+              "cause": "07:00 hrs Parada manual equipo JINAN02 por mantenimiento programado. 15:27 hrs finaliza mantenimiento y ingresa a linea con una carga de 350 kw",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 9 h | SB 0 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-21",
+              "equipment": "JIN-10",
+              "eventType": "Causa comun",
+              "cause": "10:55 hrs A solicitud de CCM equipo cpw010 ingresa equipo en linea con gas MRU. 17:55 hrs Sale de linea generador CPW010 por salida de la MRU, 18:32 hrs a solicitud de CCM equipo ingresa a linea con gas CYC, sale de nuevo a las 20:41 horas. 22:32 hrs. Ingresa en linea equipo CPW10, a solicitud del CCM con gas tratado",
+              "downtimeHours": 14,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 14 h | PF_contr 0 h | PF_cli 14 h | Falla_evento 0 · EVT-2026-07-21-MRU · FO-GE-033 No. 61"
+          },
+          {
+              "date": "2026-07-21",
+              "equipment": "JIN-11",
+              "eventType": "Operativo",
+              "cause": "18:32 hrs Ingresa a linea generador CPW011 a solicitud de CCM con gas CYC, FDL a las 20:01 horas",
+              "downtimeHours": 22,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 22 h | PF_contr 0 h | PF_cli 22 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-21",
+              "equipment": "JIN-12",
+              "eventType": "Operativo",
+              "cause": "11:47 hrs A petición de CCM parada manual del generador CPW012 por estabilidad de gas CYC 18:36 hrs Ingresa a linea generador CPW012 a solicitud de CCM, por salida de la MRU, con gas CYC, FDL a las 19:45 hrs.",
+              "downtimeHours": 11,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 11 h | PF_contr 0 h | PF_cli 11 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-20",
+              "equipment": "CPW04",
+              "eventType": "Operativo",
+              "cause": "07:18 A solicitud de CCM, Equipo cpw04 sale de linea parada manual, para estabilidad en presión en gas Moqueta 110 PSI. 16:29 A solicitud de CCM, Equipo cpw04 ingresa en linea, se estabiliza presión gas Moqueta 160 PSI",
+              "downtimeHours": 9,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 9 h | PF_contr 0 h | PF_cli 9 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-20",
+              "equipment": "CPW05",
+              "eventType": "Operativo",
+              "cause": "02:59 hrs, EQUIPO: CPW05 A solicitud del CCM, entra en linea por estabilidad en presión en gas Moqueta 170 PSI 21:15 hrs. FDL manual. A solicitud de CCM, para recuperar presión en gas Moqueta, 110 PSI.",
+              "downtimeHours": 5,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 5 h | PF_contr 0 h | PF_cli 5 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-20",
+              "equipment": "CPW06",
+              "eventType": "Operativo",
+              "cause": "09:45 A petición de ccm ingresa en linea cpw06, se estabiliza presión de gas MQT 168 PSI. 14:53 A petición de ccm sale de linea cpw06, para estabilidad de presión gas Moqueta 115 PSI.",
+              "downtimeHours": 19,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 19 h | PF_contr 0 h | PF_cli 19 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-20",
+              "equipment": "JIN-10",
+              "eventType": "Operativo",
+              "cause": "06:36 FDL manual equipo CPW10, en coordinacion con el CCM por Rotacion de equipos en operación. Equipo disponible por baja presion de gas Costayaco",
+              "downtimeHours": 18,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 18 h | PF_contr 0 h | PF_cli 18 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-20",
+              "equipment": "JIN-11",
+              "eventType": "Operativo",
+              "cause": "06:36 ingresa en linea equipo cpw011 en coordinación con ccm, por salida de equipo cpw010. 08:17 A petición de ccm sale de linea parada manual equipo cpw011 para estabilizar presión de gas MRU. Equipo disponible por baja presion de gas Costayaco",
+              "downtimeHours": 22,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 22 h | PF_contr 0 h | PF_cli 22 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-19",
+              "equipment": "CPW04",
+              "eventType": "Operativo",
+              "cause": "(17-07-26) 16:30 CPW-05 a solicitud del CCM parada manual por baja presión gas MQT 63 psi maniobras en compresores y lineas de gas Moqueta. // 08:09 hrs, EQUIPO:CPW-04 a solicitud del CCM entra en linea por estabilidad en presion de gas Moqueta.",
+              "downtimeHours": 8,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 8 h | PF_contr 0 h | PF_cli 8 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-19",
+              "equipment": "CPW05",
+              "eventType": "Operativo",
+              "cause": "13:37 hrs, EQUIPO:CPW-05 a petición de CCM por caída de presión linea gas MQT, 16:05 hrs ingresa en linea a petición de CCM por estabilidad de presión linea gas MQT",
+              "downtimeHours": 3,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 3 h | PF_contr 0 h | PF_cli 3 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-19",
+              "equipment": "CPW06",
+              "eventType": "Operativo",
+              "cause": "(18-07-26), 23:39 hrs. EQUIPO: CPW06, FDL a solicitud del CCM, por caida en presion de gas Moqueta. // EQUIPO: CPW06 ingresa en linea a las 07:16 horas, y sale de linea a las 08:14 horas, A solicitud del CCM por rotacion de equipos.",
+              "downtimeHours": 23,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 23 h | PF_contr 0 h | PF_cli 23 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-19",
+              "equipment": "JIN-11",
+              "eventType": "Operativo",
+              "cause": "Equipo disponible por baja presion de gas Costayaco",
+              "downtimeHours": 24,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 24 h | PF_contr 0 h | PF_cli 24 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-19",
+              "equipment": "JIN-12",
+              "eventType": "Operativo",
+              "cause": "13:37 sale de linea equipo CPW-12 a petición de CCM por caída de presión linea gas CYC 16:05 ingresa en linea equipo CPW-12 a petición de CCM por estabilidad de presión linea gas CYC",
+              "downtimeHours": 2,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 2 h | PF_contr 0 h | PF_cli 2 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-18",
+              "equipment": "CPW04",
+              "eventType": "Operativo",
+              "cause": "07:00 CPW-04 se adelanta intervencion programada de cambio intercooler por novedad linea gas MQT, 15:00 hrs se finaliza intervención equipo CPW-04. // (17-07-26) 16:30 CPW-04 a solicitud del CCM parada manual por baja presión gas MQT 63 psi maniobras en compresores y lineas de gas Moqueta.",
+              "downtimeHours": 15,
+              "responsible": "GTE",
+              "notes": "PP 9 h | SB 15 h | PF_contr 0 h | PF_cli 15 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-18",
+              "equipment": "CPW05",
+              "eventType": "Operativo",
+              "cause": "(17-07-26) 16:30 CPW-05 a solicitud del CCM parada manual por baja presión gas MQT 63 psi maniobras en compresores y lineas de gas Moqueta. // 22:41 hrs. EQUIPO: CPW05, entra en linea por recuperar presion en gas Moqueta",
+              "downtimeHours": 22,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 22 h | PF_contr 0 h | PF_cli 22 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-18",
+              "equipment": "CPW06",
+              "eventType": "Operativo",
+              "cause": "(17-07-26) 16:30 CPW-06 a solicitud del CCM parada manual por baja presión gas MQT 63 psi maniobras en compresores y lineas de gas Moqueta. // 22:56 hrs. EQUIPO: CPW06, entra en linea por recuperar presion en gas Moqueta // 23:39 hrs. EQUIPO: CPW06, FDL a solicitud del CCM, por caida en presion de gas Moqueta",
+              "downtimeHours": 23,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 23 h | PF_contr 0 h | PF_cli 23 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-18",
+              "equipment": "G102J",
+              "eventType": "Operativo",
+              "cause": "(17-07-2026) 17:15 G102J a solicitud del CCM equipo Diesel ingresa como respaldo caida presion linea gas MQT",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 1 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-18",
+              "equipment": "JIN-11",
+              "eventType": "Operativo",
+              "cause": "Equipo disponible por baja presion de gas Costayaco",
+              "downtimeHours": 24,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 24 h | PF_contr 0 h | PF_cli 24 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-17",
+              "equipment": "CPW03",
+              "eventType": "Operativo",
+              "cause": "08:30 hrs Generador CPW03 inicia intervención de personal de PAC con personal de control COPOWER // 13:08 hrs Equipo CPW03 FDL parada manual a solicitud de CCM por baja presion de gas MQT 115 PSI. // 16:57 CPW-03 a solicitud del CCM parada manual por baja presión gas MQT 50 psi. // 17:22 CPW-03 ingresa en linea rotacion por la CPW-02 alineada con gas MQT",
+              "downtimeHours": 3,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 3 h | PF_contr 0 h | PF_cli 3 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-17",
+              "equipment": "CPW04",
+              "eventType": "Operativo",
+              "cause": "00:16 horas EQUIPO: CPW04, FDL A solicitud del CCM, por baja presión del gas Moqueta 120 PSI. Ingresa a als 03:38 Causa: A solicitud del CCM, por estabilidad en presión del gas Moqueta 165 PSI. // 07:15 hrs generador CPW04 parada manual a solicitud de CCM por baja presion de gas MQT 116 PSI. // 16:30 CPW-04 a solicitud del CCM parada manual por baja presión gas MQT 63 psi.",
+              "downtimeHours": 14,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 14 h | PF_contr 0 h | PF_cli 14 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-17",
+              "equipment": "CPW05",
+              "eventType": "Operativo",
+              "cause": "12:21 hrs se realiza deslastre de carga 200 kw equipos asociados a gas MQT, CPW05 y CPW06, por caida de presión de gas Moqueta 125 PSI. // 16:39 CPW-05 a solicitud del CCM parada manual por baja presión gas MQT 63 psi.",
+              "downtimeHours": 8,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 8 h | PF_contr 0 h | PF_cli 8 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-17",
+              "equipment": "CPW06",
+              "eventType": "Operativo",
+              "cause": "12:21 hrs se realiza deslastre de carga 200 kw equipos asociados a gas MQT, CPW05 y CPW06, por caida de presión de gas Moqueta 125 PSI. // 16:42 CPW-06 a solicitud del CCM parada manual por baja presión gas MQT 63 psi.",
+              "downtimeHours": 7,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 7 h | PF_contr 0 h | PF_cli 7 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-17",
+              "equipment": "G101V",
+              "eventType": "Operativo",
+              "cause": "07:15 hrs generador G101V ingresa a linea a solicitud de CCM como respaldo por salida generador CPW04, sale de linea a las 8:50 // 17:15 G101V a solicitud del CCM equipo Diesel ingresa como respaldo caida presion linea gas MQT",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 21 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-17",
+              "equipment": "G102J",
+              "eventType": "Operativo",
+              "cause": "17:15 G102J a solicitud del CCM equipo Diesel ingresa como respaldo caida presion linea gas MQT",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 17 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-17",
+              "equipment": "G102K",
+              "eventType": "Operativo",
+              "cause": "16:54 G102K ingresa equipo diesel a peticion de CCM reapaldo caida presion linea gas MQT",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 22 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-17",
+              "equipment": "JIN-11",
+              "eventType": "Operativo",
+              "cause": "07:00 hrs generador cpw011 parada manual a solicitud de CCM por baja presion gas CYC",
+              "downtimeHours": 17,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 17 h | PF_contr 0 h | PF_cli 17 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-17",
+              "equipment": "JIN-12",
+              "eventType": "Operativo",
+              "cause": "07:00 hrs generador cpw012 parada manual a solicitud de CCM por baja presion gas CYC, ingresa a linea a las 08:34 hrs",
+              "downtimeHours": 2,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 2 h | PF_contr 0 h | PF_cli 2 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-16",
+              "equipment": "CPW01",
+              "eventType": "Operativo",
+              "cause": "08:50 hrs generador CPW01 inicia intervencion con personal de PAC para configuracion control DEIF aplicativo utility Software, ingresa en linea a las 10:34 hrs en modo reparto de carga con gas MQT // 11:20 CPW 01-05-06, parada manual por peticion de CCM compresor # 2, parada manual por autorización del supervisor de producción, suspender envió de gas MQT – CYC. Debido a trabajos realizados por contratista en línea del gasoducto en rio Mocoa.",
+              "downtimeHours": 6,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 6 h | PF_contr 0 h | PF_cli 6 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-16",
+              "equipment": "CPW02",
+              "eventType": "Operativo",
+              "cause": "10:07 hrs generador CPW02 inicia intervencion con personal de PAC para configuracion control DEIF aplicativo utility Software, ingresa en linea a las 10:34 hrs en modo reparto de carga con gas MQT",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 0 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-16",
+              "equipment": "CPW03",
+              "eventType": "Operativo",
+              "cause": "CPW 03- 04-05-06, parada manual al compresor # 2, por autorización del supervisor de producción, suspender envió de gas MQT – CYC. Debido a trabajos realizados por contratista en línea del gasoducto en rio Mocoa.",
+              "downtimeHours": 5,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 5 h | PF_contr 0 h | PF_cli 5 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-16",
+              "equipment": "CPW04",
+              "eventType": "Operativo",
+              "cause": "a las 23:01 horas 15-07-2026, sale de linea equipo cpw04 por baja presion de gas moqueta 125 psi // ingresa a las 02:50 horas del 16-07-2026. // 06:54 hrs a solicitud del CCM FDL equipo CPW-04 por estabilidad de presión de gas Moqueta, 120 PSI, ingresa a linea a las 08:32 hrs a solicitud de CCM por salida de generador CPW01por intervención de personal de PAC // CPW 03- 04-05-06, parada manual al compresor # 2, por autorización del supervisor de producción, suspender envió de gas MQT – CYC. Debido a trabajos realizados por contratista en línea del gasoducto en rio Mocoa.",
+              "downtimeHours": 12,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 12 h | PF_contr 0 h | PF_cli 12 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-16",
+              "equipment": "CPW05",
+              "eventType": "Operativo",
+              "cause": "CPW 03- 04-05-06, parada manual al compresor # 2, por autorización del supervisor de producción, suspender envió de gas MQT – CYC. Debido a trabajos realizados por contratista en línea del gasoducto en rio Mocoa.",
+              "downtimeHours": 7,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 7 h | PF_contr 0 h | PF_cli 7 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-16",
+              "equipment": "CPW06",
+              "eventType": "Operativo",
+              "cause": "CPW 03- 04-05-06, parada manual al compresor # 2, por autorización del supervisor de producción, suspender envió de gas MQT – CYC. Debido a trabajos realizados por contratista en línea del gasoducto en rio Mocoa.",
+              "downtimeHours": 7,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 7 h | PF_contr 0 h | PF_cli 7 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-16",
+              "equipment": "G101V",
+              "eventType": "Operativo",
+              "cause": "11:16 G101V, Ingresa en operación generacion diesel a peticion de CCM como respaldo por salida de generadores gas MQ",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 16 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-16",
+              "equipment": "G102J",
+              "eventType": "Operativo",
+              "cause": "11:13 G102J-G102K, Ingresa en operación generacion diesel a peticion de CCM como respaldo por salida de generadores gas MQT",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 15 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-16",
+              "equipment": "G102K",
+              "eventType": "Operativo",
+              "cause": "11:13 G102J-G102K, Ingresa en operación generacion diesel a peticion de CCM como respaldo por salida de generadores gas MQT",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 15 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-16",
+              "equipment": "JIN-01",
+              "eventType": "Operativo",
+              "cause": "08:58 hrs sale de línea, parada manual equipo JINAN-01, por mantenimiento preventivo programado.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 6 h | SB 0 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-15",
+              "equipment": "CPW02",
+              "eventType": "Operativo",
+              "cause": "Ingresa en linea a las 02:26 horas despues del mantenimiento semanal de la MRU del dia anterior.",
+              "downtimeHours": 2,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 2 h | PF_contr 0 h | PF_cli 2 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-15",
+              "equipment": "CPW03",
+              "eventType": "Operativo",
+              "cause": "Mantenimiento preventivo programado. // a las 22:30 horas Equipo queda en linea en modo carga base con 600 Kw, pendiente realizar ajuste fino.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 20 h | SB 0 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-15",
+              "equipment": "CPW04",
+              "eventType": "Operativo",
+              "cause": "sale de linea equipo cpw04 por baja presion de gas moqueta 120 psi--ingresa en linea cpw04 160 psi 4:50 // 8:30 hrs equuipo cpw04 parada manual a solicitud de ccm por baja presion de gas MQT 120 psi, ingresa a linea a las 10:14 hrs // Hora de parada: 23:01 A solicitud del CCM FDL por baja presión del gas Moqueta, 125PSI.",
+              "downtimeHours": 5,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 5 h | PF_contr 0 h | PF_cli 5 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-15",
+              "equipment": "CPW07",
+              "eventType": "Operativo",
+              "cause": "Ingresa en linea a las 00:54 horas despues del mantenimiento semanal de la MRU del dia anterior.",
+              "downtimeHours": 1,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 1 h | PF_contr 0 h | PF_cli 1 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-15",
+              "equipment": "G101V",
+              "eventType": "Operativo",
+              "cause": "Equipos diesel ingresan a linea a solicitud de CCM como respaldo por maniobra en Turbina.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 23 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-15",
+              "equipment": "G102J",
+              "eventType": "Operativo",
+              "cause": "Equipos diesel ingresan a linea a solicitud de CCM como respaldo por maniobra en Turbina.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 24 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-15",
+              "equipment": "G102K",
+              "eventType": "Operativo",
+              "cause": "Equipos diesel ingresan a linea a solicitud de CCM como respaldo por maniobra en Turbina.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 24 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-15",
+              "equipment": "JIN-10",
+              "eventType": "Operativo",
+              "cause": "02:20 sale de linea equipos CPW10 ingresacon gas tratado MRU 2:49 // 08:05 hrs parada manual equipo cpw010 por mantenimiento programado, Finaliza mantenimiento a las 15:00 esquipo queda en stanbay // 20:21 horas A solicitud del CCM entra en linea con suministro de gas tratado.",
+              "downtimeHours": 6,
+              "responsible": "GTE",
+              "notes": "PP 6 h | SB 6 h | PF_contr 0 h | PF_cli 6 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-15",
+              "equipment": "JIN-11",
+              "eventType": "Operativo",
+              "cause": "00:20 horas sale de linea equipos CPW11 ingresacon gas tratado MRU 2:51",
+              "downtimeHours": 3,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 3 h | PF_contr 0 h | PF_cli 3 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-15",
+              "equipment": "JIN-12",
+              "eventType": "Operativo",
+              "cause": "00:10 horas sale de linea equipos CPW12 ingresacon gas tratado MRU 2:57",
+              "downtimeHours": 2,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 2 h | PF_contr 0 h | PF_cli 2 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-14",
+              "equipment": "CPW02",
+              "eventType": "Operativo",
+              "cause": "09:05 hrs parada manual equipo cpw02 a solicitud de CCM por parada MRU por mantenimiento semanal, ---14:39 hrs ingresa equipo CPW02 en linea a solicitud de CCM con gas MQT---17:03 hrs parada manual equipo cpw02 a solicitud de CCM por baja presion de gas MQT 113 PSI",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 12 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-14",
+              "equipment": "CPW03",
+              "eventType": "Operativo",
+              "cause": "Mantenimiento preventivo",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 24 h | SB 0 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-14",
+              "equipment": "CPW04",
+              "eventType": "Operativo",
+              "cause": "06:30 hrs parada manual equipo cpw04 a solicitud de ccm por baja presion gas MQT 116 psi ---12:17hrs ingresa a linea generador CPW04 a solicitud de CCM por incremento en presion de gas MQT 160 psi---15:39 hrs parada manual equipo cpw04 a solicitud de CCM por baja presion gas MQT 120 psi",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 12 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-14",
+              "equipment": "CPW07",
+              "eventType": "Operativo",
+              "cause": "Sale de linea por mantenimiento se manal de la MRU",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 15 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-14",
+              "equipment": "G102J",
+              "eventType": "Operativo",
+              "cause": "1 hora en ingresa a linea a solicitud de ccm como respaldo por parada MRU por mantenimiento semanal",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 23 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-14",
+              "equipment": "G102K",
+              "eventType": "Operativo",
+              "cause": "08:30 hrs generador diesel G102K ingresa a linea a solicitud de ccm como respaldo por parada MRU por mantenimiento semanal---12:25hrs parada manual generador diesel G102K a solicitud de CCM por ingreso de generador CPW04",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 20 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-14",
+              "equipment": "JIN-10",
+              "eventType": "Operativo",
+              "cause": "08:38 hrs generadores cpw010 y 011 parada manual para realizar cambio de gas MRU a gas CYC a solicitud de CCM por mantenimineto semanal MRU, ingresan a linea a las 08:58 hrs",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 1 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-14",
+              "equipment": "JIN-11",
+              "eventType": "Operativo",
+              "cause": "08:38 hrs generadores cpw010 y 011 parada manual para realizar cambio de gas MRU a gas CYC a solicitud de CCM por mantenimineto semanal MRU, ingresan a linea a las 08:58 hrs",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 0 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-14",
+              "equipment": "JIN-12",
+              "eventType": "Operativo",
+              "cause": "Revision de equipo en la madrugada por altos niveles de condensados en camaras de admision los cuales causaron detonacion y daño en la clapeta de carburador",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 11 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-13",
+              "equipment": "CPW01",
+              "eventType": "Operativo",
+              "cause": "08:00 hrs equipo cpw01 se realiza cambio de gas MRU a gas MQT",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 0 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-13",
+              "equipment": "CPW03",
+              "eventType": "Operativo",
+              "cause": "08:00 hrs equipo cpw03 sale de linea por mantenimiento programado.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 16 h | SB 0 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-13",
+              "equipment": "CPW05",
+              "eventType": "Operativo",
+              "cause": "22:30 salida manual por salida de rl baja presion de gas moqueta 86 psi inicia a las 00:25 am",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 2 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-13",
+              "equipment": "G102J",
+              "eventType": "Operativo",
+              "cause": "09:10 hrs equipo G102J ingresa a linea a solicitud de CCM por parada de equipos por baja presion de gas CYC sale de linea a las 14:23",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 17 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-13",
+              "equipment": "JIN-10",
+              "eventType": "Operativo",
+              "cause": "09:40 hrs equipo cpw010 sale de linea por solicitud de CCM por baja presion de gas CYC",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 4 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-13",
+              "equipment": "JIN-11",
+              "eventType": "Operativo",
+              "cause": "09:15 hrs equipos cpw011 y cpw012 salen de linea por solicitud de CCM por baja presion de gas CYC",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 5 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-13",
+              "equipment": "JIN-12",
+              "eventType": "Operativo",
+              "cause": "09:15 hrs equipos cpw011 y cpw012 salen de linea por solicitud de CCM por baja presion de gas CYC 22:30 sale de linea por salida de RL",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 8 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-12",
+              "equipment": "CPW01",
+              "eventType": "Causa comun",
+              "cause": "5:28 EQUIPO: CPW-01-FDL por salida de la MRU. Motivo de salida: baja presión de lubricación de aceite compresor Quincy.. Ingresa a las 07:33 horas",
+              "downtimeHours": 0,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 2 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0 · EVT-2026-07-12-MRU · FO-GE-033 No. 58"
+          },
+          {
+              "date": "2026-07-12",
+              "equipment": "CPW02",
+              "eventType": "Operativo",
+              "cause": "4:00 am equipo culmina mantenimiento y pruebas de ajuste e ingresa en linea con una carga de 720 KW en modo carga base",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 4 h | SB 0 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-12",
+              "equipment": "CPW03",
+              "eventType": "Causa comun",
+              "cause": "5:28 EQUIPO: CPW-03-FDL por salida de la MRU. Motivo de salida: baja presión de lubricación de aceite compresor Quincy.. Ingresa a las 07:16 horas",
+              "downtimeHours": 0,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 2 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0 · EVT-2026-07-12-MRU · FO-GE-033 No. 58"
+          },
+          {
+              "date": "2026-07-12",
+              "equipment": "CPW04",
+              "eventType": "Operativo",
+              "cause": "8:55 EQUIPO: CPW-04, parada manual a solicitud del CCM, para recuperar presion de gas Moqueta, ingresa en linea a las 11:01 horas",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 5 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-12",
+              "equipment": "CPW07",
+              "eventType": "Causa comun",
+              "cause": "5:28 EQUIPO: CPW-07-FDL por salida de la MRU. Motivo de salida: baja presión de lubricación de aceite compresor Quincy.. Ingresa a las 08:00 horas",
+              "downtimeHours": 0,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 2 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0 · EVT-2026-07-12-MRU · FO-GE-033 No. 58"
+          },
+          {
+              "date": "2026-07-12",
+              "equipment": "G101V",
+              "eventType": "Operativo",
+              "cause": "5:50 EQUIPO: G101V, entra en linea como respaldo por FDL de la MRU, sale de operación a las 08:05",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 22 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-12",
+              "equipment": "G102J",
+              "eventType": "Operativo",
+              "cause": "5:35 EQUIPO: G102J, entra en linea como respaldo por FDL de la MRU, sale de operación a las 08:10",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 22 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-12",
+              "equipment": "G102K",
+              "eventType": "Operativo",
+              "cause": "5:40 EQUIPO: G102K, entra en linea como respaldo por FDL de la MRU, sale de operación a las 07:48",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 22 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-12",
+              "equipment": "JIN-10",
+              "eventType": "Causa comun",
+              "cause": "5:28 EQUIPO: JINAN-10-FDL por salida de la MRU. Motivo de salida: baja presión de lubricación de aceite compresor Quincy.. Ingresa a las 07:36 horas- -----14:53EQUIPO: Jinan-10, Motivo de salida: A solicitud del CCM, por caída de presión en gas Costayaco. Ingresa a las 15:06",
+              "downtimeHours": 0,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 2 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0 · EVT-2026-07-12-MRU · FO-GE-033 No. 58"
+          },
+          {
+              "date": "2026-07-12",
+              "equipment": "JIN-11",
+              "eventType": "Causa comun",
+              "cause": "5:28 EQUIPO: JINAN-11-FDL por salida de la MRU. Motivo de salida: baja presión de lubricación de aceite compresor Quincy.. Ingresa a las 07:56 horas-----14:48 EQUIPO: Jinan-11, Motivo de salida: A solicitud del CCM, por caída de presión en gas Costayaco. Ingresa a las 15:13",
+              "downtimeHours": 0,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 3 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0 · EVT-2026-07-12-MRU · FO-GE-033 No. 58"
+          },
+          {
+              "date": "2026-07-12",
+              "equipment": "JIN-12",
+              "eventType": "Causa comun",
+              "cause": "5:28 EQUIPO: JINAN-12-FDL por salida de la MRU. Motivo de salida: baja presión de lubricación de aceite compresor Quincy.. Ingresa a las 07:58 horas----14:46 EQUIPO: Jinan-12, Motivo de salida: A solicitud del CCM, por caída de presión en gas Costayaco. Ingresa a las 15:14",
+              "downtimeHours": 0,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 5 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0 · EVT-2026-07-12-MRU · FO-GE-033 No. 58"
+          },
+          {
+              "date": "2026-07-11",
+              "equipment": "CPW02",
+              "eventType": "Operativo",
+              "cause": "22:00 inicia pruebas de ajuste de mezcla y monitoreo en vacio",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 23 h | SB 0 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-11",
+              "equipment": "CPW04",
+              "eventType": "Operativo",
+              "cause": "12:09 Se presenta FDL del equipo G54, se revisa con el lider de MANTTO y personal de CONTROL, se encontro alta restriccion en la presion del MAP, se evalua carga minima para mantener en operación el equipo y se deja en 760 KW de potencia nominal.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 0 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-10",
+              "equipment": "CPW01",
+              "eventType": "Operativo",
+              "cause": "7:37 EQUIPO: CPW-01-FDL por salida de la MRU alto nivel de GLP en el recipiente. Ingresa a las 08:59 horas",
+              "downtimeHours": 2,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 2 h | PF_contr 0 h | PF_cli 2 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-10",
+              "equipment": "CPW02",
+              "eventType": "Operativo",
+              "cause": "7:37 EQUIPO: CPW-02-FDL por salida de la MRU alto nivel de GLP en el recipiente. Entra a mantenimiento",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 16 h | SB 0 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-10",
+              "equipment": "CPW03",
+              "eventType": "Operativo",
+              "cause": "7:37 EQUIPO: CPW-03-FDL por salida de la MRU alto nivel de GLP en el recipiente. Ingresa a las 09:03 horas",
+              "downtimeHours": 1,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 1 h | PF_contr 0 h | PF_cli 1 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-10",
+              "equipment": "CPW07",
+              "eventType": "Operativo",
+              "cause": "7:37 EQUIPO: CPW-07-FDL por salida de la MRU alto nivel de GLP en el recipiente. Ingresa a las 09:26 horas",
+              "downtimeHours": 2,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 2 h | PF_contr 0 h | PF_cli 2 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-10",
+              "equipment": "G102J",
+              "eventType": "Operativo",
+              "cause": "Ingreso en linea en respaldo de salida de equipos con gas suministro MRU",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 21 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-10",
+              "equipment": "JIN-11",
+              "eventType": "Operativo",
+              "cause": "EQUIPO: Jinan-10, 11 & 12. a solicitud del CCM, pasan a operar con gas tratato Ingresa a las 10:10 horas",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 10 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-10",
+              "equipment": "JIN-12",
+              "eventType": "Operativo",
+              "cause": "EQUIPO: Jinan-10, 11 & 12. a solicitud del CCM, pasan a operar con gas tratato Ingresa a las 10:10 horas",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 11 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-09",
+              "equipment": "CPW01",
+              "eventType": "Operativo",
+              "cause": "EQUIPO: CPW-01-FDL por salida de la MRU alto nivel de GLP en el recipiente",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 1 h | SB 6 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-09",
+              "equipment": "CPW02",
+              "eventType": "Operativo",
+              "cause": "EQUIPO: CPW-02-FDL por salida de la MRU alto nivel de GLP en el recipiente. Ingresa a las 10:49 horas",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 3 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-09",
+              "equipment": "CPW03",
+              "eventType": "Operativo",
+              "cause": "EQUIPO: CPW-02-FDL por salida de la MRU alto nivel de GLP en el recipiente. Ingresa a las 10:44 horas",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 3 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-09",
+              "equipment": "CPW04",
+              "eventType": "Operativo",
+              "cause": "SDL por baja presion de gas 11:00 a 17:00, sale delinea por baja presion de gas MQT 105 psi 21:30 a 23:45",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 8 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-09",
+              "equipment": "CPW06",
+              "eventType": "Falla",
+              "cause": "CPW-06-FDL al momento de salida de la MRU alto nivel de GLP en el recipiente. Presenta alta potencia de Reactiva, Ingresa a las 10:25 horas",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 1 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 1"
+          },
+          {
+              "date": "2026-07-09",
+              "equipment": "CPW07",
+              "eventType": "Operativo",
+              "cause": "CPW-07-FDL por salida de la MRU alto nivel de GLP en el recipiente. Ingresa a las 11:14 horas, EQUIPO: CPW-07-FDL por salida de la MRU alto nivel de GLP en el recipiente. Ingresa a las 18:49 horas",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 4 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-08",
+              "equipment": "CPW01",
+              "eventType": "Operativo",
+              "cause": "Equipo CPW en mantenimiento 22:30 inician pruebas en vacio de equipo cpw01",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 24 h | SB 0 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-08",
+              "equipment": "CPW02",
+              "eventType": "Operativo",
+              "cause": "10:46 EQUIPO: CPW 02, A solicitud del CCM, FDL por mantenimiento semanal de la MRU. Ingresa a las 14:50 horas.",
+              "downtimeHours": 4,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 4 h | PF_contr 0 h | PF_cli 4 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-08",
+              "equipment": "CPW03",
+              "eventType": "Operativo",
+              "cause": "10:29 CPW 03, A solicitud del CCM, FDL por mantenimiento semanal de la MRU. Ingresa a las 14:58 horas",
+              "downtimeHours": 4,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 4 h | PF_contr 0 h | PF_cli 4 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-08",
+              "equipment": "CPW04",
+              "eventType": "Operativo",
+              "cause": "18:20 Se deslatras carga nominal a equipos con gas moqueta por baja presion hasta recuperar presion 900 KW -19:20 se normaliza nominal en equipos a 950KW",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 0 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-08",
+              "equipment": "CPW05",
+              "eventType": "Operativo",
+              "cause": "18:20 Se deslatras carga nominal a equipos con gas moqueta por baja presion hasta recuperar presion 900 KW -19:20 se normaliza nominal en equipos a 950KW",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 0 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-08",
+              "equipment": "CPW06",
+              "eventType": "Operativo",
+              "cause": "18:20 Se deslatras carga nominal a equipos con gas moqueta por baja presion hasta recuperar presion 900 KW -19:20 se normaliza nominal en equipos a 950KW",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 0 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-08",
+              "equipment": "CPW07",
+              "eventType": "Operativo",
+              "cause": "10:50 EQUIPO: CPW 07, A solicitud del CCM, FDL por mantenimiento semanal de la MRU. Ingresa a las 15:35 horas",
+              "downtimeHours": 4,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 4 h | PF_contr 0 h | PF_cli 4 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-08",
+              "equipment": "G101V",
+              "eventType": "Operativo",
+              "cause": "10:43 EQUIPO: G101V, A solicitud del CCM, ingresa en linea por mantenimiento semanal de la MRU. FDL a las 15:08 horas.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 19 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-08",
+              "equipment": "G102J",
+              "eventType": "Operativo",
+              "cause": "10:25 EQUIPO: G102J, A solicitud del CCM, ingresa en linea por mantenimiento semanal de la MRU. FDL a las15:35 horas.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 18 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-08",
+              "equipment": "G102K",
+              "eventType": "Operativo",
+              "cause": "10:35 G102K, A solicitud del CCM, ingresa en linea por mantenimiento semanal de la MRU. FDL a las15:40 horas.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 19 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-08",
+              "equipment": "JIN-10",
+              "eventType": "Operativo",
+              "cause": "10:50 EQUIPO: CPW 10 & 11, A solicitud del CCM, FDL por mantenimiento semanal de la MRU.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 1 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-08",
+              "equipment": "JIN-11",
+              "eventType": "Operativo",
+              "cause": "10:50 EQUIPO: CPW 10 & 11, A solicitud del CCM, FDL por mantenimiento semanal de la MRU.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 0 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-07",
+              "equipment": "CPW01",
+              "eventType": "Operativo",
+              "cause": "6:20 salen de linea equipos asociados a gas MRU+chiler CPW01,CPW02,CPW03,CPW07. 07:20 hrs EQUIPO CPW01queda en stop por mantenimiento preventivo programado.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 17 h | SB 0 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-07",
+              "equipment": "CPW02",
+              "eventType": "Operativo",
+              "cause": "6:20 salen de linea equipos asociados a gas MRU+chiler CPW01,CPW02,CPW03,CPW07. 8:40 ingresa en linea equipo CPW02 alineado MRU+chiler.",
+              "downtimeHours": 1,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 1 h | PF_contr 0 h | PF_cli 1 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-07",
+              "equipment": "CPW03",
+              "eventType": "Operativo",
+              "cause": "6:20 salen de linea equipos asociados a gas MRU+chiler CPW01,CPW02,CPW03,CPW07. 8:45 ingresa en linea equipo CPW03 alineado MRU+chiler.",
+              "downtimeHours": 2,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 2 h | PF_contr 0 h | PF_cli 2 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-07",
+              "equipment": "CPW04",
+              "eventType": "Operativo",
+              "cause": "00:34:00 A petición de CCM se deslastran 300KW deslastrando 100KW a cada equipo CPW04, CPW05 y CPW06para recuperar presion de MQT al momento en 144ps. 05:00 hrs A petición de CCM, se normaliza carga en los equipos alineados con gas MQT, CPW04, CPW05 ,Y CPW06.149 PSI gas MQT 20.15 hrs A petición de CCM se deslastran 300KW deslastrando 100KW a cada equipo para recuperar presion de MQT al momento en 115psi.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 0 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-07",
+              "equipment": "CPW05",
+              "eventType": "Operativo",
+              "cause": "00:34:00 A petición de CCM se deslastran 300KW deslastrando 100KW a cada equipo CPW04, CPW05 y CPW06para recuperar presion de MQT al momento en 144ps 05:00 hrs A petición de CCM, se normaliza carga en los equipos alineados con gas MQT, CPW04, CPW05 ,Y CPW06.149 PSI gas MQT 20.15 hrs A petición de CCM se deslastran 300KW deslastrando 100KW a cada equipo para recuperar presion de MQT al momento en 115psi.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 0 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-07",
+              "equipment": "CPW06",
+              "eventType": "Operativo",
+              "cause": "00:34:00 A petición de CCM se deslastran 300KW deslastrando 100KW a cada equipo CPW04, CPW05 y CPW06para recuperar presion de MQT al momento en 144ps. 05:00 hrs A petición de CCM, se normaliza carga en los equipos alineados con gas MQT, CPW04, CPW05 ,Y CPW06.149 PSI gas MQT 20.15 hrs A petición de CCM se deslastran 300KW deslastrando 100KW a cada equipo para recuperar presion de MQT al momento en 115psi.",
+              "downtimeHours": 1,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 1 h | PF_contr 0 h | PF_cli 1 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-07",
+              "equipment": "CPW07",
+              "eventType": "Operativo",
+              "cause": "6:20 salen de linea equipos asociados a gas MRU+chiler CPW01,CPW02,CPW03,CPW07. 8:42 ingresa en linea equipo CPW07 alineado MRU+chiler.",
+              "downtimeHours": 2,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 2 h | PF_contr 0 h | PF_cli 2 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-07",
+              "equipment": "G101V",
+              "eventType": "Operativo",
+              "cause": "06:20 hrs EQUIPO G101V Ingresa en linea como respaldo por salida de equipos asociados a gas suministro MRU+chiler 12:20 hrs EQUIPO G101V sale de linea pareada manual por Ingreso equipos con gas tratado MRU+chiller.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 18 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-07",
+              "equipment": "G102J",
+              "eventType": "Operativo",
+              "cause": "6:40 hrs EQUIPO G102J y EQUIPO G102K Ingresan en linea como respaldo por salida de equipos asociados a gas suministro MRU+chiler. 9:15 hrs EQUIPO G102J sale de linea pareada manual por Ingreso equipos con gas tratado MRU+chiller.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 21 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-07",
+              "equipment": "G102K",
+              "eventType": "Operativo",
+              "cause": "6:40 hrs EQUIPO G102J y EQUIPO G102K Ingresan en linea como respaldo por salida de equipos asociados a gas suministro MRU+chiler, 08:50 hrs EQUIPO G102K sale de linea pareada manual por Ingreso equipos con gas tratado MRU+chiller.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 21 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-07",
+              "equipment": "JIN-11",
+              "eventType": "Operativo",
+              "cause": "9:12 ingresa en linea equipo CPW011 alineado MRU+chiler.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 10 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-07",
+              "equipment": "JIN-12",
+              "eventType": "Operativo",
+              "cause": "9:16 ingresa en linea equipo CPW012 alineado MRU+chiler.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 24 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-06",
+              "equipment": "CPW02",
+              "eventType": "Operativo",
+              "cause": "9:00 se cambia a gas MQT a equipo CPW02 e ingresa equipo jinan-10 con gas MRU 16:30 sale de linea CPW-02 por baja presion en linea de MQT presion en 93PSI, ngresa en linea equipo jinan-12 . 23:21:00 hrs ingresa en linea alinado con gas MRU.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 7 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-06",
+              "equipment": "CPW04",
+              "eventType": "Operativo",
+              "cause": "7:50 CPW-04 que sale a mantenimiento. Ingresa G102J en en respaldo de equipo, 17:00 hrs se finaliza mantenimiento, queda en stand by disponible por baja presión de gas. 22:23:00 hrs ingresa en línea CPW-04, alineado con gas MQT.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 9 h | SB 4 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-06",
+              "equipment": "G102J",
+              "eventType": "Operativo",
+              "cause": "7:50 Ingresa G102J en en respaldo de equipo CPW-04 que sale a mantenimiento. 9:40 SDL equipo G102J e ingresa equio Jinan-12",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 23 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-06",
+              "equipment": "JIN-10",
+              "eventType": "Operativo",
+              "cause": "9:00 ingresa equipo jinan-10 con gas MRU",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 9 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-06",
+              "equipment": "JIN-11",
+              "eventType": "Operativo",
+              "cause": "22:47:00 hrs sale de linea por petición de ccm ingrea en linea equipo cpw04.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 1 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-06",
+              "equipment": "JIN-12",
+              "eventType": "Operativo",
+              "cause": "9:40 ingresa equio Jinan-12 con gas MRU. 14:17 SDL equipo Jinan-12 por lluvias en la zona. 16:30 ingresa en linea equipo jinan-12 y sale de linea CPW-02 por baja presion en linea de MQT presion en 93PSI. 22:49:00 hrs sale de linea por petición de ccm ingrea en linea equipo cpw04.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 13 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-05",
+              "equipment": "CPW01",
+              "eventType": "Operativo",
+              "cause": "Sale de linea para mantenimiento correctivo de MRU por saturacion de filtros de aceite Soenergy entrega informacion para dar arranque a las 16:06 pm se alinea equipos con gas tratado MRU a las 16:11 pm e inician equipos sobre las 16:25 pm",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 3 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-05",
+              "equipment": "CPW02",
+              "eventType": "Operativo",
+              "cause": "Sale de linea para mantenimiento correctivo de MRU por saturacion de filtros de aceite Soenergy entrega informacion para dar arranque a las 16:06 pm se alinea equipos con gas tratado MRU a las 16:11 pm e inician equipos sobre las 16:25 pm",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 2 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-05",
+              "equipment": "CPW03",
+              "eventType": "Operativo",
+              "cause": "Sale de linea para mantenimiento correctivo de MRU por saturacion de filtros de aceite Soenergy entrega informacion para dar arranque a las 16:06 pm se alinea equipos con gas tratado MRU a las 16:11 pm e inician equipos sobre las 16:25 pm",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 2 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-05",
+              "equipment": "CPW07",
+              "eventType": "Operativo",
+              "cause": "Sale de linea para mantenimiento correctivo de MRU por saturacion de filtros de aceite Soenergy entrega informacion para dar arranque a las 16:06 pm se alinea equipos con gas tratado MRU a las 16:11 pm e inician equipos sobre las 16:25 pm",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 3 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-05",
+              "equipment": "G101V",
+              "eventType": "Operativo",
+              "cause": "Ingresan en linea en respaldo de equipos que se encontraban trabajjando con gas MRU",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 22 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-05",
+              "equipment": "G102J",
+              "eventType": "Operativo",
+              "cause": "Ingresan en linea en respaldo de equipos que se encontraban trabajjando con gas MRU",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 20 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-05",
+              "equipment": "G102K",
+              "eventType": "Operativo",
+              "cause": "Ingresan en linea en respaldo de equipos que se encontraban trabajjando con gas MRU",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 21 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-05",
+              "equipment": "JIN-02",
+              "eventType": "Operativo",
+              "cause": "04:49:00 hrs sale de línea parada manual equipo JINAN-02, por mantenimiento preventivo programado. 17:40:00 hrs ingresa en línea equipo cpw-02, se finalizó intervención mantenimiento preventivo programado",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 12 h | SB 0 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-05",
+              "equipment": "JIN-11",
+              "eventType": "Operativo",
+              "cause": "Sale de linea para mantenimiento correctivo de MRU por saturacion de filtros de aceite Soenergy entrega informacion para dar arranque a las 16:06 pm se alinea equipos con gas tratado MRU a las 16:11 pm e inician equipos sobre las 16:25 pm",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 2 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-04",
+              "equipment": "CPW06",
+              "eventType": "Falla",
+              "cause": "13:37 Sale de linea equipo CPW-06 por sobre carga en generador",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 0 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 1"
+          },
+          {
+              "date": "2026-07-04",
+              "equipment": "CPW07",
+              "eventType": "Falla",
+              "cause": "13:35 Sale de linea equipo CPW-07 por sobre carga en generador",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 0 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 1"
+          },
+          {
+              "date": "2026-07-04",
+              "equipment": "G101V",
+              "eventType": "Operativo",
+              "cause": "6:00 hrs equipo G101V ingresa a linea a solicitud de ccm como respaldo por apertura del RL, 6:40 hrs sale de linea.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 20 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-04",
+              "equipment": "G102J",
+              "eventType": "Operativo",
+              "cause": "6:18 hrs equipo G102J ingresa a linea a solicitud de ccm como respaldo por apertura del RL, 6:40 hrs sale de linea. 13:00 ingresa en linea equipos a DIESEL G102J .",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 17 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-04",
+              "equipment": "G102K",
+              "eventType": "Operativo",
+              "cause": "6:18 hrs equipo G102K ingresa a linea a solicitud de ccm como respaldo por apertura del RL, 7:05 hrs sale de linea. 13:00 ingresa en linea equipos a DIESEL G102K.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 16 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-03",
+              "equipment": "CPW04",
+              "eventType": "Operativo",
+              "cause": "20:00:00 hrs sale de linea equipo CPW04, A solicitud de CCM por baja presión de gas MQT. 22:02:00 hrs ingresa en linea equipo CPW04, A solicitud de CCM se estabiliza presión de gas MQT.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 2 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-03",
+              "equipment": "CPW05",
+              "eventType": "Operativo",
+              "cause": "11:30 hrs sale de linea equipo cpw05 a solicitud de ccm por baja presion de gas MQT, 13:25 hrs ingresa a linea en modo reparto de carga",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 2 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-03",
+              "equipment": "G102J",
+              "eventType": "Operativo",
+              "cause": "11:30 hrs ingresa de linea equipo G102J a solicitud de ccm por baja presion de gas MQT, 13:38 hrs sale de linea",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 22 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-03",
+              "equipment": "JIN-01",
+              "eventType": "Operativo",
+              "cause": "9:20 hrs sale equipo Jinan 01 por mantenimiento programado, 16:00 hrs ingresa equipo a linea.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 7 h | SB 0 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-03",
+              "equipment": "JIN-10",
+              "eventType": "Operativo",
+              "cause": "12:36 hrs sale de linea equipo cpw010 a solicitud de ccm por baja presion de gas cyc 10 psi, 13:45 hrs ingresa a linea en modo reparto de carga. 19:00 CPW-10 sale de linea a peticion de CCM para priorizar gas CYC a la MRU",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 5 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-02",
+              "equipment": "CPW01",
+              "eventType": "Operativo",
+              "cause": "Parada externa (horas concertadas)",
+              "downtimeHours": 2,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 0 h | PF_contr 0 h | PF_cli 2 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-02",
+              "equipment": "CPW02",
+              "eventType": "Operativo",
+              "cause": "Parada externa (horas concertadas)",
+              "downtimeHours": 2,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 0 h | PF_contr 0 h | PF_cli 2 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-02",
+              "equipment": "CPW03",
+              "eventType": "Operativo",
+              "cause": "Parada externa (horas concertadas)",
+              "downtimeHours": 1,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 0 h | PF_contr 0 h | PF_cli 1 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-02",
+              "equipment": "CPW05",
+              "eventType": "Operativo",
+              "cause": "11:30 hrs equipo cpw05 se deslastra carga y queda en vacio por solicitud de CCM por maniobra en sistema de inyeccion, 11:45 hr asume carga de nuevo equipo, 14:08hrs equipo cpw05 sale de linea a solicitud de CCM por baja presion de gas MQT, 14:25 hrs equipo ingresa a linea a solicitud de CCM",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 0 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-02",
+              "equipment": "CPW06",
+              "eventType": "Operativo",
+              "cause": "13:55 hrs equipo cpw06 sale de linea a solicitud de CCM por baja presion de gas MQT, 15:08 hrs equipo ingresa a linea a solicitud de CCM",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 0 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-02",
+              "equipment": "CPW07",
+              "eventType": "Operativo",
+              "cause": "Parada externa (horas concertadas)",
+              "downtimeHours": 2,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 0 h | PF_contr 0 h | PF_cli 2 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-02",
+              "equipment": "G102K",
+              "eventType": "Operativo",
+              "cause": "8:51 hrs equipo G102K inicia mantenimiento programado, 14:00 hr finaliza mantenimiento 14:08hrs equipo G102K ingresa en linea a solicitud de CCM como respaldo por baja presion de gas MQT,15:15 hrs sale de linea a solicitud de CCM",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 6 h | SB 18 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-02",
+              "equipment": "JIN-10",
+              "eventType": "Operativo",
+              "cause": "10:00 hrs equipo cpw010 sale de linea por solicitud de CCM por baja presion de gas CYC, 12:15 hrs equipo ingresa a linea en modo reparto de carga",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 3 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-02",
+              "equipment": "JIN-11",
+              "eventType": "Operativo",
+              "cause": "8:51hrs equipo cpw011 inicia mantenimiento programado 17:00 hr finaliza mantenimiento 17:20 equipo cpw011 ingresa a linea en modo reparto de carga, 23:18 hrs sale de línea equipo CPW011 parada manual por baja presión de gas CYC, equipo en stand by disponible.",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 9 h | SB 9 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-02",
+              "equipment": "JIN-12",
+              "eventType": "Operativo",
+              "cause": "6:35hrs equipo cpw012 sale de linea a solicitud de CCM por baja presion de gas CYC",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 18 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-01",
+              "equipment": "CPW01",
+              "eventType": "Operativo",
+              "cause": "11:57hrs equipo cpw01 sale de linea por salida MRU, ingresa a linea 13:25 modo reparto de carga",
+              "downtimeHours": 2,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 2 h | PF_contr 0 h | PF_cli 2 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-01",
+              "equipment": "CPW02",
+              "eventType": "Operativo",
+              "cause": "11:57hrs equipo cpw02 sale de linea por salida MRU, ingresa a linea 13:25 modo reparto de carga",
+              "downtimeHours": 2,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 2 h | PF_contr 0 h | PF_cli 2 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-01",
+              "equipment": "CPW03",
+              "eventType": "Operativo",
+              "cause": "11:57hrs equipo cpw03 sale de linea por salida MRU, ingresa a linea 13:28 modo reparto de carga",
+              "downtimeHours": 1,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 1 h | PF_contr 0 h | PF_cli 1 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-01",
+              "equipment": "CPW07",
+              "eventType": "Operativo",
+              "cause": "11:57hrs equipo cpw07 sale de linea por salida MRU, ingresa a linea 13:30 modo reparto de carga",
+              "downtimeHours": 2,
+              "responsible": "GTE",
+              "notes": "PP 0 h | SB 2 h | PF_contr 0 h | PF_cli 2 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-01",
+              "equipment": "JIN-11",
+              "eventType": "Operativo",
+              "cause": "14:05hrs equipo cpw011 ingresa a linea por solicitud de CCM, 16:30 sale de linea para ingresar el equipo cpw012 por finalizacion de mantenimiento",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 0 h | SB 16 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          },
+          {
+              "date": "2026-07-01",
+              "equipment": "JIN-12",
+              "eventType": "Operativo",
+              "cause": "08:00 hrs equipo COW012 inicia mantenimiento programdo M0, 16:38 ingresa equipo a linea modo reparto de carga",
+              "downtimeHours": 0,
+              "responsible": "COPOWER",
+              "notes": "PP 10 h | SB 6 h | PF_contr 0 h | PF_cli 0 h | Falla_evento 0"
+          }
+      ],
+      "consumos": [
+          {
+              "unidad": "CPW01",
+              "campo": "COSTAYACO",
+              "adicionAceite": 0,
+              "cambioAceite": 0,
+              "adicionCoolant": 0
+          },
+          {
+              "unidad": "CPW02",
+              "campo": "COSTAYACO",
+              "adicionAceite": 0,
+              "cambioAceite": 0,
+              "adicionCoolant": 0
+          },
+          {
+              "unidad": "CPW03",
+              "campo": "COSTAYACO",
+              "adicionAceite": 0,
+              "cambioAceite": 0,
+              "adicionCoolant": 0
+          },
+          {
+              "unidad": "CPW04",
+              "campo": "COSTAYACO",
+              "adicionAceite": 0,
+              "cambioAceite": 0,
+              "adicionCoolant": 0
+          },
+          {
+              "unidad": "CPW05",
+              "campo": "COSTAYACO",
+              "adicionAceite": 0,
+              "cambioAceite": 0,
+              "adicionCoolant": 0
+          },
+          {
+              "unidad": "CPW06",
+              "campo": "COSTAYACO",
+              "adicionAceite": 0,
+              "cambioAceite": 0,
+              "adicionCoolant": 0
+          },
+          {
+              "unidad": "CPW07",
+              "campo": "COSTAYACO",
+              "adicionAceite": 0,
+              "cambioAceite": 0,
+              "adicionCoolant": 0
+          },
+          {
+              "unidad": "G101V",
+              "campo": "COSTAYACO",
+              "adicionAceite": 0,
+              "cambioAceite": 0,
+              "adicionCoolant": 0
+          },
+          {
+              "unidad": "G102J",
+              "campo": "COSTAYACO",
+              "adicionAceite": 0,
+              "cambioAceite": 0,
+              "adicionCoolant": 0
+          },
+          {
+              "unidad": "G102K",
+              "campo": "COSTAYACO",
+              "adicionAceite": 0,
+              "cambioAceite": 0,
+              "adicionCoolant": 0
+          },
+          {
+              "unidad": "JIN-01",
+              "campo": "VONU",
+              "adicionAceite": 0,
+              "cambioAceite": 0,
+              "adicionCoolant": 0
+          },
+          {
+              "unidad": "JIN-02",
+              "campo": "VONU",
+              "adicionAceite": 0,
+              "cambioAceite": 0,
+              "adicionCoolant": 0
+          },
+          {
+              "unidad": "JIN-10",
+              "campo": "COSTAYACO",
+              "adicionAceite": 0,
+              "cambioAceite": 0,
+              "adicionCoolant": 0
+          },
+          {
+              "unidad": "JIN-11",
+              "campo": "COSTAYACO",
+              "adicionAceite": 0,
+              "cambioAceite": 0,
+              "adicionCoolant": 0
+          },
+          {
+              "unidad": "JIN-12",
+              "campo": "COSTAYACO",
+              "adicionAceite": 0,
+              "cambioAceite": 0,
+              "adicionCoolant": 0
+          }
+      ],
+      "kpi": {
+          "availability": 0.977332,
+          "reliability": 0.977332,
+          "maintainability": null,
+          "generationMwh": 4131.917,
+          "operationalLossesMwh": null,
+          "contractualCompliance": null
       }
-    ],
-    "generationByEquipment": [
-      {
-        "equipo": "CPW01",
-        "campo": "COSTAYACO",
-        "energiaKwh": 239664,
-        "horasOperacion": 364,
-        "horasStandBy": 19,
-        "horasPP": 41,
-        "horasPFContr": 0,
-        "horasPFCli": 0,
-        "horasCalDia": 426,
-        "fallaEvento": 27
-      },
-      {
-        "equipo": "CPW02",
-        "campo": "COSTAYACO",
-        "energiaKwh": 230452,
-        "horasOperacion": 349,
-        "horasStandBy": 31,
-        "horasPP": 44,
-        "horasPFContr": 0,
-        "horasPFCli": 0,
-        "horasCalDia": 426,
-        "fallaEvento": 8
-      },
-      {
-        "equipo": "CPW03",
-        "campo": "COSTAYACO",
-        "energiaKwh": 219897,
-        "horasOperacion": 343,
-        "horasStandBy": 20,
-        "horasPP": 60,
-        "horasPFContr": 0,
-        "horasPFCli": 0,
-        "horasCalDia": 426,
-        "fallaEvento": 9
-      },
-      {
-        "equipo": "CPW04",
-        "campo": "COSTAYACO",
-        "energiaKwh": 246612,
-        "horasOperacion": 341,
-        "horasStandBy": 67,
-        "horasPP": 18,
-        "horasPFContr": 0,
-        "horasPFCli": 0,
-        "horasCalDia": 426,
-        "fallaEvento": 16
-      },
-      {
-        "equipo": "CPW05",
-        "campo": "COSTAYACO",
-        "energiaKwh": 317085,
-        "horasOperacion": 389,
-        "horasStandBy": 37,
-        "horasPP": 0,
-        "horasPFContr": 0,
-        "horasPFCli": 0,
-        "horasCalDia": 426,
-        "fallaEvento": 5
-      },
-      {
-        "equipo": "CPW06",
-        "campo": "COSTAYACO",
-        "energiaKwh": 322370,
-        "horasOperacion": 392,
-        "horasStandBy": 33,
-        "horasPP": 0,
-        "horasPFContr": 0,
-        "horasPFCli": 0,
-        "horasCalDia": 426,
-        "fallaEvento": 3
-      },
-      {
-        "equipo": "JIN-10",
-        "campo": "COSTAYACO",
-        "energiaKwh": 136837,
-        "horasOperacion": 339,
-        "horasStandBy": 81,
-        "horasPP": 6,
-        "horasPFContr": 0,
-        "horasPFCli": 0,
-        "horasCalDia": 426,
-        "fallaEvento": 2
-      },
-      {
-        "equipo": "JIN-11",
-        "campo": "COSTAYACO",
-        "energiaKwh": 103392,
-        "horasOperacion": 277,
-        "horasStandBy": 140,
-        "horasPP": 9,
-        "horasPFContr": 0,
-        "horasPFCli": 0,
-        "horasCalDia": 426,
-        "fallaEvento": 2
-      },
-      {
-        "equipo": "CPW07",
-        "campo": "COSTAYACO",
-        "energiaKwh": 253746,
-        "horasOperacion": 391,
-        "horasStandBy": 33,
-        "horasPP": 0,
-        "horasPFContr": 0,
-        "horasPFCli": 0,
-        "horasCalDia": 426,
-        "fallaEvento": 7
-      },
-      {
-        "equipo": "JIN-12",
-        "campo": "COSTAYACO",
-        "energiaKwh": 71944,
-        "horasOperacion": 196,
-        "horasStandBy": 220,
-        "horasPP": 10,
-        "horasPFContr": 0,
-        "horasPFCli": 0,
-        "horasCalDia": 426,
-        "fallaEvento": 3
-      },
-      {
-        "equipo": "G102J",
-        "campo": "COSTAYACO",
-        "energiaKwh": 59633,
-        "horasOperacion": 80,
-        "horasStandBy": 346,
-        "horasPP": 0,
-        "horasPFContr": 0,
-        "horasPFCli": 0,
-        "horasCalDia": 426,
-        "fallaEvento": 0
-      },
-      {
-        "equipo": "G102K",
-        "campo": "COSTAYACO",
-        "energiaKwh": 28105,
-        "horasOperacion": 40,
-        "horasStandBy": 380,
-        "horasPP": 6,
-        "horasPFContr": 0,
-        "horasPFCli": 0,
-        "horasCalDia": 426,
-        "fallaEvento": 0
-      },
-      {
-        "equipo": "G101V",
-        "campo": "COSTAYACO",
-        "energiaKwh": 11345,
-        "horasOperacion": 37,
-        "horasStandBy": 389,
-        "horasPP": 0,
-        "horasPFContr": 0,
-        "horasPFCli": 0,
-        "horasCalDia": 426,
-        "fallaEvento": 0
-      },
-      {
-        "equipo": "JIN-01",
-        "campo": "VONU",
-        "energiaKwh": 144159,
-        "horasOperacion": 413,
-        "horasStandBy": 0,
-        "horasPP": 13,
-        "horasPFContr": 0,
-        "horasPFCli": 0,
-        "horasCalDia": 426,
-        "fallaEvento": 1
-      },
-      {
-        "equipo": "JIN-02",
-        "campo": "VONU",
-        "energiaKwh": 117542,
-        "horasOperacion": 414,
-        "horasStandBy": 0,
-        "horasPP": 12,
-        "horasPFContr": 0,
-        "horasPFCli": 0,
-        "horasCalDia": 426,
-        "fallaEvento": 2
-      }
-    ],
-    "totalGenerationKwh": 2502783,
-    "machineIndicators": [
-      {
-        "unidad": "CPW01",
-        "campo": "COSTAYACO",
-        "horasStandBy": 19,
-        "disponibilidadPct": 89.91,
-        "confiabilidadPct": 89.91,
-        "fallas": 27,
-        "mtbfLabel": "13.48",
-        "mttrHours": null,
-        "riesgoTecnico": "RIESGO MEDIO",
-        "cumplimiento": "N/A",
-        "detalle": "Fuente COPOWER Resumen OP · OP 364 h · FS 0 h"
-      },
-      {
-        "unidad": "CPW02",
-        "campo": "COSTAYACO",
-        "horasStandBy": 31,
-        "disponibilidadPct": 89.2,
-        "confiabilidadPct": 89.2,
-        "fallas": 8,
-        "mtbfLabel": "43.63",
-        "mttrHours": null,
-        "riesgoTecnico": "RIESGO MEDIO",
-        "cumplimiento": "N/A",
-        "detalle": "Fuente COPOWER Resumen OP · OP 349 h · FS 0 h"
-      },
-      {
-        "unidad": "CPW03",
-        "campo": "COSTAYACO",
-        "horasStandBy": 20,
-        "disponibilidadPct": 85.21,
-        "confiabilidadPct": 85.21,
-        "fallas": 9,
-        "mtbfLabel": "38.11",
-        "mttrHours": null,
-        "riesgoTecnico": "RIESGO MEDIO",
-        "cumplimiento": "N/A",
-        "detalle": "Fuente COPOWER Resumen OP · OP 343 h · FS 0 h"
-      },
-      {
-        "unidad": "CPW04",
-        "campo": "COSTAYACO",
-        "horasStandBy": 67,
-        "disponibilidadPct": 95.77,
-        "confiabilidadPct": 95.77,
-        "fallas": 16,
-        "mtbfLabel": "21.31",
-        "mttrHours": null,
-        "riesgoTecnico": "RIESGO MEDIO",
-        "cumplimiento": "N/A",
-        "detalle": "Fuente COPOWER Resumen OP · OP 341 h · FS 0 h"
-      },
-      {
-        "unidad": "CPW05",
-        "campo": "COSTAYACO",
-        "horasStandBy": 37,
-        "disponibilidadPct": 100,
-        "confiabilidadPct": 100,
-        "fallas": 5,
-        "mtbfLabel": "77.8",
-        "mttrHours": null,
-        "riesgoTecnico": "RIESGO MEDIO",
-        "cumplimiento": "N/A",
-        "detalle": "Fuente COPOWER Resumen OP · OP 389 h · FS 0 h"
-      },
-      {
-        "unidad": "CPW06",
-        "campo": "COSTAYACO",
-        "horasStandBy": 33,
-        "disponibilidadPct": 99.77,
-        "confiabilidadPct": 99.77,
-        "fallas": 3,
-        "mtbfLabel": "130.67",
-        "mttrHours": null,
-        "riesgoTecnico": "RIESGO MEDIO",
-        "cumplimiento": "N/A",
-        "detalle": "Fuente COPOWER Resumen OP · OP 392 h · FS 0 h"
-      },
-      {
-        "unidad": "JIN-10",
-        "campo": "COSTAYACO",
-        "horasStandBy": 81,
-        "disponibilidadPct": 98.59,
-        "confiabilidadPct": 98.59,
-        "fallas": 2,
-        "mtbfLabel": "169.5",
-        "mttrHours": null,
-        "riesgoTecnico": "RIESGO BAJO",
-        "cumplimiento": "N/A",
-        "detalle": "Fuente COPOWER Resumen OP · OP 339 h · FS 0 h"
-      },
-      {
-        "unidad": "JIN-11",
-        "campo": "COSTAYACO",
-        "horasStandBy": 140,
-        "disponibilidadPct": 97.89,
-        "confiabilidadPct": 97.89,
-        "fallas": 2,
-        "mtbfLabel": "138.5",
-        "mttrHours": null,
-        "riesgoTecnico": "RIESGO BAJO",
-        "cumplimiento": "N/A",
-        "detalle": "Fuente COPOWER Resumen OP · OP 277 h · FS 0 h"
-      },
-      {
-        "unidad": "CPW07",
-        "campo": "COSTAYACO",
-        "horasStandBy": 33,
-        "disponibilidadPct": 99.53,
-        "confiabilidadPct": 99.53,
-        "fallas": 7,
-        "mtbfLabel": "55.86",
-        "mttrHours": null,
-        "riesgoTecnico": "RIESGO MEDIO",
-        "cumplimiento": "N/A",
-        "detalle": "Fuente COPOWER Resumen OP · OP 391 h · FS 0 h"
-      },
-      {
-        "unidad": "JIN-12",
-        "campo": "COSTAYACO",
-        "horasStandBy": 220,
-        "disponibilidadPct": 97.65,
-        "confiabilidadPct": 97.65,
-        "fallas": 3,
-        "mtbfLabel": "65.33",
-        "mttrHours": null,
-        "riesgoTecnico": "RIESGO MEDIO",
-        "cumplimiento": "N/A",
-        "detalle": "Fuente COPOWER Resumen OP · OP 196 h · FS 0 h"
-      },
-      {
-        "unidad": "G102J",
-        "campo": "COSTAYACO",
-        "horasStandBy": 346,
-        "disponibilidadPct": 100,
-        "confiabilidadPct": 100,
-        "fallas": 0,
-        "mtbfLabel": "Sin Fallas",
-        "mttrHours": 0,
-        "riesgoTecnico": "RIESGO BAJO",
-        "cumplimiento": "N/A",
-        "detalle": "Fuente COPOWER Resumen OP · OP 80 h · FS 0 h"
-      },
-      {
-        "unidad": "G102K",
-        "campo": "COSTAYACO",
-        "horasStandBy": 380,
-        "disponibilidadPct": 98.59,
-        "confiabilidadPct": 98.59,
-        "fallas": 0,
-        "mtbfLabel": "Sin Fallas",
-        "mttrHours": 0,
-        "riesgoTecnico": "RIESGO BAJO",
-        "cumplimiento": "N/A",
-        "detalle": "Fuente COPOWER Resumen OP · OP 40 h · FS 0 h"
-      },
-      {
-        "unidad": "G101V",
-        "campo": "COSTAYACO",
-        "horasStandBy": 389,
-        "disponibilidadPct": 100,
-        "confiabilidadPct": 100,
-        "fallas": 0,
-        "mtbfLabel": "Sin Fallas",
-        "mttrHours": 0,
-        "riesgoTecnico": "RIESGO BAJO",
-        "cumplimiento": "N/A",
-        "detalle": "Fuente COPOWER Resumen OP · OP 37 h · FS 0 h"
-      },
-      {
-        "unidad": "JIN-01",
-        "campo": "VONU",
-        "horasStandBy": 0,
-        "disponibilidadPct": 96.95,
-        "confiabilidadPct": 96.95,
-        "fallas": 1,
-        "mtbfLabel": "413",
-        "mttrHours": null,
-        "riesgoTecnico": "RIESGO BAJO",
-        "cumplimiento": "N/A",
-        "detalle": "Fuente COPOWER Resumen OP · OP 413 h · FS 0 h"
-      },
-      {
-        "unidad": "JIN-02",
-        "campo": "VONU",
-        "horasStandBy": 0,
-        "disponibilidadPct": 97.18,
-        "confiabilidadPct": 97.18,
-        "fallas": 2,
-        "mtbfLabel": "207",
-        "mttrHours": null,
-        "riesgoTecnico": "RIESGO BAJO",
-        "cumplimiento": "N/A",
-        "detalle": "Fuente COPOWER Resumen OP · OP 414 h · FS 0 h"
-      }
-    ],
-    "eventLog": [
-      {
-        "date": "2026-07-03",
-        "equipment": "CPW01",
-        "eventType": "Falla",
-        "cause": "19:00 CPW-10 sale de linea a peticion de CCM para priorizar gas CYC a la MRU",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Noche · Sat Dec 30 1899 19:00:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-03",
-        "equipment": "CPW04",
-        "eventType": "Falla",
-        "cause": "20:00:00 hrs sale de linea equipo CPW04, A solicitud de CCM por baja presión de gas MQT. 22:02:00 hrs ingresa en linea equipo CPW04, A solicitud de CCM se estabiliza presión de gas",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Noche · Sat Dec 30 1899 20:00:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-04",
-        "equipment": "CPW04",
-        "eventType": "Operativo",
-        "cause": "Se baja nominal a 900 kw, equipos cpw-04 ,06 y 06, para estabilizar presión gas MQT",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Noche · Sat Dec 30 1899 03:46:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-04",
-        "equipment": "CPW05",
-        "eventType": "Operativo",
-        "cause": "Se realiza cambio de aplicativo cpw05 reparto de carga a carga base La señal de gov del DEIF está mandando a bajar la potencia del equipo y está sobrecargando los demás equipos.",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Noche · Sat Dec 30 1899 18:40:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-05",
-        "equipment": "JIN-02",
-        "eventType": "Falla",
-        "cause": "04:49:00 hrs sale de línea parada manual equipo JINAN-02, por mantenimiento preventivo programado.",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Noche · Sat Dec 30 1899 04:49:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-06",
-        "equipment": "CPW04",
-        "eventType": "Operativo",
-        "cause": "22:23:00 hrs ingresa en línea CPW-04, alineado con gas MQT.",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Noche · Sat Dec 30 1899 22:23:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-06",
-        "equipment": "CPW01",
-        "eventType": "Falla",
-        "cause": "22:47:00 hrs sale de linea por petición de ccm Equipo cpw11, ingrea en linea equipo cpw04.",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Noche · Sat Dec 30 1899 22:47:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-06",
-        "equipment": "CPW01",
-        "eventType": "Falla",
-        "cause": "22:49::00 hrs sale de linea por petición de ccm Equipo cpw12 por solocitud de ccm.",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Noche · 22.49"
-      },
-      {
-        "date": "2026-07-06",
-        "equipment": "CPW01",
-        "eventType": "Operativo",
-        "cause": "23:21:00 hrs solicitud de CCM salen equipos CPW-11 CPW-12 de linea y ingresa CPW-02 alineada con gas tratado MRU",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Noche · Sat Dec 30 1899 23:21:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-07",
-        "equipment": "CPW04",
-        "eventType": "Operativo",
-        "cause": "00:34:00 A petición de CCM se deslastran 300KW deslastrando 100KW a cada equipo CPW04, CPW05 y CPW06para recuperar presion de MQT al momento en 144ps",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Noche · Sat Dec 30 1899 00:34:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-07",
-        "equipment": "CPW04",
-        "eventType": "Operativo",
-        "cause": "05:00 hrs A petición de CCM, se normaliza carga en los equipos alineados con gas MQT, CPW04, CPW05 ,Y CPW06.149 PSI gas MQT",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Noche · Sat Dec 30 1899 05:00:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-07",
-        "equipment": "Parque",
-        "eventType": "Operativo",
-        "cause": "20.15 hrs A petición de CCM se deslastran 300KW deslastrando 100KW a cada equipo para recuperar presion de MQT al momento en 115psi",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Noche · Sat Dec 30 1899 20:15:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-08",
-        "equipment": "JIN-01",
-        "eventType": "Operativo",
-        "cause": "01:40:00 hrs en coordinación con CCM se deslastran 50KW a equipo JINAN-01 para recuperar presion de gas CYC19 al momento en 7 psi.",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Noche · Sat Dec 30 1899 01:40:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-08",
-        "equipment": "Parque",
-        "eventType": "Operativo",
-        "cause": "18:20 Se deslatras carga nominal a equipos con gas moqueta por baja presion hasta recuperar presion 900 KW -19:20 se normaliza nominal en equipos a 950KW",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Noche · Sat Dec 30 1899 18:20:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-09",
-        "equipment": "Parque",
-        "eventType": "Operativo",
-        "cause": "Ingresa en linea con 750 KW modo carga base",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Noche · Sat Dec 30 1899 00:50:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-09",
-        "equipment": "Parque",
-        "eventType": "Operativo",
-        "cause": "Se realiza deslastre de carga Nominal a equipos asociados con gas Moqueta para recuperar presión de gas moqueta 125psi a petición de operador de CCM",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Noche · Sat Dec 30 1899 02:00:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-09",
-        "equipment": "CPW01",
-        "eventType": "Operativo",
-        "cause": "ingresan en linea equipos con gas MRU CPW01,02,03 y 07",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Noche · Sat Dec 30 1899 18:30:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-09",
-        "equipment": "CPW04",
-        "eventType": "Operativo",
-        "cause": "SLD equipo CPW-04 por baja presion de gas MQT",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Noche · Sat Dec 30 1899 21:30:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-09",
-        "equipment": "CPW04",
-        "eventType": "Operativo",
-        "cause": "ingresa equipo CPW-04 en linea con 800KW",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Noche · Sat Dec 30 1899 23:45:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-13",
-        "equipment": "Parque",
-        "eventType": "Operativo",
-        "cause": "apertura de RL",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Noche · Sat Dec 30 1899 22:06:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-13",
-        "equipment": "JIN-12",
-        "eventType": "Operativo",
-        "cause": "SLD JINAN-12 por apertura de RL",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Noche · Sat Dec 30 1899 22:06:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-13",
-        "equipment": "CPW05",
-        "eventType": "Falla",
-        "cause": "Parada manual a equipo CPW-05 por baja carga y baja presion en gas MQT 85PSI",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Noche · Sat Dec 30 1899 22:10:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-13",
-        "equipment": "CPW07",
-        "eventType": "Operativo",
-        "cause": "SDL equipo CPW-07 por apertura de RL",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Noche · Sat Dec 30 1899 22:10:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-01",
-        "equipment": "Parque",
-        "eventType": "Operativo",
-        "cause": "08:00 hrs equipo COW012 inicia mantenimiento programdo M0, 16:38 ingresa equipo a linea modo reparto de carga",
-        "downtimeHours": 8,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 08:00:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-01",
-        "equipment": "CPW01",
-        "eventType": "Falla",
-        "cause": "11:57hrs equipo cpw01 sale de linea por salida MRU, ingresa a linea 13:25 modo reparto de carga",
-        "downtimeHours": 1,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 11:57:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-01",
-        "equipment": "CPW02",
-        "eventType": "Falla",
-        "cause": "11:57hrs equipo cpw02 sale de linea por salida MRU, ingresa a linea 13:25 modo reparto de carga",
-        "downtimeHours": 1,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 11:57:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-01",
-        "equipment": "CPW03",
-        "eventType": "Falla",
-        "cause": "11:57hrs equipo cpw03 sale de linea por salida MRU, ingresa a linea 13:28 modo reparto de carga",
-        "downtimeHours": 1,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 11:57:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-01",
-        "equipment": "CPW07",
-        "eventType": "Falla",
-        "cause": "11:57hrs equipo cpw07 sale de linea por salida MRU, ingresa a linea 13:30 modo reparto de carga",
-        "downtimeHours": 1,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 11:57:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-01",
-        "equipment": "Parque",
-        "eventType": "Operativo",
-        "cause": "12:25hrs equipo G102J ingresa a linea por solicitud de ccm, 14:00hr sale equipo de linea a solicitud de ccm",
-        "downtimeHours": 2,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 12:25:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-01",
-        "equipment": "CPW01",
-        "eventType": "Falla",
-        "cause": "14:05hrs equipo cpw011 ingresa a linea por solicitud de CCM, 16:30 sale de linea para ingresar el equipo cpw012 por finalizacion de mantenimiento",
-        "downtimeHours": 2,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 14:05:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-02",
-        "equipment": "CPW01",
-        "eventType": "Falla",
-        "cause": "6:35hrs equipo cpw012 sale de linea a solicitud de CCM por baja presion de gas CYC",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 06:35:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-02",
-        "equipment": "Parque",
-        "eventType": "Operativo",
-        "cause": "8:51 hrs equipo G102K inicia mantenimiento programado, 14:00 hr finaliza mantenimiento",
-        "downtimeHours": 5,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 08:51:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-02",
-        "equipment": "CPW01",
-        "eventType": "Operativo",
-        "cause": "8:51hrs equipo cpw011 inicia mantenimiento programado 17:00 hr finaliza mantenimiento",
-        "downtimeHours": 8,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 08:51:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-02",
-        "equipment": "CPW01",
-        "eventType": "Falla",
-        "cause": "10:00 hrs equipo cpw010 sale de linea por solicitud de CCM por baja presion de gas CYC, 12:15 hrs equipo ingresa a linea en modo reparto de carga",
-        "downtimeHours": 2,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 10:00:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-02",
-        "equipment": "CPW05",
-        "eventType": "Operativo",
-        "cause": "11:30 hrs equipo cpw05 se deslastra carga y queda en vacio por solicitud de CCM por maniobra en sistema de inyeccion, 11:45 hr asume carga de nuevo equipo,",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 11:30:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-02",
-        "equipment": "CPW06",
-        "eventType": "Falla",
-        "cause": "13:55 hrs equipo cpw06 sale de linea a solicitud de CCM por baja presion de gas MQT, 15:08 hrs equipo ingresa a linea a solicitud de CCM",
-        "downtimeHours": 1,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 13:55:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-02",
-        "equipment": "CPW05",
-        "eventType": "Falla",
-        "cause": "14:08hrs equipo cpw05 sale de linea a solicitud de CCM por baja presion de gas MQT, 14:25 hrs equipo ingresa a linea a solicitud de CCM",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 14:08:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-02",
-        "equipment": "Parque",
-        "eventType": "Falla",
-        "cause": "14:08hrs equipo G102K ingresa en linea a solicitud de CCM como respaldo por baja presion de gas MQT,15:15 hrs sale de linea a solicitud de CCM",
-        "downtimeHours": 1,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 14:08:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-02",
-        "equipment": "CPW01",
-        "eventType": "Falla",
-        "cause": "17:20 equipo cpw011 ingresa a linea en modo reparto de carga, 23:18 hrs sale de línea equipo CPW011 parada manual por baja presión de gas CYC, equipo en stand by disponible.",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 17:20:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-03",
-        "equipment": "JIN-01",
-        "eventType": "Operativo",
-        "cause": "9:20 hrs sale equipo Jinan 01 por mantenimiento programado, 16:00 hrs ingresa equipo a linea.",
-        "downtimeHours": 6,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 09:20:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-03",
-        "equipment": "CPW05",
-        "eventType": "Falla",
-        "cause": "11:30 hrs sale de linea equipo cpw05 a solicitud de ccm por baja presion de gas MQT, 13:25 hrs ingresa a linea en modo reparto de carga",
-        "downtimeHours": 2,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 11:30:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-03",
-        "equipment": "Parque",
-        "eventType": "Falla",
-        "cause": "11:30 hrs ingresa de linea equipo G102J a solicitud de ccm por baja presion de gas MQT, 13:38 hrs sale de linea",
-        "downtimeHours": 2,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 11:30:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-03",
-        "equipment": "CPW01",
-        "eventType": "Falla",
-        "cause": "12:36 hrs sale de linea equipo cpw010 a solicitud de ccm por baja presion de gas cyc 10 psi, 13:45 hrs ingresa a linea en modo reparto de carga",
-        "downtimeHours": 1,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 12:36:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-04",
-        "equipment": "Parque",
-        "eventType": "Falla",
-        "cause": "6:00 hrs equipo G101V ingresa a linea a solicitud de ccm como respaldo por apertura del RL, 6:40 hrs sale de linea.",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 06:00:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-04",
-        "equipment": "Parque",
-        "eventType": "Falla",
-        "cause": "6:18 hrs equipo G102J ingresa a linea a solicitud de ccm como respaldo por apertura del RL, 6:40 hrs sale de linea.",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 06:18:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-04",
-        "equipment": "Parque",
-        "eventType": "Falla",
-        "cause": "6:18 hrs equipo G102K ingresa a linea a solicitud de ccm como respaldo por apertura del RL, 7:05 hrs sale de linea.",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 06:18:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-04",
-        "equipment": "CPW01",
-        "eventType": "Operativo",
-        "cause": "9:56 hrs equipo CPW011 ingresa a linea a solicitud de ccm en modo reparto de carga con gas MRU",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 09:56:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-04",
-        "equipment": "Parque",
-        "eventType": "Operativo",
-        "cause": "ingresa en linea equipos a DIESEL G102J y G102K",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 13:00:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-04",
-        "equipment": "CPW07",
-        "eventType": "Operativo",
-        "cause": "SDL equipo CPW-07 por sobre carga en generador",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 13:35:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-04",
-        "equipment": "CPW06",
-        "eventType": "Operativo",
-        "cause": "SDL equipo CPW-06 por sobre carga en generador",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 13:37:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-04",
-        "equipment": "Parque",
-        "eventType": "Operativo",
-        "cause": "ingresa en campo en modo operación con el sin",
-        "downtimeHours": 4,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 16:50:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-05",
-        "equipment": "JIN-02",
-        "eventType": "Falla",
-        "cause": "04:49:00 hrs sale de línea parada manual equipo JINAN-02, por mantenimiento preventivo programado. 17:40:00 hrs ingresa en línea equipo cpw-02, se finalizó intervención mantenimien",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 04:49:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-05",
-        "equipment": "Parque",
-        "eventType": "Operativo",
-        "cause": "07:00 hrs a solicitud de CCM se baja nominal de los generadores asociados a gas MQT por baja presion 115 psi.",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 07:00:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-05",
-        "equipment": "Parque",
-        "eventType": "Falla",
-        "cause": "ingresan equipos G102J y G102k por salida de el RL",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 13:18:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-05",
-        "equipment": "CPW01",
-        "eventType": "Falla",
-        "cause": "Sale de linea equipos CPW01 CPW02 CPW03 CPW07 e ingresa en linea equipo G101V como respaldo",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 13:50:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-05",
-        "equipment": "CPW01",
-        "eventType": "Operativo",
-        "cause": "ingresan de linea equipos CPW01 CPW02 CPW03 CPW07 e ingresa en linea equipo G101V como respaldo",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 16:25:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-05",
-        "equipment": "Parque",
-        "eventType": "Falla",
-        "cause": "Salen equipos G102J y G102k por salida de el RL",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 16:40:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-06",
-        "equipment": "CPW04",
-        "eventType": "Operativo",
-        "cause": "Ingresa G102J en en respaldo de equipo CPW-04 que sale a mantenimiento. 22:23:00 hrs ingresa en línea CPW-04, alineado con gas MQT.",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 07:50:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-06",
-        "equipment": "CPW02",
-        "eventType": "Operativo",
-        "cause": "se cambia a gas MQT a equipo CPW02 e ingresa equipo jinan-10 con gas MRU. 23:21:00 hrs ingresa en linea alinado con gas MRU.",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 09:00:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-06",
-        "equipment": "JIN-12",
-        "eventType": "Operativo",
-        "cause": "SDL equipo G102J e ingresa equio Jinan-12",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 09:40:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-06",
-        "equipment": "JIN-12",
-        "eventType": "Operativo",
-        "cause": "SDL equipo Jinan-12 por lluvias en la zona",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 14:17:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-06",
-        "equipment": "JIN-12",
-        "eventType": "Falla",
-        "cause": "ingresa en linea equipo jinan-12 y sale de linea CPW-02 por baja presion en linea de MQT presion en 93PSI",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 16:30:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-07",
-        "equipment": "CPW01",
-        "eventType": "Operativo",
-        "cause": "6:20 salen de linea equipos asociados a gas MRU+chiler CPW01,CPW02,CPW03,CPW07.",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 06:20:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-07",
-        "equipment": "Parque",
-        "eventType": "Falla",
-        "cause": "6:40 hrs EQUIPO G102J y EQUIPO G102K Ingresan en linea como respaldo por salida de equipos asociados a gas suministro MRU+chiler",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día ·  6:40"
-      },
-      {
-        "date": "2026-07-07",
-        "equipment": "Parque",
-        "eventType": "Falla",
-        "cause": "07:20 hrs EQUIPO G101V Ingresa en linea como respaldo por salida de equipos asociados a gas suministro MRU+chiler",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día ·  7:20"
-      },
-      {
-        "date": "2026-07-07",
-        "equipment": "CPW02",
-        "eventType": "Operativo",
-        "cause": "8:40 ingresa en linea equipo CPW02 alineado MRU+chiler.",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 08:40:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-07",
-        "equipment": "CPW07",
-        "eventType": "Operativo",
-        "cause": "8:42 ingresa en linea equipo CPW07 alineado MRU+chiler.",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 08:42:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-07",
-        "equipment": "CPW03",
-        "eventType": "Operativo",
-        "cause": "8:45 ingresa en linea equipo CPW03 alineado MRU+chiler.",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 08:45:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-07",
-        "equipment": "Parque",
-        "eventType": "Falla",
-        "cause": "08:50 hrs EQUIPO G102K sale de linea pareada manual por Ingreso equipos con gas tratado MRU+chiller.",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 08:50:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-07",
-        "equipment": "CPW01",
-        "eventType": "Operativo",
-        "cause": "9:12 ingresa en linea equipo CPW011 alineado MRU+chiler.",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 09:12:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-07",
-        "equipment": "CPW01",
-        "eventType": "Operativo",
-        "cause": "9:16 ingresa en linea equipo CPW012 alineado MRU+chiler.",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 09:16:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-07",
-        "equipment": "Parque",
-        "eventType": "Falla",
-        "cause": "9:15 hrs EQUIPO G102J sale de linea pareada manual por Ingreso equipos con gas tratado MRU+chiller.",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 09:15:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-07",
-        "equipment": "Parque",
-        "eventType": "Falla",
-        "cause": "9:20 hrs EQUIPO G101V sale de linea pareada manual por Ingreso equipos con gas tratado MRU+chiller.",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 09:20:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-08",
-        "equipment": "Parque",
-        "eventType": "Falla",
-        "cause": "EQUIPO: G102J, A solicitud del CCM, ingresa en linea por mantenimiento semanal de la MRU. FDL a las15:35 horas.",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 10:25:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-08",
-        "equipment": "CPW03",
-        "eventType": "Falla",
-        "cause": "CPW 03, A solicitud del CCM, FDL por mantenimiento semanal de la MRU. Ingresa a las 14:58 horas",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 10:29:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-08",
-        "equipment": "Parque",
-        "eventType": "Falla",
-        "cause": "G102K, A solicitud del CCM, ingresa en linea por mantenimiento semanal de la MRU. FDL a las15:40 horas.",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 10:35:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-08",
-        "equipment": "Parque",
-        "eventType": "Falla",
-        "cause": "EQUIPO: G101V, A solicitud del CCM, ingresa en linea por mantenimiento semanal de la MRU. FDL a las 15:08 horas.",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 10:43:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-08",
-        "equipment": "CPW02",
-        "eventType": "Falla",
-        "cause": "EQUIPO: CPW 02, A solicitud del CCM, FDL por mantenimiento semanal de la MRU. Ingresa a las 14:50 horas.",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 10:46:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-08",
-        "equipment": "CPW07",
-        "eventType": "Falla",
-        "cause": "EQUIPO: CPW 07, A solicitud del CCM, FDL por mantenimiento semanal de la MRU. Ingresa a las 15:35 horas",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 10:50:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-08",
-        "equipment": "CPW01",
-        "eventType": "Falla",
-        "cause": "EQUIPO: CPW 10 & 11, A solicitud del CCM, FDL por mantenimiento semanal de la MRU.",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 10:55:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-08",
-        "equipment": "CPW01",
-        "eventType": "Operativo",
-        "cause": "EQUIPO: CPW 10 & 11, A solicitud del CCM, ingresan en línea con suministro de gas CYC",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 11:30:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-09",
-        "equipment": "CPW01",
-        "eventType": "Falla",
-        "cause": "EQUIPO: CPW-01-FDL por salida de la MRU alto nivel de GLP en el recipiente. Ingresa a las 16:01 horas",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 09:13:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-09",
-        "equipment": "CPW02",
-        "eventType": "Falla",
-        "cause": "EQUIPO: CPW-02-FDL por salida de la MRU alto nivel de GLP en el recipiente. Ingresa a las 10:49 horas",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 09:13:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-09",
-        "equipment": "CPW03",
-        "eventType": "Falla",
-        "cause": "EQUIPO: CPW-03-FDL por salida de la MRU alto nivel de GLP en el recipiente. Ingresa a las 10:44 horas",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 09:13:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-09",
-        "equipment": "CPW07",
-        "eventType": "Falla",
-        "cause": "EQUIPO: CPW-07-FDL por salida de la MRU alto nivel de GLP en el recipiente. Ingresa a las 11:14 horas",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 09:13:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-09",
-        "equipment": "CPW06",
-        "eventType": "Falla",
-        "cause": "EQUIPO: CPW-06-FDL al momento de salida de la MRU alto nivel de GLP en el recipiente. Presenta alta potencia de Reactiva, Ingresa a las 10:25 horas",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 09:13:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-09",
-        "equipment": "CPW01",
-        "eventType": "Falla",
-        "cause": "EQUIPO: CPW-01-FDL por salida de la MRU alto nivel de GLP en el recipiente. Ingresa a las 16:01 horas",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 17:08:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-09",
-        "equipment": "CPW02",
-        "eventType": "Falla",
-        "cause": "EQUIPO: CPW-02-FDL por salida de la MRU alto nivel de GLP en el recipiente. Ingresa a las 18:49 horas",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 17:08:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-09",
-        "equipment": "CPW03",
-        "eventType": "Falla",
-        "cause": "EQUIPO: CPW-03-FDL por salida de la MRU alto nivel de GLP en el recipiente. Ingresa a las 18:44 horas",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 17:08:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-09",
-        "equipment": "CPW07",
-        "eventType": "Falla",
-        "cause": "EQUIPO: CPW-07-FDL por salida de la MRU alto nivel de GLP en el recipiente. Ingresa a las 18:49 horas",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 17:08:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-10",
-        "equipment": "CPW01",
-        "eventType": "Falla",
-        "cause": "EQUIPO: CPW-01-FDL por salida de la MRU alto nivel de GLP en el recipiente. Ingresa a las 08:59 horas",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 07:37:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-10",
-        "equipment": "CPW02",
-        "eventType": "Falla",
-        "cause": "EQUIPO: CPW-02-FDL por salida de la MRU alto nivel de GLP en el recipiente. Entra a mantenimiento",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 07:37:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-10",
-        "equipment": "CPW03",
-        "eventType": "Falla",
-        "cause": "EQUIPO: CPW-03-FDL por salida de la MRU alto nivel de GLP en el recipiente. Ingresa a las 09:03 horas",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 07:37:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-10",
-        "equipment": "CPW07",
-        "eventType": "Falla",
-        "cause": "EQUIPO: CPW-07-FDL por salida de la MRU alto nivel de GLP en el recipiente. Ingresa a las 09:26 horas",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 07:37:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-10",
-        "equipment": "JIN-10",
-        "eventType": "Operativo",
-        "cause": "EQUIPO: Jinan-10, 11 & 12. a solicitud del CCM, pasan a operar con gas tratato Ingresa a las 10:10 horas",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 09:33:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-11",
-        "equipment": "CPW04",
-        "eventType": "Falla",
-        "cause": "Se presenta FDL del equipo G54, se revisa con el lider de MANTTO y personal de CONTROL, se encontro alta restriccion en la presion del MAP, se evalua carga minima para mantener en ",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 12:09:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-12",
-        "equipment": "CPW01",
-        "eventType": "Falla",
-        "cause": "EQUIPO: CPW-01-FDL por salida de la MRU. Motivo de salida: baja presión de lubricación de aceite compresor Quincy.. Ingresa a las 07:33 horas",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 05:28:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-12",
-        "equipment": "CPW03",
-        "eventType": "Falla",
-        "cause": "EQUIPO: CPW-03-FDL por salida de la MRU. Motivo de salida: baja presión de lubricación de aceite compresor Quincy.. Ingresa a las 07:16 horas",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 05:28:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-12",
-        "equipment": "CPW07",
-        "eventType": "Falla",
-        "cause": "EQUIPO: CPW-07-FDL por salida de la MRU. Motivo de salida: baja presión de lubricación de aceite compresor Quincy.. Ingresa a las 08:00 horas",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 05:28:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-12",
-        "equipment": "JIN-10",
-        "eventType": "Falla",
-        "cause": "EQUIPO: JINAN-10-FDL por salida de la MRU. Motivo de salida: baja presión de lubricación de aceite compresor Quincy.. Ingresa a las 07:36 horas",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 05:28:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-12",
-        "equipment": "JIN-11",
-        "eventType": "Falla",
-        "cause": "EQUIPO: JINAN-11-FDL por salida de la MRU. Motivo de salida: baja presión de lubricación de aceite compresor Quincy.. Ingresa a las 07:56 horas",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 05:28:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-12",
-        "equipment": "JIN-12",
-        "eventType": "Falla",
-        "cause": "EQUIPO: JINAN-12-FDL por salida de la MRU. Motivo de salida: baja presión de lubricación de aceite compresor Quincy.. Ingresa a las 07:58 horas",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 05:28:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-12",
-        "equipment": "CPW04",
-        "eventType": "Falla",
-        "cause": "EQUIPO: CPW-04, parada manual a solicitud del CCM, para recuperar presion de gas Moqueta, ingresa en linea a las 11:01 horas",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 08:55:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-12",
-        "equipment": "Parque",
-        "eventType": "Falla",
-        "cause": "EQUIPO: G102K, entra en linea como respaldo por FDL de la MRU, sale de operación a las 07:48",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 05:40:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-12",
-        "equipment": "Parque",
-        "eventType": "Falla",
-        "cause": "EQUIPO: G101V, entra en linea como respaldo por FDL de la MRU, sale de operación a las 08:05",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 05:50:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-12",
-        "equipment": "Parque",
-        "eventType": "Falla",
-        "cause": "EQUIPO: G102J, entra en linea como respaldo por FDL de la MRU, sale de operación a las 08:10",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 05:35:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-12",
-        "equipment": "JIN-10",
-        "eventType": "Falla",
-        "cause": "EQUIPO: Jinan-10, Motivo de salida: A solicitud del CCM, por caída de presión en gas Costayaco. Ingresa a las 15:06",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 14:53:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-12",
-        "equipment": "JIN-11",
-        "eventType": "Falla",
-        "cause": "EQUIPO: Jinan-11, Motivo de salida: A solicitud del CCM, por caída de presión en gas Costayaco. Ingresa a las 15:13",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 14:48:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-12",
-        "equipment": "JIN-12",
-        "eventType": "Falla",
-        "cause": "EQUIPO: Jinan-12, Motivo de salida: A solicitud del CCM, por caída de presión en gas Costayaco. Ingresa a las 15:14",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 14:46:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-13",
-        "equipment": "CPW03",
-        "eventType": "Falla",
-        "cause": "08:00 hrs equipo cpw03 sale de linea por mantenimiento programado.",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 08:00:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-13",
-        "equipment": "Parque",
-        "eventType": "Falla",
-        "cause": "22:06 FDL SIN, FDL sistema inyección.EEP reporta disparo línea 34.5 Kv subestación Junin Mocoa.",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Noche · Sat Dec 30 1899 22:04:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-13",
-        "equipment": "CPW01",
-        "eventType": "Operativo",
-        "cause": "08:00 hrs equipo cpw01 se realiza cambio de gas MRU a gas MQT",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 08:00:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-13",
-        "equipment": "CPW05",
-        "eventType": "Falla",
-        "cause": "Parada manual de equipo cpw05 por baja presaion de gas moqueta 80 psi",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Noche · Sat Dec 30 1899 22:10:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-13",
-        "equipment": "Parque",
-        "eventType": "Falla",
-        "cause": "09:10 hrs equipo G102J ingresa a linea a solicitud de CCM por parada de equipos por baja presion de gas CYC",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 09:10:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-13",
-        "equipment": "CPW07",
-        "eventType": "Operativo",
-        "cause": "sale delinea equipo cpw07 por sobrecarga",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Noche · Sat Dec 30 1899 22:06:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-13",
-        "equipment": "CPW01",
-        "eventType": "Operativo",
-        "cause": "09:15 hrs equipos cpw011 y cpw012 salen de linea por solicitud de CCM por baja presion de gas CYC",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 09:15:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-13",
-        "equipment": "CPW01",
-        "eventType": "Falla",
-        "cause": "sale de linea equipo cpw12 por potencia inversa",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Noche · Sat Dec 30 1899 22:06:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-13",
-        "equipment": "CPW01",
-        "eventType": "Falla",
-        "cause": "09:40 hrs equipo cpw010 sale de linea por solicitud de CCM por baja presion de gas CYC",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 09:40:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-13",
-        "equipment": "CPW01",
-        "eventType": "Operativo",
-        "cause": "14:00 hrs equipo cpw010 ingresa a linea a solicitud de CCM en modo reparto de carga con gas MRU",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 14:00:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-13",
-        "equipment": "CPW01",
-        "eventType": "Operativo",
-        "cause": "14:00 hrs equipo cpw011 ingresa a linea a solicitud de CCM en modo reparto de carga con gas MRU",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 14:10:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-13",
-        "equipment": "Parque",
-        "eventType": "Falla",
-        "cause": "14:23 hrs equipo G102J sale de linea a solicitud de CCM",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 14:23:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-13",
-        "equipment": "CPW05",
-        "eventType": "Operativo",
-        "cause": "14:30 hrs se baja nominal a 900Kw a generadores cpw05 y 06 a solicitud de CCM por baja presion de gas MQT 120 psi",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 14:30:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-14",
-        "equipment": "CPW04",
-        "eventType": "Falla",
-        "cause": "06:30 hrs parada manual equipo cpw04 a solicitud de ccm por baja presion gas MQT 116 psi",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 06:30:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-14",
-        "equipment": "CPW04",
-        "eventType": "Operativo",
-        "cause": "21:40 hrs ingresa equipo cpw04 a solicitud de CCM por baja presion gas MQT 120 psi",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Noche · Sat Dec 30 1899 21:40:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-14",
-        "equipment": "Parque",
-        "eventType": "Falla",
-        "cause": "08:30 hrs generador diesel G102K ingresa a linea a solicitud de ccm como respaldo por parada MRU por mantenimiento semanal",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 08:30:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-14",
-        "equipment": "CPW01",
-        "eventType": "Falla",
-        "cause": "08:38 hrs generadores cpw010 y 011 parada manual para realizar cambio de gas MRU a gas CYC a solicitud de CCM por mantenimineto semanal MRU, ingresan a linea a las 08:58 hrs",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 08:38:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-14",
-        "equipment": "CPW02",
-        "eventType": "Falla",
-        "cause": "09:05 hrs parada manual equipo cpw02 a solicitud de CCM por parada MRU por mantenimiento semanal,",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 09:05:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-14",
-        "equipment": "CPW07",
-        "eventType": "Falla",
-        "cause": "9:09 hrs parada manual equipo cpw07 a solicitud de CCM por parada MRU por mantenimiento semanal",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 09:09:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-14",
-        "equipment": "CPW04",
-        "eventType": "Operativo",
-        "cause": "12:17hrs ingresa a linea generador CPW04 a solicitud de CCM por incremento en presion de gas MQT 160 psi",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 12:17:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-14",
-        "equipment": "CPW04",
-        "eventType": "Falla",
-        "cause": "12:25hrs parada manual generador diesel G102K a solicitud de CCM por ingreso de generador CPW04",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 12:25:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-14",
-        "equipment": "CPW02",
-        "eventType": "Operativo",
-        "cause": "14:39 hrs ingresa equipo CPW02 en linea a solicitud de CCM con gas MQT",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 14:39:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-14",
-        "equipment": "CPW04",
-        "eventType": "Falla",
-        "cause": "15:39 hrs parada manual equipo cpw04 a solicitud de CCM por baja presion gas MQT 120 psi",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 15:39:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-14",
-        "equipment": "CPW02",
-        "eventType": "Falla",
-        "cause": "17:03 hrs parada manual equipo cpw02 a solicitud de CCM por baja presion de gas MQT 113 PSI",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 17:03:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-15",
-        "equipment": "CPW01",
-        "eventType": "Falla",
-        "cause": "08:05 hrs parada manual equipo cpw010 por mantenimiento programado, Finaliza mantenimiento a las 15:00 esquipo queda en stanbay",
-        "downtimeHours": 7,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 08:05:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-15",
-        "equipment": "CPW01",
-        "eventType": "Falla",
-        "cause": "sale de linea equipos CPW11 ingresacon gas tratado MRU 2:51",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Noche · Sat Dec 30 1899 00:20:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-15",
-        "equipment": "Parque",
-        "eventType": "Falla",
-        "cause": "8:29 hrs parada manual por cambio de gas MQT a gas MRU, por baja presion de gas MQT 120 psi, equipo ingresa a linea a las 08:45 hrs con gas MRU modo carga base",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 08:29:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-15",
-        "equipment": "CPW01",
-        "eventType": "Falla",
-        "cause": "sale de linea equipos CPW12 ingresacon gas tratado MRU 2:57",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Noche · Sat Dec 30 1899 00:10:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-15",
-        "equipment": "CPW04",
-        "eventType": "Falla",
-        "cause": "8:30 hrs equuipo cpw04 parada manual a solicitud de ccm por baja presion de gas MQT 120 psi, ingresa a linea a las 10:14 hrs",
-        "downtimeHours": 2,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 08:30:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-15",
-        "equipment": "CPW01",
-        "eventType": "Falla",
-        "cause": "sale de linea equipos CPW10 ingresacon gas tratado MRU 2:49",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Noche · Sat Dec 30 1899 02:20:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-15",
-        "equipment": "Parque",
-        "eventType": "Falla",
-        "cause": "14:15 hrs generador diesel G102J ingresa a linea como respaldo maniobra de la turbina, sale de linea a las 14:50 hrs",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 14:15:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-15",
-        "equipment": "CPW04",
-        "eventType": "Falla",
-        "cause": "sale de linea equipo cpw04 por baja presion de gas moqueta 120 psi--ingresa en linea cpw04 160 psi 4:50",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Noche · Sat Dec 30 1899 02:54:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-15",
-        "equipment": "Parque",
-        "eventType": "Falla",
-        "cause": "14:15 hrs generador diesel G102k ingresa a linea como respaldo maniobra de la turbina, sale de linea a las 14:50 hrs",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 14:15:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-15",
-        "equipment": "JIN-10",
-        "eventType": "Operativo",
-        "cause": "EQUIPO: Jinan-10, A solicitud del CCM entra en linea con suministro de gas tratado.",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Noche · Sat Dec 30 1899 20:21:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-15",
-        "equipment": "Parque",
-        "eventType": "Falla",
-        "cause": "14:25 hrs generador diesel G102k ingresa a linea como respaldo maniobra de la turbina, sale de linea a las 14:48 hrs",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 14:25:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-15",
-        "equipment": "CPW03",
-        "eventType": "Operativo",
-        "cause": "Se ingresa en linea el equipo G53, queda en modo carga base con 600 Kw, pendiente realizar ajuste fino en mezcla y control.",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Noche · Sat Dec 30 1899 22:30:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-15",
-        "equipment": "CPW03",
-        "eventType": "Operativo",
-        "cause": "17:20 hrs ingresa en linea en pruebas generador CPW03 modo carga base con gas MQT",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 17:20:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-15",
-        "equipment": "CPW04",
-        "eventType": "Falla",
-        "cause": "sale de linea equipo cpw04 por baja presion de gas moqueta 125 psi",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Noche · Sat Dec 30 1899 23:01:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-16",
-        "equipment": "CPW04",
-        "eventType": "Falla",
-        "cause": "06:54 hrs a solicitud del CCM FDL equipo CPW-04 por estabilidad de presión de gas Moqueta, 120 PSI, ingresa a linea a las 08:32 hrs a solicitud de CCM por salida de generador CPW01",
-        "downtimeHours": 1,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 06:54:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-16",
-        "equipment": "CPW04",
-        "eventType": "Falla",
-        "cause": "EQUIPO: CPW-04. A solicitud del CCM FDL por estabilidad de presión del gas Moqueta, 165PSI",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Noche · Sat Dec 30 1899 02:50:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-16",
-        "equipment": "CPW01",
-        "eventType": "Operativo",
-        "cause": "08:50 hrs generador CPW01 inicia intervencion con personal de PAC para configuracion control DEIF aplicativo utility Software, ingresa en linea a las 10:34 hrs en modo reparto de c",
-        "downtimeHours": 1,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 08:50:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-16",
-        "equipment": "JIN-01",
-        "eventType": "Falla",
-        "cause": "08:58 hrs sale de línea, parada manual equipo JINAN-01, por mantenimiento preventivo programado.",
-        "downtimeHours": 7,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 08:58:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-16",
-        "equipment": "CPW02",
-        "eventType": "Operativo",
-        "cause": "10:07 hrs generador CPW02 inicia intervencion con personal de PAC para configuracion control DEIF aplicativo utility Software, ingresa en linea a las 10:34 hrs en modo reparto de c",
-        "downtimeHours": 1,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 10:07:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-16",
-        "equipment": "CPW01",
-        "eventType": "Falla",
-        "cause": "11:13 G102J-G102K, Ingresa en operación generacion diesel a peticion de CCM como respaldo por salida de generadores gas MQT CPW 01- 04-05-06, parada manual al compresor # 2, por au",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 11:13:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-16",
-        "equipment": "CPW01",
-        "eventType": "Falla",
-        "cause": "11:16 G101V, Ingresa en operación generacion diesel a peticion de CCM como respaldo por salida de generadores gas MQT CPW 01- 04-05-06, parada manual al compresor # 2, por autoriza",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 11:16:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-16",
-        "equipment": "CPW01",
-        "eventType": "Falla",
-        "cause": "11:20 CPW 01-05-06, parada manual por peticion de CCM compresor # 2, parada manual por autorización del supervisor de producción, suspender envió de gas MQT – CYC. Debido a trabajo",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 11:20:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-16",
-        "equipment": "CPW04",
-        "eventType": "Falla",
-        "cause": "11:40 CPW 04, parada manual por peticion de CCM compresor # 2, parada manual por autorización del supervisor de producción, suspender envió de gas MQT – CYC. Debido a trabajos real",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 11:40:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-17",
-        "equipment": "CPW01",
-        "eventType": "Falla",
-        "cause": "07:00 hrs generador cpw011 parada manual a solicitud de CCM por baja presion gas CYC",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 07:00:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-17",
-        "equipment": "CPW04",
-        "eventType": "Falla",
-        "cause": "00:16 horas EQUIPO: CPW04, FDL A solicitud del CCM, por baja presión del gas Moqueta 120 PSI. Ingresa a las 03:38 horas.",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Noche · Sat Dec 30 1899 00:16:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-17",
-        "equipment": "CPW01",
-        "eventType": "Falla",
-        "cause": "07:00 hrs generador cpw012 parada manual a solicitud de CCM por baja presion gas CYC, ingresa a linea a las 08:34 hrs",
-        "downtimeHours": 1,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 07:00:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-17",
-        "equipment": "CPW04",
-        "eventType": "Falla",
-        "cause": "07:15 hrs generador CPW04 parada manual a solicitud de CCM por baja presion de gas MQT 116 PSI. 10:01 hrs A petición de CCM equipo ingresa en línea, alineado con gas MQT.",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 07:15:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-17",
-        "equipment": "CPW04",
-        "eventType": "Falla",
-        "cause": "07:15 hrs generador G101V ingresa a linea a solicitud de CCM como respaldo por salida generador CPW04, sale de linea a las 8:50",
-        "downtimeHours": 1,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 07:15:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-17",
-        "equipment": "CPW03",
-        "eventType": "Operativo",
-        "cause": "08:30 hrs Generador CPW03 inicia intervención de personal de PAC con personal de control COPOWER",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 08:30:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-17",
-        "equipment": "CPW05",
-        "eventType": "Operativo",
-        "cause": "12:21 hrs se realiza deslastre de carga 200 kw equipos asociados a gas MQT, CPW05 y CPW06, por caida de presión de gas Moqueta 125 PSI.",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 12:21:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-17",
-        "equipment": "CPW03",
-        "eventType": "Falla",
-        "cause": "13:08 hrs Equipo CPW03 FDL parada manual a solicitud de CCM por baja presion de gas MQT 115 PSI.",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 13:08:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-17",
-        "equipment": "CPW04",
-        "eventType": "Falla",
-        "cause": "16:30 CPW-04 a solicitud del CCM parada manual por baja presión gas MQT 63 psi.",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 16:30:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-17",
-        "equipment": "CPW05",
-        "eventType": "Falla",
-        "cause": "16:39 CPW-05 a solicitud del CCM parada manual por baja presión gas MQT 63 psi.",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 16:39:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-17",
-        "equipment": "CPW06",
-        "eventType": "Falla",
-        "cause": "16:42 CPW-06 a solicitud del CCM parada manual por baja presión gas MQT 63 psi.",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 16:42:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-17",
-        "equipment": "Parque",
-        "eventType": "Operativo",
-        "cause": "16:54 G102K ingresa equipo diesel a peticion de CCM reapaldo caida presion linea gas MQT",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 16:54:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-17",
-        "equipment": "CPW03",
-        "eventType": "Falla",
-        "cause": "16:57 CPW-03 a solicitud del CCM parada manual por baja presión gas MQT 50 psi.",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 16:57:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-17",
-        "equipment": "CPW02",
-        "eventType": "Falla",
-        "cause": "17:03 CPW-02 salde de linea por detonacion no sincroniza.",
-        "downtimeHours": 0,
-        "responsible": "COPOWER",
-        "notes": "Día · Sat Dec 30 1899 17:03:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-17",
-        "equipment": "CPW03",
-        "eventType": "Operativo",
-        "cause": "17:22 CPW-03 ingresa en linea rotacion por la CPW-02 alineada con gas MQT",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 17:22:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-17",
-        "equipment": "Parque",
-        "eventType": "Operativo",
-        "cause": "17:15 G101V a solicitud del CCM equipo Diesel ingresa como respaldo caida presion linea gas MQT",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 17:15:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-17",
-        "equipment": "Parque",
-        "eventType": "Operativo",
-        "cause": "17:15 G102J a solicitud del CCM equipo Diesel ingresa como respaldo caida presion linea gas MQT",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 17:15:00 GMT-0456 (Colombia Standard Time)"
-      },
-      {
-        "date": "2026-07-18",
-        "equipment": "CPW04",
-        "eventType": "Operativo",
-        "cause": "07:00 CPW-04 se adelanta intervencion programada de cambio intercooler por novedad linea gas MQT, 15:00 hrs se finaliza intervención equipo CPW-04.",
-        "downtimeHours": 0,
-        "responsible": "GTE",
-        "notes": "Día · Sat Dec 30 1899 07:00:00 GMT-0456 (Colombia Standard Time)"
-      }
-    ],
-    "consumos": [
-      {
-        "unidad": "CPW01",
-        "campo": "COSTAYACO",
-        "adicionAceite": 0,
-        "cambioAceite": 0,
-        "adicionCoolant": 0
-      },
-      {
-        "unidad": "CPW02",
-        "campo": "COSTAYACO",
-        "adicionAceite": 0,
-        "cambioAceite": 0,
-        "adicionCoolant": 0
-      },
-      {
-        "unidad": "CPW03",
-        "campo": "COSTAYACO",
-        "adicionAceite": 0,
-        "cambioAceite": 0,
-        "adicionCoolant": 0
-      },
-      {
-        "unidad": "CPW04",
-        "campo": "COSTAYACO",
-        "adicionAceite": 0,
-        "cambioAceite": 0,
-        "adicionCoolant": 0
-      },
-      {
-        "unidad": "CPW05",
-        "campo": "COSTAYACO",
-        "adicionAceite": 0,
-        "cambioAceite": 0,
-        "adicionCoolant": 0
-      },
-      {
-        "unidad": "CPW06",
-        "campo": "COSTAYACO",
-        "adicionAceite": 0,
-        "cambioAceite": 0,
-        "adicionCoolant": 0
-      },
-      {
-        "unidad": "JIN-10",
-        "campo": "COSTAYACO",
-        "adicionAceite": 0,
-        "cambioAceite": 0,
-        "adicionCoolant": 0
-      },
-      {
-        "unidad": "G102J",
-        "campo": "COSTAYACO",
-        "adicionAceite": 0,
-        "cambioAceite": 0,
-        "adicionCoolant": 0
-      },
-      {
-        "unidad": "G102K",
-        "campo": "COSTAYACO",
-        "adicionAceite": 0,
-        "cambioAceite": 0,
-        "adicionCoolant": 0
-      },
-      {
-        "unidad": "G101V",
-        "campo": "COSTAYACO",
-        "adicionAceite": 0,
-        "cambioAceite": 0,
-        "adicionCoolant": 0
-      },
-      {
-        "unidad": "JIN-01",
-        "campo": "VONU",
-        "adicionAceite": 0,
-        "cambioAceite": 0,
-        "adicionCoolant": 0
-      },
-      {
-        "unidad": "JIN-02",
-        "campo": "VONU",
-        "adicionAceite": 0,
-        "cambioAceite": 0,
-        "adicionCoolant": 0
-      }
-    ],
-    "kpi": {
-      "availability": 0.965674,
-      "reliability": 0.965674,
-      "maintainability": null,
-      "generationMwh": 2502.78,
-      "operationalLossesMwh": null,
-      "contractualCompliance": null
-    }
-  },
+  }
+
 };
 
 export const COPOWER_KPI_FROM_MONTHS: KpiRow[] = COPOWER_MONTH_ORDER.map((month) => ({

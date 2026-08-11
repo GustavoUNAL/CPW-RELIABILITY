@@ -17,6 +17,10 @@ import {
 } from "./concertacionHoursData";
 import { INVENTORY_MINIMUMS } from "./inventoryMinimumsData";
 import { InventoryMinimumsDashboard } from "./InventoryMinimumsDashboard";
+import { GteResumen } from "./GteResumen";
+import { DisponibilidadAnalisisBoard } from "./DisponibilidadAnalisisBoard";
+import { DisponibilidadConciliacionSlide } from "./DisponibilidadConciliacionSlide";
+import { GRAN_TIERRA_MONTHLY_DATA, type GranTierraMonthKey } from "./granTierraMonthly";
 
 type Props = {
   leafId: string;
@@ -202,6 +206,31 @@ function EventsTable({
 }
 
 export function InformesResultadosDashboard({ leafId, month, monthLabel }: Props) {
+  if (leafId === "inf-conf-resumen" || leafId.startsWith("inf-conf-")) {
+    const gteMonth = (month in GRAN_TIERRA_MONTHLY_DATA ? month : "Jul") as GranTierraMonthKey;
+    if (leafId === "inf-conf-conciliacion") {
+      return (
+        <div className="dash-module exec-dashboard inf-resultados">
+          <DisponibilidadConciliacionSlide month={gteMonth} monthLabel={monthLabel} />
+        </div>
+      );
+    }
+    return (
+      <div className="dash-module exec-dashboard inf-resultados">
+        <header className="exec-header dash-hero">
+          <div>
+            <p className="eyebrow">Informes · Confiabilidad</p>
+            <h2>Indicadores sistémicos y eventos</h2>
+            <p className="muted">Periodo {monthLabel} · Informe oficial Gran Tierra</p>
+          </div>
+          <span className="source-badge gte">GTE</span>
+        </header>
+        <GteResumen month={gteMonth} only={["sistemicos", "horas"]} />
+        <DisponibilidadAnalisisBoard month={gteMonth} monthLabel={monthLabel} />
+      </div>
+    );
+  }
+
   const pack = getConcertacionMonth(month);
   const prevKey = prevMonthKey(month);
   const prevPack = prevKey ? getConcertacionMonth(prevKey) : null;
