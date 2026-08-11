@@ -1,13 +1,10 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { ArrowLeft, Maximize2 } from "lucide-react";
 import {
-  LoginScreen,
   ROLE_LABELS,
-  canAccessInformes,
   clearSession,
   isInformesOnlyRole,
   loadSession,
-  persistSession,
   type SessionUser,
 } from "./auth";
 import {
@@ -18,29 +15,33 @@ import {
   type NavNode,
 } from "./nav/projectTree";
 import { defaultMonth, monthOptionLabel, resolveViewContext } from "./nav/resolveContext";
+import {
+  buildInformesPath,
+  parsePath,
+  pushAppUrl,
+  replaceAppUrl,
+} from "./nav/urlRouting";
 import { PlatformContent } from "./reports/PlatformContent";
 
 const INFORMES_MODULE = PROJECT_NAV_TREE.find((m) => m.key === "informes");
 const DEFAULT_LEAF = firstLeafId(INFORMES_MODULE?.children ?? []) ?? "inf-rg-indisponibilidad";
 
-export function isInformesPath(pathname = window.location.pathname) {
-  const clean = pathname.replace(/\/+$/, "") || "/";
-  return clean === "/informes";
+function leafFromLocation(): string {
+  const parsed = parsePath();
+  if (parsed?.page === "informes") return parsed.leaf;
+  return DEFAULT_LEAF;
 }
 
-type Props = {
-  /** Si true, omite el shell de login (solo cuando App ya autenticó). */
-  embedded?: boolean;
-};
-
 /**
- * Vista dedicada `/informes`: solo Resultados de Gestión + selector de mes.
+ * Vista dedicada `/informes/...`: acceso público (sin login).
+ * Se sirve en el mismo dominio (p. ej. https://reliability.opsai.space/informes/indisponibilidad).
+ * El resto de la plataforma sigue protegido en `/`.
  */
-export function InformesStandalonePage({ embedded = false }: Props) {
+export function InformesStandalonePage() {
   const [session, setSession] = useState<SessionUser | null>(() => loadSession());
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [selectedMonth, setSelectedMonth] = useState("Jul");
-  const [activeLeafId, setActiveLeafId] = useState(DEFAULT_LEAF);
+  const [activeLeafId, setActiveLeafId] = useState(leafFromLocation);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     "inf-resultados": true,
     "inf-confiabilidad": true,
@@ -51,6 +52,19 @@ export function InformesStandalonePage({ embedded = false }: Props) {
     document.body.classList.toggle("theme-dark", theme === "dark");
     document.title = `Informes · ${PROJECT_TITLE}`;
   }, [theme]);
+
+  // Normaliza `/informes` → `/informes/indisponibilidad` y sincroniza URL.
+  useEffect(() => {
+    replaceAppUrl("informes", activeLeafId);
+  }, [activeLeafId]);
+
+  useEffect(() => {
+    const onPop = () => {
+      setActiveLeafId(leafFromLocation());
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
 
   const viewContext = useMemo(
     () => resolveViewContext("informes", activeLeafId),
@@ -66,42 +80,12 @@ export function InformesStandalonePage({ embedded = false }: Props) {
   const monthLabel = monthOptionLabel(selectedMonth, viewContext);
   const leafLabel =
     (INFORMES_MODULE ? findLeafLabel(INFORMES_MODULE.children, activeLeafId) : null) ?? activeLeafId;
-
-  const handleLogin = (user: SessionUser) => {
-    persistSession(user);
-    setSession(user);
-  };
+  const pathLabel = buildInformesPath(activeLeafId);
 
   const handleLogout = () => {
     clearSession();
     setSession(null);
   };
-
-  if (!session && !embedded) {
-    return (
-      <div className={`app-shell ${theme} login-shell`}>
-        <LoginScreen onSuccess={handleLogin} />
-      </div>
-    );
-  }
-
-  if (session && !canAccessInformes(session.role)) {
-    return (
-      <div className={`app-shell ${theme} login-shell`}>
-        <div className="login-card">
-          <p className="login-brand-mark">COPOWER</p>
-          <h1 className="login-brand-title">Informes</h1>
-          <p className="login-error" role="alert">
-            No tienes permiso para ver Resultados de Gestión.
-          </p>
-          <a className="login-submit" href="/" style={{ textDecoration: "none" }}>
-            <ArrowLeft size={18} />
-            Volver a la plataforma
-          </a>
-        </div>
-      </div>
-    );
-  }
 
   const toggleGroup = (id: string) => {
     setOpenGroups((prev) => ({ ...prev, [id]: !(prev[id] ?? true) }));
@@ -109,6 +93,7 @@ export function InformesStandalonePage({ embedded = false }: Props) {
 
   const selectLeaf = (leafId: string) => {
     setActiveLeafId(leafId);
+    pushAppUrl("informes", leafId);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -201,7 +186,7 @@ export function InformesStandalonePage({ embedded = false }: Props) {
 
         <div className="tree-panel informes-standalone-actions">
           {session && !isInformesOnlyRole(session.role) ? (
-            <a className="menu-item" href="/" title="Volver a la plataforma">
+            <a className="menu-item" href="/dashboard/resumen" title="Volver a la plataforma">
               <ArrowLeft size={16} />
               <span>Plataforma</span>
             </a>
@@ -220,7 +205,7 @@ export function InformesStandalonePage({ embedded = false }: Props) {
       <main className="main main-dual">
         <header className="informes-standalone-head">
           <div>
-            <p className="eyebrow">Vista completa · /informes</p>
+            <p className="eyebrow">Vista completa · {pathLabel}</p>
             <h2>{leafLabel}</h2>
             <p className="muted">{monthLabel}</p>
           </div>

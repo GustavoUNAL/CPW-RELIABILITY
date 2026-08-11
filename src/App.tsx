@@ -49,6 +49,13 @@ import {
   resolveViewContext,
 } from "./domain/reliability/nav/resolveContext";
 import {
+  buildInformesPath,
+  buildPath,
+  parsePath,
+  pushAppUrl,
+  replaceAppUrl,
+} from "./domain/reliability/nav/urlRouting";
+import {
   LoginScreen,
   ROLE_LABELS,
   canAccessInformes,
@@ -88,12 +95,21 @@ const DEFAULT_MODULE = PROJECT_NAV_TREE[0];
 const DEFAULT_LEAF = "dash-resumen";
 const MOBILE_MQ = "(max-width: 900px)";
 
+function initialRoute(): { page: PageKey; leaf: string; focusId: string | null } {
+  const parsed = parsePath();
+  if (parsed) {
+    return { page: parsed.page, leaf: parsed.leaf, focusId: parsed.focusId ?? null };
+  }
+  return { page: DEFAULT_MODULE.key, leaf: DEFAULT_LEAF, focusId: null };
+}
+
 function App() {
+  const boot = useMemo(() => initialRoute(), []);
   const [session, setSession] = useState<SessionUser | null>(() => loadSession());
-  const [activePage, setActivePage] = useState<PageKey>(DEFAULT_MODULE.key);
-  const [activeLeafId, setActiveLeafId] = useState(DEFAULT_LEAF);
+  const [activePage, setActivePage] = useState<PageKey>(boot.page);
+  const [activeLeafId, setActiveLeafId] = useState(boot.leaf);
   const [openModules, setOpenModules] = useState<Partial<Record<PageKey, boolean>>>({
-    [DEFAULT_MODULE.key]: true,
+    [boot.page]: true,
   });
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     "conf-eventos": true,
@@ -113,7 +129,8 @@ function App() {
   const sessionStartedAtRef = useRef(Date.now());
   const pageStartedAtRef = useRef(Date.now());
   const lastHeartbeatPageAtRef = useRef(Date.now());
-  const viewRef = useRef({ page: DEFAULT_MODULE.key as PageKey, leaf: DEFAULT_LEAF, label: "Resumen general" });
+  const viewRef = useRef({ page: boot.page, leaf: boot.leaf, label: "Resumen general" });
+  const skipUrlPushRef = useRef(false);
 
   useEffect(() => {
     document.body.classList.toggle("theme-light", theme === "light");
@@ -167,6 +184,34 @@ function App() {
   const activeLeafLabel =
     (activeModule ? findLeafLabel(activeModule.children, activeLeafId) : null) ?? activeLeafId;
 
+  // Normaliza la URL inicial (`/` → path semántico) una sola vez al entrar en sesión.
+  useEffect(() => {
+    if (!session) return;
+    const focus = parsePath()?.focusId;
+    replaceAppUrl(activePage, activeLeafId, focus);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- solo al autenticar
+  }, [session?.id]);
+
+  useEffect(() => {
+    const onPop = () => {
+      const parsed = parsePath();
+      if (!parsed) return;
+      skipUrlPushRef.current = true;
+      setActivePage(parsed.page);
+      setActiveLeafId(parsed.leaf);
+      setOpenModules((prev) => ({ ...prev, [parsed.page]: true }));
+      if (parsed.focusId?.startsWith("EVT-")) {
+        setFocusCostayacoRcaId(parsed.focusId);
+        setFocusRcaId(null);
+      } else if (parsed.focusId) {
+        setFocusRcaId(parsed.focusId);
+        setFocusCostayacoRcaId(null);
+      }
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
   // Land informes-only users on Resultados de Gestión; keep others out of informes unless allowed.
   useEffect(() => {
     if (!session) return;
@@ -176,6 +221,7 @@ function App() {
         setActivePage(home.page);
         setActiveLeafId(home.leaf);
         setOpenModules((prev) => ({ ...prev, informes: true }));
+        replaceAppUrl(home.page, home.leaf);
       }
       return;
     }
@@ -183,6 +229,7 @@ function App() {
       const home = defaultHomeForRole(session.role);
       setActivePage(home.page);
       setActiveLeafId(home.leaf);
+      replaceAppUrl(home.page, home.leaf);
     }
   }, [activePage, session]);
 
@@ -247,8 +294,12 @@ function App() {
     };
   }, [session, analyticsSessionId]);
 
-  const [focusRcaId, setFocusRcaId] = useState<string | null>(null);
-  const [focusCostayacoRcaId, setFocusCostayacoRcaId] = useState<string | null>(null);
+  const [focusRcaId, setFocusRcaId] = useState<string | null>(() =>
+    boot.focusId && !boot.focusId.startsWith("EVT-") ? boot.focusId : null,
+  );
+  const [focusCostayacoRcaId, setFocusCostayacoRcaId] = useState<string | null>(() =>
+    boot.focusId?.startsWith("EVT-") ? boot.focusId : null,
+  );
   const [rcaCases, setRcaCases] = useState<RcaCaseDetail[]>(() => loadRcaCases());
   const [costayacoRcaEvents, setCostayacoRcaEvents] = useState<RcaEventoFalla[]>(() =>
     loadCostayacoRcaEvents(),
@@ -272,10 +323,20 @@ function App() {
     lastHeartbeatPageAtRef.current = Date.now();
     persistSession(user);
     setSession(user);
+    const fromUrl = parsePath();
     const home = defaultHomeForRole(user.role);
-    setActivePage(home.page);
-    setActiveLeafId(home.leaf);
-    setOpenModules({ [home.page]: true });
+    const canKeepUrl =
+      Boolean(fromUrl) &&
+      (isInformesOnlyRole(user.role)
+        ? fromUrl!.page === "informes"
+        : fromUrl!.page !== "informes" || canAccessInformes(user.role));
+    const nextPage = canKeepUrl && fromUrl ? fromUrl.page : home.page;
+    const nextLeaf = canKeepUrl && fromUrl ? fromUrl.leaf : home.leaf;
+    const nextFocus = canKeepUrl && fromUrl ? fromUrl.focusId : null;
+    setActivePage(nextPage);
+    setActiveLeafId(nextLeaf);
+    setOpenModules({ [nextPage]: true });
+    replaceAppUrl(nextPage, nextLeaf, nextFocus);
     void trackLogin(user, sid);
   };
 
@@ -319,6 +380,10 @@ function App() {
     setActivePage(page);
     setActiveLeafId(leafId);
     setOpenModules((prev) => ({ ...prev, [page]: true }));
+    if (!skipUrlPushRef.current) {
+      pushAppUrl(page, leafId);
+    }
+    skipUrlPushRef.current = false;
     setNavOpen(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -343,12 +408,22 @@ function App() {
     if (rcaId?.startsWith("EVT-")) {
       setFocusCostayacoRcaId(rcaId);
       setOpenGroups((prev) => ({ ...prev, "conf-analisis": true }));
-      selectLeaf("confiabilidad", "an-rca-gte");
+      setActivePage("confiabilidad");
+      setActiveLeafId("an-rca-gte");
+      setOpenModules((prev) => ({ ...prev, confiabilidad: true }));
+      pushAppUrl("confiabilidad", "an-rca-gte", rcaId);
+      setNavOpen(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
     setFocusRcaId(rcaId ?? null);
     setOpenGroups((prev) => ({ ...prev, "conf-analisis": true }));
-    selectLeaf("confiabilidad", "an-rca-casos");
+    setActivePage("confiabilidad");
+    setActiveLeafId("an-rca-casos");
+    setOpenModules((prev) => ({ ...prev, confiabilidad: true }));
+    pushAppUrl("confiabilidad", "an-rca-casos", rcaId);
+    setNavOpen(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const navigateToCostayacoRca = (evtId?: string) => {
@@ -359,7 +434,12 @@ function App() {
       "conf-bitacoras": true,
       "conf-analisis": true,
     }));
-    selectLeaf("confiabilidad", "an-rca-gte");
+    setActivePage("confiabilidad");
+    setActiveLeafId("an-rca-gte");
+    setOpenModules((prev) => ({ ...prev, confiabilidad: true }));
+    pushAppUrl("confiabilidad", "an-rca-gte", evtId);
+    setNavOpen(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const createRcaFromEvent = (draft: RcaEventDraft) => {
@@ -599,7 +679,11 @@ function App() {
                     {mod.key === "informes" ? (
                       <a
                         className="project-mod-fullscreen"
-                        href="/informes"
+                        href={
+                          activePage === "informes"
+                            ? buildInformesPath(activeLeafId)
+                            : buildPath("informes", "inf-rg-indisponibilidad")
+                        }
                         target="_blank"
                         rel="noreferrer"
                         title="Abrir Informes en ventana completa"
