@@ -272,6 +272,7 @@ export const PROJECT_NAV_TREE: NavModule[] = [
         children: [
           { id: "inf-conf-resumen", label: "Indicadores y eventos" },
           { id: "inf-conf-conciliacion", label: "Slide conciliación Disp." },
+          { id: "inf-conf-confiabilidad", label: "Slide conciliación Conf." },
         ],
       },
     ],

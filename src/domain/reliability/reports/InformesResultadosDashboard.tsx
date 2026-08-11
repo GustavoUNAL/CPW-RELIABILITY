@@ -20,6 +20,9 @@ import { InventoryMinimumsDashboard } from "./InventoryMinimumsDashboard";
 import { GteResumen } from "./GteResumen";
 import { DisponibilidadAnalisisBoard } from "./DisponibilidadAnalisisBoard";
 import { DisponibilidadConciliacionSlide } from "./DisponibilidadConciliacionSlide";
+import { DisponibilidadHorasBoard } from "./DisponibilidadHorasBoard";
+import { ConfiabilidadAnalisisBoard } from "./ConfiabilidadAnalisisBoard";
+import { ConfiabilidadConciliacionSlide } from "./ConfiabilidadConciliacionSlide";
 import { GRAN_TIERRA_MONTHLY_DATA, type GranTierraMonthKey } from "./granTierraMonthly";
 
 type Props = {
@@ -215,6 +218,13 @@ export function InformesResultadosDashboard({ leafId, month, monthLabel }: Props
         </div>
       );
     }
+    if (leafId === "inf-conf-confiabilidad") {
+      return (
+        <div className="dash-module exec-dashboard inf-resultados">
+          <ConfiabilidadConciliacionSlide month={gteMonth} monthLabel={monthLabel} />
+        </div>
+      );
+    }
     return (
       <div className="dash-module exec-dashboard inf-resultados">
         <header className="exec-header dash-hero">
@@ -227,6 +237,8 @@ export function InformesResultadosDashboard({ leafId, month, monthLabel }: Props
         </header>
         <GteResumen month={gteMonth} only={["sistemicos", "horas"]} />
         <DisponibilidadAnalisisBoard month={gteMonth} monthLabel={monthLabel} />
+        <DisponibilidadHorasBoard month={gteMonth} monthLabel={monthLabel} />
+        <ConfiabilidadAnalisisBoard month={gteMonth} monthLabel={monthLabel} />
       </div>
     );
   }

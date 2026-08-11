@@ -24,6 +24,7 @@ import {
   GRAN_TIERRA_MONTHLY_DATA,
   type GranTierraMonthKey,
 } from "./granTierraMonthly";
+import { buildDisponibilidadAnalisis } from "./DisponibilidadAnalisisBoard";
 
 const META = CONTRACTUAL_KPI_TARGETS.reliability;
 const META_EFF = CONTRACTUAL_KPI_TARGETS.efficiencyPct;
@@ -219,7 +220,13 @@ export function GteResumen({ month, only }: Props) {
       flat: Math.abs(mwh) < 0.05,
     };
   };
+  const cpwDisp = useMemo(() => buildDisponibilidadAnalisis(month), [month]);
+  const prevCpwDisp = useMemo(
+    () => (prevMonth ? buildDisponibilidadAnalisis(prevMonth) : null),
+    [prevMonth],
+  );
   const deltaDisp = fmtPpDelta(data.kpi.availability, prevData?.kpi.availability);
+  const deltaDispCpw = fmtPpDelta(cpwDisp.dispCpw, prevCpwDisp?.dispCpw);
   const deltaConf = fmtPpDelta(data.kpi.reliability, prevData?.kpi.reliability);
   const deltaGen = fmtGenDelta(data.totalGenerationKwh, prevData?.totalGenerationKwh);
 
@@ -402,7 +409,7 @@ export function GteResumen({ month, only }: Props) {
         <article className="card">
           <p className="eyebrow">1 · Indicadores sistémicos</p>
           <h3>Cumplimiento contractual</h3>
-          <div className="exec-core-grid exec-core-grid--4">
+          <div className="exec-core-grid exec-core-grid--5">
             <div className="exec-core">
               <span>Generación total</span>
               <strong>{kwh(data.totalGenerationKwh)}</strong>
@@ -428,12 +435,12 @@ export function GteResumen({ month, only }: Props) {
                 ) : null}
               </small>
             </div>
-            <div className={`exec-core${availOk ? " ok" : " warn"}`}>
-              <span>Disponibilidad</span>
+            <div className={`exec-core gte${availOk ? " ok" : " warn"}`}>
+              <span>Disponibilidad GTE</span>
               <strong>{pct(data.kpi.availability)}</strong>
               <p>Meta ≥ {pct(META, 0)}</p>
               <small>
-                Informe mensual GTE
+                Informe mensual
                 {deltaDisp ? (
                   <>
                     <br />
@@ -447,6 +454,37 @@ export function GteResumen({ month, only }: Props) {
                       }
                     >
                       {deltaDisp.text}
+                    </span>
+                  </>
+                ) : null}
+              </small>
+            </div>
+            <div className={`exec-core cpw${cpwDisp.dispCpw != null && cpwDisp.dispCpw >= META ? " ok" : ""}`}>
+              <span>Disponibilidad COPOWER</span>
+              <strong>{pct(cpwDisp.dispCpw)}</strong>
+              <p>Meta ≥ {pct(META, 0)}</p>
+              <small>
+                Concertación · OP + stand-by
+                {cpwDisp.programmed > 0 ? (
+                  <>
+                    <br />
+                    {Math.round(cpwDisp.cpwAvailable).toLocaleString("es-CO")} /{" "}
+                    {Math.round(cpwDisp.programmed).toLocaleString("es-CO")} h
+                  </>
+                ) : null}
+                {deltaDispCpw ? (
+                  <>
+                    <br />
+                    <span
+                      className={
+                        deltaDispCpw.flat
+                          ? undefined
+                          : deltaDispCpw.improved
+                            ? "delta positive"
+                            : "delta negative"
+                      }
+                    >
+                      {deltaDispCpw.text}
                     </span>
                   </>
                 ) : null}

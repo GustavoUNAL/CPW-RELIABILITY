@@ -149,6 +149,7 @@ export const INTEGRATED_DUAL_LEAVES = new Set([
   "conf-formulas-revision",
   "inf-conf-resumen",
   "inf-conf-conciliacion",
+  "inf-conf-confiabilidad",
   "dash-resumen",
   "admin-usuarios",
   "admin-uso",

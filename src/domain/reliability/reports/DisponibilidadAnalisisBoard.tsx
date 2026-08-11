@@ -122,8 +122,8 @@ export function DisponibilidadAnalisisBoard({ month, monthLabel }: Props) {
       <article className="card disp-analisis">
         <header className="disp-analisis-head">
           <div>
-            <p className="eyebrow">Informes · Confiabilidad{monthLabel ? ` · ${monthLabel}` : ""}</p>
-            <h3>Conciliación de disponibilidad</h3>
+            <p className="eyebrow">3 · Análisis de disponibilidad{monthLabel ? ` · ${monthLabel}` : ""}</p>
+            <h3>Conciliación COPOWER vs Gran Tierra</h3>
           </div>
           <div className="disp-formula" aria-label="Disponibilidad igual a horas disponibles entre programadas">
             <span className="disp-formula-name">Disp</span>
@@ -243,7 +243,7 @@ export function DisponibilidadAnalisisBoard({ month, monthLabel }: Props) {
                     <td>{fmtN(a.agc4.hoursMto)}</td>
                   </tr>
                   <tr>
-                    <td>Descarbonización · CPW02</td>
+                    <td>CPW02 10–11 jul (sábana: descarbonización; Data Soporte: AGC4)</td>
                     <td>{fmtN(a.descarbCpw02)}</td>
                   </tr>
                   <tr>
