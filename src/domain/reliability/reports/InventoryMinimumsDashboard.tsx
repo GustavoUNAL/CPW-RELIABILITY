@@ -79,11 +79,14 @@ type FamilyStats = {
 export function InventoryMinimumsDashboard({
   hideCatalogTable = false,
   embedded = false,
+  slide = false,
 }: {
   /** Oculta la tabla detallada familia / descripción / gap (p. ej. informe §9). */
   hideCatalogTable?: boolean;
   /** Sin hero propio cuando va bajo el encabezado del informe. */
   embedded?: boolean;
+  /** Vista compacta de un slide: KPIs + críticos top. */
+  slide?: boolean;
 } = {}) {
   const [query, setQuery] = useState("");
   const [family, setFamily] = useState("Todos");
@@ -198,6 +201,114 @@ export function InventoryMinimumsDashboard({
       });
   }, [enriched, family, coverage, query]);
 
+  const criticalRows = slide ? planningCritical.slice(0, 6) : planningCritical;
+
+  const kpiRow = (
+    <div className="exec-kpi-row" style={{ marginTop: embedded || slide ? "0" : "0.65rem" }}>
+      <div className="exec-kpi">
+        <Package size={16} />
+        <span>Ítems catalogados</span>
+        <strong>{kpis.total}</strong>
+        <small>{kpis.families} tipos de máquina</small>
+      </div>
+      <div className="exec-kpi">
+        <AlertTriangle size={16} />
+        <span>Sin existencia</span>
+        <strong style={{ color: COVERAGE_META.sin_existencia.color }}>{kpis.sin}</strong>
+      </div>
+      <div className="exec-kpi">
+        <PackageMinus size={16} />
+        <span>Bajo mínimo</span>
+        <strong style={{ color: COVERAGE_META.bajo.color }}>{kpis.bajo}</strong>
+      </div>
+      <div className="exec-kpi">
+        <PackageSearch size={16} />
+        <span>En mínimo</span>
+        <strong style={{ color: COVERAGE_META.en_minimo.color }}>{kpis.enMin}</strong>
+      </div>
+      <div className="exec-kpi">
+        <CheckCircle2 size={16} />
+        <span>Sobre mínimo</span>
+        <strong style={{ color: COVERAGE_META.ok.color }}>{kpis.ok}</strong>
+      </div>
+    </div>
+  );
+
+  const criticalTable =
+    criticalRows.length > 0 ? (
+      <section className="op-panel" style={{ marginTop: "0.55rem" }}>
+        <div className="op-panel-head">
+          <h4>Críticos del plan</h4>
+          <span className="muted">
+            {slide
+              ? `${criticalRows.length} de ${planningCritical.length} · RCA/IP GTE`
+              : `${planningCritical.length} · ligados a RCA/IP GTE`}
+          </span>
+        </div>
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Urgencia</th>
+                <th>Repuesto</th>
+                <th>P/N</th>
+                <th>Exist. / Mín.</th>
+                <th>Equipo</th>
+                {!slide ? <th>Evento</th> : null}
+              </tr>
+            </thead>
+            <tbody>
+              {criticalRows.map((s) => (
+                <tr key={s.id}>
+                  <td>
+                    <ToneBadge
+                      label={s.urgency}
+                      color={
+                        s.urgency === "Crítica"
+                          ? "#dc2626"
+                          : s.urgency === "Alta"
+                            ? "#ea580c"
+                            : "#ca8a04"
+                      }
+                    />
+                  </td>
+                  <td>
+                    <strong>{s.description}</strong>
+                    <div className="muted" style={{ fontSize: "0.75rem" }}>
+                      {s.family}
+                    </div>
+                  </td>
+                  <td>
+                    <code style={{ fontSize: "0.78rem" }}>{s.partNumber}</code>
+                  </td>
+                  <td>
+                    <strong style={{ color: s.onHand < s.stockMin ? "#dc2626" : undefined }}>
+                      {s.onHand}/{s.stockMin}
+                    </strong>
+                  </td>
+                  <td>{s.asset}</td>
+                  {!slide ? (
+                    <td>
+                      <small className="muted">{s.linkedEvent}</small>
+                    </td>
+                  ) : null}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    ) : null;
+
+  if (slide) {
+    return (
+      <div className="inf-conf-embed inv-dashboard--slide">
+        {kpiRow}
+        {criticalTable}
+      </div>
+    );
+  }
+
   return (
     <div className={`panel${embedded ? " inv-dashboard--embedded" : ""}`}>
       <article className="card">
@@ -215,93 +326,8 @@ export function InventoryMinimumsDashboard({
           </>
         )}
 
-        {planningCritical.length > 0 ? (
-          <section className="op-panel" style={{ marginTop: embedded ? "0" : "0.75rem" }}>
-            <div className="op-panel-head">
-              <h4>Críticos del plan julio</h4>
-              <span className="muted">{planningCritical.length} · ligados a RCA/IP GTE</span>
-            </div>
-            <div className="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Urgencia</th>
-                    <th>Repuesto</th>
-                    <th>P/N</th>
-                    <th>Exist. / Mín.</th>
-                    <th>Equipo</th>
-                    <th>Evento</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {planningCritical.map((s) => (
-                    <tr key={s.id}>
-                      <td>
-                        <ToneBadge
-                          label={s.urgency}
-                          color={
-                            s.urgency === "Crítica"
-                              ? "#dc2626"
-                              : s.urgency === "Alta"
-                                ? "#ea580c"
-                                : "#ca8a04"
-                          }
-                        />
-                      </td>
-                      <td>
-                        <strong>{s.description}</strong>
-                        <div className="muted" style={{ fontSize: "0.75rem" }}>
-                          {s.family}
-                        </div>
-                      </td>
-                      <td>
-                        <code style={{ fontSize: "0.78rem" }}>{s.partNumber}</code>
-                      </td>
-                      <td>
-                        <strong style={{ color: s.onHand < s.stockMin ? "#dc2626" : undefined }}>
-                          {s.onHand}/{s.stockMin}
-                        </strong>
-                      </td>
-                      <td>{s.asset}</td>
-                      <td>
-                        <small className="muted">{s.linkedEvent}</small>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        ) : null}
-
-        <div className="exec-kpi-row" style={{ marginTop: "0.65rem" }}>
-          <div className="exec-kpi">
-            <Package size={16} />
-            <span>Ítems catalogados</span>
-            <strong>{kpis.total}</strong>
-            <small>{kpis.families} tipos de máquina</small>
-          </div>
-          <div className="exec-kpi">
-            <AlertTriangle size={16} />
-            <span>Sin existencia</span>
-            <strong style={{ color: COVERAGE_META.sin_existencia.color }}>{kpis.sin}</strong>
-          </div>
-          <div className="exec-kpi">
-            <PackageMinus size={16} />
-            <span>Bajo mínimo</span>
-            <strong style={{ color: COVERAGE_META.bajo.color }}>{kpis.bajo}</strong>
-          </div>
-          <div className="exec-kpi">
-            <PackageSearch size={16} />
-            <span>En mínimo</span>
-            <strong style={{ color: COVERAGE_META.en_minimo.color }}>{kpis.enMin}</strong>
-          </div>
-          <div className="exec-kpi">
-            <CheckCircle2 size={16} />
-            <span>Sobre mínimo</span>
-            <strong style={{ color: COVERAGE_META.ok.color }}>{kpis.ok}</strong>
-          </div>
-        </div>
+        {criticalTable}
+        {kpiRow}
 
         <section style={{ marginTop: "0.85rem" }}>
           <h4 style={{ margin: "0 0 0.55rem" }}>Indicadores por tipo de máquina</h4>

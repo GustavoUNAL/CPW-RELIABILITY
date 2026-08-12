@@ -118,9 +118,9 @@ export function DisponibilidadHorasBoard({ month, monthLabel }: Props) {
 
   return (
     <section className="panel">
-      <article className="card disp-analisis hours-viz">
-        <header className="disp-analisis-head">
-          <div>
+      <details className="card disp-analisis hours-viz inf-conf-collapse" open>
+        <summary className="inf-conf-collapse-sum">
+          <div className="inf-conf-collapse-sum-main">
             <p className="eyebrow">4 · Desglose de horas{monthLabel ? ` · ${monthLabel}` : ""}</p>
             <h3>De las unidades al resultado concertado</h3>
           </div>
@@ -135,8 +135,8 @@ export function DisponibilidadHorasBoard({ month, monthLabel }: Props) {
             <em>=</em>
             <strong>{fmtPct(a.dispCpw)}</strong>
           </div>
-        </header>
-
+        </summary>
+        <div className="inf-conf-collapse-body">
         <div className="hours-viz-kpis">
           <article>
             <span>Energía entregada</span>
@@ -301,7 +301,8 @@ export function DisponibilidadHorasBoard({ month, monthLabel }: Props) {
             </div>
           </div>
         </div>
-      </article>
+        </div>
+      </details>
     </section>
   );
 }

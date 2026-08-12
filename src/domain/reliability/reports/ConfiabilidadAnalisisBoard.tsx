@@ -180,9 +180,9 @@ export function ConfiabilidadAnalisisBoard({ month, monthLabel }: Props) {
 
   return (
     <section className="panel">
-      <article className="card disp-analisis conf-analisis">
-        <header className="disp-analisis-head">
-          <div>
+      <details className="card disp-analisis conf-analisis inf-conf-collapse" open>
+        <summary className="inf-conf-collapse-sum">
+          <div className="inf-conf-collapse-sum-main">
             <p className="eyebrow">5 · Análisis de confiabilidad{period ? ` · ${period}` : ""}</p>
             <h3>Justificación de confiabilidad 100 %</h3>
           </div>
@@ -196,8 +196,8 @@ export function ConfiabilidadAnalisisBoard({ month, monthLabel }: Props) {
             <span className="disp-formula-op">→</span>
             <span className="disp-formula-100">100 %</span>
           </div>
-        </header>
-
+        </summary>
+        <div className="inf-conf-collapse-body">
         <div className="disp-kpi-row">
           <article className="disp-kpi disp-kpi-gte">
             <span>Gran Tierra · informe</span>
@@ -296,7 +296,8 @@ export function ConfiabilidadAnalisisBoard({ month, monthLabel }: Props) {
             </table>
           </div>
         </div>
-      </article>
+        </div>
+      </details>
     </section>
   );
 }

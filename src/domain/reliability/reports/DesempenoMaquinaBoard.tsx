@@ -300,9 +300,9 @@ export function DesempenoMaquinaBoard({ month, monthLabel }: Props) {
 
   return (
     <section className="panel">
-      <article className="card disp-analisis maq-board maq-board-slide">
-        <header className="disp-analisis-head maq-head-slide">
-          <div>
+      <details className="card disp-analisis maq-board maq-board-slide inf-conf-collapse" open>
+        <summary className="inf-conf-collapse-sum">
+          <div className="inf-conf-collapse-sum-main">
             <p className="eyebrow">6 · Indicadores de desempeño por máquina{period ? ` · ${period}` : ""}</p>
             <h3>Disponibilidad GTE y COPOWER por unidad y campo</h3>
           </div>
@@ -311,8 +311,8 @@ export function DesempenoMaquinaBoard({ month, monthLabel }: Props) {
             <strong>Costayaco ≥ {META_COSTAYACO.toFixed(0)} %</strong>
             <em>Vonú ≥ {META_VONU} %</em>
           </div>
-        </header>
-
+        </summary>
+        <div className="inf-conf-collapse-body">
         <div className="maq-stack">
           <SourceTable
             title="Disponibilidad GTE"
@@ -331,7 +331,8 @@ export function DesempenoMaquinaBoard({ month, monthLabel }: Props) {
             tone="cpw"
           />
         </div>
-      </article>
+        </div>
+      </details>
     </section>
   );
 }

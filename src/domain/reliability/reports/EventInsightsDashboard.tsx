@@ -37,6 +37,10 @@ type Props = {
   month: string;
   monthLabel: string;
   mode: Mode;
+  /** Solo KPIs + tabla top (slide de informe). */
+  compact?: boolean;
+  /** Sin hero propio cuando va dentro del encabezado §N. */
+  embedded?: boolean;
 };
 
 type CategoryMeta = {
@@ -70,7 +74,14 @@ function iioBandLabel(iio: number) {
   return "Impacto crítico (RCA inmediato)";
 }
 
-export function EventInsightsDashboard({ report, month, monthLabel, mode }: Props) {
+export function EventInsightsDashboard({
+  report,
+  month,
+  monthLabel,
+  mode,
+  compact = false,
+  embedded = false,
+}: Props) {
   const snap = getSnap(report, month);
   if (!snap) return <p className="empty-state">Sin datos para {monthLabel} en esta fuente.</p>;
 
@@ -255,6 +266,89 @@ export function EventInsightsDashboard({ report, month, monthLabel, mode }: Prop
   const gteJuneFailures =
     report === "gran_tierra" && month === "Jun" ? JUNE_2026_IMPUTABLE_EVENTS : [];
   if (mode === "repetitivos") {
+    const kpiRow = (
+      <div className="exec-kpi-row">
+        <div className="exec-kpi">
+          <Repeat size={16} />
+          <span>Eventos totales</span>
+          <strong>{totalEvents}</strong>
+          <small>{`Recurrencia en ${repeatedByEquipment.length} equipos`}</small>
+        </div>
+        <div className="exec-kpi">
+          <AlertTriangle size={16} />
+          <span>Equipos con repetición (≥2)</span>
+          <strong>{repeatedByEquipment.length}</strong>
+          <small>
+            {topRepeatedEquip
+              ? `Más recurrentes: ${topRepeatedEquip}`
+              : "Sin equipos con recurrencia"}
+          </small>
+        </div>
+        <div className="exec-kpi">
+          <ShieldAlert size={16} />
+          <span>Categorías repetitivas</span>
+          <strong>{repeatedByCategory.length}</strong>
+          <small>
+            {topRepeatedCategories
+              ? `Causas: ${topRepeatedCategories}`
+              : "Sin categoría repetitiva"}
+          </small>
+        </div>
+      </div>
+    );
+
+    if (compact) {
+      return (
+        <div className={embedded ? "inf-conf-embed" : "panel"}>
+          <div className={embedded ? undefined : "card"}>
+            {embedded ? null : (
+              <>
+                <p className="eyebrow">Eventos repetitivos</p>
+                <div className="screen-shell-head">
+                  <h3>{monthLabel}</h3>
+                  <span className={`source-badge ${badgeClass}`}>{badgeLabel}</span>
+                </div>
+              </>
+            )}
+            {kpiRow}
+            <div className="table-wrap" style={{ marginTop: "0.55rem" }}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Equipo</th>
+                    <th>Eventos</th>
+                    <th>Categoría top</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {repeatedByEquipment.slice(0, 6).map(([equipment, count], idx) => {
+                    const topCat =
+                      repeatedEqCat.find((r) => r.equipment === equipment)?.category ?? "";
+                    return (
+                      <tr key={equipment}>
+                        <td>{idx + 1}</td>
+                        <td>
+                          <strong>{equipment}</strong>
+                        </td>
+                        <td>{count}</td>
+                        <td>{(CATEGORY_META[topCat]?.label ?? topCat) || "—"}</td>
+                      </tr>
+                    );
+                  })}
+                  {repeatedByEquipment.length === 0 ? (
+                    <tr>
+                      <td colSpan={4}>Sin equipos con repetición ≥2 en el periodo.</td>
+                    </tr>
+                  ) : null}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="panel">
         <article className="card">
@@ -264,34 +358,7 @@ export function EventInsightsDashboard({ report, month, monthLabel, mode }: Prop
             <span className={`source-badge ${badgeClass}`}>{badgeLabel}</span>
           </div>
 
-          <div className="exec-kpi-row">
-            <div className="exec-kpi">
-              <Repeat size={16} />
-              <span>Eventos totales</span>
-              <strong>{totalEvents}</strong>
-              <small>{`Se detecta recurrencia en ${repeatedByEquipment.length} equipos del periodo`}</small>
-            </div>
-            <div className="exec-kpi">
-              <AlertTriangle size={16} />
-              <span>Equipos con repetición (&gt;=2)</span>
-              <strong>{repeatedByEquipment.length}</strong>
-              <small>
-                {topRepeatedEquip
-                  ? `Más recurrentes: ${topRepeatedEquip}`
-                  : "Sin equipos con recurrencia en este mes"}
-              </small>
-            </div>
-            <div className="exec-kpi">
-              <ShieldAlert size={16} />
-              <span>Categorías repetitivas</span>
-              <strong>{repeatedByCategory.length}</strong>
-              <small>
-                {topRepeatedCategories
-                  ? `Causas dominantes: ${topRepeatedCategories}`
-                  : "Sin categoría repetitiva en este mes"}
-              </small>
-            </div>
-          </div>
+          {kpiRow}
 
           <div className="dash-chart-grid" style={{ marginTop: "0.7rem" }}>
             <article className="dash-chart-panel">
@@ -488,6 +555,99 @@ export function EventInsightsDashboard({ report, month, monthLabel, mode }: Prop
     );
   }
 
+  const badActorKpis = (
+    <div className="exec-kpi-row">
+      <div className="exec-kpi">
+        <ShieldAlert size={16} />
+        <span>Unidades con fallas</span>
+        <strong>{badActors.length}</strong>
+        <small>
+          {topBadActorUnits
+            ? `Más impactadas: ${topBadActorUnits}`
+            : "Sin unidades con fallas registradas"}
+        </small>
+      </div>
+      <div className="exec-kpi">
+        <AlertTriangle size={16} />
+        <span>IIO máximo</span>
+        <strong>{maxIioRow ? maxIioRow.iio.toFixed(3) : "0.000"}</strong>
+        <small>
+          {maxIioRow
+            ? `${maxIioRow.unidad} · ${iioBandLabel(maxIioRow.iio)}`
+            : "Sin registros para priorizar"}
+        </small>
+      </div>
+      <div className="exec-kpi">
+        <Repeat size={16} />
+        <span>Fallas COPOWER</span>
+        <strong>{totalFallasPeriodo}</strong>
+        <small>
+          {report === "gran_tierra" && month === "Jun"
+            ? `PF_contr ${EXEC_JUN.hoursPfContr.toLocaleString("es-CO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} h · MTTR ${EXEC_JUN.mttrHours.toFixed(2)} h`
+            : maxFailuresRow
+              ? `Máx. ${maxFailuresRow.unidad} (${maxFailuresRow.fallas}) · PF ${totalPfContrPeriodo.toFixed(2)} h`
+              : "0 imputables en el KPI de Conf."}
+        </small>
+      </div>
+    </div>
+  );
+
+  if (compact) {
+    return (
+      <div className={embedded ? "inf-conf-embed" : "panel"}>
+        <div className={embedded ? undefined : "card"}>
+          {embedded ? null : (
+            <>
+              <p className="eyebrow">Malos actores</p>
+              <div className="screen-shell-head">
+                <h3>{monthLabel}</h3>
+                <span className={`source-badge ${badgeClass}`}>{badgeLabel}</span>
+              </div>
+            </>
+          )}
+          {badActorKpis}
+          <div className="table-wrap" style={{ marginTop: "0.55rem" }}>
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Unidad</th>
+                  <th>Fallas</th>
+                  <th>Disp. %</th>
+                  <th>IIO</th>
+                  <th>Riesgo</th>
+                </tr>
+              </thead>
+              <tbody>
+                {badActors.slice(0, 6).map((row, idx) => (
+                  <tr key={row.unidad}>
+                    <td>{idx + 1}</td>
+                    <td>
+                      <strong>{row.unidad}</strong>
+                    </td>
+                    <td>{row.fallas}</td>
+                    <td>
+                      {row.disponibilidadPct == null ? "N/D" : `${row.disponibilidadPct.toFixed(1)}%`}
+                    </td>
+                    <td>{row.iio.toFixed(3)}</td>
+                    <td>{row.riesgoTecnico}</td>
+                  </tr>
+                ))}
+                {badActors.length === 0 ? (
+                  <tr>
+                    <td colSpan={6}>
+                      Sin malos actores por fallas tipificadas · Conf. 100 % (0 FO imputables).
+                    </td>
+                  </tr>
+                ) : null}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="panel">
       <article className="card">
@@ -496,40 +656,7 @@ export function EventInsightsDashboard({ report, month, monthLabel, mode }: Prop
           <h3>{monthLabel}</h3>
           <span className={`source-badge ${badgeClass}`}>{badgeLabel}</span>
         </div>
-        <div className="exec-kpi-row">
-          <div className="exec-kpi">
-            <ShieldAlert size={16} />
-            <span>Unidades con fallas</span>
-            <strong>{badActors.length}</strong>
-            <small>
-              {topBadActorUnits
-                ? `Más impactadas: ${topBadActorUnits}`
-                : "Sin unidades con fallas registradas"}
-            </small>
-          </div>
-          <div className="exec-kpi">
-            <AlertTriangle size={16} />
-            <span>Índice de Impacto Operacional (máx.)</span>
-            <strong>{maxIioRow ? maxIioRow.iio.toFixed(3) : "0.000"}</strong>
-            <small>
-              {maxIioRow
-                ? `Unidad: ${maxIioRow.unidad} · ${iioBandLabel(maxIioRow.iio)}`
-                : "Sin registros para calcular prioridad"}
-            </small>
-          </div>
-          <div className="exec-kpi">
-            <Repeat size={16} />
-            <span>Fallas COPOWER del periodo</span>
-            <strong>{totalFallasPeriodo}</strong>
-            <small>
-              {report === "gran_tierra" && month === "Jun"
-                ? `PF_contr ${EXEC_JUN.hoursPfContr.toLocaleString("es-CO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} h · MTTR ${EXEC_JUN.mttrHours.toFixed(2)} h`
-                : maxFailuresRow
-                  ? `Máxima frecuencia: ${maxFailuresRow.unidad} (${maxFailuresRow.fallas}) · PF ${totalPfContrPeriodo.toFixed(2)} h`
-                  : "Sin fallas acumuladas"}
-            </small>
-          </div>
-        </div>
+        {badActorKpis}
 
         <article className="dash-chart-panel" style={{ marginTop: "0.7rem" }}>
           <h4>Top malos actores por impacto</h4>

@@ -406,9 +406,14 @@ export function GteResumen({ month, only }: Props) {
 
       {showSistemicos ? (
       <section className="panel">
-        <article className="card">
-          <p className="eyebrow">1 · Indicadores sistémicos</p>
-          <h3>Cumplimiento contractual</h3>
+        <details className="card inf-conf-collapse" open>
+          <summary className="inf-conf-collapse-sum">
+            <div className="inf-conf-collapse-sum-main">
+              <p className="eyebrow">1 · Indicadores sistémicos</p>
+              <h3>Cumplimiento contractual</h3>
+            </div>
+          </summary>
+          <div className="inf-conf-collapse-body">
           <div className="exec-core-grid exec-core-grid--5">
             <div className="exec-core">
               <span>Generación total</span>
@@ -521,15 +526,21 @@ export function GteResumen({ month, only }: Props) {
               <small>Eficiencia estimada en todo el parque de generación</small>
             </div>
           </div>
-        </article>
+          </div>
+        </details>
       </section>
       ) : null}
 
       {showHoras ? (
       <section className="panel">
-        <article className="card">
-          <p className="eyebrow">2 · Horas y eventos</p>
-          <h3>Resumen operativo del informe</h3>
+        <details className="card inf-conf-collapse" open>
+          <summary className="inf-conf-collapse-sum">
+            <div className="inf-conf-collapse-sum-main">
+              <p className="eyebrow">2 · Horas y eventos</p>
+              <h3>Resumen operativo del informe</h3>
+            </div>
+          </summary>
+          <div className="inf-conf-collapse-body">
           <MetricGlossary />
           <div className="exec-kpi-row">
             <div className="exec-kpi">
@@ -579,7 +590,8 @@ export function GteResumen({ month, only }: Props) {
               <strong>{hours(data.summary.hoursFailureClient)}</strong>
             </div>
           </div>
-        </article>
+          </div>
+        </details>
       </section>
       ) : null}
 

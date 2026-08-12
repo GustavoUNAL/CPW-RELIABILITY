@@ -30,6 +30,7 @@ import {
   InformeConfDegradacionSection,
   InformeConfFallasSection,
   InformeConfInventarioSection,
+  InformeConfMalosActoresSection,
   InformeConfRepetitivosSection,
 } from "./InformeConfContinuacion";
 import { GRAN_TIERRA_MONTHLY_DATA, type GranTierraMonthKey } from "./granTierraMonthly";
@@ -252,6 +253,13 @@ export function InformesResultadosDashboard({ leafId, month, monthLabel }: Props
       return (
         <div className="dash-module exec-dashboard inf-resultados">
           <InformeConfRepetitivosSection month={gteMonth} monthLabel={monthLabel} />
+        </div>
+      );
+    }
+    if (leafId === "inf-conf-malos") {
+      return (
+        <div className="dash-module exec-dashboard inf-resultados">
+          <InformeConfMalosActoresSection month={gteMonth} monthLabel={monthLabel} />
         </div>
       );
     }

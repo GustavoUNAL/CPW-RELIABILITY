@@ -119,9 +119,9 @@ export function DisponibilidadAnalisisBoard({ month, monthLabel }: Props) {
 
   return (
     <section className="panel">
-      <article className="card disp-analisis">
-        <header className="disp-analisis-head">
-          <div>
+      <details className="card disp-analisis inf-conf-collapse" open>
+        <summary className="inf-conf-collapse-sum">
+          <div className="inf-conf-collapse-sum-main">
             <p className="eyebrow">3 · Análisis de disponibilidad{monthLabel ? ` · ${monthLabel}` : ""}</p>
             <h3>Conciliación COPOWER vs Gran Tierra</h3>
           </div>
@@ -135,8 +135,8 @@ export function DisponibilidadAnalisisBoard({ month, monthLabel }: Props) {
             <span className="disp-formula-op">×</span>
             <span className="disp-formula-100">100</span>
           </div>
-        </header>
-
+        </summary>
+        <div className="inf-conf-collapse-body">
         <div className="disp-kpi-row disp-kpi-row-3">
           <article className="disp-kpi disp-kpi-cpw">
             <span>COPOWER · Horas concertadas</span>
@@ -261,7 +261,8 @@ export function DisponibilidadAnalisisBoard({ month, monthLabel }: Props) {
             </div>
           </div>
         </div>
-      </article>
+        </div>
+      </details>
     </section>
   );
 }

@@ -44,6 +44,10 @@ import {
 
 type Props = {
   monthLabel: string;
+  /** Vista compacta de un slide (informe). */
+  slide?: boolean;
+  /** Sin hero propio. */
+  embedded?: boolean;
 };
 
 const TIMELINE = [
@@ -189,64 +193,113 @@ function TrendText({
   );
 }
 
-export function DegradationRiskDashboard({ monthLabel }: Props) {
+export function DegradationRiskDashboard({
+  monthLabel,
+  slide = false,
+  embedded = false,
+}: Props) {
   const [assets] = useState<AssetHealth[]>(() => buildGteDegradationRiskPortfolio());
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const selected = assets.find((a) => a.id === selectedId) ?? null;
   const summary = useMemo(() => portfolioSummary(assets), [assets]);
   const dist = useMemo(() => riskDistribution(assets), [assets]);
-  const topDeg = useMemo(() => topDegrading(assets, 5), [assets]);
+  const topDeg = useMemo(() => topDegrading(assets, slide ? 5 : 5), [assets, slide]);
   const riskRows = useMemo(() => allRiskRows(assets).slice(0, 12), [assets]);
   const gteCtx = useMemo(() => gteJuneDegradationContext(assets), [assets]);
+
+  const kpiRow = (
+    <div className="exec-kpi-row" style={{ marginTop: embedded || slide ? "0" : "0.6rem" }}>
+      <div className="exec-kpi">
+        <Activity size={16} />
+        <span>Activos monitoreados</span>
+        <strong>{summary.monitored}</strong>
+      </div>
+      <div className="exec-kpi">
+        <TrendingDown size={16} />
+        <span>En degradación</span>
+        <strong>{summary.degrading}</strong>
+      </div>
+      <div className="exec-kpi">
+        <ShieldAlert size={16} />
+        <span>Riesgo crítico</span>
+        <strong>{summary.criticalRisk}</strong>
+      </div>
+      <div className="exec-kpi">
+        <AlertTriangle size={16} />
+        <span>Riesgo alto</span>
+        <strong>{summary.highRisk}</strong>
+      </div>
+      <div className="exec-kpi">
+        <HeartPulse size={16} />
+        <span>Salud promedio</span>
+        <strong>{summary.avgHealth}</strong>
+      </div>
+      <div className="exec-kpi">
+        <Gauge size={16} />
+        <span>Baseline jun. fallas</span>
+        <strong>{gteCtx.failures}</strong>
+        <small>PF_contr {gteCtx.pfContrHours} h</small>
+      </div>
+    </div>
+  );
+
+  if (slide) {
+    return (
+      <div className="inf-conf-embed deg-dashboard--slide">
+        {kpiRow}
+        <div className="table-wrap" style={{ marginTop: "0.55rem" }}>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Activo</th>
+                <th>Salud</th>
+                <th>Degradación</th>
+                <th>Riesgo</th>
+              </tr>
+            </thead>
+            <tbody>
+              {topDeg.map((a, idx) => (
+                <tr key={a.id}>
+                  <td>{idx + 1}</td>
+                  <td>
+                    <strong>{a.assetId}</strong>
+                  </td>
+                  <td>{a.healthIndex}</td>
+                  <td>{a.degradationLevel}</td>
+                  <td style={{ color: RISK_LEVEL_COLOR[a.riskLevel] }}>{a.riskLevel}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="muted" style={{ marginTop: "0.45rem", fontSize: "0.75rem" }}>
+          Baseline APM junio (seed {GTE_JUNE_DEG_SEED}) · MTBF 986,71 h · MTTR 2,60 h
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="panel">
       <article className="card">
-        <p className="eyebrow">Tendencias de Degradación y Riesgos · APM</p>
-        <div className="screen-shell-head">
-          <h3>{monthLabel}</h3>
-          <span className="source-badge gte">GTE</span>
-        </div>
-        <p className="muted" style={{ marginTop: "0.35rem" }}>
-          Portafolio Costayaco alineado a Gran Tierra: {gteCtx.failures} fallas COPOWER ·{" "}
-          {gteCtx.pfContrHours.toLocaleString("es-CO", { minimumFractionDigits: 2 })} h PF_contr · MTTR
-          2,60 h · MTBF 986,71 h. Enlazado a RCA / IP / MSO. Seed {GTE_JUNE_DEG_SEED}.
-        </p>
+        {embedded ? null : (
+          <>
+            <p className="eyebrow">Tendencias de Degradación y Riesgos · APM</p>
+            <div className="screen-shell-head">
+              <h3>{monthLabel}</h3>
+              <span className="source-badge gte">GTE</span>
+            </div>
+            <p className="muted" style={{ marginTop: "0.35rem" }}>
+              Portafolio Costayaco alineado a Gran Tierra: {gteCtx.failures} fallas COPOWER ·{" "}
+              {gteCtx.pfContrHours.toLocaleString("es-CO", { minimumFractionDigits: 2 })} h PF_contr · MTTR
+              2,60 h · MTBF 986,71 h. Enlazado a RCA / IP / MSO. Seed {GTE_JUNE_DEG_SEED}.
+            </p>
+          </>
+        )}
 
-        <div className="exec-kpi-row" style={{ marginTop: "0.6rem" }}>
-          <div className="exec-kpi">
-            <Activity size={16} />
-            <span>Activos monitoreados</span>
-            <strong>{summary.monitored}</strong>
-          </div>
-          <div className="exec-kpi">
-            <TrendingDown size={16} />
-            <span>Activos en degradación</span>
-            <strong>{summary.degrading}</strong>
-          </div>
-          <div className="exec-kpi">
-            <ShieldAlert size={16} />
-            <span>Riesgo crítico</span>
-            <strong>{summary.criticalRisk}</strong>
-          </div>
-          <div className="exec-kpi">
-            <AlertTriangle size={16} />
-            <span>Riesgo alto</span>
-            <strong>{summary.highRisk}</strong>
-          </div>
-          <div className="exec-kpi">
-            <HeartPulse size={16} />
-            <span>Salud promedio del parque</span>
-            <strong>{summary.avgHealth}</strong>
-          </div>
-          <div className="exec-kpi">
-            <Gauge size={16} />
-            <span>Fallas COPOWER</span>
-            <strong>{gteCtx.failures}</strong>
-            <small>PF_contr {gteCtx.pfContrHours} h</small>
-          </div>
-        </div>
+        {kpiRow}
 
         <div className="dash-chart-grid mso-chart-grid" style={{ marginTop: "0.75rem" }}>
           <article className="dash-chart-panel">

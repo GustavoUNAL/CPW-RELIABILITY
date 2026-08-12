@@ -14206,3 +14206,113 @@ tr.row-focal td {
 .inf-conf-fallas-unified .rca-report--compact .rca-slide-body {
   min-height: 0;
 }
+
+/* Informes · slides contraíbles */
+.inf-conf-collapse {
+  gap: 0;
+}
+
+.inf-conf-collapse > .inf-conf-collapse-sum {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  list-style: none;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+}
+
+.inf-conf-collapse > .inf-conf-collapse-sum::-webkit-details-marker {
+  display: none;
+}
+
+.inf-conf-collapse-sum-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.inf-conf-collapse-sum-main h3 {
+  margin: 0.1rem 0 0;
+}
+
+.inf-conf-collapse-sum-side {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
+}
+
+.inf-conf-collapse-chevron {
+  color: var(--text-muted);
+  transition: transform 0.18s ease;
+}
+
+.inf-conf-collapse:not([open]) > .inf-conf-collapse-sum .inf-conf-collapse-chevron {
+  transform: rotate(-90deg);
+}
+
+.inf-conf-collapse-body {
+  margin-top: 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.inf-conf-collapse:not([open]) > .inf-conf-collapse-sum {
+  margin-bottom: 0;
+}
+
+.inf-conf-vs-box--compact {
+  padding: 0.55rem 0.75rem;
+}
+
+.inf-conf-vs-box--compact p,
+.inf-conf-vs-box--compact ul {
+  margin: 0.2rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.inf-conf-vs-box--compact ul {
+  padding-left: 1rem;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.inf-conf-embed {
+  min-width: 0;
+}
+
+.inf-conf-slide-one .exec-kpi-row {
+  gap: 0.45rem;
+}
+
+.inf-conf-slide-one .exec-kpi {
+  padding: 0.55rem 0.65rem;
+}
+
+.inf-conf-slide-one .table-wrap table {
+  font-size: 0.8rem;
+}
+
+.inf-conf-collapse > .inf-conf-collapse-sum::after {
+  content: "";
+  width: 0.55rem;
+  height: 0.55rem;
+  margin-top: 0.45rem;
+  border-right: 2px solid var(--text-muted);
+  border-bottom: 2px solid var(--text-muted);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+  transition: transform 0.18s ease;
+}
+
+.inf-conf-collapse:not([open]) > .inf-conf-collapse-sum::after {
+  transform: rotate(-135deg);
+  margin-top: 0.65rem;
+}
+
+.inf-conf-collapse > .inf-conf-collapse-sum:has(.inf-conf-collapse-chevron)::after {
+  display: none;
+}

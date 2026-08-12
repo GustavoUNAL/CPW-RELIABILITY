@@ -153,6 +153,7 @@ export const INTEGRATED_DUAL_LEAVES = new Set([
   "inf-conf-maquinas",
   "inf-conf-fallas",
   "inf-conf-repetitivos",
+  "inf-conf-malos",
   "inf-conf-inventario",
   "inf-conf-degradacion",
   "inf-conf-conclusiones",
