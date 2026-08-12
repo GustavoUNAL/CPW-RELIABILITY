@@ -6,6 +6,7 @@ import {
   GRAN_TIERRA_MONTHLY_DATA,
   type GranTierraMonthKey,
 } from "./granTierraMonthly";
+import { ExecInsight, INFORME_EXEC_INSIGHTS } from "./informeExecInsights";
 
 type Props = {
   month: string;
@@ -235,6 +236,7 @@ function SourceTable({
   machines,
   sistemas,
   tone,
+  insight,
 }: {
   title: string;
   badge: string;
@@ -243,9 +245,11 @@ function SourceTable({
   machines: EnrichedRow[];
   sistemas: EnrichedRow[];
   tone: "gte" | "cpw";
+  insight?: string;
 }) {
   return (
     <div className={`maq-source-table maq-source-${tone}`}>
+      {insight ? <ExecInsight text={insight} className="inf-exec-insight--nested" /> : null}
       <header>
         <div>
           <p className="eyebrow">{title}</p>
@@ -325,6 +329,7 @@ export function DesempenoMaquinaBoard({ month, monthLabel }: Props) {
             machines={a.gte.machines}
             sistemas={a.gte.sistemas}
             tone="gte"
+            insight={INFORME_EXEC_INSIGHTS.maquinasGte}
           />
           <SourceTable
             title="Disponibilidad COPOWER"
@@ -334,6 +339,7 @@ export function DesempenoMaquinaBoard({ month, monthLabel }: Props) {
             machines={a.cpw.machines}
             sistemas={a.cpw.sistemas}
             tone="cpw"
+            insight={INFORME_EXEC_INSIGHTS.maquinasCopower}
           />
         </div>
         </div>

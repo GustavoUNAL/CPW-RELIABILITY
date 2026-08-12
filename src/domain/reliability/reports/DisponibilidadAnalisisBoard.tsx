@@ -3,6 +3,7 @@ import {
   GRAN_TIERRA_MONTHLY_DATA,
   type GranTierraMonthKey,
 } from "./granTierraMonthly";
+import { ExecInsight, INFORME_EXEC_INSIGHTS } from "./informeExecInsights";
 import { MAINTENANCE_PLANS } from "./maintenancePlansData";
 
 type Props = {
@@ -137,6 +138,7 @@ export function DisponibilidadAnalisisBoard({ month, monthLabel }: Props) {
           </div>
         </summary>
         <div className="inf-conf-collapse-body">
+        <ExecInsight text={INFORME_EXEC_INSIGHTS.disponibilidad} />
         <div className="disp-kpi-row disp-kpi-row-3">
           <article className="disp-kpi disp-kpi-cpw">
             <span>COPOWER · Horas concertadas</span>

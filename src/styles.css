@@ -14394,6 +14394,86 @@ tr.row-focal td {
   gap: 0.55rem;
 }
 
+/* Lectura ejecutiva al inicio de cada sección del informe */
+.inf-exec-insight {
+  position: relative;
+  margin: 0 0 0.35rem;
+  padding: 1rem 1.15rem 1.05rem 1.2rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--accent, #1f6feb) 8%, transparent) 0%,
+      color-mix(in srgb, var(--surface, #fff) 92%, #f4f7fb) 48%,
+      color-mix(in srgb, var(--surface, #fff) 100%, transparent) 100%
+    );
+  box-shadow: 0 1px 0 color-mix(in srgb, #fff 55%, transparent) inset;
+}
+
+.inf-exec-insight::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.85rem;
+  bottom: 0.85rem;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: color-mix(in srgb, var(--accent, #1f6feb) 75%, #0b3d91);
+}
+
+.inf-exec-insight-label {
+  margin: 0 0 0.35rem;
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--accent, #1f6feb) 85%, var(--text-muted));
+}
+
+.inf-exec-insight-copy {
+  margin: 0;
+  max-width: 72ch;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--text);
+  text-wrap: pretty;
+}
+
+.inf-exec-insight-copy strong {
+  font-weight: 700;
+  color: color-mix(in srgb, var(--text) 92%, var(--accent, #1f6feb));
+}
+
+.inf-exec-insight--nested {
+  margin-bottom: 0.75rem;
+  padding: 0.85rem 1rem 0.9rem 1.05rem;
+  border-radius: 10px;
+}
+
+.inf-exec-insight--nested .inf-exec-insight-copy {
+  font-size: 0.9rem;
+  max-width: none;
+}
+
+.inf-conf-rca-item > .inf-exec-insight {
+  margin-bottom: 0.65rem;
+}
+
+.inf-conf-concl-col > .inf-exec-insight {
+  margin: 0.35rem 0 0.75rem;
+}
+
+@media (max-width: 720px) {
+  .inf-exec-insight {
+    padding: 0.85rem 0.9rem 0.9rem 1rem;
+  }
+
+  .inf-exec-insight-copy {
+    font-size: 0.9rem;
+  }
+}
+
 .inf-conf-collapse:not([open]) > .inf-conf-collapse-sum {
   margin-bottom: 0;
 }
@@ -14528,8 +14608,89 @@ tr.row-focal td {
 .rep-slide-kpis {
   grid-row: 1;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(11.5rem, 1fr));
   gap: 0.38rem;
+}
+
+.rep-slide-kpis article:nth-child(6) { border-left-color: #b45309; }
+.rep-slide-kpis article:nth-child(7) { border-left-color: #15803d; }
+
+.eff-kpi-formula-eq {
+  font-size: 0.78rem !important;
+  letter-spacing: -0.01em;
+  line-height: 1.25 !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.eff-kpi-formula .eff-formula-block {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.28rem 0.35rem;
+  margin: 0.12rem 0 0.08rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.eff-kpi-formula .eff-formula-block > em {
+  font-style: italic;
+  font-weight: 750;
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+}
+
+.eff-kpi-formula .eff-formula-block > em > span {
+  font-style: normal;
+  font-size: 0.72rem;
+  font-weight: 650;
+  margin-left: 0.05rem;
+}
+
+.eff-kpi-formula .eff-formula-op {
+  color: var(--text-muted);
+  font-weight: 650;
+  font-size: 0.85rem;
+}
+
+.eff-kpi-formula .eff-formula-frac {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 7.2rem;
+  font-weight: 750;
+  font-size: 0.72rem;
+  line-height: 1.2;
+}
+
+.eff-kpi-formula .eff-formula-frac > span:first-child {
+  padding: 0 0.25rem 0.1rem;
+  white-space: nowrap;
+}
+
+.eff-kpi-formula .eff-formula-frac > span:last-child {
+  padding: 0.1rem 0.25rem 0;
+  border-top: 1.5px solid currentColor;
+  font-size: 0.62rem;
+  font-weight: 650;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.eff-kpi-formula .eff-formula-block > strong {
+  font-size: 0.95rem !important;
+  margin: 0 !important;
+  line-height: 1 !important;
+}
+
+.eff-kpi-formula .eff-formula-meta {
+  margin-left: 0.15rem;
+  padding: 0.12rem 0.35rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, #15803d 14%, transparent);
+  color: #15803d;
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.01em;
 }
 
 .informes-standalone:has(.inf-viewport-page) .rep-slide {
@@ -14880,4 +15041,12 @@ tr.row-focal td {
   flex-direction: column;
   gap: 0.4rem;
   overflow: hidden;
+}
+
+.deg-slide-charts .dash-chart-panel {
+  min-height: 17rem;
+}
+
+.deg-dashboard--slide .exec-kpi-row {
+  margin-bottom: 0.15rem;
 }

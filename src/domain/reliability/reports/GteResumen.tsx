@@ -35,6 +35,7 @@ import {
   type GranTierraMonthKey,
 } from "./granTierraMonthly";
 import { buildDisponibilidadAnalisis } from "./DisponibilidadAnalisisBoard";
+import { ExecInsight, INFORME_EXEC_INSIGHTS } from "./informeExecInsights";
 
 const META = CONTRACTUAL_KPI_TARGETS.reliability;
 const META_EFF = CONTRACTUAL_KPI_TARGETS.efficiencyPct;
@@ -477,6 +478,7 @@ export function GteResumen({ month, only }: Props) {
             </div>
           </summary>
           <div className="inf-conf-collapse-body">
+          <ExecInsight text={INFORME_EXEC_INSIGHTS.resumen} />
           <div className="exec-core-grid exec-core-grid--5">
             <div className="exec-core">
               <span>Generación total</span>

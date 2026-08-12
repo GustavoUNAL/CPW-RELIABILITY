@@ -7,6 +7,7 @@ import {
   type GranTierraMonthKey,
 } from "./granTierraMonthly";
 import { RCA_DELIVERED_DOCUMENTS } from "./rcaDocuments";
+import { ExecInsight, INFORME_EXEC_INSIGHTS } from "./informeExecInsights";
 
 type Props = {
   month: string;
@@ -198,6 +199,7 @@ export function ConfiabilidadAnalisisBoard({ month, monthLabel }: Props) {
           </div>
         </summary>
         <div className="inf-conf-collapse-body">
+        <ExecInsight text={INFORME_EXEC_INSIGHTS.confiabilidad} />
         <div className="disp-kpi-row">
           <article className="disp-kpi disp-kpi-gte">
             <span>Gran Tierra · informe</span>

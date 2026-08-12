@@ -103,6 +103,30 @@ function formatLongDate(iso: string | null): string {
   return d.toLocaleDateString("es-CO", { day: "numeric", month: "long", year: "numeric" });
 }
 
+function periodLabelFromFecha(iso: string | null | undefined): string {
+  if (!iso) return "Costayaco";
+  const m = /^(\d{4})-(\d{2})/.exec(iso);
+  if (!m) return "Costayaco";
+  const months = [
+    "Enero",
+    "Febrero",
+    "Marzo",
+    "Abril",
+    "Mayo",
+    "Junio",
+    "Julio",
+    "Agosto",
+    "Septiembre",
+    "Octubre",
+    "Noviembre",
+    "Diciembre",
+  ];
+  const mi = Number(m[2]) - 1;
+  const monthName = months[mi];
+  if (!monthName) return `Costayaco · ${m[1]}`;
+  return `${monthName} ${m[1]}`;
+}
+
 function boolLabel(v: boolean | null | undefined): string {
   if (v == null) return "No confirmada";
   return v ? "Sí" : "No";
@@ -410,7 +434,9 @@ export function EditableEventDetail({
         <div className="rca-slide-cover">
           <div className="rca-slide-cover-top">
             <div>
-              <p className="eyebrow">RCA Costayaco · Junio 2026 · GTE / COPOWER</p>
+              <p className="eyebrow">
+                RCA Costayaco · {periodLabelFromFecha(draft.fecha)} · GTE / COPOWER
+              </p>
               {editing ? (
                 <label className="rca-report-title-input">
                   <span className="sr-only">Título</span>

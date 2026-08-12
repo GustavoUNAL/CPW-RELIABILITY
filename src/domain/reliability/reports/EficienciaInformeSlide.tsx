@@ -17,6 +17,7 @@ import {
 import {
   buildEnergyEfficiency,
   EFICIENCIA_MEDIDA_FORMULA,
+  KWH_TO_BTU,
   REPORT_HEATING_VALUE,
 } from "./energyEfficiency";
 import { checkChromatography, GAS_CHROMATOGRAPHIES, GAS_MRU_TRATADO } from "./gasChromatography";
@@ -127,14 +128,39 @@ export function EficienciaInformeSlide({ month, monthLabel }: Props) {
         </article>
         <article>
           <FlaskConical size={15} />
-          <span>Poder calorífico</span>
-          <strong>{REPORT_HEATING_VALUE.hhvBtuScf}</strong>
+          <span>Poder calorífico MRU</span>
+          <strong>{GAS_MRU_TRATADO.hhvRealBtuScf}</strong>
           <small>
-            BTU/scf HHV · {REPORT_HEATING_VALUE.lhvBtuScf} LHV
+            BTU/scf HHV real · {GAS_MRU_TRATADO.lhvRealBtuScf} LHV
             <br />
-            Base contractual del informe; la cromatografía del MRU mide{" "}
-            {GAS_MRU_TRATADO.hhvRealBtuScf} y se presenta como escenario
+            Cromatografía {GAS_MRU_TRATADO.shortLabel} · base informe{" "}
+            {REPORT_HEATING_VALUE.hhvBtuScf} BTU/scf
           </small>
+        </article>
+        <article className="eff-kpi-formula">
+          <Zap size={15} />
+          <span>Fórmula Orden 1</span>
+          <div
+            className="eff-formula-block"
+            aria-label="Eta porcentaje igual a kW por 3412, dividido entre SCF por hora por PCI en BTU por SCF, por 100. Meta mayor o igual a 37 por ciento."
+          >
+            <em>
+              η<span>(%)</span>
+            </em>
+            <span className="eff-formula-op">=</span>
+            <span className="eff-formula-frac">
+              <span>
+                kW × {KWH_TO_BTU}
+              </span>
+              <span>
+                SCF/h × PCI (BTU/SCF)
+              </span>
+            </span>
+            <span className="eff-formula-op">×</span>
+            <strong>100</strong>
+            <span className="eff-formula-meta">≥ 37%</span>
+          </div>
+          <small>PCI · poder calorífico inferior · meta contractual ≥ 37 %</small>
         </article>
       </div>
 

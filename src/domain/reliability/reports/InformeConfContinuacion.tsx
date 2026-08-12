@@ -30,6 +30,11 @@ import {
   topDegrading,
 } from "./buildDegradationRiskPortfolio";
 import { portfolioSummary } from "./degradationRiskEngine";
+import {
+  ExecInsight,
+  foInsightKey,
+  INFORME_EXEC_INSIGHTS,
+} from "./informeExecInsights";
 
 const MONTH_ISO: Record<string, string> = {
   Ene: "01",
@@ -61,6 +66,7 @@ export function CollapsibleSlide({
   children,
   className = "",
   id,
+  insight,
 }: {
   n: number;
   title: string;
@@ -70,6 +76,7 @@ export function CollapsibleSlide({
   children: ReactNode;
   className?: string;
   id?: string;
+  insight?: string | null;
 }) {
   return (
     <section className="panel" id={id}>
@@ -86,7 +93,10 @@ export function CollapsibleSlide({
             <ChevronDown size={18} className="inf-conf-collapse-chevron" aria-hidden />
           </div>
         </summary>
-        <div className="inf-conf-collapse-body">{children}</div>
+        <div className="inf-conf-collapse-body">
+          <ExecInsight text={insight} />
+          {children}
+        </div>
       </details>
     </section>
   );
@@ -203,6 +213,7 @@ export function InformeConfFallasSection({ month, monthLabel }: MonthProps) {
       sub="Resumen de formatos de ocurrencia FO-GE-033"
       badge="GTE"
       className="inf-conf-fallas-unified"
+      insight={INFORME_EXEC_INSIGHTS.fallas}
     >
       <div className="inf-conf-fallas-kpis" aria-label="Indicadores demostrados del periodo">
         <article>
@@ -282,17 +293,21 @@ export function InformeConfFallasSection({ month, monthLabel }: MonthProps) {
               Detalle FO-GE-033 · {periodRca.length} evento{periodRca.length === 1 ? "" : "s"}
             </h3>
           </header>
-          {periodRca.map((evento) => (
-            <div key={evento.id} id={`inf-conf-rca-${evento.id}`} className="inf-conf-rca-item">
-              <EditableEventDetail
-                event={evento}
-                compact
-                readOnly
-                onSave={handleRcaSave}
-                onOpenRelated={openRelatedRca}
-              />
-            </div>
-          ))}
+          {periodRca.map((evento) => {
+            const foKey = foInsightKey(evento.id) ?? foInsightKey(evento.fuente ?? "");
+            return (
+              <div key={evento.id} id={`inf-conf-rca-${evento.id}`} className="inf-conf-rca-item">
+                {foKey ? <ExecInsight text={INFORME_EXEC_INSIGHTS[foKey]} /> : null}
+                <EditableEventDetail
+                  event={evento}
+                  compact
+                  readOnly
+                  onSave={handleRcaSave}
+                  onOpenRelated={openRelatedRca}
+                />
+              </div>
+            );
+          })}
         </div>
       ) : null}
     </CollapsibleSlide>
@@ -324,6 +339,7 @@ export function InformeConfRepetitivosSection({
       sub="Recurrencia por equipo y categoría"
       badge="GTE"
       className={`inf-conf-slide-one inf-rep-viewport-slide${slideViewport ? " inf-rep-slide-deck" : ""}`}
+      insight={INFORME_EXEC_INSIGHTS.repetitivos}
     >
       <InformeConfRepetitivosBody month={month} monthLabel={monthLabel} slideViewport={slideViewport} />
     </CollapsibleSlide>
@@ -344,6 +360,7 @@ export function InformeConfMantenimientoSection({
       sub="Plan vs ejecución · horas MTO e intervenciones"
       badge="MTO"
       className={`inf-conf-slide-one inf-mto-viewport-slide${slideViewport ? " inf-rep-slide-deck" : ""}`}
+      insight={INFORME_EXEC_INSIGHTS.mantenimiento}
     >
       <InformeConfMantenimientoBody month={month} monthLabel={monthLabel} />
     </CollapsibleSlide>
@@ -359,6 +376,7 @@ export function InformeConfInventarioSection({ monthLabel }: { monthLabel: strin
       sub={`Cobertura · ${INVENTORY_MINIMUMS.items.length} ítems`}
       badge="Activos"
       className="inf-conf-slide-one"
+      insight={INFORME_EXEC_INSIGHTS.inventario}
     >
       <InventoryMinimumsDashboard hideCatalogTable embedded slide />
     </CollapsibleSlide>
@@ -374,6 +392,7 @@ export function InformeConfDegradacionSection({ monthLabel }: { monthLabel: stri
       sub="Baseline APM junio · contraste operativo"
       badge="APM"
       className="inf-conf-slide-one"
+      insight={INFORME_EXEC_INSIGHTS.degradacion}
     >
       <DegradationRiskDashboard
         monthLabel={`${monthLabel} · baseline junio`}
@@ -398,6 +417,7 @@ export function InformeConfEficienciaSection({
       sub="Heat rate medido del gas Moqueta · CPW04–CPW06"
       badge="Gas MQT"
       className={`inf-conf-slide-one inf-eff-viewport-slide${slideViewport ? " inf-rep-slide-deck" : ""}`}
+      insight={INFORME_EXEC_INSIGHTS.eficiencia}
     >
       <EficienciaInformeSlide month={month} monthLabel={monthLabel} />
     </CollapsibleSlide>
@@ -486,6 +506,7 @@ export function ConclusionesConfiabilidadBoard({ month, monthLabel }: MonthProps
       sub="Cierre del informe de confiabilidad"
       badge="Orden 1"
       className="inf-conf-conclusiones"
+      insight={INFORME_EXEC_INSIGHTS.conclusiones}
     >
       <div className="inf-conf-concl-kpis">
         <article>
@@ -600,6 +621,7 @@ export function ConclusionesConfiabilidadBoard({ month, monthLabel }: MonthProps
 
         <section className="inf-conf-concl-col">
           <p className="eyebrow">Acciones · Orden 1</p>
+          <ExecInsight text={INFORME_EXEC_INSIGHTS.acciones} className="inf-exec-insight--nested" />
           <ol>
             <li>
               Solicitar a Gran Tierra el <strong>desglose horario</strong> del{" "}

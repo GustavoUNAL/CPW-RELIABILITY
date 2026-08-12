@@ -4,7 +4,6 @@ import {
   Gauge,
   HeartPulse,
   ShieldAlert,
-  TrendingDown,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import {
@@ -216,11 +215,6 @@ export function DegradationRiskDashboard({
         <strong>{summary.monitored}</strong>
       </div>
       <div className="exec-kpi">
-        <TrendingDown size={16} />
-        <span>En degradación</span>
-        <strong>{summary.degrading}</strong>
-      </div>
-      <div className="exec-kpi">
         <ShieldAlert size={16} />
         <span>Riesgo crítico</span>
         <strong>{summary.criticalRisk}</strong>
@@ -244,8 +238,10 @@ export function DegradationRiskDashboard({
     </div>
   );
 
+  const chartH = slide ? 260 : 210;
+
   const portfolioPanels = (
-    <div className="dash-chart-grid mso-chart-grid" style={{ marginTop: "0.75rem" }}>
+    <div className={`dash-chart-grid mso-chart-grid${slide ? " deg-slide-charts" : ""}`} style={{ marginTop: "0.75rem" }}>
       <article className="dash-chart-panel">
         <h4>Top degradación</h4>
         <p className="muted dash-chart-sub">Menor salud / mayor deterioro</p>
@@ -268,7 +264,7 @@ export function DegradationRiskDashboard({
         <h4>Distribución de riesgos</h4>
         <p className="muted dash-chart-sub">Clasificación Probabilidad × Impacto</p>
         <div className="dash-chart">
-          <ResponsiveContainer width="100%" height={210}>
+          <ResponsiveContainer width="100%" height={chartH}>
             <BarChart data={dist} margin={{ top: 8, right: 8, left: 0, bottom: 4 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
               <XAxis dataKey="name" tick={{ fontSize: 10 }} />

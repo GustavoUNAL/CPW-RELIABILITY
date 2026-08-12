@@ -14,6 +14,7 @@ import {
 } from "recharts";
 import { COPOWER_MONTHLY_DATA, type CopowerMonthKey } from "./copowerMonthly";
 import { buildDisponibilidadAnalisis } from "./DisponibilidadAnalisisBoard";
+import { ExecInsight, INFORME_EXEC_INSIGHTS } from "./informeExecInsights";
 
 type Props = {
   month: string;
@@ -137,6 +138,7 @@ export function DisponibilidadHorasBoard({ month, monthLabel }: Props) {
           </div>
         </summary>
         <div className="inf-conf-collapse-body">
+        <ExecInsight text={INFORME_EXEC_INSIGHTS.generacion} />
         <div className="hours-viz-kpis">
           <article>
             <span>Energía entregada</span>
