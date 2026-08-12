@@ -182,9 +182,17 @@ export type EventFilters = {
   failuresOnly: boolean;
 };
 
+/** Evento de listado de fallas del informe: tipificadas, causa común o con FO-GE-033. */
+export function isReportFailureEvent(e: EnrichedEvent): boolean {
+  if (e.eventType === "Falla" || e.eventType === "Causa comun") return true;
+  if (/FO-GE-033/i.test(e.notes ?? "")) return true;
+  if ((e.parsed.fallaEvento ?? 0) > 0) return true;
+  return false;
+}
+
 export function filterEvents(events: EnrichedEvent[], filters: EventFilters): EnrichedEvent[] {
   return events.filter((e) => {
-    if (filters.failuresOnly && e.eventType !== "Falla") return false;
+    if (filters.failuresOnly && !isReportFailureEvent(e)) return false;
     if (filters.type !== "all" && e.eventType !== filters.type) return false;
     if (filters.responsible !== "all" && e.responsible !== filters.responsible) return false;
     if (filters.query) {
@@ -196,10 +204,20 @@ export function filterEvents(events: EnrichedEvent[], filters: EventFilters): En
   });
 }
 
-/** Imputables contractuales: tipo Falla + responsable COPOWER o PF_contr > 0. */
-export function isContractualFailure(e: EnrichedEvent): boolean {
+/** Marca de Excel tipo Falla sin FO ni PF_contr — no baja confiabilidad contractual. */
+export function isConcertacionMarkWithoutFo(e: EnrichedEvent): boolean {
   if (e.eventType !== "Falla") return false;
-  if (e.responsible === "COPOWER" || e.responsible === "GTE + COPOWER") return true;
+  if (/FO-GE-033/i.test(e.notes ?? "")) return false;
+  return (e.parsed.pfContr ?? 0) <= 0;
+}
+
+/**
+ * Imputable al KPI de confiabilidad (FO + COPOWER o PF_contr > 0).
+ * No cuenta marcas de concertación sin FO ni FO compartidas GTE+COPOWER sin PF_contr.
+ */
+export function isContractualFailure(e: EnrichedEvent): boolean {
   if ((e.parsed.pfContr ?? 0) > 0) return true;
-  return false;
+  if (e.eventType !== "Falla") return false;
+  if (!/FO-GE-033/i.test(e.notes ?? "")) return false;
+  return e.responsible === "COPOWER";
 }

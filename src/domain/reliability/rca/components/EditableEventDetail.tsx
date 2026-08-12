@@ -27,12 +27,14 @@ import { Timeline } from "./Timeline";
 
 type Props = {
   event: RcaEventoFalla;
-  onSave: (next: RcaEventoFalla) => void;
+  onSave?: (next: RcaEventoFalla) => void;
   onClose?: () => void;
   onOpenRelated?: (id: string) => void;
   extraActions?: ReactNode;
   compact?: boolean;
   startEditing?: boolean;
+  /** Solo lectura (informe): sin botones Editar / Guardar. */
+  readOnly?: boolean;
 };
 
 const ESTADO_OPTS: RcaEstadoEvento[] = ["abierto", "en_seguimiento", "cerrado", "sin_marcar"];
@@ -153,9 +155,10 @@ export function EditableEventDetail({
   extraActions,
   compact,
   startEditing = false,
+  readOnly = false,
 }: Props) {
   const [draft, setDraft] = useState<RcaEventoFalla>(() => structuredClone(event));
-  const [editing, setEditing] = useState(startEditing);
+  const [editing, setEditing] = useState(readOnly ? false : startEditing);
   const [savedFlash, setSavedFlash] = useState(false);
   const [page, setPage] = useState(0);
 
@@ -166,11 +169,11 @@ export function EditableEventDetail({
 
   useEffect(() => {
     setDraft(structuredClone(event));
-    setEditing(startEditing);
+    setEditing(readOnly ? false : startEditing);
     setSavedFlash(false);
     setPage(0);
     // Rehidrata al cambiar el contenido seed (resumen, cronología, etc.), no solo la referencia.
-  }, [event, event.id, event.resumen_ejecutivo, cronologiaKey, startEditing]);
+  }, [event, event.id, event.resumen_ejecutivo, cronologiaKey, startEditing, readOnly]);
 
   const dirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(event), [draft, event]);
   const warn = needsWarningBanner(draft);
@@ -222,7 +225,7 @@ export function EditableEventDetail({
       },
       hours,
     );
-    onSave(next);
+    onSave?.(next);
     setDraft(next);
     setEditing(false);
     setSavedFlash(true);
@@ -1074,7 +1077,7 @@ export function EditableEventDetail({
               </span>
             ) : null}
             {extraActions}
-            {editing ? (
+            {readOnly ? null : editing ? (
               <>
                 <button type="button" className="btn ghost" onClick={cancelEdit}>
                   Cancelar

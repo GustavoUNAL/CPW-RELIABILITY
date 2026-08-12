@@ -4,6 +4,7 @@ import {
   computeEventStats,
   enrichEventLog,
   filterEvents,
+  isConcertacionMarkWithoutFo,
   isContractualFailure,
   parseEventNotes,
   type EnrichedEvent,
@@ -31,6 +32,7 @@ import { shortRcaEventId } from "../rca/data";
 import { findCostayacoRcasForEvent } from "../rca/matchCostayacoRca";
 import { loadCostayacoRcaEvents, persistCostayacoRcaEvents, upsertCostayacoRcaEvent } from "../rca/rcaEventStore";
 import type { RcaEventoFalla } from "../rca/types";
+import { buildConfiabilidadAnalisis } from "./ConfiabilidadAnalisisBoard";
 
 const hours = (v: number) =>
   `${v.toLocaleString("es-CO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} h`;
@@ -42,6 +44,14 @@ type Props = {
   monthLabel: string;
   mode?: ViewMode;
   failuresOnlyDefault?: boolean;
+  /** KPIs del panel alineados a FO / Conf del informe (Informes · Confiabilidad). */
+  informeStats?: boolean;
+  /** Sin hero propio: va embebido bajo el encabezado §7 del informe. */
+  embedded?: boolean;
+  /** Oculta el panel de indicadores (ya van en el card unificado del informe). */
+  hideStatsPanel?: boolean;
+  /** Solo calendario: oculta tablas largas de bitácora / RCA (slide del informe). */
+  hideEventLists?: boolean;
   onNavigateToRca?: (rcaId?: string) => void;
   rcaCases?: RcaCaseDetail[];
   onCreateRcaFromEvent?: (draft: RcaEventDraft) => void;
@@ -88,9 +98,64 @@ function StatCard({
   );
 }
 
-function EventStatsRow({ events, label }: { events: EnrichedEvent[]; label?: string }) {
+function EventStatsRow({
+  events,
+  label,
+  month,
+  informe,
+}: {
+  events: EnrichedEvent[];
+  label?: string;
+  month?: string;
+  /** KPIs alineados al análisis de confiabilidad del informe. */
+  informe?: boolean;
+}) {
   const s = computeEventStats(events);
-  const contractual = events.filter(isContractualFailure).length;
+  const confImp = events.filter(isContractualFailure).length;
+  const marksSinFo = events.filter(isConcertacionMarkWithoutFo).length;
+  const conf = month && informe ? buildConfiabilidadAnalisis(month) : null;
+
+  if (informe && conf) {
+    const confPct =
+      conf.gteConf != null
+        ? `${(conf.gteConf * 100).toLocaleString("es-CO", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })} %`
+        : "—";
+    return (
+      <div className="ev-stats-block ev-stats-block--informe">
+        {label ? <p className="ev-stats-source">{label}</p> : null}
+        <div className="field-stat-grid field-stat-grid--compact ev-stats-informe-grid">
+          <StatCard
+            label="FO-GE-033"
+            value={String(conf.rows.length)}
+            hint={`${conf.imputables.length} imputables`}
+            legend="Formatos de ocurrencia del periodo (§5)."
+          />
+          <StatCard
+            label="Confiabilidad"
+            value={confPct}
+            hint={`${conf.imputables.length} FO imputables`}
+            legend="Externos y marcas sin FO no entran al KPI."
+          />
+          <StatCard
+            label="Marcas sin formato de ocurrencia"
+            value={String(conf.orphanMarks.length)}
+            hint="Concertación"
+            legend="Marcas de falla sin FO-GE-033; no bajan confiabilidad."
+          />
+          <StatCard
+            label="Parada por falla del contratista"
+            value={hours(conf.pfContr)}
+            hint="PF_contr"
+            legend="Horas de parada por falla del contratista del periodo."
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="ev-stats-block">
       {label ? <p className="ev-stats-source">{label}</p> : null}
@@ -103,13 +168,14 @@ function EventStatsRow({ events, label }: { events: EnrichedEvent[]; label?: str
         <StatCard
           label="Fallas"
           value={String(s.failures)}
-          hint={`${contractual} asociadas a COPOWER`}
-          legend="Eventos tipo Falla. El subtítulo cuenta las imputables a COPOWER."
+          hint={`${confImp} imputables Conf · ${marksSinFo} marcas sin FO`}
+          legend="Tipo Falla. Imputables = FO COPOWER o PF_contr > 0; marcas sin FO no bajan Conf."
         />
         <StatCard
           label="Operativos"
           value={String(s.operativo)}
-          legend="Eventos operativos o de causa común (sin falla tipificada)."
+          hint={s.causaComun ? `${s.causaComun} causa común` : undefined}
+          legend="Eventos operativos. La causa común se cuenta aparte en el subtítulo."
         />
         <StatCard
           label="Horas FS"
@@ -858,6 +924,10 @@ function SourceColumn({
   costayacoRcaEvents,
   onSelectEvent,
   calendar,
+  month,
+  informeStats,
+  compact,
+  hideStatsPanel,
 }: {
   source: ReportKey;
   events: EnrichedEvent[];
@@ -872,42 +942,63 @@ function SourceColumn({
     sourceLabel: string;
     onCreateRcaFromEvent?: (draft: RcaEventDraft) => void;
   };
+  month?: string;
+  informeStats?: boolean;
+  compact?: boolean;
+  hideStatsPanel?: boolean;
 }) {
   const filtered = useMemo(() => filterEvents(events, filters), [events, filters]);
+  const calendarEvents = filters.failuresOnly ? filtered : events;
   const label = source === "gran_tierra" ? "Gran Tierra Energy" : "COPOWER · Reporte diario";
   const badge = source === "gran_tierra" ? "gte" : "cpw";
+  const showStats = !hideStatsPanel;
 
   return (
     <section className={`ev-source-column ev-source-column--${badge}`}>
-      <header className="ev-source-head">
-        <div>
-          <strong>{label}</strong>
-          <small>
-            {filtered.length} de {events.length} filtrados
-          </small>
-        </div>
-        <span className={`source-badge ${badge}`}>{badge.toUpperCase()}</span>
-      </header>
-      <div className={calendar ? "ev-stats-cal-row" : undefined}>
-        {calendar ? (
-          <article className="ev-stats-panel">
+      {compact ? null : (
+        <header className="ev-source-head">
+          <div>
+            <strong>{label}</strong>
+            <small>
+              {filtered.length} de {events.length} en listado de fallas
+            </small>
+          </div>
+          <span className={`source-badge ${badge}`}>{badge.toUpperCase()}</span>
+        </header>
+      )}
+      <div
+        className={
+          calendar
+            ? showStats
+              ? "ev-stats-cal-row"
+              : "ev-stats-cal-row ev-stats-cal-row--cal-only"
+            : undefined
+        }
+      >
+        {calendar && showStats ? (
+          <article className={`ev-stats-panel${informeStats ? " ev-stats-panel--informe" : ""}`}>
             <header className="ev-cal-panel-head">
               <div>
                 <p className="eyebrow">Indicadores del periodo</p>
                 <h3>Resumen {calendar.monthLabel}</h3>
               </div>
             </header>
-            <EventStatsRow events={filtered} />
+            <EventStatsRow
+              events={filtered}
+              month={month ?? calendar.month}
+              informe={Boolean(informeStats)}
+            />
           </article>
-        ) : (
-          <EventStatsRow events={filtered} label="Indicadores filtrados" />
-        )}
+        ) : null}
+        {!calendar && showStats ? (
+          <EventStatsRow events={filtered} label="Indicadores filtrados" month={month} />
+        ) : null}
         {calendar ? (
           <GteEventCalendarModal
             variant="inline"
             month={calendar.month}
             monthLabel={calendar.monthLabel}
-            events={events}
+            events={calendarEvents}
             sourceLabel={calendar.sourceLabel}
             onNavigateToRca={onNavigateToRca}
             rcaCases={rcaCases}
@@ -926,6 +1017,10 @@ export function FailureEventsView({
   monthLabel,
   mode = "dual",
   failuresOnlyDefault = false,
+  informeStats = false,
+  embedded = false,
+  hideStatsPanel = false,
+  hideEventLists = false,
   onNavigateToRca,
   rcaCases: rcaCasesProp,
   onCreateRcaFromEvent,
@@ -1002,7 +1097,8 @@ export function FailureEventsView({
 
   const categoryCatalog = useMemo(() => {
     if (mode === "dual") return null;
-    const pool = mode === "gte" ? gteEvents : cpwEvents;
+    const poolRaw = mode === "gte" ? gteEvents : cpwEvents;
+    const pool = failuresOnlyDefault ? filterEvents(poolRaw, filters) : poolRaw;
     const report: ReportKey = mode === "gte" ? "gran_tierra" : "copower";
     const codes = pool.map(
       (e) =>
@@ -1020,7 +1116,7 @@ export function FailureEventsView({
       total: pool.length,
       label: mode === "gte" ? "Gran Tierra" : "COPOWER",
     };
-  }, [mode, gteEvents, cpwEvents, month]);
+  }, [mode, gteEvents, cpwEvents, month, failuresOnlyDefault, filters]);
 
   function handleSelect(event: EnrichedEvent) {
     setSelectedId(event.id);
@@ -1032,23 +1128,25 @@ export function FailureEventsView({
   }
 
   return (
-    <div className="ev-module exec-dashboard">
-      <header className="exec-header">
-        <div>
-          <p className="eyebrow">Eventos de falla · {monthLabel}</p>
-          <h2>
-            <AlertTriangle size={22} style={{ verticalAlign: "middle", marginRight: 8 }} />
-            Bitácora operativa
-          </h2>
-          <p className="muted">
-            {mode === "dual"
-              ? "COPOWER (hoja Eventos) vs Gran Tierra (Data Soporte / bitácora oficial)"
-              : mode === "copower"
-                ? "Reporte diario COPOWER · hoja Eventos de Generación"
-                : "Gran Tierra Energy · Excel Data Soporte / informe mensual"}
-          </p>
-        </div>
-      </header>
+    <div className={`ev-module exec-dashboard${embedded ? " ev-module--embedded" : ""}`}>
+      {embedded ? null : (
+        <header className="exec-header">
+          <div>
+            <p className="eyebrow">Eventos de falla · {monthLabel}</p>
+            <h2>
+              <AlertTriangle size={22} style={{ verticalAlign: "middle", marginRight: 8 }} />
+              Bitácora operativa
+            </h2>
+            <p className="muted">
+              {mode === "dual"
+                ? "COPOWER (hoja Eventos) vs Gran Tierra (Data Soporte / bitácora oficial)"
+                : mode === "copower"
+                  ? "Reporte diario COPOWER · hoja Eventos de Generación"
+                  : "Gran Tierra Energy · Excel Data Soporte / informe mensual"}
+            </p>
+          </div>
+        </header>
+      )}
 
       {mode === "dual" ? (
         <div className="ev-dual-summary">
@@ -1057,7 +1155,7 @@ export function FailureEventsView({
         </div>
       ) : null}
 
-      {categoryCatalog ? (
+      {!embedded && categoryCatalog ? (
         <EventCategoryCatalogTable
           rows={categoryCatalog.rows}
           totalEvents={categoryCatalog.total}
@@ -1078,6 +1176,10 @@ export function FailureEventsView({
               costayacoRcaEvents={costayacoRcaEvents}
               onSelectEvent={handleSelect}
               calendar={mode === "copower" ? calendarProps : undefined}
+              month={month}
+              informeStats={informeStats}
+              compact={embedded}
+              hideStatsPanel={hideStatsPanel}
             />
           ) : null}
           {showGte ? (
@@ -1090,27 +1192,35 @@ export function FailureEventsView({
               costayacoRcaEvents={costayacoRcaEvents}
               onSelectEvent={handleSelect}
               calendar={mode === "gte" ? calendarProps : undefined}
+              month={month}
+              informeStats={informeStats || (mode === "gte" && failuresOnlyDefault)}
+              compact={embedded}
+              hideStatsPanel={hideStatsPanel}
             />
           ) : null}
         </div>
       </div>
 
-      <BitacoraEventsSection
-        events={bitacoraEvents}
-        selectedId={selectedId}
-        onSelect={handleSelect}
-        rcaCases={rcaCases}
-        costayacoRcaEvents={costayacoRcaEvents}
-      />
+      {hideEventLists ? null : (
+        <>
+          <BitacoraEventsSection
+            events={bitacoraEvents}
+            selectedId={selectedId}
+            onSelect={handleSelect}
+            rcaCases={rcaCases}
+            costayacoRcaEvents={costayacoRcaEvents}
+          />
 
-      <FormalRcaEventsSection
-        events={formalRcaEvents}
-        selectedId={selectedId}
-        onSelect={handleSelect}
-        rcaCases={rcaCases}
-        costayacoRcaEvents={costayacoRcaEvents}
-        onNavigateToRca={onNavigateToRca}
-      />
+          <FormalRcaEventsSection
+            events={formalRcaEvents}
+            selectedId={selectedId}
+            onSelect={handleSelect}
+            rcaCases={rcaCases}
+            costayacoRcaEvents={costayacoRcaEvents}
+            onNavigateToRca={onNavigateToRca}
+          />
+        </>
+      )}
 
       {selected ? (
         <EventDetailModal

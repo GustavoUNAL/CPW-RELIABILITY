@@ -23,6 +23,15 @@ import { DisponibilidadConciliacionSlide } from "./DisponibilidadConciliacionSli
 import { DisponibilidadHorasBoard } from "./DisponibilidadHorasBoard";
 import { ConfiabilidadAnalisisBoard } from "./ConfiabilidadAnalisisBoard";
 import { ConfiabilidadConciliacionSlide } from "./ConfiabilidadConciliacionSlide";
+import { DesempenoMaquinaBoard } from "./DesempenoMaquinaBoard";
+import {
+  ConclusionesConfiabilidadBoard,
+  InformeConfContinuacion,
+  InformeConfDegradacionSection,
+  InformeConfFallasSection,
+  InformeConfInventarioSection,
+  InformeConfRepetitivosSection,
+} from "./InformeConfContinuacion";
 import { GRAN_TIERRA_MONTHLY_DATA, type GranTierraMonthKey } from "./granTierraMonthly";
 
 type Props = {
@@ -225,6 +234,48 @@ export function InformesResultadosDashboard({ leafId, month, monthLabel }: Props
         </div>
       );
     }
+    if (leafId === "inf-conf-maquinas") {
+      return (
+        <div className="dash-module exec-dashboard inf-resultados">
+          <DesempenoMaquinaBoard month={gteMonth} monthLabel={monthLabel} />
+        </div>
+      );
+    }
+    if (leafId === "inf-conf-fallas") {
+      return (
+        <div className="dash-module exec-dashboard inf-resultados">
+          <InformeConfFallasSection month={gteMonth} monthLabel={monthLabel} />
+        </div>
+      );
+    }
+    if (leafId === "inf-conf-repetitivos") {
+      return (
+        <div className="dash-module exec-dashboard inf-resultados">
+          <InformeConfRepetitivosSection month={gteMonth} monthLabel={monthLabel} />
+        </div>
+      );
+    }
+    if (leafId === "inf-conf-inventario") {
+      return (
+        <div className="dash-module exec-dashboard inf-resultados">
+          <InformeConfInventarioSection monthLabel={monthLabel} />
+        </div>
+      );
+    }
+    if (leafId === "inf-conf-degradacion") {
+      return (
+        <div className="dash-module exec-dashboard inf-resultados">
+          <InformeConfDegradacionSection monthLabel={monthLabel} />
+        </div>
+      );
+    }
+    if (leafId === "inf-conf-conclusiones") {
+      return (
+        <div className="dash-module exec-dashboard inf-resultados">
+          <ConclusionesConfiabilidadBoard month={gteMonth} monthLabel={monthLabel} />
+        </div>
+      );
+    }
     return (
       <div className="dash-module exec-dashboard inf-resultados">
         <header className="exec-header dash-hero">
@@ -239,6 +290,8 @@ export function InformesResultadosDashboard({ leafId, month, monthLabel }: Props
         <DisponibilidadAnalisisBoard month={gteMonth} monthLabel={monthLabel} />
         <DisponibilidadHorasBoard month={gteMonth} monthLabel={monthLabel} />
         <ConfiabilidadAnalisisBoard month={gteMonth} monthLabel={monthLabel} />
+        <DesempenoMaquinaBoard month={gteMonth} monthLabel={monthLabel} />
+        <InformeConfContinuacion month={gteMonth} monthLabel={monthLabel} />
       </div>
     );
   }

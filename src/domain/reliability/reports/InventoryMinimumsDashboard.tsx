@@ -76,7 +76,15 @@ type FamilyStats = {
   coveragePct: number;
 };
 
-export function InventoryMinimumsDashboard() {
+export function InventoryMinimumsDashboard({
+  hideCatalogTable = false,
+  embedded = false,
+}: {
+  /** Oculta la tabla detallada familia / descripción / gap (p. ej. informe §9). */
+  hideCatalogTable?: boolean;
+  /** Sin hero propio cuando va bajo el encabezado del informe. */
+  embedded?: boolean;
+} = {}) {
   const [query, setQuery] = useState("");
   const [family, setFamily] = useState("Todos");
   const [coverage, setCoverage] = useState<"Todos" | Coverage>("Todos");
@@ -191,20 +199,24 @@ export function InventoryMinimumsDashboard() {
   }, [enriched, family, coverage, query]);
 
   return (
-    <div className="panel">
+    <div className={`panel${embedded ? " inv-dashboard--embedded" : ""}`}>
       <article className="card">
-        <p className="eyebrow">Gestión de activos · Inventario</p>
-        <div className="screen-shell-head">
-          <h3>Mínimos de inventario</h3>
-          <span className="source-badge gte">CYC</span>
-        </div>
-        <p className="muted" style={{ marginTop: "0.35rem" }}>
-          Catálogo {INVENTORY_MINIMUMS.items.length} ítems · actualizado con consumos críticos junio 2026
-          (escape CPW01, intercooler CPW06, flexibles) · {INVENTORY_MINIMUMS.extractedAt}
-        </p>
+        {embedded ? null : (
+          <>
+            <p className="eyebrow">Gestión de activos · Inventario</p>
+            <div className="screen-shell-head">
+              <h3>Mínimos de inventario</h3>
+              <span className="source-badge gte">CYC</span>
+            </div>
+            <p className="muted" style={{ marginTop: "0.35rem" }}>
+              Catálogo {INVENTORY_MINIMUMS.items.length} ítems · actualizado con consumos críticos junio 2026
+              (escape CPW01, intercooler CPW06, flexibles) · {INVENTORY_MINIMUMS.extractedAt}
+            </p>
+          </>
+        )}
 
         {planningCritical.length > 0 ? (
-          <section className="op-panel" style={{ marginTop: "0.75rem" }}>
+          <section className="op-panel" style={{ marginTop: embedded ? "0" : "0.75rem" }}>
             <div className="op-panel-head">
               <h4>Críticos del plan julio</h4>
               <span className="muted">{planningCritical.length} · ligados a RCA/IP GTE</span>
@@ -382,104 +394,108 @@ export function InventoryMinimumsDashboard() {
           </article>
         </div>
 
-        <div className="inv-filters" style={{ marginTop: "0.85rem" }}>
-          <label className="ev-bitacora-filter inv-search">
-            <Search size={14} />
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Buscar descripción, parte o familia…"
-              aria-label="Buscar inventario"
-            />
-          </label>
-          <label className="ev-bitacora-filter">
-            <select
-              value={family}
-              onChange={(e) => setFamily(e.target.value)}
-              aria-label="Filtrar por familia"
-            >
-              {families.map((f) => (
-                <option key={f} value={f}>
-                  {f === "Todos" ? "Todas las familias" : f}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="ev-bitacora-filter">
-            <select
-              value={coverage}
-              onChange={(e) => setCoverage(e.target.value as "Todos" | Coverage)}
-              aria-label="Filtrar por cobertura"
-            >
-              <option value="Todos">Todas las coberturas</option>
-              {(Object.keys(COVERAGE_META) as Coverage[]).map((k) => (
-                <option key={k} value={k}>
-                  {COVERAGE_META[k].label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <span className="muted" style={{ alignSelf: "center", fontSize: "0.8rem" }}>
-            {rows.length} de {kpis.total}
-            {family !== "Todos" ? ` · ${family}` : ""}
-          </span>
-        </div>
+        {hideCatalogTable ? null : (
+          <>
+            <div className="inv-filters" style={{ marginTop: "0.85rem" }}>
+              <label className="ev-bitacora-filter inv-search">
+                <Search size={14} />
+                <input
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Buscar descripción, parte o familia…"
+                  aria-label="Buscar inventario"
+                />
+              </label>
+              <label className="ev-bitacora-filter">
+                <select
+                  value={family}
+                  onChange={(e) => setFamily(e.target.value)}
+                  aria-label="Filtrar por familia"
+                >
+                  {families.map((f) => (
+                    <option key={f} value={f}>
+                      {f === "Todos" ? "Todas las familias" : f}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="ev-bitacora-filter">
+                <select
+                  value={coverage}
+                  onChange={(e) => setCoverage(e.target.value as "Todos" | Coverage)}
+                  aria-label="Filtrar por cobertura"
+                >
+                  <option value="Todos">Todas las coberturas</option>
+                  {(Object.keys(COVERAGE_META) as Coverage[]).map((k) => (
+                    <option key={k} value={k}>
+                      {COVERAGE_META[k].label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <span className="muted" style={{ alignSelf: "center", fontSize: "0.8rem" }}>
+                {rows.length} de {kpis.total}
+                {family !== "Todos" ? ` · ${family}` : ""}
+              </span>
+            </div>
 
-        <div className="table-wrap" style={{ marginTop: "0.65rem" }}>
-          <table>
-            <thead>
-              <tr>
-                <th>Familia</th>
-                <th>Descripción</th>
-                <th>N° parte</th>
-                <th>Stock mínimo</th>
-                <th>Existencia</th>
-                <th>Gap</th>
-                <th>Cobertura</th>
-                <th>Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => {
-                const meta = COVERAGE_META[r.coverage];
-                return (
-                  <tr key={r.id}>
-                    <td>
-                      <strong>{r.family || "—"}</strong>
-                    </td>
-                    <td>{r.description}</td>
-                    <td>
-                      <code style={{ fontSize: "0.78rem" }}>{r.partNumber}</code>
-                    </td>
-                    <td>{r.stockMin}</td>
-                    <td>
-                      <strong style={{ color: meta.color }}>{r.onHand}</strong>
-                    </td>
-                    <td
-                      style={{
-                        color: r.gap < 0 ? "#dc2626" : r.gap === 0 ? "#d97706" : "var(--text-muted)",
-                      }}
-                    >
-                      {r.gap > 0 ? `+${r.gap}` : r.gap}
-                    </td>
-                    <td>
-                      <ToneBadge label={meta.label} color={meta.color} />
-                    </td>
-                    <td>{r.status}</td>
+            <div className="table-wrap" style={{ marginTop: "0.65rem" }}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Familia</th>
+                    <th>Descripción</th>
+                    <th>N° parte</th>
+                    <th>Stock mínimo</th>
+                    <th>Existencia</th>
+                    <th>Gap</th>
+                    <th>Cobertura</th>
+                    <th>Estado</th>
                   </tr>
-                );
-              })}
-              {rows.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="muted">
-                    Sin ítems para el filtro actual.
-                  </td>
-                </tr>
-              ) : null}
-            </tbody>
-          </table>
-        </div>
+                </thead>
+                <tbody>
+                  {rows.map((r) => {
+                    const meta = COVERAGE_META[r.coverage];
+                    return (
+                      <tr key={r.id}>
+                        <td>
+                          <strong>{r.family || "—"}</strong>
+                        </td>
+                        <td>{r.description}</td>
+                        <td>
+                          <code style={{ fontSize: "0.78rem" }}>{r.partNumber}</code>
+                        </td>
+                        <td>{r.stockMin}</td>
+                        <td>
+                          <strong style={{ color: meta.color }}>{r.onHand}</strong>
+                        </td>
+                        <td
+                          style={{
+                            color: r.gap < 0 ? "#dc2626" : r.gap === 0 ? "#d97706" : "var(--text-muted)",
+                          }}
+                        >
+                          {r.gap > 0 ? `+${r.gap}` : r.gap}
+                        </td>
+                        <td>
+                          <ToneBadge label={meta.label} color={meta.color} />
+                        </td>
+                        <td>{r.status}</td>
+                      </tr>
+                    );
+                  })}
+                  {rows.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className="muted">
+                        Sin ítems para el filtro actual.
+                      </td>
+                    </tr>
+                  ) : null}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
       </article>
     </div>
   );
