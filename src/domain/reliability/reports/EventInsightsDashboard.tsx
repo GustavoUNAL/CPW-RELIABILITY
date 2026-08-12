@@ -4,7 +4,11 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Cell,
+  LabelList,
   Legend,
+  Pie,
+  PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -41,6 +45,8 @@ type Props = {
   compact?: boolean;
   /** Sin hero propio cuando va dentro del encabezado §N. */
   embedded?: boolean;
+  /** Slide a pantalla completa: gráficas + sin scroll interno. */
+  slideViewport?: boolean;
 };
 
 type CategoryMeta = {
@@ -74,6 +80,48 @@ function iioBandLabel(iio: number) {
   return "Impacto crítico (RCA inmediato)";
 }
 
+function normUnitKey(raw: string) {
+  return raw.toUpperCase().replace(/[^A-Z0-9]/g, "");
+}
+
+function dominantCategoryForUnit(
+  unit: string,
+  events: Array<{ equipment: string; categoryCode: EventCategoryCode }>,
+) {
+  const unitKey = normUnitKey(unit);
+  const matches = events.filter((e) => {
+    const eqKey = normUnitKey(e.equipment);
+    return eqKey.includes(unitKey) || unitKey.includes(eqKey);
+  });
+  const counts = new Map<EventCategoryCode, number>();
+  for (const e of matches) {
+    counts.set(e.categoryCode, (counts.get(e.categoryCode) ?? 0) + 1);
+  }
+  const top = [...counts.entries()].sort((a, b) => b[1] - a[1])[0];
+  if (!top) return null;
+  return {
+    code: top[0],
+    label: CATEGORY_META[top[0]]?.label ?? top[0],
+    count: top[1],
+  };
+}
+
+function sharePct(count: number, total: number, digits = 1) {
+  if (total <= 0) return "0.0%";
+  return pct((count / total) * 100, digits);
+}
+
+const REP_CHART_COLORS = [
+  "#0e6e8c",
+  "#6366f1",
+  "#7c3aed",
+  "#0f766e",
+  "#d97706",
+  "#ef4444",
+  "#0891b2",
+  "#84cc16",
+];
+
 export function EventInsightsDashboard({
   report,
   month,
@@ -81,6 +129,7 @@ export function EventInsightsDashboard({
   mode,
   compact = false,
   embedded = false,
+  slideViewport = false,
 }: Props) {
   const snap = getSnap(report, month);
   if (!snap) return <p className="empty-state">Sin datos para {monthLabel} en esta fuente.</p>;
@@ -297,6 +346,149 @@ export function EventInsightsDashboard({
       </div>
     );
 
+    if (compact && slideViewport) {
+      const topCategoriesChart = categoryCatalog
+        .filter((c) => c.count > 0)
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 8)
+        .map((c) => ({
+          code: c.code,
+          label: c.shortLabel,
+          count: c.count,
+          share: Number(c.share.toFixed(1)),
+        }));
+      const equipChart = repeatedEquipmentChart.slice(0, 8).map((row) => ({
+        ...row,
+        share: Number(((row.count / Math.max(totalEvents, 1)) * 100).toFixed(1)),
+      }));
+
+      return (
+        <div className="ev-rep-viewport">
+          {month === "Jul" ? (
+            <p className="ev-rep-vs-line">
+              <strong>Julio vs junio:</strong> fallas imputables {EXEC_JUN.failures} (foco {EXEC_JUN.focalUnit}) → 0
+              en Conf. · cascadas MRU / FO externas · sin cluster PF_contr de junio (
+              {EXEC_JUN.hoursPfContr} h).
+            </p>
+          ) : null}
+
+          <div className="exec-kpi-row ev-rep-kpis">{kpiRow}</div>
+
+          <div className="ev-rep-slide-grid">
+            <article className="ev-rep-chart-card">
+              <header>
+                <h4>Top equipos repetitivos</h4>
+                <p className="muted">Frecuencia en bitácora · % del periodo</p>
+              </header>
+              <div className="ev-rep-chart-area">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={equipChart} margin={{ top: 6, right: 8, left: 0, bottom: 2 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" vertical={false} />
+                    <XAxis dataKey="equipment" tick={{ fontSize: 10 }} interval={0} angle={-18} textAnchor="end" height={42} />
+                    <YAxis tick={{ fontSize: 10 }} width={28} allowDecimals={false} />
+                    <Tooltip
+                      formatter={(v, name) => [
+                        name === "share" ? `${v} %` : String(v),
+                        name === "share" ? "Participación" : "Eventos",
+                      ]}
+                    />
+                    <Bar dataKey="count" name="Eventos" fill="#0e6e8c" radius={[4, 4, 0, 0]}>
+                      <LabelList dataKey="share" position="top" formatter={(v) => `${v}%`} fontSize={10} />
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </article>
+
+            <article className="ev-rep-chart-card">
+              <header>
+                <h4>Categorías · código y %</h4>
+                <p className="muted">Distribución sobre {totalEvents} eventos</p>
+              </header>
+              <div className="ev-rep-chart-area ev-rep-chart-split">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={topCategoriesChart}
+                      dataKey="count"
+                      nameKey="code"
+                      cx="50%"
+                      cy="50%"
+                      innerRadius="42%"
+                      outerRadius="72%"
+                      paddingAngle={2}
+                    >
+                      {topCategoriesChart.map((_, idx) => (
+                        <Cell key={idx} fill={REP_CHART_COLORS[idx % REP_CHART_COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      formatter={(v, _n, item) => {
+                        const row = item?.payload as (typeof topCategoriesChart)[number] | undefined;
+                        return [`${v} · ${row?.share ?? 0}%`, row?.label ?? ""];
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+                <ul className="ev-rep-legend">
+                  {topCategoriesChart.map((c, idx) => (
+                    <li key={c.code}>
+                      <span className="ev-rep-legend-dot" style={{ background: REP_CHART_COLORS[idx % REP_CHART_COLORS.length] }} />
+                      <strong>{c.code}</strong>
+                      <span>{c.count}</span>
+                      <em>{c.share}%</em>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </article>
+          </div>
+
+          <div className="ev-rep-foot-table">
+            <div className="table-wrap ev-category-table-wrap">
+              <table className="ev-category-table ev-rep-table-dense">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Equipo</th>
+                    <th>Código</th>
+                    <th>Categoría</th>
+                    <th className="ev-col-num">Evt.</th>
+                    <th className="ev-col-num">%</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {repeatedByEquipment.slice(0, 6).map(([equipment, count], idx) => {
+                    const topCat =
+                      repeatedEqCat.find((r) => r.equipment === equipment)?.category ?? "";
+                    return (
+                      <tr key={equipment}>
+                        <td>{idx + 1}</td>
+                        <td>
+                          <strong>{equipment}</strong>
+                        </td>
+                        <td>
+                          <strong>{topCat || "—"}</strong>
+                        </td>
+                        <td>{(CATEGORY_META[topCat]?.label ?? topCat) || "—"}</td>
+                        <td className="ev-col-num">{count}</td>
+                        <td className="ev-col-num">{sharePct(count, totalEvents)}</td>
+                      </tr>
+                    );
+                  })}
+                  {repeatedByEquipment.length === 0 ? (
+                    <tr>
+                      <td colSpan={6}>Sin equipos con repetición ≥2 en el periodo.</td>
+                    </tr>
+                  ) : null}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     if (compact) {
       return (
         <div className={embedded ? "inf-conf-embed" : "panel"}>
@@ -311,39 +503,63 @@ export function EventInsightsDashboard({
               </>
             )}
             {kpiRow}
-            <div className="table-wrap" style={{ marginTop: "0.55rem" }}>
-              <table>
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Equipo</th>
-                    <th>Eventos</th>
-                    <th>Categoría top</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {repeatedByEquipment.slice(0, 6).map(([equipment, count], idx) => {
-                    const topCat =
-                      repeatedEqCat.find((r) => r.equipment === equipment)?.category ?? "";
-                    return (
-                      <tr key={equipment}>
-                        <td>{idx + 1}</td>
-                        <td>
-                          <strong>{equipment}</strong>
-                        </td>
-                        <td>{count}</td>
-                        <td>{(CATEGORY_META[topCat]?.label ?? topCat) || "—"}</td>
-                      </tr>
-                    );
-                  })}
-                  {repeatedByEquipment.length === 0 ? (
+
+            <EventCategoryCatalogTable
+              rows={categoryCatalog}
+              totalEvents={totalEvents}
+              title="Clasificación por categoría"
+              subtitle={`${totalEvents} evento(s) · distribución % sobre la bitácora del periodo`}
+            />
+
+            <section className="ev-category-section inf-conf-table-block">
+              <header className="ev-category-head">
+                <div>
+                  <h3>Equipos con repetición</h3>
+                  <p className="muted">
+                    {repeatedByEquipment.length} equipos · recurrencia ≥ 2 · % sobre bitácora
+                  </p>
+                </div>
+              </header>
+              <div className="table-wrap ev-category-table-wrap">
+                <table className="ev-category-table">
+                  <thead>
                     <tr>
-                      <td colSpan={4}>Sin equipos con repetición ≥2 en el periodo.</td>
+                      <th>#</th>
+                      <th>Equipo</th>
+                      <th>Código</th>
+                      <th>Categoría dominante</th>
+                      <th className="ev-col-num">Eventos</th>
+                      <th className="ev-col-num">%</th>
                     </tr>
-                  ) : null}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {repeatedByEquipment.slice(0, 10).map(([equipment, count], idx) => {
+                      const topCat =
+                        repeatedEqCat.find((r) => r.equipment === equipment)?.category ?? "";
+                      return (
+                        <tr key={equipment}>
+                          <td>{idx + 1}</td>
+                          <td>
+                            <strong>{equipment}</strong>
+                          </td>
+                          <td>
+                            <strong>{topCat || "—"}</strong>
+                          </td>
+                          <td>{(CATEGORY_META[topCat]?.label ?? topCat) || "—"}</td>
+                          <td className="ev-col-num">{count}</td>
+                          <td className="ev-col-num">{sharePct(count, totalEvents)}</td>
+                        </tr>
+                      );
+                    })}
+                    {repeatedByEquipment.length === 0 ? (
+                      <tr>
+                        <td colSpan={6}>Sin equipos con repetición ≥2 en el periodo.</td>
+                      </tr>
+                    ) : null}
+                  </tbody>
+                </table>
+              </div>
+            </section>
           </div>
         </div>
       );
@@ -593,6 +809,15 @@ export function EventInsightsDashboard({
   );
 
   if (compact) {
+    const badActorUnitKeys = new Set(badActors.map((row) => normUnitKey(row.unidad)));
+    const badActorEvents = classifiedEvents.filter((ev) => {
+      const eqKey = normUnitKey(ev.equipment);
+      return [...badActorUnitKeys].some((u) => eqKey.includes(u) || u.includes(eqKey));
+    });
+    const badActorCategoryCatalog = buildEventCategoryCatalog(
+      badActorEvents.map((ev) => ev.categoryCode),
+    );
+
     return (
       <div className={embedded ? "inf-conf-embed" : "panel"}>
         <div className={embedded ? undefined : "card"}>
@@ -606,43 +831,74 @@ export function EventInsightsDashboard({
             </>
           )}
           {badActorKpis}
-          <div className="table-wrap" style={{ marginTop: "0.55rem" }}>
-            <table>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Unidad</th>
-                  <th>Fallas</th>
-                  <th>Disp. %</th>
-                  <th>IIO</th>
-                  <th>Riesgo</th>
-                </tr>
-              </thead>
-              <tbody>
-                {badActors.slice(0, 6).map((row, idx) => (
-                  <tr key={row.unidad}>
-                    <td>{idx + 1}</td>
-                    <td>
-                      <strong>{row.unidad}</strong>
-                    </td>
-                    <td>{row.fallas}</td>
-                    <td>
-                      {row.disponibilidadPct == null ? "N/D" : `${row.disponibilidadPct.toFixed(1)}%`}
-                    </td>
-                    <td>{row.iio.toFixed(3)}</td>
-                    <td>{row.riesgoTecnico}</td>
-                  </tr>
-                ))}
-                {badActors.length === 0 ? (
+
+          {badActors.length > 0 ? (
+            <EventCategoryCatalogTable
+              rows={badActorCategoryCatalog.filter((r) => r.count > 0)}
+              totalEvents={badActors.length}
+              title="Categorías en unidades prioritarias"
+              subtitle={`${badActors.length} unidad(es) · distribución % por código de causa`}
+            />
+          ) : null}
+
+          <section className="ev-category-section inf-conf-table-block">
+            <header className="ev-category-head">
+              <div>
+                <h3>Ranking por impacto operacional</h3>
+                <p className="muted">IIO normalizado · % de fallas e IIO sobre el periodo</p>
+              </div>
+            </header>
+            <div className="table-wrap ev-category-table-wrap">
+              <table className="ev-category-table">
+                <thead>
                   <tr>
-                    <td colSpan={6}>
-                      Sin malos actores por fallas tipificadas · Conf. 100 % (0 FO imputables).
-                    </td>
+                    <th>#</th>
+                    <th>Unidad</th>
+                    <th>Código</th>
+                    <th>Categoría</th>
+                    <th className="ev-col-num">Fallas</th>
+                    <th className="ev-col-num">% fallas</th>
+                    <th className="ev-col-num">Disp. %</th>
+                    <th className="ev-col-num">IIO</th>
+                    <th className="ev-col-num">% IIO</th>
+                    <th>Riesgo</th>
                   </tr>
-                ) : null}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {badActors.slice(0, 10).map((row, idx) => {
+                    const dom = dominantCategoryForUnit(row.unidad, classifiedEvents);
+                    return (
+                      <tr key={row.unidad}>
+                        <td>{idx + 1}</td>
+                        <td>
+                          <strong>{row.unidad}</strong>
+                        </td>
+                        <td>
+                          <strong>{dom?.code ?? "—"}</strong>
+                        </td>
+                        <td>{dom?.label ?? "—"}</td>
+                        <td className="ev-col-num">{row.fallas}</td>
+                        <td className="ev-col-num">{sharePct(row.fallas, totalFallasPeriodo)}</td>
+                        <td className="ev-col-num">
+                          {row.disponibilidadPct == null ? "N/D" : `${row.disponibilidadPct.toFixed(1)}%`}
+                        </td>
+                        <td className="ev-col-num">{row.iio.toFixed(3)}</td>
+                        <td className="ev-col-num">{sharePct(row.iio, 1, 1)}</td>
+                        <td>{row.riesgoTecnico}</td>
+                      </tr>
+                    );
+                  })}
+                  {badActors.length === 0 ? (
+                    <tr>
+                      <td colSpan={10}>
+                        Sin malos actores por fallas tipificadas · Conf. 100 % (0 FO imputables).
+                      </td>
+                    </tr>
+                  ) : null}
+                </tbody>
+              </table>
+            </div>
+          </section>
         </div>
       </div>
     );

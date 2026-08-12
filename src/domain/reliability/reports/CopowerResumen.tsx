@@ -24,6 +24,7 @@ import {
   COPOWER_SOURCE_FILE,
   type CopowerMonthKey,
 } from "./copowerMonthly";
+import { generationBreakdown } from "./granTierraMonthly";
 
 const pct = (ratio: number | null | undefined, digits = 2) =>
   ratio == null || Number.isNaN(ratio) ? "N/D" : `${(ratio * 100).toFixed(digits)}%`;
@@ -115,6 +116,7 @@ export function CopowerResumen({ month }: Props) {
   const deltaDisp = fmtPpDelta(data.kpi.availability, prevData?.kpi.availability);
   const deltaConf = fmtPpDelta(data.kpi.reliability, prevData?.kpi.reliability);
   const deltaGen = fmtGenDelta(data.totalGenerationKwh, prevData?.totalGenerationKwh);
+  const genBreakdown = useMemo(() => generationBreakdown(data), [data]);
 
   return (
     <div className="exec-dashboard">
@@ -131,7 +133,7 @@ export function CopowerResumen({ month }: Props) {
 
       <section className="panel">
         <article className="card">
-          <p className="eyebrow">0 · KPI del periodo Junio</p>
+          <p className="eyebrow">0 · KPI del periodo {data.label}</p>
           <div className="exec-kpi-row">
             <div className="exec-kpi">
               <span>Disponibilidad</span>
@@ -250,7 +252,7 @@ export function CopowerResumen({ month }: Props) {
               <strong>{kwh(data.totalGenerationKwh)}</strong>
               <p>{data.kpi.generationMwh.toFixed(1)} MWh</p>
               <small>
-                Gas {kwh(data.summary.energyGasKwh)} · Diésel {kwh(data.summary.energyDieselKwh)}
+                Gas {kwh(genBreakdown.gasKwh)} · Diésel {kwh(genBreakdown.dieselKwh)}
                 {deltaGen ? (
                   <>
                     <br />

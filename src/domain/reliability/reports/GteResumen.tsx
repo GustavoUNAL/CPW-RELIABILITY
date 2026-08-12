@@ -15,9 +15,19 @@ import {
   YAxis,
 } from "recharts";
 import { CONTRACTUAL_KPI_TARGETS } from "../contracts/gteOrders";
+import type { EventRecord } from "../types";
 import { loadOperacionPack } from "../operacion/api";
-import { EFICIENCIA_FORMULA, eficienciaCampoSnapshot } from "../operacion/eficiencia";
+import {
+  EFICIENCIA_FORMULA,
+  eficienciaCampoSnapshot,
+  gasFt3FromResumen,
+} from "../operacion/eficiencia";
 import { MetricGlossary, MetricLabel } from "../ui/metricDefs";
+import {
+  buildEnergyEfficiency,
+  EFICIENCIA_MEDIDA_FORMULA,
+  REPORT_HEATING_VALUE,
+} from "./energyEfficiency";
 import { RCA_COSTAYACO_EVENTOS } from "../rca/data";
 import {
   GRAN_TIERRA_MONTH_ORDER,
@@ -54,6 +64,17 @@ type GteJuneEventRow = {
   notes: string;
   classification: GteJuneClass;
 };
+
+/**
+ * Las filas de bitácora importadas de "Horas concertadas" llegan con responsable
+ * COPOWER por defecto y 0 h de parada: solo son imputables las fallas con horas.
+ */
+function classifyLogRow(e: EventRecord): GteJuneClass {
+  const shared = e.responsible === "COPOWER" || e.responsible === "GTE + COPOWER";
+  if (e.eventType === "Falla" && shared && e.downtimeHours > 0) return "COPOWER";
+  if (e.responsible === "Externo") return "Infraestructura externa";
+  return "Infraestructura del campo";
+}
 
 const GTE_JUNE_EVENT_LOG: GteJuneEventRow[] = [
   { id: "GTE-JUN-001", date: "03-jun", equipment: "CPW06", eventType: "Falla", responsible: "GTE + COPOWER", notes: "Intercooler / secuestrante; PF_contr 4 h.", classification: "COPOWER" },
@@ -128,9 +149,7 @@ export function GteResumen({ month, only }: Props) {
         eventType: e.eventType,
         responsible: e.responsible,
         notes: e.notes || e.cause,
-        classification: (e.responsible === "COPOWER" || e.responsible === "GTE + COPOWER"
-          ? "COPOWER"
-          : "Infraestructura del campo") as GteJuneClass,
+        classification: classifyLogRow(e) as GteJuneClass,
       }));
   const recentEvents = gteEventLog.slice(0, 16);
   const eventSummary = useMemo(() => {
@@ -188,18 +207,57 @@ export function GteResumen({ month, only }: Props) {
         .map((u) => ({ unidad: u.unidad, fallas: u.fallas })),
     [units],
   );
+  /**
+   * Fallas y tiempos medios recalculados desde las columnas oficiales del Data
+   * Soporte (Falla_evento / Horas_PF_contr), no desde el resumen precalculado.
+   */
+  const official = useMemo(() => {
+    const failures = data.generationByEquipment.reduce((s, r) => s + (r.fallaEvento ?? 0), 0);
+    return {
+      failures,
+      mtbfHours: failures > 0 ? equipmentTotals.opHours / failures : null,
+      mttrHours: failures > 0 ? equipmentTotals.pfContrHours / failures : null,
+    };
+  }, [data.generationByEquipment, equipmentTotals]);
+
+  /** Medición real del totalizador de gas Moqueta; sustituye al heat rate nominal del pack. */
+  const effMedida = useMemo(() => buildEnergyEfficiency(month), [month]);
+
   const effCampo = useMemo(() => {
     const pack = loadOperacionPack();
     return eficienciaCampoSnapshot(pack.resumenDiario, month);
   }, [month]);
+
+  /** Cobertura del cálculo de eficiencia frente a la generación oficial del mes. */
+  const effBase = useMemo(() => {
+    const pack = loadOperacionPack();
+    const ym = effCampo.yearMonth;
+    const monthRows = pack.resumenDiario.filter((r) => r.fecha.startsWith(ym));
+    const withGas = monthRows.filter(
+      (r) => (gasFt3FromResumen(r) ?? 0) > 0 && (r.kwAcumuladoDia ?? 0) > 0,
+    );
+    const hr = effCampo.general.heatRateFt3Kwh;
+    const gasKwhOficial = data.generationByAsset.reduce((s, a) => s + a.gasKwh, 0);
+    return {
+      days: new Set(withGas.map((r) => r.fecha)).size,
+      totalDays: new Set(monthRows.map((r) => r.fecha)).size,
+      units: new Set(withGas.map((r) => r.equipoId)).size,
+      totalUnits: new Set(monthRows.map((r) => r.equipoId)).size,
+      coveragePct:
+        data.totalGenerationKwh > 0
+          ? (effCampo.general.energiaKwh / data.totalGenerationKwh) * 100
+          : null,
+      gasKwhOficial,
+      /** Gas del mes implícito al aplicar el heat rate a la generación oficial. */
+      gasMscfEstimado: hr != null ? (hr * gasKwhOficial) / 1000 : null,
+    };
+  }, [effCampo, data]);
   const prevMonth = monthIdx > 0 ? GRAN_TIERRA_MONTH_ORDER[monthIdx - 1] : null;
   const prevData = prevMonth ? GRAN_TIERRA_MONTHLY_DATA[prevMonth] : null;
-  const effPctLabel =
-    effCampo.general.eficienciaPct == null
-      ? "N/D"
-      : `${effCampo.general.eficienciaPct.toFixed(1)}%`;
-  const effOk =
-    effCampo.general.eficienciaPct != null && effCampo.general.eficienciaPct >= META_EFF;
+  const effPct = effMedida?.efficiencyHhvPct ?? effCampo.general.eficienciaPct;
+  const effHeatRate = effMedida?.heatRateFt3Kwh ?? effCampo.general.heatRateFt3Kwh;
+  const effPctLabel = effPct == null ? "N/D" : `${effPct.toFixed(1)}%`;
+  const effOk = effPct != null && effPct >= META_EFF;
 
   const fmtPpDelta = (curr: number | null | undefined, prev: number | null | undefined) => {
     if (curr == null || prev == null || Number.isNaN(curr) || Number.isNaN(prev)) return null;
@@ -289,13 +347,18 @@ export function GteResumen({ month, only }: Props) {
               )}
             </div>
             <div className="exec-kpi">
-              <span>Eficiencia estimada</span>
+              <span>{effMedida ? "Eficiencia medida" : "Eficiencia estimada"}</span>
               <strong>{effPctLabel}</strong>
-              <small>Eficiencia estimada en todo el parque de generación</small>
+              <small>
+                HR {effHeatRate == null ? "N/D" : `${effHeatRate.toFixed(2)} ft³/kWh`}
+                {effMedida
+                  ? ` · gas MQT medido · ${effMedida.month.units.join("/")}`
+                  : ` · ${effBase.days}/${effBase.totalDays} días con dato de gas`}
+              </small>
             </div>
           </div>
           <p className="muted" style={{ marginTop: "0.65rem", fontSize: "0.78rem" }}>
-            Fórmula: {EFICIENCIA_FORMULA}
+            Fórmula: {effMedida ? EFICIENCIA_MEDIDA_FORMULA : EFICIENCIA_FORMULA}
           </p>
         </article>
       </section>
@@ -519,13 +582,60 @@ export function GteResumen({ month, only }: Props) {
                 ) : null}
               </small>
             </div>
-            <div className={`exec-core${effCampo.general.eficienciaPct == null ? "" : effOk ? " ok" : " warn"}`}>
-              <span>Eficiencia estimada</span>
+            <div className={`exec-core${effPct == null ? "" : effOk ? " ok" : " warn"}`}>
+              <span>{effMedida ? "Eficiencia medida" : "Eficiencia estimada"}</span>
               <strong>{effPctLabel}</strong>
               <p>Meta ≥ {META_EFF}%</p>
-              <small>Eficiencia estimada en todo el parque de generación</small>
+              <small>
+                HR {effHeatRate == null ? "N/D" : `${effHeatRate.toFixed(2)} ft³/kWh`}
+                {effMedida ? (
+                  <>
+                    <br />
+                    {Math.round(effMedida.month.gasMcf).toLocaleString("es-CO")} MCF medidos ·{" "}
+                    {effMedida.month.spanDays.toFixed(0)}/{effMedida.month.calendarDays} días
+                    <br />
+                    {effMedida.efficiencyLhvPct == null
+                      ? null
+                      : `${effMedida.efficiencyLhvPct.toFixed(1)} % sobre LHV`}
+                    <br />
+                    Base contractual {REPORT_HEATING_VALUE.hhvBtuScf} BTU/scf HHV
+                  </>
+                ) : (
+                  <>
+                    <br />
+                    {effBase.days}/{effBase.totalDays} días · {effBase.units}/{effBase.totalUnits}{" "}
+                    unidades con medición
+                    {effBase.coveragePct != null ? (
+                      <>
+                        <br />
+                        Base {effBase.coveragePct.toFixed(0)} % de la generación del mes
+                      </>
+                    ) : null}
+                  </>
+                )}
+              </small>
             </div>
           </div>
+          {effMedida ? (
+            <p className="muted" style={{ marginTop: "0.6rem", fontSize: "0.74rem" }}>
+              Heat rate medido con el totalizador del gas Moqueta sobre{" "}
+              {effMedida.month.units.join(", ")}: {Math.round(effMedida.month.gasMcf).toLocaleString("es-CO")}{" "}
+              MCF contra {Math.round(effMedida.month.energyKwh).toLocaleString("es-CO")} kWh entre el{" "}
+              {effMedida.month.from} y el {effMedida.month.to}:{" "}
+              {effMedida.heatRateBtuKwh == null
+                ? "N/D"
+                : Math.round(effMedida.heatRateBtuKwh).toLocaleString("es-CO")}{" "}
+              BTU/kWh. Eficiencia calculada con el poder calorífico contractual de{" "}
+              {REPORT_HEATING_VALUE.hhvBtuScf} BTU/scf HHV, la misma base de los informes anteriores;
+              la línea Moqueta no tiene cromatografía propia. Detalle por máquina y escenarios con la
+              cromatografía medida en el slide 12.
+            </p>
+          ) : (
+            <p className="muted" style={{ marginTop: "0.6rem", fontSize: "0.74rem" }}>
+              Sin totalizador de gas para el periodo: se usa el heat rate nominal del pack diario,
+              que es una constante de referencia y no una medición.
+            </p>
+          )}
           </div>
         </details>
       </section>
@@ -555,41 +665,75 @@ export function GteResumen({ month, only }: Props) {
             </div>
             <div className="exec-kpi">
               <Wrench size={16} />
-              <span>Eventos en bitácora</span>
+              <span>Registros de bitácora</span>
               <strong>{gteEventLog.length}</strong>
-              <small>{failureEvents.length} tipo falla</small>
+              <small>
+                {failureEvents.length} tipo falla
+                {reportedFoCount > 0 ? ` · ${reportedFoCount} FO-GE-033` : ""}
+                <br />
+                Sin consolidar: la lámina de repetitivos fusiona los multi-unidad
+              </small>
             </div>
             <div className="exec-kpi">
               <Wrench size={16} />
-              <span>Fallas asociadas a COPOWER</span>
-              <strong>{eventSummary.copower}</strong>
-              <small>{`Eventos infraestructura del campo ${eventSummary.infrastructure}`}</small>
+              <span>Fallas imputables a COPOWER</span>
+              <strong>{official.failures}</strong>
+              <small>
+                Falla_evento · Data Soporte
+                <br />
+                {`Infraestructura del campo ${eventSummary.infrastructure}`}
+              </small>
             </div>
             <div className="exec-kpi">
               <Gauge size={16} />
               <MetricLabel code="MTBF" />
-              <strong>{hours(data.summary.mtbfHours)}</strong>
-              <small>MTTR {hours(data.summary.mttrHours)}</small>
+              <strong>
+                {official.mtbfHours == null ? "Sin fallas" : hours(official.mtbfHours)}
+              </strong>
+              <small>
+                MTTR {official.mttrHours == null ? "—" : hours(official.mttrHours)}
+                <br />
+                {official.failures > 0
+                  ? `${equipmentTotals.opHours.toFixed(0)} h OP / ${official.failures} fallas`
+                  : "Sin fallas imputables en el periodo"}
+              </small>
             </div>
           </div>
           <div className="exec-kpi-row" style={{ marginTop: "0.5rem" }}>
             <div className="exec-kpi">
               <span>Preventivo (PP)</span>
-              <strong>{hours(data.summary.hoursPreventive)}</strong>
+              <strong>{hours(equipmentTotals.ppHours)}</strong>
+              <small>Paradas programadas del mes</small>
             </div>
             <div className="exec-kpi">
               <span>Correctivo</span>
               <strong>{hours(data.summary.hoursCorrective)}</strong>
+              <small>Fuera de plan</small>
             </div>
             <div className="exec-kpi">
               <span>FS asociado a COPOWER</span>
-              <strong>{hours(data.summary.hoursFailureCopower)}</strong>
+              <strong>{hours(equipmentTotals.pfContrHours)}</strong>
+              <small>PF_contr · descuenta confiabilidad</small>
             </div>
             <div className="exec-kpi">
               <span>FS cliente</span>
-              <strong>{hours(data.summary.hoursFailureClient)}</strong>
+              <strong>{hours(equipmentTotals.pfCliHours)}</strong>
+              <small>PF_cli · no imputable</small>
             </div>
           </div>
+          <p className="muted" style={{ marginTop: "0.5rem", fontSize: "0.74rem" }}>
+            Cierre de horas: OP {equipmentTotals.opHours.toFixed(0)} + SB{" "}
+            {equipmentTotals.sbHours.toFixed(0)} + PP {equipmentTotals.ppHours.toFixed(0)} + PF_contr{" "}
+            {equipmentTotals.pfContrHours.toFixed(0)} + PF_cli {equipmentTotals.pfCliHours.toFixed(0)} ={" "}
+            {(
+              equipmentTotals.opHours +
+              equipmentTotals.sbHours +
+              equipmentTotals.ppHours +
+              equipmentTotals.pfContrHours +
+              equipmentTotals.pfCliHours
+            ).toFixed(0)}{" "}
+            h sobre {data.generationByEquipment.length} unidades.
+          </p>
           </div>
         </details>
       </section>

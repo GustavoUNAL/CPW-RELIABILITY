@@ -231,6 +231,7 @@ function SourceTable({
   title,
   badge,
   headline,
+  basis,
   machines,
   sistemas,
   tone,
@@ -238,6 +239,7 @@ function SourceTable({
   title: string;
   badge: string;
   headline: string;
+  basis: string;
   machines: EnrichedRow[];
   sistemas: EnrichedRow[];
   tone: "gte" | "cpw";
@@ -248,6 +250,7 @@ function SourceTable({
         <div>
           <p className="eyebrow">{title}</p>
           <strong>{headline}</strong>
+          <small className="maq-source-basis">{basis}</small>
         </div>
         <span className={`maq-source-badge ${tone}`}>{badge}</span>
       </header>
@@ -318,6 +321,7 @@ export function DesempenoMaquinaBoard({ month, monthLabel }: Props) {
             title="Disponibilidad GTE"
             badge="Informe"
             headline={`${fmtPct(a.dispGte)} %`}
+            basis="Base: anexo oficial GTE. Las filas Sistema replican el dashboard del informe, no el promedio de las unidades."
             machines={a.gte.machines}
             sistemas={a.gte.sistemas}
             tone="gte"
@@ -326,6 +330,7 @@ export function DesempenoMaquinaBoard({ month, monthLabel }: Props) {
             title="Disponibilidad COPOWER"
             badge="Concertación"
             headline={`${fmtPct(a.dispCpw)} %`}
+            basis="Base: (OP + SB) / calendario sobre horas concertadas. Las filas Sistema se recalculan desde las unidades del campo."
             machines={a.cpw.machines}
             sistemas={a.cpw.sistemas}
             tone="cpw"

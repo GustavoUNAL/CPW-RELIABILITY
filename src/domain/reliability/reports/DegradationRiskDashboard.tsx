@@ -244,38 +244,63 @@ export function DegradationRiskDashboard({
     </div>
   );
 
+  const portfolioPanels = (
+    <div className="dash-chart-grid mso-chart-grid" style={{ marginTop: "0.75rem" }}>
+      <article className="dash-chart-panel">
+        <h4>Top degradación</h4>
+        <p className="muted dash-chart-sub">Menor salud / mayor deterioro</p>
+        <ul className="mso-opp-list">
+          {topDeg.map((a) => (
+            <li key={a.id}>
+              <strong>{a.assetId}</strong>
+              <span>
+                {a.degradationLevel} · HI {a.healthIndex}
+              </span>
+              <em style={{ color: RISK_LEVEL_COLOR[a.riskLevel], fontStyle: "normal" }}>
+                {a.riskLevel}
+              </em>
+            </li>
+          ))}
+        </ul>
+      </article>
+
+      <article className="dash-chart-panel">
+        <h4>Distribución de riesgos</h4>
+        <p className="muted dash-chart-sub">Clasificación Probabilidad × Impacto</p>
+        <div className="dash-chart">
+          <ResponsiveContainer width="100%" height={210}>
+            <BarChart data={dist} margin={{ top: 8, right: 8, left: 0, bottom: 4 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
+              <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+              <YAxis allowDecimals={false} tick={{ fontSize: 10 }} width={24} />
+              <Tooltip />
+              <Bar dataKey="count" name="Activos" radius={[4, 4, 0, 0]}>
+                {dist.map((row) => (
+                  <Cell key={row.name} fill={RISK_LEVEL_COLOR[row.name as RiskLevel]} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </article>
+
+      <article className="dash-chart-panel">
+        <h4>Matriz de riesgo 5×5</h4>
+        <p className="muted dash-chart-sub">Impacto → · Probabilidad ↑</p>
+        <RiskMatrix5x5 assets={assets} />
+      </article>
+    </div>
+  );
+
   if (slide) {
     return (
       <div className="inf-conf-embed deg-dashboard--slide">
         {kpiRow}
-        <div className="table-wrap" style={{ marginTop: "0.55rem" }}>
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Activo</th>
-                <th>Salud</th>
-                <th>Degradación</th>
-                <th>Riesgo</th>
-              </tr>
-            </thead>
-            <tbody>
-              {topDeg.map((a, idx) => (
-                <tr key={a.id}>
-                  <td>{idx + 1}</td>
-                  <td>
-                    <strong>{a.assetId}</strong>
-                  </td>
-                  <td>{a.healthIndex}</td>
-                  <td>{a.degradationLevel}</td>
-                  <td style={{ color: RISK_LEVEL_COLOR[a.riskLevel] }}>{a.riskLevel}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        {portfolioPanels}
         <p className="muted" style={{ marginTop: "0.45rem", fontSize: "0.75rem" }}>
-          Baseline APM junio (seed {GTE_JUNE_DEG_SEED}) · MTBF 986,71 h · MTTR 2,60 h
+          Baseline APM junio (seed {GTE_JUNE_DEG_SEED}) · MTBF histórico 986,71 h · MTTR histórico 2,60 h.
+          Son valores de referencia de junio: el periodo cierra sin fallas imputables, por lo que no tiene
+          MTBF del mes.
         </p>
       </div>
     );
@@ -292,60 +317,16 @@ export function DegradationRiskDashboard({
               <span className="source-badge gte">GTE</span>
             </div>
             <p className="muted" style={{ marginTop: "0.35rem" }}>
-              Portafolio Costayaco alineado a Gran Tierra: {gteCtx.failures} fallas COPOWER ·{" "}
+              Portafolio Costayaco alineado a Gran Tierra. Baseline junio: {gteCtx.failures} fallas COPOWER ·{" "}
               {gteCtx.pfContrHours.toLocaleString("es-CO", { minimumFractionDigits: 2 })} h PF_contr · MTTR
-              2,60 h · MTBF 986,71 h. Enlazado a RCA / IP / MSO. Seed {GTE_JUNE_DEG_SEED}.
+              histórico 2,60 h · MTBF histórico 986,71 h. Enlazado a RCA / IP / MSO. Seed {GTE_JUNE_DEG_SEED}.
             </p>
           </>
         )}
 
         {kpiRow}
 
-        <div className="dash-chart-grid mso-chart-grid" style={{ marginTop: "0.75rem" }}>
-          <article className="dash-chart-panel">
-            <h4>Top degradación</h4>
-            <p className="muted dash-chart-sub">Menor salud / mayor deterioro</p>
-            <ul className="mso-opp-list">
-              {topDeg.map((a) => (
-                <li key={a.id}>
-                  <strong>{a.assetId}</strong>
-                  <span>
-                    {a.degradationLevel} · HI {a.healthIndex}
-                  </span>
-                  <em style={{ color: RISK_LEVEL_COLOR[a.riskLevel], fontStyle: "normal" }}>
-                    {a.riskLevel}
-                  </em>
-                </li>
-              ))}
-            </ul>
-          </article>
-
-          <article className="dash-chart-panel">
-            <h4>Distribución de riesgos</h4>
-            <p className="muted dash-chart-sub">Clasificación Probabilidad × Impacto</p>
-            <div className="dash-chart">
-              <ResponsiveContainer width="100%" height={210}>
-                <BarChart data={dist} margin={{ top: 8, right: 8, left: 0, bottom: 4 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
-                  <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                  <YAxis allowDecimals={false} tick={{ fontSize: 10 }} width={24} />
-                  <Tooltip />
-                  <Bar dataKey="count" name="Activos" radius={[4, 4, 0, 0]}>
-                    {dist.map((row) => (
-                      <Cell key={row.name} fill={RISK_LEVEL_COLOR[row.name as RiskLevel]} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </article>
-
-          <article className="dash-chart-panel">
-            <h4>Matriz de riesgo 5×5</h4>
-            <p className="muted dash-chart-sub">Impacto → · Probabilidad ↑</p>
-            <RiskMatrix5x5 assets={assets} />
-          </article>
-        </div>
+        {portfolioPanels}
 
         <div className="table-wrap" style={{ marginTop: "0.75rem" }}>
           <table>

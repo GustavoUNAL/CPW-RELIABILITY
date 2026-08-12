@@ -5,6 +5,7 @@ import {
 } from "./copowerMonthly";
 import {
   GRAN_TIERRA_MONTHLY_DATA,
+  generationBreakdown,
   type GranTierraMonthKey,
 } from "./granTierraMonthly";
 import { CopowerIndicatorsDashboard } from "./CopowerIndicatorsPanel";
@@ -274,12 +275,35 @@ function KpiFocus({
   const snap = getSnap(report, month);
   if (!snap) return <EmptyScreen detail="Sin registros para este periodo." report={report} />;
   const s = snap.summary;
+  /** Fallas imputables del periodo: sin ellas el mes no tiene MTBF ni MTTR propios. */
+  const periodFailures = snap.generationByEquipment.reduce((sum, r) => sum + (r.fallaEvento ?? 0), 0);
   const map = {
     disp: { label: "Disponibilidad", value: pct(snap.kpi.availability), note: "OP+SB / (OP+SB+MTO+FS) o anexo oficial" },
     conf: { label: "Confiabilidad", value: pct(snap.kpi.reliability), note: METRIC_DEFS.MTBF.es + " / ventana operativa" },
-    mtbf: { label: "MTBF", value: hours(s.mtbfHours), note: METRIC_DEFS.MTBF.es },
-    mttr: { label: "MTTR", value: hours(s.mttrHours), note: METRIC_DEFS.MTTR.es },
-    prod: { label: "Producción", value: kwh(snap.totalGenerationKwh), note: `Gas ${kwh(s.energyGasKwh)} · Diésel ${kwh(s.energyDieselKwh)}` },
+    mtbf: {
+      label: "MTBF",
+      value: periodFailures > 0 ? hours(s.mtbfHours) : "Sin fallas",
+      note:
+        periodFailures > 0
+          ? METRIC_DEFS.MTBF.es
+          : `${METRIC_DEFS.MTBF.es} · 0 fallas imputables en el periodo`,
+    },
+    mttr: {
+      label: "MTTR",
+      value: periodFailures > 0 ? hours(s.mttrHours) : "Sin fallas",
+      note:
+        periodFailures > 0
+          ? METRIC_DEFS.MTTR.es
+          : `${METRIC_DEFS.MTTR.es} · 0 fallas imputables en el periodo`,
+    },
+    prod: (() => {
+      const gen = generationBreakdown(snap);
+      return {
+        label: "Producción",
+        value: kwh(snap.totalGenerationKwh),
+        note: `Gas ${kwh(gen.gasKwh)} · Diésel ${kwh(gen.dieselKwh)}`,
+      };
+    })(),
     util: {
       label: "Utilización",
       value:

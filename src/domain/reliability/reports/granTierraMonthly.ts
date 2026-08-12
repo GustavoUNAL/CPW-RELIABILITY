@@ -40,6 +40,45 @@ export function granTierraMonthLabel(month: GranTierraMonthKey): string {
   return GRAN_TIERRA_MONTH_LABELS[month];
 }
 
+export type GenerationBreakdown = {
+  gasKwh: number;
+  dieselKwh: number;
+  /** Suma de los activos: debe coincidir con `totalGenerationKwh`. */
+  totalKwh: number;
+  byField: { field: string; gasKwh: number; dieselKwh: number; totalKwh: number }[];
+  /** Diferencia contra el total oficial; distinto de cero señala datos desalineados. */
+  residualKwh: number;
+};
+
+/**
+ * Desglose gas/diésel del mes.
+ *
+ * `summary.energyGasKwh` solo cubre Costayaco en los snapshots de GTE, así que
+ * enfrentarlo al total del parque no cuadra. La descomposición por activo sí
+ * suma el total, y es la única que se publica.
+ */
+export function generationBreakdown(snapshot: {
+  generationByAsset: GenerationAssetRow[];
+  totalGenerationKwh: number;
+}): GenerationBreakdown {
+  const byField = snapshot.generationByAsset.map((a) => ({
+    field: a.asset,
+    gasKwh: a.gasKwh,
+    dieselKwh: a.dieselKwh,
+    totalKwh: a.gasKwh + a.dieselKwh,
+  }));
+  const gasKwh = byField.reduce((s, f) => s + f.gasKwh, 0);
+  const dieselKwh = byField.reduce((s, f) => s + f.dieselKwh, 0);
+  const totalKwh = gasKwh + dieselKwh;
+  return {
+    gasKwh,
+    dieselKwh,
+    totalKwh,
+    byField,
+    residualKwh: snapshot.totalGenerationKwh - totalKwh,
+  };
+}
+
 /** Datos por mes desde data/GTE y data/Julio/GTE. May–Jul: KPIs oficiales de informe; Ene–Abr: estimados Excel. */
 export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMonthlySnapshot> = {
   "Ene": {

@@ -28,9 +28,10 @@ import {
   ConclusionesConfiabilidadBoard,
   InformeConfContinuacion,
   InformeConfDegradacionSection,
-  InformeConfFallasSection,
+  InformeConfEficienciaSection,
+  InformeConfFallasGroup,
   InformeConfInventarioSection,
-  InformeConfMalosActoresSection,
+  InformeConfMantenimientoSection,
   InformeConfRepetitivosSection,
 } from "./InformeConfContinuacion";
 import { GRAN_TIERRA_MONTHLY_DATA, type GranTierraMonthKey } from "./granTierraMonthly";
@@ -245,21 +246,21 @@ export function InformesResultadosDashboard({ leafId, month, monthLabel }: Props
     if (leafId === "inf-conf-fallas") {
       return (
         <div className="dash-module exec-dashboard inf-resultados">
-          <InformeConfFallasSection month={gteMonth} monthLabel={monthLabel} />
+          <InformeConfFallasGroup month={gteMonth} monthLabel={monthLabel} />
         </div>
       );
     }
     if (leafId === "inf-conf-repetitivos") {
       return (
-        <div className="dash-module exec-dashboard inf-resultados">
-          <InformeConfRepetitivosSection month={gteMonth} monthLabel={monthLabel} />
+        <div className="dash-module exec-dashboard inf-resultados inf-viewport-page">
+          <InformeConfRepetitivosSection month={gteMonth} monthLabel={monthLabel} slideViewport />
         </div>
       );
     }
-    if (leafId === "inf-conf-malos") {
+    if (leafId === "inf-conf-mantenimiento" || leafId === "inf-conf-malos") {
       return (
-        <div className="dash-module exec-dashboard inf-resultados">
-          <InformeConfMalosActoresSection month={gteMonth} monthLabel={monthLabel} />
+        <div className="dash-module exec-dashboard inf-resultados inf-viewport-page">
+          <InformeConfMantenimientoSection month={gteMonth} monthLabel={monthLabel} slideViewport />
         </div>
       );
     }
@@ -277,6 +278,13 @@ export function InformesResultadosDashboard({ leafId, month, monthLabel }: Props
         </div>
       );
     }
+    if (leafId === "inf-conf-eficiencia") {
+      return (
+        <div className="dash-module exec-dashboard inf-resultados inf-viewport-page">
+          <InformeConfEficienciaSection month={gteMonth} monthLabel={monthLabel} slideViewport />
+        </div>
+      );
+    }
     if (leafId === "inf-conf-conclusiones") {
       return (
         <div className="dash-module exec-dashboard inf-resultados">
@@ -289,8 +297,8 @@ export function InformesResultadosDashboard({ leafId, month, monthLabel }: Props
         <header className="exec-header dash-hero">
           <div>
             <p className="eyebrow">Informes · Confiabilidad</p>
-            <h2>Indicadores sistémicos y eventos</h2>
-            <p className="muted">Periodo {monthLabel} · Informe oficial Gran Tierra</p>
+            <h2>Reporte de confiabilidad parque de generación Putumayo Norte</h2>
+            <p className="muted">Periodo {monthLabel}</p>
           </div>
           <span className="source-badge gte">GTE</span>
         </header>

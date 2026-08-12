@@ -10,13 +10,15 @@ import {
 import {
   PROJECT_NAV_TREE,
   PROJECT_TITLE,
-  findLeafLabel,
   firstLeafId,
   type NavNode,
 } from "./nav/projectTree";
 import { defaultMonth, monthOptionLabel, resolveViewContext } from "./nav/resolveContext";
 import {
-  buildInformesPath,
+  FULL_REPORT_DOM_ID,
+  FULL_REPORT_LEAF,
+  FULL_REPORT_PATH,
+  isFullReportPath,
   parsePath,
   pushAppUrl,
   replaceAppUrl,
@@ -41,7 +43,10 @@ export function InformesStandalonePage() {
   const [session, setSession] = useState<SessionUser | null>(() => loadSession());
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [selectedMonth, setSelectedMonth] = useState("Jul");
-  const [activeLeafId, setActiveLeafId] = useState(leafFromLocation);
+  const [fullReport, setFullReport] = useState(isFullReportPath);
+  const [activeLeafId, setActiveLeafId] = useState(() =>
+    isFullReportPath() ? FULL_REPORT_LEAF : leafFromLocation(),
+  );
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     "inf-resultados": true,
     "inf-confiabilidad": true,
@@ -55,12 +60,15 @@ export function InformesStandalonePage() {
 
   // Normaliza `/informes` → `/informes/indisponibilidad` y sincroniza URL.
   useEffect(() => {
+    if (fullReport) return;
     replaceAppUrl("informes", activeLeafId);
-  }, [activeLeafId]);
+  }, [activeLeafId, fullReport]);
 
   useEffect(() => {
     const onPop = () => {
-      setActiveLeafId(leafFromLocation());
+      const full = isFullReportPath();
+      setFullReport(full);
+      setActiveLeafId(full ? FULL_REPORT_LEAF : leafFromLocation());
     };
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
@@ -78,9 +86,19 @@ export function InformesStandalonePage() {
   }, [viewContext, selectedMonth]);
 
   const monthLabel = monthOptionLabel(selectedMonth, viewContext);
-  const leafLabel =
-    (INFORMES_MODULE ? findLeafLabel(INFORMES_MODULE.children, activeLeafId) : null) ?? activeLeafId;
-  const pathLabel = buildInformesPath(activeLeafId);
+
+  const openFullReport = () => {
+    setFullReport(true);
+    setActiveLeafId(FULL_REPORT_LEAF);
+    window.history.pushState({ page: "informes", leaf: FULL_REPORT_LEAF }, "", FULL_REPORT_PATH);
+    window.scrollTo({ top: 0 });
+  };
+
+  const closeFullReport = () => {
+    setFullReport(false);
+    pushAppUrl("informes", FULL_REPORT_LEAF);
+    window.scrollTo({ top: 0 });
+  };
 
   const handleLogout = () => {
     clearSession();
@@ -132,6 +150,25 @@ export function InformesStandalonePage() {
         </li>
       );
     });
+
+  if (fullReport) {
+    return (
+      <div className={`app-shell ${theme} informes-report-only`}>
+        <main className="main informes-report-page" id={FULL_REPORT_DOM_ID}>
+          <button type="button" className="informes-report-exit" onClick={closeFullReport}>
+            <ArrowLeft size={14} />
+            <span>Salir de la vista limpia</span>
+          </button>
+          <PlatformContent
+            page="informes"
+            leafId={FULL_REPORT_LEAF}
+            month={selectedMonth}
+            monthLabel={monthLabel}
+          />
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className={`app-shell ${theme} informes-standalone`}>
@@ -204,15 +241,15 @@ export function InformesStandalonePage() {
 
       <main className="main main-dual">
         <header className="informes-standalone-head">
-          <div>
-            <p className="eyebrow">Vista completa · {pathLabel}</p>
-            <h2>{leafLabel}</h2>
-            <p className="muted">{monthLabel}</p>
-          </div>
-          <span className="informes-standalone-badge" title="Vista dedicada">
+          <button
+            type="button"
+            className="informes-standalone-badge"
+            title="Abrir el informe completo en una sola página"
+            onClick={openFullReport}
+          >
             <Maximize2 size={14} />
             Completa
-          </span>
+          </button>
         </header>
         <PlatformContent
           page="informes"

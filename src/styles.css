@@ -13244,6 +13244,15 @@ tr.row-focal td {
   margin-top: 0.08rem;
 }
 
+.maq-source-basis {
+  display: block;
+  margin-top: 0.12rem;
+  max-width: 62ch;
+  font-size: 0.62rem;
+  line-height: 1.25;
+  color: var(--muted);
+}
+
 .maq-source-gte > header strong {
   color: #6366f1;
 }
@@ -13822,15 +13831,9 @@ tr.row-focal td {
 .informes-standalone-head {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 1rem;
-  margin-bottom: 0.85rem;
-}
-
-.informes-standalone-head h2 {
-  margin: 0.2rem 0 0.15rem;
-  font-size: 1.25rem;
-  line-height: 1.25;
+  margin-bottom: 0.5rem;
 }
 
 .informes-standalone-badge {
@@ -13840,10 +13843,58 @@ tr.row-focal td {
   padding: 0.35rem 0.55rem;
   border-radius: 999px;
   border: 1px solid var(--border);
+  background: var(--panel-soft);
   font-size: 0.72rem;
   font-weight: 650;
   color: var(--text-muted);
   white-space: nowrap;
+  cursor: pointer;
+}
+
+.informes-standalone-badge:hover {
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+}
+
+/* Vista limpia: el informe completo ocupa la página, sin sidebar ni cabeceras. */
+.app-shell.informes-report-only {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.informes-report-page {
+  position: relative;
+  max-width: 1600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.informes-report-exit {
+  position: sticky;
+  top: 0.5rem;
+  z-index: 20;
+  float: right;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  font-size: 0.72rem;
+  font-weight: 650;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.informes-report-exit:hover {
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+}
+
+@media print {
+  .informes-report-exit {
+    display: none;
+  }
 }
 
 .informes-standalone-actions {
@@ -13921,7 +13972,7 @@ tr.row-focal td {
 
 .inf-conf-concl-kpis {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
   gap: 0.55rem;
   margin: 0.55rem 0 0.75rem;
 }
@@ -13959,6 +14010,48 @@ tr.row-focal td {
 
 .inf-conf-concl-copy {
   max-width: 78ch;
+}
+
+.inf-conf-concl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
+  gap: 0.75rem;
+}
+
+.inf-conf-concl-col {
+  padding: 0.7rem 0.85rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+}
+
+.inf-conf-concl-col .eyebrow {
+  margin: 0 0 0.45rem;
+}
+
+.inf-conf-concl-col ul,
+.inf-conf-concl-col ol {
+  margin: 0;
+  padding-left: 1.05rem;
+  display: grid;
+  gap: 0.42rem;
+}
+
+.inf-conf-concl-col li {
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--text);
+}
+
+.inf-conf-concl-col li strong {
+  font-weight: 650;
+}
+
+.inf-conf-concl-meta {
+  margin: 0.7rem 0 0;
+  font-size: 0.74rem;
+  line-height: 1.4;
+  color: var(--text-muted);
 }
 
 @media (max-width: 900px) {
@@ -14207,6 +14300,48 @@ tr.row-focal td {
   min-height: 0;
 }
 
+.inf-conf-fallas-tail {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 1.1rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--border);
+}
+
+.inf-conf-fallas-subsec {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  scroll-margin-top: 5rem;
+}
+
+.inf-conf-fallas-subsec-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.inf-conf-fallas-subsec-head h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+}
+
+.inf-conf-fallas-subsec .ev-module--embedded {
+  margin: 0;
+}
+
+.inf-conf-fallas-subsec .inf-conf-table-block,
+.inf-conf-embed .inf-conf-table-block {
+  margin-top: 0.75rem;
+}
+
+.inf-conf-fallas-subsec .ev-category-section + .ev-category-section,
+.inf-conf-embed .ev-category-section + .ev-category-section {
+  margin-top: 0.75rem;
+}
+
 /* Informes · slides contraíbles */
 .inf-conf-collapse {
   gap: 0;
@@ -14315,4 +14450,434 @@ tr.row-focal td {
 
 .inf-conf-collapse > .inf-conf-collapse-sum:has(.inf-conf-collapse-chevron)::after {
   display: none;
+}
+
+/* Informes · slide viewport (eventos repetitivos sin scroll) */
+.informes-standalone:has(.inf-viewport-page) {
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+.informes-standalone:has(.inf-viewport-page) > .main {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding-top: 0.55rem;
+  padding-bottom: 0.55rem;
+}
+
+.informes-standalone:has(.inf-viewport-page) .informes-standalone-head {
+  display: none;
+}
+
+.informes-standalone:has(.inf-viewport-page) .dash-module {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.informes-standalone:has(.inf-viewport-page) .panel {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.informes-standalone:has(.inf-viewport-page) .inf-rep-viewport-slide.card,
+.informes-standalone:has(.inf-viewport-page) .inf-mto-viewport-slide.card,
+.informes-standalone:has(.inf-viewport-page) .inf-eff-viewport-slide.card,
+.informes-standalone:has(.inf-rep-slide-deck) .inf-rep-viewport-slide.card,
+.informes-standalone:has(.inf-rep-slide-deck) .inf-mto-viewport-slide.card,
+.informes-standalone:has(.inf-rep-slide-deck) .inf-eff-viewport-slide.card {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.informes-standalone:has(.inf-viewport-page) .inf-rep-viewport-slide > .inf-conf-collapse-body,
+.informes-standalone:has(.inf-viewport-page) .inf-mto-viewport-slide > .inf-conf-collapse-body,
+.informes-standalone:has(.inf-viewport-page) .inf-eff-viewport-slide > .inf-conf-collapse-body,
+.informes-standalone:has(.inf-rep-slide-deck) .inf-rep-viewport-slide > .inf-conf-collapse-body,
+.informes-standalone:has(.inf-rep-slide-deck) .inf-mto-viewport-slide > .inf-conf-collapse-body,
+.informes-standalone:has(.inf-rep-slide-deck) .inf-eff-viewport-slide > .inf-conf-collapse-body {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  margin-top: 0.45rem;
+}
+
+/* Slide deck · eventos repetitivos */
+.rep-slide {
+  height: 100%;
+  min-height: calc(100dvh - 7.5rem);
+  max-height: calc(100dvh - 7.5rem);
+  display: grid;
+  grid-template-rows: auto minmax(14rem, 1fr) auto;
+  gap: 0.42rem;
+  overflow: hidden;
+}
+
+.rep-slide-kpis {
+  grid-row: 1;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.38rem;
+}
+
+.informes-standalone:has(.inf-viewport-page) .rep-slide {
+  min-height: 0;
+  max-height: none;
+  height: 100%;
+}
+
+.rep-slide-kpis article {
+  display: flex;
+  flex-direction: column;
+  gap: 0.08rem;
+  padding: 0.42rem 0.5rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--panel) 94%, transparent);
+  min-width: 0;
+  border-left: 3px solid #0e6e8c;
+}
+
+.rep-slide-kpis article:nth-child(2) { border-left-color: #6366f1; }
+.rep-slide-kpis article:nth-child(3) { border-left-color: #7c3aed; }
+.rep-slide-kpis article:nth-child(4) { border-left-color: #d97706; }
+.rep-slide-kpis article:nth-child(5) { border-left-color: #0f766e; }
+
+.rep-slide-kpis svg {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.rep-slide-kpis span {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  line-height: 1.2;
+}
+
+.rep-slide-kpis strong {
+  font-size: 1.22rem;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.05;
+}
+
+.rep-slide-kpis small {
+  font-size: 0.66rem;
+  color: var(--text-muted);
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rep-slide-charts {
+  grid-row: 2;
+  min-height: 14rem;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 0.72fr;
+  gap: 0.42rem;
+  overflow: hidden;
+}
+
+.mto-slide-charts,
+.eff-slide-charts {
+  grid-template-columns: 1fr 1fr;
+}
+
+.rep-slide-chart {
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--panel) 92%, transparent);
+  overflow: hidden;
+}
+
+.rep-slide-chart header {
+  flex-shrink: 0;
+  padding: 0.38rem 0.55rem 0.2rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+}
+
+.rep-slide-chart h4 {
+  margin: 0;
+  font-size: 0.78rem;
+  letter-spacing: -0.01em;
+}
+
+.rep-slide-chart header p {
+  margin: 0.06rem 0 0;
+  font-size: 0.64rem;
+  color: var(--text-muted);
+}
+
+.rep-slide-chart-body {
+  flex: 1;
+  min-height: 10rem;
+}
+
+.rep-slide-donut-wrap {
+  position: relative;
+}
+
+.rep-slide-donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.rep-slide-donut-center strong {
+  font-size: 1.35rem;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.rep-slide-donut-center span {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.rep-slide-tables {
+  grid-row: 3;
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.42rem;
+  max-height: 10.5rem;
+  overflow: hidden;
+}
+
+.rep-slide-chart--pairs .rep-slide-chart-body {
+  min-height: 8rem;
+}
+
+.rep-slide-pair-foot {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  padding: 0.28rem 0.55rem 0.38rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.66rem;
+  color: var(--text-muted);
+}
+
+.rep-slide-pair-foot span {
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-weight: 700;
+}
+
+.rep-slide-pair-foot strong {
+  color: var(--text);
+  font-size: 0.72rem;
+}
+
+.rep-slide-pair-foot em {
+  font-style: normal;
+  font-size: 0.68rem;
+  color: #0f766e;
+  font-weight: 650;
+}
+
+.rep-slide-pair-foot b {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.rep-slide-empty {
+  margin: auto;
+  padding: 1rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.rep-slide-chart-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(6.5rem, 7.5rem);
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.mto-status-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0 0.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  font-size: 0.62rem;
+}
+
+.mto-status-legend li {
+  display: grid;
+  grid-template-columns: 0.45rem 1fr auto auto;
+  gap: 0.22rem;
+  align-items: center;
+  color: var(--text-muted);
+}
+
+.mto-status-legend strong {
+  color: var(--text);
+  font-size: 0.64rem;
+  font-weight: 650;
+}
+
+.mto-status-legend em {
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+  color: #0f766e;
+  font-weight: 650;
+}
+
+.ev-rep-legend-dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.rep-slide-table-panel {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--panel) 94%, transparent);
+}
+
+.rep-slide-table-panel header {
+  flex-shrink: 0;
+  padding: 0.32rem 0.5rem 0.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.rep-slide-table-panel h4 {
+  margin: 0;
+  font-size: 0.72rem;
+}
+
+.rep-slide-table-panel p {
+  margin: 0.04rem 0 0;
+  font-size: 0.62rem;
+  color: var(--text-muted);
+}
+
+.rep-slide-table-panel .table-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.rep-slide-table thead th,
+.rep-slide-table tbody td {
+  padding: 0.24rem 0.38rem;
+  font-size: 0.68rem;
+}
+
+/* La lámina de eficiencia lleva el detalle por máquina: necesita más alto y scroll. */
+.eff-slide-tables {
+  max-height: 13.5rem;
+}
+
+.eff-slide-tables .rep-slide-table-panel .table-wrap {
+  overflow-y: auto;
+}
+
+.rep-slide-note {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0.22rem 0.5rem 0.3rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.6rem;
+  color: var(--text-muted);
+}
+
+@media (max-width: 1200px) {
+  .rep-slide-kpis {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .rep-slide-charts {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .rep-slide-chart--pairs {
+    grid-column: 1 / -1;
+    max-height: 11rem;
+  }
+
+  .rep-slide-tables {
+    grid-template-columns: 1fr;
+    max-height: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .informes-standalone:has(.inf-viewport-page) {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .informes-standalone:has(.inf-viewport-page) > .main,
+  .informes-standalone:has(.inf-viewport-page) .dash-module,
+  .informes-standalone:has(.inf-viewport-page) .panel,
+  .informes-standalone:has(.inf-viewport-page) .inf-rep-viewport-slide.card,
+  .informes-standalone:has(.inf-viewport-page) .inf-mto-viewport-slide.card,
+  .informes-standalone:has(.inf-viewport-page) .inf-rep-viewport-slide > .inf-conf-collapse-body,
+  .informes-standalone:has(.inf-viewport-page) .inf-mto-viewport-slide > .inf-conf-collapse-body,
+  .rep-slide {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .rep-slide {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .rep-slide-charts {
+    min-height: 20rem;
+    grid-template-columns: 1fr;
+  }
+}
+
+/* legacy ev-rep-* (EventInsightsDashboard compact slide) — keep minimal */
+.ev-rep-viewport {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  overflow: hidden;
 }

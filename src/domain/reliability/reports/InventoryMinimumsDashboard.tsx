@@ -202,6 +202,8 @@ export function InventoryMinimumsDashboard({
   }, [enriched, family, coverage, query]);
 
   const criticalRows = slide ? planningCritical.slice(0, 6) : planningCritical;
+  const catalogIds = useMemo(() => new Set(enriched.map((i) => i.id)), [enriched]);
+  const uncatalogedCritical = planningCritical.filter((s) => !catalogIds.has(s.id)).length;
 
   const kpiRow = (
     <div className="exec-kpi-row" style={{ marginTop: embedded || slide ? "0" : "0.65rem" }}>
@@ -297,6 +299,11 @@ export function InventoryMinimumsDashboard({
             </tbody>
           </table>
         </div>
+        <p className="muted" style={{ marginTop: "0.35rem", fontSize: "0.7rem" }}>
+          Universo distinto al de los KPI: {planningCritical.length} críticos del plan de los cuales{" "}
+          {uncatalogedCritical} no están en el catálogo de {kpis.total} ítems, por eso su conteo de
+          faltantes no coincide con «Sin existencia» y «Bajo mínimo».
+        </p>
       </section>
     ) : null;
 

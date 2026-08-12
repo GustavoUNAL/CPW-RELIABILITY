@@ -165,6 +165,17 @@ export function isInformesStandalonePath(pathname = window.location.pathname): b
   return clean === "/informes" || clean.startsWith("/informes/");
 }
 
+/** Informe completo en una sola página, sin navegación ni cabeceras. */
+export const FULL_REPORT_PATH = "/informes/reporte-completo";
+/** Hoja que agrupa todas las secciones del informe de confiabilidad. */
+export const FULL_REPORT_LEAF = "inf-conf-resumen";
+/** Ancla única de la página para deep links e impresión. */
+export const FULL_REPORT_DOM_ID = "reporte-confiabilidad";
+
+export function isFullReportPath(pathname = window.location.pathname): boolean {
+  return cleanPathname(pathname) === FULL_REPORT_PATH;
+}
+
 function collectLeaves(nodes: NavNode[], out: Set<string> = new Set()): Set<string> {
   for (const n of nodes) {
     if (!n.children?.length) out.add(n.id);
