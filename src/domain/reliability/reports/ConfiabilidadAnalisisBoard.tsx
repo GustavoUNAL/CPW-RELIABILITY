@@ -180,7 +180,8 @@ export function ConfiabilidadAnalisisBoard({ month, monthLabel }: Props) {
   const period = monthLabel ?? month;
 
   return (
-    <section className="panel">
+    <section className="panel inf-report-section" id="inf-sec-confiabilidad">
+      <ExecInsight text={INFORME_EXEC_INSIGHTS.confiabilidad} />
       <details className="card disp-analisis conf-analisis inf-conf-collapse" open>
         <summary className="inf-conf-collapse-sum">
           <div className="inf-conf-collapse-sum-main">
@@ -199,7 +200,6 @@ export function ConfiabilidadAnalisisBoard({ month, monthLabel }: Props) {
           </div>
         </summary>
         <div className="inf-conf-collapse-body">
-        <ExecInsight text={INFORME_EXEC_INSIGHTS.confiabilidad} />
         <div className="disp-kpi-row">
           <article className="disp-kpi disp-kpi-gte">
             <span>Gran Tierra · informe</span>

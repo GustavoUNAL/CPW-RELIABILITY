@@ -19,6 +19,8 @@ import { ExecInsight, INFORME_EXEC_INSIGHTS } from "./informeExecInsights";
 type Props = {
   month: string;
   monthLabel?: string;
+  hideInsight?: boolean;
+  n?: number;
 };
 
 const C = {
@@ -87,7 +89,12 @@ function ChartTip({
   );
 }
 
-export function DisponibilidadHorasBoard({ month, monthLabel }: Props) {
+export function DisponibilidadHorasBoard({
+  month,
+  monthLabel,
+  hideInsight = false,
+  n = 4,
+}: Props) {
   const a = buildDisponibilidadAnalisis(month);
   const cpw = COPOWER_MONTHLY_DATA[month as CopowerMonthKey];
   if (!a.programmed || a.dispCpw == null || !cpw) return null;
@@ -118,11 +125,12 @@ export function DisponibilidadHorasBoard({ month, monthLabel }: Props) {
   const preventivo = units.filter((u) => u.pp > 0).sort((x, y) => y.pp - x.pp);
 
   return (
-    <section className="panel">
+    <section className="panel inf-report-section" id="inf-sec-generacion">
+      {hideInsight ? null : <ExecInsight text={INFORME_EXEC_INSIGHTS.generacion} />}
       <details className="card disp-analisis hours-viz inf-conf-collapse" open>
         <summary className="inf-conf-collapse-sum">
           <div className="inf-conf-collapse-sum-main">
-            <p className="eyebrow">4 · Desglose de horas{monthLabel ? ` · ${monthLabel}` : ""}</p>
+            <p className="eyebrow">{n} · Desglose de horas{monthLabel ? ` · ${monthLabel}` : ""}</p>
             <h3>De las unidades al resultado concertado</h3>
           </div>
           <div className="hours-viz-formula" aria-label="Disponibles igual operación más stand-by">
@@ -138,7 +146,6 @@ export function DisponibilidadHorasBoard({ month, monthLabel }: Props) {
           </div>
         </summary>
         <div className="inf-conf-collapse-body">
-        <ExecInsight text={INFORME_EXEC_INSIGHTS.generacion} />
         <div className="hours-viz-kpis">
           <article>
             <span>Energía entregada</span>

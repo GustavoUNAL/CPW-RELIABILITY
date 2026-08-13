@@ -283,6 +283,21 @@ export const PROJECT_NAV_TREE: NavModule[] = [
           { id: "inf-conf-conclusiones", label: "13 · Conclusiones" },
         ],
       },
+      {
+        id: "inf-conf-copower",
+        label: "Confiabilidad COPOWER",
+        children: [
+          { id: "inf-cpw-resumen", label: "Indicadores y eventos" },
+          { id: "inf-cpw-horas", label: "Generación y horas" },
+          { id: "inf-cpw-maquinas", label: "Desempeño por máquina" },
+          { id: "inf-cpw-fallas", label: "Análisis de fallas" },
+          { id: "inf-cpw-repetitivos", label: "Eventos repetitivos" },
+          { id: "inf-cpw-mantenimiento", label: "Mantenimiento" },
+          { id: "inf-cpw-inventario", label: "Mínimos de inventario" },
+          { id: "inf-cpw-eficiencia", label: "Eficiencia energética" },
+          { id: "inf-cpw-conclusiones", label: "Conclusiones" },
+        ],
+      },
     ],
   },
   {

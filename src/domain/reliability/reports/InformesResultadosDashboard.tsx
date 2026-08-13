@@ -34,6 +34,8 @@ import {
   InformeConfMantenimientoSection,
   InformeConfRepetitivosSection,
 } from "./InformeConfContinuacion";
+import { InformeLogo } from "./InformeBrandChrome";
+import { InformeCopowerConfiabilidad } from "./InformeCopowerConfiabilidad";
 import { GRAN_TIERRA_MONTHLY_DATA, type GranTierraMonthKey } from "./granTierraMonthly";
 
 type Props = {
@@ -220,6 +222,9 @@ function EventsTable({
 }
 
 export function InformesResultadosDashboard({ leafId, month, monthLabel }: Props) {
+  if (leafId.startsWith("inf-cpw-")) {
+    return <InformeCopowerConfiabilidad leafId={leafId} month={month} monthLabel={monthLabel} />;
+  }
   if (leafId === "inf-conf-resumen" || leafId.startsWith("inf-conf-")) {
     const gteMonth = (month in GRAN_TIERRA_MONTHLY_DATA ? month : "Jul") as GranTierraMonthKey;
     if (leafId === "inf-conf-conciliacion") {
@@ -294,11 +299,12 @@ export function InformesResultadosDashboard({ leafId, month, monthLabel }: Props
     }
     return (
       <div className="dash-module exec-dashboard inf-resultados">
-        <header className="exec-header dash-hero">
-          <div>
+        <header className="exec-header dash-hero inf-report-cover">
+          <InformeLogo className="inf-brand-logo inf-brand-logo--cover" />
+          <div className="inf-report-cover-copy">
             <p className="eyebrow">Informes · Confiabilidad</p>
             <h2>Reporte de confiabilidad parque de generación Putumayo Norte</h2>
-            <p className="muted">Periodo {monthLabel}</p>
+            <p className="muted">Periodo {monthLabel} · Costayaco / Vonú · Gran Tierra Energy</p>
           </div>
           <span className="source-badge gte">GTE</span>
         </header>

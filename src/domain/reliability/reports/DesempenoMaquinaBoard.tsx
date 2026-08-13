@@ -11,6 +11,8 @@ import { ExecInsight, INFORME_EXEC_INSIGHTS } from "./informeExecInsights";
 type Props = {
   month: string;
   monthLabel?: string;
+  /** Solo tabla COPOWER (informe interno). Dual por defecto. */
+  source?: "dual" | "copower";
 };
 
 const META_COSTAYACO = CONTRACTUAL_KPI_TARGETS.availability * 100;
@@ -236,7 +238,6 @@ function SourceTable({
   machines,
   sistemas,
   tone,
-  insight,
 }: {
   title: string;
   badge: string;
@@ -245,11 +246,9 @@ function SourceTable({
   machines: EnrichedRow[];
   sistemas: EnrichedRow[];
   tone: "gte" | "cpw";
-  insight?: string;
 }) {
   return (
     <div className={`maq-source-table maq-source-${tone}`}>
-      {insight ? <ExecInsight text={insight} className="inf-exec-insight--nested" /> : null}
       <header>
         <div>
           <p className="eyebrow">{title}</p>
@@ -291,9 +290,10 @@ function SourceTable({
   );
 }
 
-export function DesempenoMaquinaBoard({ month, monthLabel }: Props) {
+export function DesempenoMaquinaBoard({ month, monthLabel, source = "dual" }: Props) {
   const a = buildDesempenoMaquina(month);
   const period = monthLabel ?? month;
+  const copowerOnly = source === "copower";
   if (!a.gte.machines.length && !a.cpw.machines.length) {
     return (
       <section className="panel">
@@ -306,12 +306,27 @@ export function DesempenoMaquinaBoard({ month, monthLabel }: Props) {
   }
 
   return (
-    <section className="panel">
+    <section className="panel inf-report-section" id="inf-sec-maquinas">
+      {copowerOnly ? (
+        <ExecInsight text={INFORME_EXEC_INSIGHTS.maquinasCopower} />
+      ) : (
+        <>
+          <ExecInsight text={INFORME_EXEC_INSIGHTS.maquinasGte} />
+          <ExecInsight text={INFORME_EXEC_INSIGHTS.maquinasCopower} />
+        </>
+      )}
       <details className="card disp-analisis maq-board maq-board-slide inf-conf-collapse" open>
         <summary className="inf-conf-collapse-sum">
           <div className="inf-conf-collapse-sum-main">
-            <p className="eyebrow">6 · Indicadores de desempeño por máquina{period ? ` · ${period}` : ""}</p>
-            <h3>Disponibilidad GTE y COPOWER por unidad y campo</h3>
+            <p className="eyebrow">
+              {copowerOnly ? "3" : "6"} · Indicadores de desempeño por máquina
+              {period ? ` · ${period}` : ""}
+            </p>
+            <h3>
+              {copowerOnly
+                ? "Disponibilidad COPOWER por unidad y campo"
+                : "Disponibilidad GTE y COPOWER por unidad y campo"}
+            </h3>
           </div>
           <div className="maq-meta-strip" aria-label="Metas contractuales Orden 1">
             <span>Orden 1</span>
@@ -321,6 +336,7 @@ export function DesempenoMaquinaBoard({ month, monthLabel }: Props) {
         </summary>
         <div className="inf-conf-collapse-body">
         <div className="maq-stack">
+          {copowerOnly ? null : (
           <SourceTable
             title="Disponibilidad GTE"
             badge="Informe"
@@ -329,8 +345,8 @@ export function DesempenoMaquinaBoard({ month, monthLabel }: Props) {
             machines={a.gte.machines}
             sistemas={a.gte.sistemas}
             tone="gte"
-            insight={INFORME_EXEC_INSIGHTS.maquinasGte}
           />
+          )}
           <SourceTable
             title="Disponibilidad COPOWER"
             badge="Concertación"
@@ -339,7 +355,6 @@ export function DesempenoMaquinaBoard({ month, monthLabel }: Props) {
             machines={a.cpw.machines}
             sistemas={a.cpw.sistemas}
             tone="cpw"
-            insight={INFORME_EXEC_INSIGHTS.maquinasCopower}
           />
         </div>
         </div>

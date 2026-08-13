@@ -77,7 +77,7 @@ function renderInsightCopy(text: string): ReactNode {
   });
 }
 
-/** Párrafo interpretativo al inicio de cada slide del informe. */
+/** Párrafo interpretativo del informe: prosa de documento, sin etiqueta. */
 export function ExecInsight({
   text,
   children,
@@ -86,17 +86,18 @@ export function ExecInsight({
   text?: string | null;
   children?: ReactNode;
   className?: string;
+  /** @deprecated Ya no se muestra etiqueta; se conserva por compatibilidad. */
+  label?: string;
 }) {
   const body = text?.trim() || children;
   if (!body) return null;
   return (
-    <aside className={`inf-exec-insight ${className}`.trim()}>
-      <p className="inf-exec-insight-label">Lectura del periodo</p>
+    <div className={`inf-exec-insight ${className}`.trim()}>
       {typeof body === "string" ? (
         <p className="inf-exec-insight-copy">{renderInsightCopy(body)}</p>
       ) : (
         body
       )}
-    </aside>
+    </div>
   );
 }

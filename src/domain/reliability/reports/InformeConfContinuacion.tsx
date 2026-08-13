@@ -23,12 +23,8 @@ import {
 } from "../rca/rcaEventStore";
 import type { RcaEventoFalla } from "../rca/types";
 import { INVENTORY_MINIMUMS } from "./inventoryMinimumsData";
-import { getPlanningCriticalSpares } from "./inventoryPlanningCritical";
 import { MAINTENANCE_PLANS } from "./maintenancePlansData";
-import {
-  buildGteDegradationRiskPortfolio,
-  topDegrading,
-} from "./buildDegradationRiskPortfolio";
+import { buildGteDegradationRiskPortfolio } from "./buildDegradationRiskPortfolio";
 import { portfolioSummary } from "./degradationRiskEngine";
 import {
   ExecInsight,
@@ -64,9 +60,11 @@ export function CollapsibleSlide({
   badge,
   defaultOpen = true,
   children,
+  footer,
   className = "",
   id,
   insight,
+  secondaryInsight,
 }: {
   n: number;
   title: string;
@@ -74,13 +72,21 @@ export function CollapsibleSlide({
   badge?: string;
   defaultOpen?: boolean;
   children: ReactNode;
+  /** Contenido fuera del details (p. ej. fichas RCA con su lectura). */
+  footer?: ReactNode;
   className?: string;
   id?: string;
   insight?: string | null;
+  secondaryInsight?: string | null;
 }) {
   return (
-    <section className="panel" id={id}>
-      <details className={`card disp-analisis maq-board-slide inf-conf-sec inf-conf-collapse ${className}`.trim()} open={defaultOpen}>
+    <section className="panel inf-report-section" id={id}>
+      <ExecInsight text={insight} />
+      <ExecInsight text={secondaryInsight} />
+      <details
+        className={`card disp-analisis maq-board-slide inf-conf-sec inf-conf-collapse ${className}`.trim()}
+        open={defaultOpen}
+      >
         <summary className="inf-conf-collapse-sum">
           <div className="inf-conf-collapse-sum-main">
             <p className="eyebrow">
@@ -93,11 +99,9 @@ export function CollapsibleSlide({
             <ChevronDown size={18} className="inf-conf-collapse-chevron" aria-hidden />
           </div>
         </summary>
-        <div className="inf-conf-collapse-body">
-          <ExecInsight text={insight} />
-          {children}
-        </div>
+        <div className="inf-conf-collapse-body">{children}</div>
       </details>
+      {footer}
     </section>
   );
 }
@@ -129,14 +133,15 @@ function InformeConfRepetitivosBody({
   month,
   monthLabel,
   slideViewport = true,
-}: MonthProps & { slideViewport?: boolean }) {
+  report = "gran_tierra",
+}: MonthProps & { slideViewport?: boolean; report?: "gran_tierra" | "copower" }) {
   if (slideViewport) {
-    return <RepetitivosInformeSlide month={month} monthLabel={monthLabel} />;
+    return <RepetitivosInformeSlide report={report} month={month} monthLabel={monthLabel} />;
   }
 
   return (
     <>
-      {month === "Jul" ? (
+      {month === "Jul" && report === "gran_tierra" ? (
         <div className="inf-conf-vs-box inf-conf-vs-box--compact">
           <p className="eyebrow">Julio vs junio</p>
           <p>
@@ -146,7 +151,7 @@ function InformeConfRepetitivosBody({
         </div>
       ) : null}
       <EventInsightsDashboard
-        report="gran_tierra"
+        report={report}
         month={month}
         monthLabel={monthLabel}
         mode="repetitivos"
@@ -208,12 +213,40 @@ export function InformeConfFallasSection({ month, monthLabel }: MonthProps) {
 
   return (
     <CollapsibleSlide
+      id="inf-sec-fallas"
       n={7}
       title={`Análisis de fallas · ${monthLabel}`}
       sub="Resumen de formatos de ocurrencia FO-GE-033"
       badge="GTE"
       className="inf-conf-fallas-unified"
       insight={INFORME_EXEC_INSIGHTS.fallas}
+      footer={
+        periodRca.length > 0 ? (
+          <div className="inf-conf-rca-stack">
+            <header className="inf-conf-rca-stack-head">
+              <p className="eyebrow">Fichas RCA · {monthLabel}</p>
+              <h3>
+                Detalle FO-GE-033 · {periodRca.length} evento{periodRca.length === 1 ? "" : "s"}
+              </h3>
+            </header>
+            {periodRca.map((evento) => {
+              const foKey = foInsightKey(evento.id) ?? foInsightKey(evento.fuente ?? "");
+              return (
+                <div key={evento.id} id={`inf-conf-rca-${evento.id}`} className="inf-conf-rca-item">
+                  {foKey ? <ExecInsight text={INFORME_EXEC_INSIGHTS[foKey]} /> : null}
+                  <EditableEventDetail
+                    event={evento}
+                    compact
+                    readOnly
+                    onSave={handleRcaSave}
+                    onOpenRelated={openRelatedRca}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        ) : null
+      }
     >
       <div className="inf-conf-fallas-kpis" aria-label="Indicadores demostrados del periodo">
         <article>
@@ -284,32 +317,6 @@ export function InformeConfFallasSection({ month, monthLabel }: MonthProps) {
           hideEventLists
         />
       </div>
-
-      {periodRca.length > 0 ? (
-        <div className="inf-conf-rca-stack">
-          <header className="inf-conf-rca-stack-head">
-            <p className="eyebrow">Fichas RCA · {monthLabel}</p>
-            <h3>
-              Detalle FO-GE-033 · {periodRca.length} evento{periodRca.length === 1 ? "" : "s"}
-            </h3>
-          </header>
-          {periodRca.map((evento) => {
-            const foKey = foInsightKey(evento.id) ?? foInsightKey(evento.fuente ?? "");
-            return (
-              <div key={evento.id} id={`inf-conf-rca-${evento.id}`} className="inf-conf-rca-item">
-                {foKey ? <ExecInsight text={INFORME_EXEC_INSIGHTS[foKey]} /> : null}
-                <EditableEventDetail
-                  event={evento}
-                  compact
-                  readOnly
-                  onSave={handleRcaSave}
-                  onOpenRelated={openRelatedRca}
-                />
-              </div>
-            );
-          })}
-        </div>
-      ) : null}
     </CollapsibleSlide>
   );
 }
@@ -330,18 +337,24 @@ export function InformeConfRepetitivosSection({
   month,
   monthLabel,
   slideViewport = true,
-}: MonthProps & { slideViewport?: boolean }) {
+  report = "gran_tierra",
+}: MonthProps & { slideViewport?: boolean; report?: "gran_tierra" | "copower" }) {
   return (
     <CollapsibleSlide
       id="inf-conf-repetitivos"
-      n={8}
+      n={report === "copower" ? 5 : 8}
       title={`Eventos repetitivos · ${monthLabel}`}
       sub="Recurrencia por equipo y categoría"
-      badge="GTE"
+      badge={report === "copower" ? "COPOWER" : "GTE"}
       className={`inf-conf-slide-one inf-rep-viewport-slide${slideViewport ? " inf-rep-slide-deck" : ""}`}
-      insight={INFORME_EXEC_INSIGHTS.repetitivos}
+      insight={report === "copower" ? null : INFORME_EXEC_INSIGHTS.repetitivos}
     >
-      <InformeConfRepetitivosBody month={month} monthLabel={monthLabel} slideViewport={slideViewport} />
+      <InformeConfRepetitivosBody
+        month={month}
+        monthLabel={monthLabel}
+        slideViewport={slideViewport}
+        report={report}
+      />
     </CollapsibleSlide>
   );
 }
@@ -351,11 +364,12 @@ export function InformeConfMantenimientoSection({
   month,
   monthLabel,
   slideViewport = true,
-}: MonthProps & { slideViewport?: boolean }) {
+  n = 9,
+}: MonthProps & { slideViewport?: boolean; n?: number }) {
   return (
     <CollapsibleSlide
       id="inf-conf-mantenimiento"
-      n={9}
+      n={n}
       title={`Mantenimiento · ${monthLabel}`}
       sub="Plan vs ejecución · horas MTO e intervenciones"
       badge="MTO"
@@ -368,10 +382,17 @@ export function InformeConfMantenimientoSection({
 }
 
 /** 10 · Mínimos de inventario */
-export function InformeConfInventarioSection({ monthLabel }: { monthLabel: string }) {
+export function InformeConfInventarioSection({
+  monthLabel,
+  n = 10,
+}: {
+  monthLabel: string;
+  n?: number;
+}) {
   return (
     <CollapsibleSlide
-      n={10}
+      id="inf-sec-inventario"
+      n={n}
       title={`Mínimos de inventario · ${monthLabel}`}
       sub={`Cobertura · ${INVENTORY_MINIMUMS.items.length} ítems`}
       badge="Activos"
@@ -387,6 +408,7 @@ export function InformeConfInventarioSection({ monthLabel }: { monthLabel: strin
 export function InformeConfDegradacionSection({ monthLabel }: { monthLabel: string }) {
   return (
     <CollapsibleSlide
+      id="inf-sec-degradacion"
       n={11}
       title={`Tendencias de degradación y riesgos · ${monthLabel}`}
       sub="Baseline APM junio · contraste operativo"
@@ -408,11 +430,12 @@ export function InformeConfEficienciaSection({
   month,
   monthLabel,
   slideViewport = true,
-}: MonthProps & { slideViewport?: boolean }) {
+  n = 12,
+}: MonthProps & { slideViewport?: boolean; n?: number }) {
   return (
     <CollapsibleSlide
       id="inf-conf-eficiencia"
-      n={12}
+      n={n}
       title={`Eficiencia energética · ${monthLabel}`}
       sub="Heat rate medido del gas Moqueta · CPW04–CPW06"
       badge="Gas MQT"
@@ -435,21 +458,10 @@ export function ConclusionesConfiabilidadBoard({ month, monthLabel }: MonthProps
   const dispCpw = disp.dispCpw != null ? disp.dispCpw * 100 : null;
   const deltaDisp =
     dispGte != null ? Number((dispGte - EXEC_JUN.availability * 100).toFixed(2)) : null;
-  const noCumple =
-    gte?.machineIndicators.filter(
-      (m) => m.cumplimiento === "NO CUMPLE" && !/SISTEMA/i.test(m.unidad),
-    ) ?? [];
-
   const cierre = useMemo(() => {
     const mto = MAINTENANCE_PLANS.monthlySummary.find((m) => m.monthKey === month) ?? null;
-    // El catálogo ETL no marca faltantes; los repuestos en riesgo salen del cruce con RCA/IP.
-    const criticalSpares = getPlanningCriticalSpares();
-    const outOfStock = criticalSpares.filter((s) => s.onHand <= 0);
-    const belowMin = criticalSpares.filter((s) => s.onHand > 0 && s.onHand < s.stockMin);
-
     const assets = buildGteDegradationRiskPortfolio();
     const apm = portfolioSummary(assets);
-    const worstAsset = topDegrading(assets, 1)[0] ?? null;
 
     // La bitácora incluye una fila diaria por unidad: solo cuentan falla y causa común.
     const logRows = gte?.eventLog ?? [];
@@ -481,12 +493,7 @@ export function ConclusionesConfiabilidadBoard({ month, monthLabel }: MonthProps
       eff: buildEnergyEfficiency(month),
       units,
       worstUnit,
-      criticalSpares: criticalSpares.length,
-      outOfStock: outOfStock.length,
-      belowMin: belowMin.length,
-      invTotal: INVENTORY_MINIMUMS.items.length,
       apm,
-      worstAsset,
       realEvents: realEvents.length,
       commonCause: commonCause.length,
       repeatedUnits: repeated.length,
@@ -501,12 +508,14 @@ export function ConclusionesConfiabilidadBoard({ month, monthLabel }: MonthProps
 
   return (
     <CollapsibleSlide
+      id="inf-sec-conclusiones"
       n={13}
       title={`Conclusiones · ${monthLabel}`}
       sub="Cierre del informe de confiabilidad"
       badge="Orden 1"
       className="inf-conf-conclusiones"
       insight={INFORME_EXEC_INSIGHTS.conclusiones}
+      secondaryInsight={INFORME_EXEC_INSIGHTS.acciones}
     >
       <div className="inf-conf-concl-kpis">
         <article>
@@ -618,45 +627,6 @@ export function ConclusionesConfiabilidadBoard({ month, monthLabel }: MonthProps
             ) : null}
           </ul>
         </section>
-
-        <section className="inf-conf-concl-col">
-          <p className="eyebrow">Acciones · Orden 1</p>
-          <ExecInsight text={INFORME_EXEC_INSIGHTS.acciones} className="inf-exec-insight--nested" />
-          <ol>
-            <li>
-              Solicitar a Gran Tierra el <strong>desglose horario</strong> del{" "}
-              {dispGte != null ? `${dispGte.toFixed(2)} %` : "indicador oficial"} y conciliar por
-              evento antes del próximo corte.
-            </li>
-            <li>
-              {month === "Jul" ? (
-                <>
-                  Cerrar los RCA de <strong>cascadas MRU</strong> y la frontera de responsabilidad
-                  FO-60 gas MQT para blindar la confiabilidad reportada.
-                </>
-              ) : (
-                <>
-                  Cerrar los <strong>RCA abiertos</strong> del periodo y documentar la frontera de
-                  responsabilidad de cada FO.
-                </>
-              )}
-            </li>
-            <li>
-              Intervenir los activos de menor salud
-              {cierre.worstAsset
-                ? ` (${cierre.worstAsset.assetId} · HI ${cierre.worstAsset.healthIndex})`
-                : ""}{" "}
-              y sostener el plan AGC4 en{" "}
-              {noCumple.map((m) => m.unidad).join(", ") || "las unidades fuera de meta"}.
-            </li>
-            <li>
-              Reponer los <strong>{cierre.criticalSpares} repuestos críticos</strong> ligados a
-              RCA/IP — {cierre.outOfStock} sin existencia y {cierre.belowMin} bajo mínimo — antes del
-              siguiente ciclo de preventivo. El catálogo tiene {cierre.invTotal} ítems y el resto está
-              en mínimo.
-            </li>
-          </ol>
-        </section>
       </div>
 
       <p className="inf-conf-concl-meta">
@@ -672,7 +642,9 @@ export function ConclusionesConfiabilidadBoard({ month, monthLabel }: MonthProps
 export function InformeConfContinuacion({ month, monthLabel }: MonthProps) {
   return (
     <>
-      <InformeConfFallasGroup month={month} monthLabel={monthLabel} />
+      <InformeConfFallasSection month={month} monthLabel={monthLabel} />
+      <InformeConfRepetitivosSection month={month} monthLabel={monthLabel} slideViewport={false} />
+      <InformeConfMantenimientoSection month={month} monthLabel={monthLabel} slideViewport={false} />
       <InformeConfInventarioSection monthLabel={monthLabel} />
       <InformeConfDegradacionSection monthLabel={monthLabel} />
       <InformeConfEficienciaSection month={month} monthLabel={monthLabel} slideViewport={false} />

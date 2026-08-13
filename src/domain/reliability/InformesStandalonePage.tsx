@@ -16,6 +16,7 @@ import {
 import { defaultMonth, monthOptionLabel, resolveViewContext } from "./nav/resolveContext";
 import {
   FULL_REPORT_DOM_ID,
+  FULL_REPORT_DOM_ID_LEGACY,
   FULL_REPORT_LEAF,
   FULL_REPORT_PATH,
   isFullReportPath,
@@ -23,6 +24,12 @@ import {
   pushAppUrl,
   replaceAppUrl,
 } from "./nav/urlRouting";
+import {
+  InformeDocumentFooter,
+  InformePrintFooter,
+  InformePrintHeader,
+} from "./reports/InformeBrandChrome";
+import { InformeReportNav } from "./reports/InformeReportNav";
 import { PlatformContent } from "./reports/PlatformContent";
 
 const INFORMES_MODULE = PROJECT_NAV_TREE.find((m) => m.key === "informes");
@@ -50,13 +57,17 @@ export function InformesStandalonePage() {
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     "inf-resultados": true,
     "inf-confiabilidad": true,
+    "inf-conf-copower": true,
   });
 
   useEffect(() => {
-    document.body.classList.toggle("theme-light", theme === "light");
-    document.body.classList.toggle("theme-dark", theme === "dark");
-    document.title = `Informes · ${PROJECT_TITLE}`;
-  }, [theme]);
+    const reportTheme = fullReport ? "light" : theme;
+    document.body.classList.toggle("theme-light", reportTheme === "light");
+    document.body.classList.toggle("theme-dark", reportTheme === "dark");
+    document.title = fullReport
+      ? `Informe de confiabilidad · ${PROJECT_TITLE}`
+      : `Informes · ${PROJECT_TITLE}`;
+  }, [theme, fullReport]);
 
   // Normaliza `/informes` → `/informes/indisponibilidad` y sincroniza URL.
   useEffect(() => {
@@ -91,12 +102,6 @@ export function InformesStandalonePage() {
     setFullReport(true);
     setActiveLeafId(FULL_REPORT_LEAF);
     window.history.pushState({ page: "informes", leaf: FULL_REPORT_LEAF }, "", FULL_REPORT_PATH);
-    window.scrollTo({ top: 0 });
-  };
-
-  const closeFullReport = () => {
-    setFullReport(false);
-    pushAppUrl("informes", FULL_REPORT_LEAF);
     window.scrollTo({ top: 0 });
   };
 
@@ -151,21 +156,41 @@ export function InformesStandalonePage() {
       );
     });
 
+  useEffect(() => {
+    if (!fullReport) return;
+    const openAll = () => {
+      document.querySelectorAll<HTMLDetailsElement>(".informes-report-page details").forEach((el) => {
+        el.open = true;
+      });
+    };
+    window.addEventListener("beforeprint", openAll);
+    return () => window.removeEventListener("beforeprint", openAll);
+  }, [fullReport]);
+
   if (fullReport) {
     return (
-      <div className={`app-shell ${theme} informes-report-only`}>
-        <main className="main informes-report-page" id={FULL_REPORT_DOM_ID}>
-          <button type="button" className="informes-report-exit" onClick={closeFullReport}>
-            <ArrowLeft size={14} />
-            <span>Salir de la vista limpia</span>
-          </button>
+      <div className="app-shell light informes-report-only">
+        <InformePrintHeader monthLabel={monthLabel} />
+        <InformeReportNav monthLabel={monthLabel} reportId={FULL_REPORT_DOM_ID} />
+        <main
+          className="main informes-report-page"
+          id={FULL_REPORT_DOM_ID}
+          data-report-id={FULL_REPORT_DOM_ID}
+          data-report-legacy-id={FULL_REPORT_DOM_ID_LEGACY}
+          data-report-period={monthLabel}
+        >
+          {/* Ancla legacy para bookmarks antiguos */}
+          <style>{`@page { size: A3 landscape; margin: 18mm 12mm 16mm 12mm; }`}</style>
+          <span id={FULL_REPORT_DOM_ID_LEGACY} hidden aria-hidden />
           <PlatformContent
             page="informes"
             leafId={FULL_REPORT_LEAF}
             month={selectedMonth}
             monthLabel={monthLabel}
           />
+          <InformeDocumentFooter monthLabel={monthLabel} />
         </main>
+        <InformePrintFooter monthLabel={monthLabel} />
       </div>
     );
   }

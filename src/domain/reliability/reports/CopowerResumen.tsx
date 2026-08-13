@@ -35,9 +35,11 @@ const META_EFF = CONTRACTUAL_KPI_TARGETS.efficiencyPct;
 
 type Props = {
   month: CopowerMonthKey;
+  /** Sin cabecera propia (p. ej. Informes · Confiabilidad COPOWER). */
+  hideHeader?: boolean;
 };
 
-export function CopowerResumen({ month }: Props) {
+export function CopowerResumen({ month, hideHeader = false }: Props) {
   const data = COPOWER_MONTHLY_DATA[month];
   const monthIdx = COPOWER_MONTH_ORDER.indexOf(month);
   const trendData = useMemo(
@@ -120,6 +122,7 @@ export function CopowerResumen({ month }: Props) {
 
   return (
     <div className="exec-dashboard">
+      {hideHeader ? null : (
       <header className="exec-header">
         <div>
           <p className="eyebrow">COPOWER · Operación diaria</p>
@@ -130,6 +133,7 @@ export function CopowerResumen({ month }: Props) {
         </div>
         <span className="badge info">Fuente COPOWER</span>
       </header>
+      )}
 
       <section className="panel">
         <article className="card">
@@ -187,6 +191,8 @@ export function CopowerResumen({ month }: Props) {
           </div>
         </article>
 
+        {hideHeader ? null : (
+          <>
         <article className="dash-chart-panel">
           <h4>Generación acumulada (MWh)</h4>
           <p className="muted dash-chart-sub">Tendencia mensual COPOWER</p>
@@ -240,6 +246,8 @@ export function CopowerResumen({ month }: Props) {
             </ResponsiveContainer>
           </div>
         </article>
+          </>
+        )}
       </section>
 
       <section className="panel">

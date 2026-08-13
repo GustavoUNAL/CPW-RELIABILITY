@@ -141,6 +141,15 @@ export const LEAF_PATH: Record<string, string> = {
   "inf-rg-pruebas-dinamicas": "pruebas-dinamicas",
   "inf-rg-implementaciones": "implementaciones",
   "inf-rg-cargabilidad": "cargabilidad",
+  "inf-cpw-resumen": "copower/indicadores",
+  "inf-cpw-horas": "copower/horas",
+  "inf-cpw-maquinas": "copower/maquinas",
+  "inf-cpw-fallas": "copower/fallas",
+  "inf-cpw-repetitivos": "copower/repetitivos",
+  "inf-cpw-mantenimiento": "copower/mantenimiento",
+  "inf-cpw-inventario": "copower/inventario",
+  "inf-cpw-eficiencia": "copower/eficiencia",
+  "inf-cpw-conclusiones": "copower/conclusiones",
 
   // admin
   "admin-usuarios": "usuarios",
@@ -169,8 +178,13 @@ export function isInformesStandalonePath(pathname = window.location.pathname): b
 export const FULL_REPORT_PATH = "/informes/reporte-completo";
 /** Hoja que agrupa todas las secciones del informe de confiabilidad. */
 export const FULL_REPORT_LEAF = "inf-conf-resumen";
-/** Ancla única de la página para deep links e impresión. */
-export const FULL_REPORT_DOM_ID = "reporte-confiabilidad";
+/**
+ * Ancla única y estable de la página del informe completo
+ * (deep links, impresión y referencia externa).
+ */
+export const FULL_REPORT_DOM_ID = "informe-confiabilidad-putumayo-norte";
+/** Alias legacy por si hay bookmarks antiguos. */
+export const FULL_REPORT_DOM_ID_LEGACY = "reporte-confiabilidad";
 
 export function isFullReportPath(pathname = window.location.pathname): boolean {
   return cleanPathname(pathname) === FULL_REPORT_PATH;

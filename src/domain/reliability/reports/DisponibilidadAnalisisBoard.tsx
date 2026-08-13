@@ -119,7 +119,8 @@ export function DisponibilidadAnalisisBoard({ month, monthLabel }: Props) {
   }
 
   return (
-    <section className="panel">
+    <section className="panel inf-report-section" id="inf-sec-disponibilidad">
+      <ExecInsight text={INFORME_EXEC_INSIGHTS.disponibilidad} />
       <details className="card disp-analisis inf-conf-collapse" open>
         <summary className="inf-conf-collapse-sum">
           <div className="inf-conf-collapse-sum-main">
@@ -138,7 +139,6 @@ export function DisponibilidadAnalisisBoard({ month, monthLabel }: Props) {
           </div>
         </summary>
         <div className="inf-conf-collapse-body">
-        <ExecInsight text={INFORME_EXEC_INSIGHTS.disponibilidad} />
         <div className="disp-kpi-row disp-kpi-row-3">
           <article className="disp-kpi disp-kpi-cpw">
             <span>COPOWER · Horas concertadas</span>

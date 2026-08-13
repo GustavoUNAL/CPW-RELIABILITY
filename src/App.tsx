@@ -119,6 +119,9 @@ function App() {
     "conf-worst": true,
     "conf-analisis": true,
     "conf-comparacion": true,
+    "inf-resultados": true,
+    "inf-confiabilidad": true,
+    "inf-conf-copower": true,
     "capa-root": true,
   });
   const [theme, setTheme] = useState<"light" | "dark">("light");

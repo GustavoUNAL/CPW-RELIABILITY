@@ -48,6 +48,15 @@ const CPW_LEAVES = new Set([
   "an-badactors-copower",
   "an-interv-copower",
   "an-riesgo",
+  "inf-cpw-resumen",
+  "inf-cpw-horas",
+  "inf-cpw-maquinas",
+  "inf-cpw-fallas",
+  "inf-cpw-repetitivos",
+  "inf-cpw-mantenimiento",
+  "inf-cpw-inventario",
+  "inf-cpw-eficiencia",
+  "inf-cpw-conclusiones",
   "gen-dashboard",
   "gen-diaria",
   "gen-mensual",
@@ -264,6 +273,14 @@ const CONCERTACION_LEAVES = new Set([
 ]);
 
 export function resolveViewContext(page: PageKey, leafId: string): ViewContext {
+  if (leafId.startsWith("inf-cpw-")) {
+    return {
+      report: "copower",
+      monthOrder: COPOWER_MONTH_ORDER,
+      reportLabel: "COPOWER · Informe interno de confiabilidad",
+      reportShort: "COPOWER",
+    };
+  }
   if (page === "admin" || leafId.startsWith("admin-")) {
     return {
       report: "dual",

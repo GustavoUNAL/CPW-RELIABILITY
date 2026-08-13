@@ -238,7 +238,7 @@ export function DegradationRiskDashboard({
     </div>
   );
 
-  const chartH = slide ? 260 : 210;
+  const chartH = slide ? 320 : 210;
 
   const portfolioPanels = (
     <div className={`dash-chart-grid mso-chart-grid${slide ? " deg-slide-charts" : ""}`} style={{ marginTop: "0.75rem" }}>

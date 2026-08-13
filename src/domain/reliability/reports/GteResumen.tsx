@@ -190,6 +190,15 @@ export function GteResumen({ month, only }: Props) {
       }),
     [monthIdx],
   );
+  const trendPctDomain = useMemo(() => {
+    const vals = trendData.flatMap((r) =>
+      [r.disponibilidad, r.confiabilidad].filter((v): v is number => v != null),
+    );
+    if (!vals.length) return [90, 100] as [number, number];
+    const min = Math.min(...vals, 98);
+    const floor = Math.max(0, Math.floor((min - 2) / 5) * 5);
+    return [floor, 100] as [number, number];
+  }, [trendData]);
   const hoursData = useMemo(
     () => [
       { estado: "Operación", horas: data.summary.hoursOperated, fill: "#818cf8" },
@@ -365,7 +374,7 @@ export function GteResumen({ month, only }: Props) {
       </section>
       ) : null}
 
-      {showAll ? (
+      {showAll || showSistemicos ? (
       <section className="dash-chart-grid">
         <article className="dash-chart-panel dash-chart-panel--wide">
           <h4>Tendencia disponibilidad y confiabilidad</h4>
@@ -375,7 +384,7 @@ export function GteResumen({ month, only }: Props) {
               <LineChart data={trendData} margin={{ top: 8, right: 16, left: 0, bottom: 4 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
                 <XAxis dataKey="month" tick={{ fontSize: 10 }} />
-                <YAxis domain={[90, 100]} tick={{ fontSize: 10 }} width={36} unit="%" />
+                <YAxis domain={trendPctDomain} tick={{ fontSize: 10 }} width={36} unit="%" />
                 <Tooltip
                   formatter={(v, name) => [v == null ? "N/D" : `${Number(v).toFixed(2)}%`, String(name)]}
                 />
@@ -404,6 +413,8 @@ export function GteResumen({ month, only }: Props) {
           </div>
         </article>
 
+        {showAll ? (
+          <>
         <article className="dash-chart-panel">
           <h4>Generación acumulada (MWh)</h4>
           <p className="muted dash-chart-sub">Tendencia mensual Gran Tierra</p>
@@ -465,11 +476,14 @@ export function GteResumen({ month, only }: Props) {
             </ResponsiveContainer>
           </div>
         </article>
+          </>
+        ) : null}
       </section>
       ) : null}
 
       {showSistemicos ? (
-      <section className="panel">
+      <section className="panel inf-report-section" id="inf-sec-resumen">
+        <ExecInsight text={INFORME_EXEC_INSIGHTS.resumen} />
         <details className="card inf-conf-collapse" open>
           <summary className="inf-conf-collapse-sum">
             <div className="inf-conf-collapse-sum-main">
@@ -478,7 +492,6 @@ export function GteResumen({ month, only }: Props) {
             </div>
           </summary>
           <div className="inf-conf-collapse-body">
-          <ExecInsight text={INFORME_EXEC_INSIGHTS.resumen} />
           <div className="exec-core-grid exec-core-grid--5">
             <div className="exec-core">
               <span>Generación total</span>
