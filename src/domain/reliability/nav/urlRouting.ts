@@ -14,6 +14,7 @@ export const MODULE_PATH: Record<PageKey, string> = {
   gestion_activos: "activos",
   gestion_acciones: "acciones",
   planeacion: "planeacion",
+  facturacion: "facturacion",
   informes: "informes",
   admin: "admin",
 };
@@ -122,6 +123,13 @@ export const LEAF_PATH: Record<string, string> = {
   "op-cronograma": "cronograma",
   "op-compromisos": "compromisos",
   "op-recursos": "recursos",
+
+  // facturacion
+  "fac-documento": "documento",
+  "fac-operaciones": "operaciones",
+  "fac-indicadores": "indicadores",
+  "fac-novedades": "novedades",
+  "fac-tickets": "tickets",
 
   // informes (público y autenticado)
   "inf-indicadores": "indicadores",

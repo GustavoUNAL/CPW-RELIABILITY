@@ -16,6 +16,7 @@
     "etl:gte-julio": "node scripts/etl-gte-julio.mjs",
     "etl:copower-julio": "node scripts/etl-copower-julio-concertacion.mjs",
     "etl:agosto": "node scripts/etl-agosto.mjs",
+    "etl:facturacion": "node scripts/etl-facturacion-ecuador.mjs",
     "audit:data": "node scripts/audit-data.mjs"
   },
   "keywords": [],

@@ -238,6 +238,18 @@ export const PROJECT_NAV_TREE: NavModule[] = [
     ],
   },
   {
+    key: "facturacion",
+    label: "Facturación",
+    description: "Soporte de facturación Copower Ecuador – GTE",
+    children: [
+      { id: "fac-documento", label: "Documento completo" },
+      { id: "fac-operaciones", label: "Resumen de operaciones" },
+      { id: "fac-indicadores", label: "Indicadores y gráficos" },
+      { id: "fac-novedades", label: "Novedades y paradas" },
+      { id: "fac-tickets", label: "Tickets OPEX / CAPEX" },
+    ],
+  },
+  {
     key: "informes",
     label: "Informes",
     description: "Resultados de gestión · administración",

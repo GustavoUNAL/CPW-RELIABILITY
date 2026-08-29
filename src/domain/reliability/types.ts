@@ -168,6 +168,7 @@ export type PageKey =
   | "gestion_activos"
   | "gestion_acciones"
   | "planeacion"
+  | "facturacion"
   | "informes"
   | "admin";
 

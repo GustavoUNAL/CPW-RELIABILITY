@@ -255,6 +255,7 @@ const GEN_LEAVES = new Set([
 
 function isCopowerLeaf(page: PageKey, leafId: string) {
   if (page === "indicadores" || leafId.startsWith("ind-") || leafId === "inf-indicadores") return true;
+  if (page === "facturacion" || leafId.startsWith("fac-")) return true;
   if (leafId.startsWith("kpi-cpw-") || leafId === "bd-ind-copower") return true;
   if (GEN_LEAVES.has(leafId)) return true;
   if (CPW_LEAVES.has(leafId)) return true;
@@ -324,6 +325,15 @@ export function resolveViewContext(page: PageKey, leafId: string): ViewContext {
       monthOrder: PLATFORM_MONTH_ORDER,
       reportLabel: "Indicadores · concertación y mantenimiento",
       reportShort: "IND",
+    };
+  }
+  if (page === "facturacion" || leafId.startsWith("fac-")) {
+    return {
+      report: "copower",
+      monthOrder: ["Jul"],
+      reportLabel: "Facturación · Copower Ecuador – GTE",
+      reportShort: "FAC",
+      fixedPeriod: true,
     };
   }
   if (GEN_LEAVES.has(leafId) && leafId.startsWith("gen-")) {

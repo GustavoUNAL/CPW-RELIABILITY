@@ -13,6 +13,7 @@ import {
   MapPin,
   Maximize2,
   Menu,
+  Receipt,
   Shield,
   UserRound,
   X,
@@ -86,6 +87,7 @@ const MODULE_ICONS: Record<PageKey, ReactNode> = {
   gestion_activos: <HeartPulse size={16} />,
   gestion_acciones: <ClipboardCheck size={16} />,
   planeacion: <CalendarRange size={16} />,
+  facturacion: <Receipt size={16} />,
   informes: <FileText size={16} />,
   admin: <Shield size={16} />,
 };

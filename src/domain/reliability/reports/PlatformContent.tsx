@@ -62,6 +62,7 @@ import { METRIC_DEFS } from "../ui/metricDefs";
 import { EmptyScreen, ScreenShell } from "../ui/ScreenShell";
 import { InformesResultadosDashboard } from "./InformesResultadosDashboard";
 import { IndicadoresDashboard } from "./IndicadoresDashboard";
+import { FacturacionDashboard } from "./FacturacionDashboard";
 
 type Props = {
   page: PageKey;
@@ -410,6 +411,10 @@ function PlatformBody({
 
   if (page === "indicadores" || leafId.startsWith("ind-")) {
     return <IndicadoresDashboard leafId={leafId} month={month} monthLabel={monthLabel} />;
+  }
+
+  if (page === "facturacion" || leafId.startsWith("fac-")) {
+    return <FacturacionDashboard leafId={leafId} />;
   }
 
   if (leafId === "admin-usuarios" || leafId === "cfg-usuarios") {
@@ -1042,6 +1047,10 @@ export function PlatformContent({
 
   if (page === "indicadores" || leafId.startsWith("ind-")) {
     return <IndicadoresDashboard leafId={leafId} month={month} monthLabel={monthLabel} />;
+  }
+
+  if (page === "facturacion" || leafId.startsWith("fac-")) {
+    return <FacturacionDashboard leafId={leafId} />;
   }
 
   if (leafId.startsWith("cmp-")) {
