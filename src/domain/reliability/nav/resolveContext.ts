@@ -11,6 +11,29 @@ import {
 } from "../reports/granTierraMonthly";
 import type { PlanningSection } from "../reports/operationalPlanningTypes";
 
+/** Meses del selector. Incluye agosto aunque GTE aún no tenga anexo oficial. */
+export const PLATFORM_MONTH_ORDER = [
+  "Ene",
+  "Feb",
+  "Mar",
+  "Abr",
+  "May",
+  "Jun",
+  "Jul",
+  "Ago",
+] as const;
+
+const PLATFORM_MONTH_LABELS: Record<(typeof PLATFORM_MONTH_ORDER)[number], string> = {
+  Ene: "Enero",
+  Feb: "Febrero",
+  Mar: "Marzo",
+  Abr: "Abril",
+  May: "Mayo",
+  Jun: "Junio",
+  Jul: "Julio",
+  Ago: "Agosto",
+};
+
 export type ViewContext = {
   /** Fuente de datos inferida del nodo del árbol. */
   report: ReportKey | "dual";
@@ -63,6 +86,10 @@ const CPW_LEAVES = new Set([
   "gen-equipos",
   "gen-utilizacion",
   "gen-horas",
+  "ind-comparacion",
+  "ind-dpto",
+  "ind-arteaga",
+  "inf-indicadores",
 ]);
 
 const GTE_LEAVES = new Set([
@@ -227,6 +254,7 @@ const GEN_LEAVES = new Set([
 ]);
 
 function isCopowerLeaf(page: PageKey, leafId: string) {
+  if (page === "indicadores" || leafId.startsWith("ind-") || leafId === "inf-indicadores") return true;
   if (leafId.startsWith("kpi-cpw-") || leafId === "bd-ind-copower") return true;
   if (GEN_LEAVES.has(leafId)) return true;
   if (CPW_LEAVES.has(leafId)) return true;
@@ -276,7 +304,7 @@ export function resolveViewContext(page: PageKey, leafId: string): ViewContext {
   if (leafId.startsWith("inf-cpw-")) {
     return {
       report: "copower",
-      monthOrder: COPOWER_MONTH_ORDER,
+      monthOrder: PLATFORM_MONTH_ORDER,
       reportLabel: "COPOWER · Informe interno de confiabilidad",
       reportShort: "COPOWER",
     };
@@ -284,10 +312,18 @@ export function resolveViewContext(page: PageKey, leafId: string): ViewContext {
   if (page === "admin" || leafId.startsWith("admin-")) {
     return {
       report: "dual",
-      monthOrder: Array.from(new Set([...GRAN_TIERRA_MONTH_ORDER, ...COPOWER_MONTH_ORDER])),
+      monthOrder: PLATFORM_MONTH_ORDER,
       reportLabel: "Administración de la plataforma",
       reportShort: "Admin",
       fixedPeriod: true,
+    };
+  }
+  if (page === "indicadores" || leafId.startsWith("ind-") || leafId === "inf-indicadores") {
+    return {
+      report: "copower",
+      monthOrder: PLATFORM_MONTH_ORDER,
+      reportLabel: "Indicadores · concertación y mantenimiento",
+      reportShort: "IND",
     };
   }
   if (GEN_LEAVES.has(leafId) && leafId.startsWith("gen-")) {
@@ -318,10 +354,9 @@ export function resolveViewContext(page: PageKey, leafId: string): ViewContext {
     };
   }
   if (INTEGRATED_DUAL_LEAVES.has(leafId) || leafId.startsWith("cfg-campos")) {
-    const union = Array.from(new Set([...GRAN_TIERRA_MONTH_ORDER, ...COPOWER_MONTH_ORDER]));
     return {
       report: "dual",
-      monthOrder: union,
+      monthOrder: PLATFORM_MONTH_ORDER,
       reportLabel: leafId.startsWith("cfg-campos")
         ? "Campo · Costayaco / Vonú"
         : "Gran Tierra + COPOWER · vista integrada",
@@ -329,10 +364,9 @@ export function resolveViewContext(page: PageKey, leafId: string): ViewContext {
     };
   }
   if (isDualLeaf(page, leafId)) {
-    const union = Array.from(new Set([...GRAN_TIERRA_MONTH_ORDER, ...COPOWER_MONTH_ORDER]));
     return {
       report: "dual",
-      monthOrder: union,
+      monthOrder: PLATFORM_MONTH_ORDER,
       reportLabel: "Gran Tierra + COPOWER",
       reportShort: "Dual",
     };
@@ -340,7 +374,7 @@ export function resolveViewContext(page: PageKey, leafId: string): ViewContext {
   if (isCopowerLeaf(page, leafId)) {
     return {
       report: "copower",
-      monthOrder: COPOWER_MONTH_ORDER,
+      monthOrder: PLATFORM_MONTH_ORDER,
       reportLabel: "COPOWER · Operación diaria",
       reportShort: "COPOWER",
     };
@@ -348,14 +382,14 @@ export function resolveViewContext(page: PageKey, leafId: string): ViewContext {
   if (isGteLeaf(page, leafId)) {
     return {
       report: "gran_tierra",
-      monthOrder: GRAN_TIERRA_MONTH_ORDER,
+      monthOrder: PLATFORM_MONTH_ORDER,
       reportLabel: "Gran Tierra Energy · Informe oficial",
       reportShort: "GTE",
     };
   }
   return {
     report: "copower",
-    monthOrder: COPOWER_MONTH_ORDER,
+    monthOrder: PLATFORM_MONTH_ORDER,
     reportLabel: "COPOWER · Operación diaria",
     reportShort: "COPOWER",
   };
@@ -367,6 +401,9 @@ export function resolveReport(page: PageKey, leafId: string): ReportKey {
 }
 
 export function monthLabelFor(month: string): string {
+  if (month in PLATFORM_MONTH_LABELS) {
+    return PLATFORM_MONTH_LABELS[month as keyof typeof PLATFORM_MONTH_LABELS];
+  }
   if (GRAN_TIERRA_MONTH_ORDER.includes(month as GranTierraMonthKey)) {
     return granTierraMonthLabel(month as GranTierraMonthKey);
   }
@@ -376,28 +413,21 @@ export function monthLabelFor(month: string): string {
   return month;
 }
 
-export function monthOptionLabel(month: string, ctx: ViewContext): string {
+export function monthOptionLabel(month: string, _ctx: ViewContext): string {
   if (month === "YTD2026") return "Ene – 18 Jul 2026 (199 días)";
-  if (ctx.report === "dual") {
-    const gte = GRAN_TIERRA_MONTH_ORDER.includes(month as GranTierraMonthKey)
-      ? granTierraMonthLabel(month as GranTierraMonthKey)
-      : null;
-    const cpw = COPOWER_MONTH_ORDER.includes(month as CopowerMonthKey)
-      ? copowerMonthLabel(month as CopowerMonthKey)
-      : null;
-    return gte ?? cpw ?? month;
-  }
   return monthLabelFor(month);
 }
 
 export function defaultMonth(ctx: ViewContext): string {
   if (ctx.monthOrder.includes("YTD2026")) return "YTD2026";
-  const preferred = ctx.monthOrder.includes("Jul")
-    ? "Jul"
-    : ctx.monthOrder.includes("Jun")
-      ? "Jun"
-      : ctx.monthOrder[ctx.monthOrder.length - 1];
-  return preferred ?? "Jul";
+  const preferred = ctx.monthOrder.includes("Ago")
+    ? "Ago"
+    : ctx.monthOrder.includes("Jul")
+      ? "Jul"
+      : ctx.monthOrder.includes("Jun")
+        ? "Jun"
+        : ctx.monthOrder[ctx.monthOrder.length - 1];
+  return preferred ?? "Ago";
 }
 
 export type GenerationSection = "dashboard" | "diaria" | "mensual" | "equipos" | "utilizacion" | "horas";

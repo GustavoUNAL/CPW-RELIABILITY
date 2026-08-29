@@ -50,14 +50,43 @@ export function agc4HoursFromSabana(month: string) {
   return { hoursMto, manHours, parts, count: execs.length };
 }
 
-function sumHours(rows: { horasOperacion?: number; horasStandBy?: number; horasPP?: number; horasPFCli?: number; horasCalDia?: number }[]) {
+function sumHours(rows: {
+  horasOperacion?: number;
+  horasStandBy?: number;
+  horasPP?: number;
+  horasPFContr?: number;
+  horasPFCli?: number;
+  horasCalDia?: number;
+}[]) {
   return {
     op: rows.reduce((s, u) => s + (u.horasOperacion ?? 0), 0),
     sb: rows.reduce((s, u) => s + (u.horasStandBy ?? 0), 0),
     pp: rows.reduce((s, u) => s + (u.horasPP ?? 0), 0),
+    pfContr: rows.reduce((s, u) => s + (u.horasPFContr ?? 0), 0),
     pf: rows.reduce((s, u) => s + (u.horasPFCli ?? 0), 0),
     cal: rows.reduce((s, u) => s + (u.horasCalDia ?? 0), 0),
   };
+}
+
+/**
+ * Disponibilidad Gran Tierra:
+ * (Tiempo total planificado − (paradas programadas + paradas no programadas)) / planificado × 100
+ */
+export function gteAvailabilityTerms(hours: {
+  op: number;
+  sb: number;
+  pp: number;
+  pfContr: number;
+  pf: number;
+  cal: number;
+}) {
+  const states = hours.op + hours.sb + hours.pp + hours.pfContr + hours.pf;
+  const planned = hours.cal > 0 ? hours.cal : states;
+  const scheduled = hours.pp;
+  const unscheduled = hours.pfContr + hours.pf;
+  const available = planned - (scheduled + unscheduled);
+  const disp = planned > 0 ? available / planned : null;
+  return { planned, scheduled, unscheduled, available, disp };
 }
 
 export function buildDisponibilidadAnalisis(month: string) {
@@ -65,8 +94,9 @@ export function buildDisponibilidadAnalisis(month: string) {
   const gte = GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey];
   const fleetCpw = sumHours(cpw?.generationByEquipment ?? []);
   const fleetGte = sumHours(gte?.generationByEquipment ?? []);
+  const gteFormula = gteAvailabilityTerms(fleetGte);
   const dispCpw = fleetCpw.cal > 0 ? (fleetCpw.op + fleetCpw.sb) / fleetCpw.cal : null;
-  const dispGteExcel = fleetGte.cal > 0 ? (fleetGte.op + fleetGte.sb) / fleetGte.cal : null;
+  const dispGteExcel = gteFormula.disp;
   const dispOficial = gte?.kpi.availability ?? null;
   const programmed = fleetCpw.cal;
   const cpwAvailable = fleetCpw.op + fleetCpw.sb;
@@ -89,6 +119,7 @@ export function buildDisponibilidadAnalisis(month: string) {
   return {
     fleetCpw,
     fleetGte,
+    gteFormula,
     dispCpw,
     dispGteExcel,
     dispOficial,
@@ -127,12 +158,17 @@ export function DisponibilidadAnalisisBoard({ month, monthLabel }: Props) {
             <p className="eyebrow">3 · Análisis de disponibilidad{monthLabel ? ` · ${monthLabel}` : ""}</p>
             <h3>Conciliación COPOWER vs Gran Tierra</h3>
           </div>
-          <div className="disp-formula" aria-label="Disponibilidad igual a horas disponibles entre programadas">
+          <div
+            className="disp-formula"
+            aria-label="Disponibilidad igual a tiempo total planificado menos paradas programadas y no programadas, sobre tiempo total planificado, por 100"
+          >
             <span className="disp-formula-name">Disp</span>
             <span className="disp-formula-op">=</span>
-            <span className="disp-formula-frac">
-              <span>Horas disponibles</span>
-              <span>Horas programadas</span>
+            <span className="disp-formula-frac disp-formula-frac--gte">
+              <span>
+                Tiempo total planificado − (paradas programadas + paradas no programadas)
+              </span>
+              <span>Tiempo total planificado</span>
             </span>
             <span className="disp-formula-op">×</span>
             <span className="disp-formula-100">100</span>
@@ -154,10 +190,11 @@ export function DisponibilidadAnalisisBoard({ month, monthLabel }: Props) {
             <span>Gran Tierra · Data Soporte</span>
             <strong>{a.dispGteExcel != null ? fmtPct(a.dispGteExcel) : "—"}</strong>
             <p>
-              <b>{fmtN(a.gteExcelAvailable)}</b> / {fmtN(a.fleetGte.cal)}
+              <b>{fmtN(a.gteFormula.available)}</b> / {fmtN(a.gteFormula.planned)}
             </p>
             <small>
-              {fmtN(a.fleetGte.op)} operación + {fmtN(a.fleetGte.sb)} stand-by
+              Planificado − (PP {fmtN(a.gteFormula.scheduled)} + no prog.{" "}
+              {fmtN(a.gteFormula.unscheduled)})
             </small>
           </article>
           <article className="disp-kpi disp-kpi-off">

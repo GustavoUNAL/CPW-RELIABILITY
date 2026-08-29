@@ -160,6 +160,7 @@ export type PageKey =
   | "dashboard"
   | "campos"
   | "generacion"
+  | "indicadores"
   | "operacion"
   | "concertacion"
   | "confiabilidad"

@@ -79,6 +79,12 @@ export const PROJECT_NAV_TREE: NavModule[] = [
     ],
   },
   {
+    key: "indicadores",
+    label: "Indicadores",
+    description: "Tabla contractual · concertación y sábana de mantenimiento",
+    children: [{ id: "ind-comparacion", label: "Tabla de indicadores" }],
+  },
+  {
     key: "operacion",
     label: "Operación",
     description: "Dashboard, equipos, eficiencia, resumen OP, eventos y consumos",
@@ -237,6 +243,7 @@ export const PROJECT_NAV_TREE: NavModule[] = [
     description: "Resultados de gestión · administración",
     adminOnly: true,
     children: [
+      { id: "inf-indicadores", label: "Indicadores · Agosto" },
       {
         id: "inf-resultados",
         label: "Resultados de Gestión",

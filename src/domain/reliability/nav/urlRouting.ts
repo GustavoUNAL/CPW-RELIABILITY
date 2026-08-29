@@ -6,6 +6,7 @@ export const MODULE_PATH: Record<PageKey, string> = {
   dashboard: "dashboard",
   campos: "campos",
   generacion: "generacion",
+  indicadores: "indicadores",
   operacion: "operacion",
   concertacion: "concertacion",
   confiabilidad: "confiabilidad",
@@ -54,6 +55,11 @@ export const LEAF_PATH: Record<string, string> = {
   "gen-equipos": "por-equipo",
   "gen-utilizacion": "disponibilidad",
   "gen-horas": "horas-estado",
+
+  // indicadores
+  "ind-comparacion": "comparacion",
+  "ind-dpto": "dpto-generacion",
+  "ind-arteaga": "gustavo-arteaga",
 
   // operacion
   "op-dashboard": "resumen",
@@ -118,6 +124,7 @@ export const LEAF_PATH: Record<string, string> = {
   "op-recursos": "recursos",
 
   // informes (público y autenticado)
+  "inf-indicadores": "indicadores",
   "inf-rg-indisponibilidad": "indisponibilidad",
   "inf-rg-desempeno": "desempeno",
   "inf-rg-ops-rendimiento": "rendimiento-unidad",

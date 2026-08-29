@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { ArrowLeft, Maximize2 } from "lucide-react";
+import { ArrowLeft, Maximize2, Menu, X } from "lucide-react";
 import {
   ROLE_LABELS,
   clearSession,
@@ -10,6 +10,7 @@ import {
 import {
   PROJECT_NAV_TREE,
   PROJECT_TITLE,
+  findLeafLabel,
   firstLeafId,
   type NavNode,
 } from "./nav/projectTree";
@@ -33,7 +34,7 @@ import { InformeReportNav } from "./reports/InformeReportNav";
 import { PlatformContent } from "./reports/PlatformContent";
 
 const INFORMES_MODULE = PROJECT_NAV_TREE.find((m) => m.key === "informes");
-const DEFAULT_LEAF = firstLeafId(INFORMES_MODULE?.children ?? []) ?? "inf-rg-indisponibilidad";
+const DEFAULT_LEAF = firstLeafId(INFORMES_MODULE?.children ?? []) ?? "inf-indicadores";
 
 function leafFromLocation(): string {
   const parsed = parsePath();
@@ -43,17 +44,21 @@ function leafFromLocation(): string {
 
 /**
  * Vista dedicada `/informes/...`: acceso público (sin login).
- * Se sirve en el mismo dominio (p. ej. https://reliability.opsai.space/informes/indisponibilidad).
+ * Se sirve en el mismo dominio (p. ej. https://reliability.opsai.space/informes/indicadores).
  * El resto de la plataforma sigue protegido en `/`.
  */
+const MOBILE_MQ = "(max-width: 900px)";
+
 export function InformesStandalonePage() {
   const [session, setSession] = useState<SessionUser | null>(() => loadSession());
   const [theme, setTheme] = useState<"light" | "dark">("light");
-  const [selectedMonth, setSelectedMonth] = useState("Jul");
+  const [selectedMonth, setSelectedMonth] = useState("Ago");
   const [fullReport, setFullReport] = useState(isFullReportPath);
   const [activeLeafId, setActiveLeafId] = useState(() =>
     isFullReportPath() ? FULL_REPORT_LEAF : leafFromLocation(),
   );
+  const [navOpen, setNavOpen] = useState(false);
+  const [isMobileNav, setIsMobileNav] = useState(false);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     "inf-resultados": true,
     "inf-confiabilidad": true,
@@ -69,7 +74,7 @@ export function InformesStandalonePage() {
       : `Informes · ${PROJECT_TITLE}`;
   }, [theme, fullReport]);
 
-  // Normaliza `/informes` → `/informes/indisponibilidad` y sincroniza URL.
+  // Normaliza `/informes` → `/informes/indicadores` y sincroniza URL.
   useEffect(() => {
     if (fullReport) return;
     replaceAppUrl("informes", activeLeafId);
@@ -84,6 +89,31 @@ export function InformesStandalonePage() {
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
   }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia(MOBILE_MQ);
+    const onChange = () => {
+      setIsMobileNav(mq.matches);
+      if (!mq.matches) setNavOpen(false);
+    };
+    onChange();
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  useEffect(() => {
+    if (!navOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setNavOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [navOpen]);
 
   const viewContext = useMemo(
     () => resolveViewContext("informes", activeLeafId),
@@ -116,9 +146,12 @@ export function InformesStandalonePage() {
 
   const selectLeaf = (leafId: string) => {
     setActiveLeafId(leafId);
+    setNavOpen(false);
     pushAppUrl("informes", leafId);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  const activeLeafLabel = findLeafLabel(INFORMES_MODULE?.children ?? [], activeLeafId) ?? "Informe";
 
   const renderNodes = (nodes: NavNode[], depth = 0): ReactNode =>
     nodes.map((node) => {
@@ -196,8 +229,37 @@ export function InformesStandalonePage() {
   }
 
   return (
-    <div className={`app-shell ${theme} informes-standalone`}>
-      <aside className="sidebar informes-standalone-sidebar">
+    <div className={`app-shell ${theme} informes-standalone${navOpen ? " nav-open" : ""}`}>
+      <header className="mobile-topbar">
+        <button
+          type="button"
+          className="mobile-menu-btn"
+          aria-label={navOpen ? "Cerrar menú" : "Abrir menú"}
+          aria-expanded={navOpen}
+          aria-controls="informes-sidebar"
+          onClick={() => setNavOpen((v) => !v)}
+        >
+          {navOpen ? <X size={22} /> : <Menu size={22} />}
+        </button>
+        <div className="mobile-topbar-copy">
+          <p className="eyebrow">COPOWER · público</p>
+          <strong>Informes</strong>
+          <span>{activeLeafLabel}</span>
+        </div>
+      </header>
+      <button
+        type="button"
+        className={`nav-backdrop${navOpen ? " open" : ""}`}
+        aria-label="Cerrar menú"
+        tabIndex={navOpen ? 0 : -1}
+        aria-hidden={!navOpen}
+        onClick={() => setNavOpen(false)}
+      />
+      <aside
+        id="informes-sidebar"
+        className={`sidebar informes-standalone-sidebar${navOpen ? " open" : ""}`}
+        aria-hidden={isMobileNav && !navOpen ? true : undefined}
+      >
         <div className="brand brand-desktop">
           <p className="eyebrow">COPOWER</p>
           <h1>Informes</h1>

@@ -23,7 +23,7 @@ export function filterNavForRole(tree: readonly NavModule[], role: UserRole): Na
 
 export function defaultHomeForRole(role: UserRole): { page: PageKey; leaf: string } {
   if (isInformesOnlyRole(role)) {
-    return { page: "informes", leaf: "inf-rg-indisponibilidad" };
+    return { page: "informes", leaf: "inf-indicadores" };
   }
   return { page: "dashboard", leaf: "dash-resumen" };
 }

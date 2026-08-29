@@ -226,7 +226,21 @@ export function InformesResultadosDashboard({ leafId, month, monthLabel }: Props
     return <InformeCopowerConfiabilidad leafId={leafId} month={month} monthLabel={monthLabel} />;
   }
   if (leafId === "inf-conf-resumen" || leafId.startsWith("inf-conf-")) {
-    const gteMonth = (month in GRAN_TIERRA_MONTHLY_DATA ? month : "Jul") as GranTierraMonthKey;
+    if (!(month in GRAN_TIERRA_MONTHLY_DATA)) {
+      return (
+        <div className="dash-module exec-dashboard inf-resultados">
+          <article className="card">
+            <p className="eyebrow">Informes · Confiabilidad</p>
+            <h3>Sin anexo Gran Tierra para {monthLabel}</h3>
+            <p className="empty-state">
+              No hay Data Soporte ni PDF de indicadores GTE en este periodo. Agosto está cargado en
+              Confiabilidad COPOWER y Resultados de Gestión con la concertación del 01 al 23.
+            </p>
+          </article>
+        </div>
+      );
+    }
+    const gteMonth = month as GranTierraMonthKey;
     if (leafId === "inf-conf-conciliacion") {
       return (
         <div className="dash-module exec-dashboard inf-resultados">

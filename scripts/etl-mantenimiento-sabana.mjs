@@ -28,6 +28,17 @@ const JULIO_PATH = [
     .filter((f) => /SABANA|MMTOS/i.test(f) && f.endsWith(".xlsx") && !f.startsWith("~$"))
     .map((f) => path.join(dataRoot, "Julio", f)),
 ].find((p) => fs.existsSync(p));
+const agostoDir = fs.readdirSync(dataRoot).find((d) => /^agosto$/i.test(d.trim()));
+const agostoMaint = agostoDir
+  ? fs.readdirSync(path.join(dataRoot, agostoDir)).find((d) => /manten/i.test(d))
+  : null;
+const AGOSTO_PATH = agostoMaint
+  ? fs
+      .readdirSync(path.join(dataRoot, agostoDir, agostoMaint))
+      .filter((f) => /SABANA|MMTOS/i.test(f) && f.endsWith(".xlsx") && !f.startsWith("~$"))
+      .map((f) => path.join(dataRoot, agostoDir, agostoMaint, f))
+      .find((p) => fs.existsSync(p))
+  : null;
 const OUT = path.join(ROOT, "src/domain/reliability/reports/maintenancePlansData.ts");
 
 const MONTH_MAP = {
@@ -283,6 +294,26 @@ if (JULIO_PATH) {
   );
 }
 
+if (AGOSTO_PATH) {
+  const agosto = loadSheetRows(AGOSTO_PATH);
+  const agostoUnits = unitsFromRows(agosto.rows);
+  const overlay = extractCalendar(agosto.rows, agostoUnits.length ? agostoUnits : units);
+  const agoDays = overlay.days.filter((row) => row.monthKey === "Ago" || (row.date ?? "").startsWith("2026-08"));
+  const agoSlots = overlay.calendarSlots.filter(
+    (row) => row.monthKey === "Ago" || (row.date ?? "").startsWith("2026-08"),
+  );
+  const agoExec = overlay.executions.filter(
+    (row) => row.monthKey === "Ago" || (row.date ?? "").startsWith("2026-08"),
+  );
+  const keepAgo = (row) => row.monthKey !== "Ago" && !(row.date ?? "").startsWith("2026-08");
+  days = [...days.filter(keepAgo), ...agoDays];
+  calendarSlots = [...calendarSlots.filter(keepAgo), ...agoSlots];
+  executions = [...executions.filter(keepAgo), ...agoExec];
+  console.log(
+    `overlay agosto ${path.relative(ROOT, AGOSTO_PATH)} · ${agoExec.length} ejecuciones · ${agoSlots.length} slots`,
+  );
+}
+
 /**
  * Periodicidad 350 h OP: si el MTO quedó pendiente porque el equipo no cumplió
  * horas (stand-by), no incumple el mes — se diferirá al siguiente.
@@ -429,9 +460,11 @@ const payload = {
   sheet: sheetName.trim(),
   extractedAt: new Date().toISOString().slice(0, 10),
   title: "Sábana de mantenimientos · Generación Putumayo",
-  notes: JULIO_PATH
-    ? "Julio 2026 ejecutado desde sábana oficial del mes. Ene–Jun y Ago–Dic desde sábana anual data/Mantenimiento. CPW-10 del 02-jul diferido a agosto: no cumplía 350 h OP (stand-by)."
-    : "Calendario diario 2026, control de ejecución y catálogo de periodicidad.",
+  notes: AGOSTO_PATH
+    ? "Agosto 2026 desde data/Agosto/mantenimiento. Julio desde sábana oficial del mes. Ene–Jun y Sep–Dic desde sábana anual."
+    : JULIO_PATH
+      ? "Julio 2026 ejecutado desde sábana oficial del mes. Ene–Jun y Ago–Dic desde sábana anual data/Mantenimiento."
+      : "Calendario diario 2026, control de ejecución y catálogo de periodicidad.",
   fleet: units.map((u) => ({ equipment: u.equipment, model: u.model })),
   catalog,
   periodicityNotes,

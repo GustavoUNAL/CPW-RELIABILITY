@@ -8,6 +8,7 @@ import {
   Gauge,
   HeartPulse,
   LayoutDashboard,
+  Sigma,
   LogOut,
   MapPin,
   Maximize2,
@@ -77,6 +78,7 @@ const MODULE_ICONS: Record<PageKey, ReactNode> = {
   dashboard: <LayoutDashboard size={16} />,
   campos: <MapPin size={16} />,
   generacion: <Zap size={16} />,
+  indicadores: <Sigma size={16} />,
   operacion: <Database size={16} />,
   concertacion: <Clock size={16} />,
   confiabilidad: <Gauge size={16} />,
@@ -125,7 +127,7 @@ function App() {
     "capa-root": true,
   });
   const [theme, setTheme] = useState<"light" | "dark">("light");
-  const [selectedMonth, setSelectedMonth] = useState<string>("Jul");
+  const [selectedMonth, setSelectedMonth] = useState<string>("Ago");
   const [navOpen, setNavOpen] = useState(false);
   const [isMobileNav, setIsMobileNav] = useState(false);
   const [analyticsSessionId, setAnalyticsSessionId] = useState(() => getOrCreateAnalyticsSessionId());
@@ -685,7 +687,7 @@ function App() {
                         href={
                           activePage === "informes"
                             ? buildInformesPath(activeLeafId)
-                            : buildPath("informes", "inf-rg-indisponibilidad")
+                            : buildPath("informes", "inf-indicadores")
                         }
                         target="_blank"
                         rel="noreferrer"

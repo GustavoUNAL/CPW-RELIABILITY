@@ -61,6 +61,7 @@ import type { PageKey, ReportKey } from "../types";
 import { METRIC_DEFS } from "../ui/metricDefs";
 import { EmptyScreen, ScreenShell } from "../ui/ScreenShell";
 import { InformesResultadosDashboard } from "./InformesResultadosDashboard";
+import { IndicadoresDashboard } from "./IndicadoresDashboard";
 
 type Props = {
   page: PageKey;
@@ -407,6 +408,10 @@ function PlatformBody({
   const cpwMonth = (COPOWER_MONTHLY_DATA[month as CopowerMonthKey] ? month : "Jul") as CopowerMonthKey;
   const gteMonthOk = Boolean(GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey]);
 
+  if (page === "indicadores" || leafId.startsWith("ind-")) {
+    return <IndicadoresDashboard leafId={leafId} month={month} monthLabel={monthLabel} />;
+  }
+
   if (leafId === "admin-usuarios" || leafId === "cfg-usuarios") {
     if (!isAdmin) {
       return (
@@ -432,6 +437,9 @@ function PlatformBody({
   }
 
   if (page === "informes" || leafId.startsWith("inf-")) {
+    if (leafId === "inf-indicadores") {
+      return <IndicadoresDashboard leafId="ind-comparacion" month={month} monthLabel={monthLabel} />;
+    }
     return (
       <InformesResultadosDashboard leafId={leafId} month={month} monthLabel={monthLabel} />
     );
@@ -1024,9 +1032,16 @@ export function PlatformContent({
   }
 
   if (page === "informes" || leafId.startsWith("inf-")) {
+    if (leafId === "inf-indicadores") {
+      return <IndicadoresDashboard leafId="ind-comparacion" month={month} monthLabel={monthLabel} />;
+    }
     return (
       <InformesResultadosDashboard leafId={leafId} month={month} monthLabel={monthLabel} />
     );
+  }
+
+  if (page === "indicadores" || leafId.startsWith("ind-")) {
+    return <IndicadoresDashboard leafId={leafId} month={month} monthLabel={monthLabel} />;
   }
 
   if (leafId.startsWith("cmp-")) {
