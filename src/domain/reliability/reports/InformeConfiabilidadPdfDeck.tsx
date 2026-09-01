@@ -1,15 +1,4 @@
 import { useMemo } from "react";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  LabelList,
-  Legend,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 import { COPOWER_PDF, PdfSlide } from "./CopowerPdfChrome";
 import { AGOSTO_WEEKLY_PLANNING, informeMonthCoverage } from "./agostoWeeklyPlanning";
 import { buildDisponibilidadAnalisis } from "./DisponibilidadAnalisisBoard";
@@ -29,8 +18,6 @@ type Props = {
 };
 
 const META = CONTRACTUAL_KPI_TARGETS.reliability;
-const TICK = { fontSize: 9, fill: "#475569" };
-const GRID = "#dbe3ee";
 
 function pct(v: number | null | undefined, d = 2) {
   return v == null || Number.isNaN(v) ? "—" : `${(v * 100).toFixed(d)} %`;
@@ -60,6 +47,27 @@ function PendingBanner({ monthLabel, extra }: { monthLabel: string; extra?: stri
       cifras de julio.{extra ? ` ${extra}` : ""}
     </p>
   );
+}
+
+function causeKind(obs: string) {
+  const t = obs.toLowerCase();
+  if (/mru/.test(t)) return "MRU";
+  if (/moqueta|\bmqt\b|presi[oó]n de gas/.test(t)) return "Gas Moqueta";
+  if (/\bccm\b|solicitud del ccm/.test(t)) return "CCM";
+  if (/stand\s*-?by/.test(t)) return "Stand-by";
+  return "Externa";
+}
+
+function shortObs(obs: string) {
+  let cleaned = obs
+    .replace(/\s+/g, " ")
+    .replace(/\d{1,2}:\d{2}\s*(hrs?\.?)?/gi, "")
+    .replace(/EQUIPO:\s*[^,]+,\s*/i, "")
+    .replace(/Equipo disponible desde el d[ií]a anterior\.?/gi, "")
+    .trim();
+  const hit = cleaned.match(/(FDL[^.]+|A solicitud[^.]+|Ingresa[^.]+|Sale[^.]+|baja presi[oó]n[^.]+)/i);
+  if (hit) cleaned = hit[1].trim();
+  return cleaned.length > 64 ? `${cleaned.slice(0, 62)}…` : cleaned;
 }
 
 function EmptyKpis({ labels }: { labels: string[] }) {
@@ -110,20 +118,30 @@ export function InformeConfiabilidadPdfDeck({ month, monthLabel }: Props) {
       .sort((a, b) => b.count - a.count)
       .slice(0, 6);
 
+    const topOutages = eventLog
+      .filter((e) => e.downtimeHours > 0)
+      .slice()
+      .sort((a, b) => b.downtimeHours - a.downtimeHours || b.date.localeCompare(a.date))
+      .slice(0, 7)
+      .map((e) => ({
+        date: e.date.slice(5),
+        equipment: e.equipment,
+        hours: e.downtimeHours,
+        kind: causeKind(e.cause),
+        note: shortObs(e.cause) || e.eventType,
+      }));
+
     const equipMap = new Map<string, number>();
     for (const e of programmed) {
       for (const part of e.equipment.split(/[,;/]+/).map((s) => s.trim()).filter(Boolean)) {
-        equipMap.set(part, (equipMap.get(part) ?? 0) + 1);
+        const label = part.replace(/\s+/g, " ").replace(/JINAN\s+/i, "JIN-");
+        equipMap.set(label, (equipMap.get(label) ?? 0) + 1);
       }
     }
     const equipChart = [...equipMap.entries()]
-      .map(([equipment, count]) => ({
-        equipment,
-        count,
-        share: Number(((count / Math.max(programmed.length, 1)) * 100).toFixed(1)),
-      }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 8);
+      .map(([equipment, count]) => ({ equipment, count }))
+      .sort((a, b) => b.count - a.count || a.equipment.localeCompare(b.equipment))
+      .slice(0, 6);
 
     const weekMap = new Map<string, { planned: number; executed: number }>();
     for (const s of slots) {
@@ -140,6 +158,7 @@ export function InformeConfiabilidadPdfDeck({ month, monthLabel }: Props) {
     }
     const weekChart = [...weekMap.entries()]
       .map(([week, v]) => ({ week, planned: Number(v.planned.toFixed(1)), executed: Number(v.executed.toFixed(1)) }))
+      .filter((v) => v.planned > 0 || v.executed > 0)
       .sort((a, b) => a.week.localeCompare(b.week));
 
     const recent = programmed
@@ -168,6 +187,7 @@ export function InformeConfiabilidadPdfDeck({ month, monthLabel }: Props) {
       machines,
       eventLog,
       repeats,
+      topOutages,
       equipChart,
       weekChart,
       recent,
@@ -209,17 +229,19 @@ export function InformeConfiabilidadPdfDeck({ month, monthLabel }: Props) {
             <p className="icpdf-sub">
               Cumplimiento contractual{model.corte ? ` · ${model.corte}` : ""}
             </p>
-            <div className="icpdf-kpis icpdf-kpis-5">
+            <div className="icpdf-kpis icpdf-kpis-4">
               <article>
                 <span>Generación total</span>
                 <strong>{n((model.gte ?? model.cpw)?.kpi.generationMwh, 1)} MWh</strong>
                 <small>{model.gte ? "Meta operativa del parque" : "Horas concertadas 01–22"}</small>
               </article>
-              <article className={model.gte?.kpi.availability != null && model.gte.kpi.availability < META ? "is-warn" : undefined}>
-                <span>Disponibilidad GTE</span>
-                <strong>{pct(model.gte?.kpi.availability)}</strong>
-                <small>Meta ≥ {(META * 100).toFixed(0)} %</small>
-              </article>
+              {model.gte ? (
+                <article className={model.gte.kpi.availability != null && model.gte.kpi.availability < META ? "is-warn" : "is-ok"}>
+                  <span>Disponibilidad GTE</span>
+                  <strong>{pct(model.gte.kpi.availability)}</strong>
+                  <small>Meta ≥ {(META * 100).toFixed(0)} %</small>
+                </article>
+              ) : null}
               <article className={model.disp.dispCpw != null && model.disp.dispCpw < META ? "is-warn" : "is-ok"}>
                 <span>Disponibilidad COPOWER</span>
                 <strong>{pct(model.disp.dispCpw)}</strong>
@@ -230,16 +252,24 @@ export function InformeConfiabilidadPdfDeck({ month, monthLabel }: Props) {
                 <strong>{pct(model.gte?.kpi.reliability ?? model.cpw?.kpi.reliability ?? model.conf.contractualConf)}</strong>
                 <small>{model.gte ? `Meta ≥ ${(META * 100).toFixed(0)} %` : "0 fallas imputables 01–22"}</small>
               </article>
-              <article>
-                <span>Eficiencia medida</span>
-                <strong>{model.eff?.efficiencyHhvPct != null ? `${model.eff.efficiencyHhvPct.toFixed(1)} %` : "—"}</strong>
-                <small>Heat rate / HHV</small>
-              </article>
+              {model.gte && model.eff?.efficiencyHhvPct != null ? (
+                <article>
+                  <span>Eficiencia medida</span>
+                  <strong>{`${model.eff.efficiencyHhvPct.toFixed(1)} %`}</strong>
+                  <small>Heat rate / HHV</small>
+                </article>
+              ) : (
+                <article className="tone-orange">
+                  <span>Paradas externas</span>
+                  <strong>{n(model.disp.fleetCpw.pf, 0)} h</strong>
+                  <small>MRU / gas / CCM</small>
+                </article>
+              )}
             </div>
             <p className="icpdf-sub" style={{ marginTop: "0.45rem" }}>
               2 · Horas y eventos
             </p>
-            <div className="icpdf-kpis icpdf-kpis-5">
+            <div className="icpdf-kpis icpdf-kpis-4">
               <article>
                 <span>Horas operación</span>
                 <strong>{n(model.disp.fleetCpw.op, 0)} h</strong>
@@ -247,10 +277,6 @@ export function InformeConfiabilidadPdfDeck({ month, monthLabel }: Props) {
               <article>
                 <span>Stand-by</span>
                 <strong>{n(model.disp.fleetCpw.sb, 0)} h</strong>
-              </article>
-              <article className="tone-orange">
-                <span>Paradas externas</span>
-                <strong>{n(model.disp.fleetCpw.pf, 0)} h</strong>
               </article>
               <article>
                 <span>Fallas COPOWER</span>
@@ -264,13 +290,13 @@ export function InformeConfiabilidadPdfDeck({ month, monthLabel }: Props) {
             {!model.gte ? (
               <PendingBanner
                 monthLabel={monthLabel}
-                extra="Disp. GTE y eficiencia quedan en — hasta Data Soporte. El corte concertado llega al 22."
+                extra="El corte concertado llega al 22. Data Soporte GTE y eficiencia quedan pendientes."
               />
             ) : null}
           </>
         ) : (
           <>
-            <EmptyKpis labels={["Generación total", "Disp. GTE", "Disp. COPOWER", "Confiabilidad", "Eficiencia"]} />
+            <EmptyKpis labels={["Generación total", "Disp. COPOWER", "Confiabilidad", "Paradas externas"]} />
             <PendingBanner monthLabel={monthLabel} extra="Sin horas concertadas ni Data Soporte." />
           </>
         )}
@@ -278,39 +304,56 @@ export function InformeConfiabilidadPdfDeck({ month, monthLabel }: Props) {
 
       <PdfSlide page={3} title="Análisis de disponibilidad" kicker={kicker(3, "Análisis de disponibilidad")}>
         <div className="icpdf-row-head">
-          <h3>Conciliación COPOWER vs Gran Tierra</h3>
-          <code>Disp = (h disponibles / h programadas) × 100</code>
+          <h3>COPOWER · horas concertadas{model.corte ? ` · ${model.corte}` : ""}</h3>
+          <code>Disp = (OP + SB) / calendario × 100</code>
         </div>
         {model.disp.dispCpw != null ? (
-          <div className="icpdf-kpis icpdf-kpis-3">
-            <article className="tone-blue">
-              <span>COPOWER · horas concertadas</span>
-              <strong>{pct(model.disp.dispCpw)}</strong>
-              <small>
-                {n(model.disp.cpwAvailable, 0)} / {n(model.disp.programmed, 0)}
-                {model.corte ? ` · ${model.corte}` : ""}
-              </small>
-            </article>
-            <article className="tone-violet">
-              <span>Gran Tierra · Data Soporte</span>
-              <strong>{pct(model.disp.dispGteExcel)}</strong>
-              <small>Misma base OP + SB</small>
-            </article>
-            <article className="tone-orange">
-              <span>Gran Tierra · informe</span>
-              <strong>{pct(model.disp.dispOficial)}</strong>
-              <small>Resultado publicado</small>
-            </article>
-          </div>
+          <>
+            <div className="icpdf-kpis icpdf-kpis-4">
+              <article className="tone-blue">
+                <span>Disponibilidad</span>
+                <strong>{pct(model.disp.dispCpw)}</strong>
+                <small>
+                  {n(model.disp.cpwAvailable, 0)} / {n(model.disp.programmed, 0)} h
+                </small>
+              </article>
+              <article>
+                <span>Operación</span>
+                <strong>{n(model.disp.fleetCpw.op, 0)} h</strong>
+              </article>
+              <article>
+                <span>Stand-by</span>
+                <strong>{n(model.disp.fleetCpw.sb, 0)} h</strong>
+              </article>
+              <article className="tone-orange">
+                <span>Paradas externas</span>
+                <strong>{n(model.disp.fleetCpw.pf, 0)} h</strong>
+                <small>PP {n(model.disp.fleetCpw.pp, 0)} h</small>
+              </article>
+            </div>
+            {model.gte ? (
+              <div className="icpdf-kpis icpdf-kpis-3" style={{ marginTop: "0.45rem" }}>
+                <article className="tone-violet">
+                  <span>Gran Tierra · Data Soporte</span>
+                  <strong>{pct(model.disp.dispGteExcel)}</strong>
+                </article>
+                <article className="tone-orange">
+                  <span>Gran Tierra · informe</span>
+                  <strong>{pct(model.disp.dispOficial)}</strong>
+                </article>
+              </div>
+            ) : (
+              <p className="icpdf-lead" style={{ marginTop: "0.45rem" }}>
+                Conciliación vs Gran Tierra queda para cuando llegue el Data Soporte. No se copia julio.
+              </p>
+            )}
+          </>
         ) : (
           <>
-            <EmptyKpis labels={["COPOWER · concertación", "GTE · Data Soporte", "GTE · informe"]} />
+            <EmptyKpis labels={["Disponibilidad", "Operación", "Stand-by", "Paradas externas"]} />
             <PendingBanner monthLabel={monthLabel} />
           </>
         )}
-        {!model.gte && model.disp.dispCpw != null ? (
-          <PendingBanner monthLabel={monthLabel} extra="GTE oficial del mes completo sigue pendiente." />
-        ) : null}
       </PdfSlide>
 
       <PdfSlide page={4} title="Indicadores de desempeño por máquina" kicker={kicker(4, "Desempeño por máquina")}>
@@ -429,11 +472,6 @@ export function InformeConfiabilidadPdfDeck({ month, monthLabel }: Props) {
       </PdfSlide>
 
       <PdfSlide page={7} title="Fallas e indisponibilidades" kicker={kicker(7, "Fallas")}>
-        <p className="icpdf-lead">
-          Durante el mes se analizaron las fallas, paradas no programadas, indisponibilidades
-          parciales y eventos operacionales que tuvieron mayor impacto en la disponibilidad y
-          generación.
-        </p>
         {model.conf.rows.length ? (
           <ol className="icpdf-fo">
             {model.conf.rows.slice(0, 5).map((r) => (
@@ -443,26 +481,61 @@ export function InformeConfiabilidadPdfDeck({ month, monthLabel }: Props) {
               </li>
             ))}
           </ol>
-        ) : model.eventLog.length ? (
+        ) : model.topOutages.length ? (
           <>
-            <p className="icpdf-lead">
-              0 FO-GE-033 digitalizados. El consolidado 01–22 registra {n(model.disp.fleetCpw.pf)} h de
-              paradas externas (MRU / gas Moqueta / CCM) y {n((model.gte ?? model.cpw)?.summary.copowerFailures)}{" "}
-              fallas imputables a COPOWER.
-            </p>
-            <ol className="icpdf-fo">
-              {model.eventLog
-                .filter((e) => e.downtimeHours > 0)
-                .slice(0, 5)
-                .map((e) => (
-                  <li key={`${e.date}-${e.equipment}-${e.cause.slice(0, 24)}`}>
-                    <strong>
-                      {e.date.slice(5)} · {e.equipment}
-                    </strong>
-                    {` · ${e.downtimeHours} h · ${e.cause.slice(0, 90)}`}
-                  </li>
-                ))}
-            </ol>
+            <div className="icpdf-kpis icpdf-kpis-4">
+              <article className="is-ok">
+                <span>Fallas COPOWER</span>
+                <strong>{n((model.gte ?? model.cpw)?.summary.copowerFailures)}</strong>
+                <small>imputables</small>
+              </article>
+              <article>
+                <span>FO-GE-033</span>
+                <strong>0</strong>
+                <small>sin digitalizar</small>
+              </article>
+              <article className="tone-orange">
+                <span>Paradas externas</span>
+                <strong>{n(model.disp.fleetCpw.pf, 0)} h</strong>
+                <small>MRU / Moqueta / CCM</small>
+              </article>
+              <article>
+                <span>Eventos</span>
+                <strong>{n(model.eventLog.length)}</strong>
+                <small>{model.corte ?? "bitácora"}</small>
+              </article>
+            </div>
+            <h4 className="icpdf-table-title">
+              Mayores indisponibilidades <span>top {model.topOutages.length} por horas</span>
+            </h4>
+            <div className="icpdf-table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Equipo</th>
+                    <th>Horas</th>
+                    <th>Origen</th>
+                    <th>Detalle</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {model.topOutages.map((e, i) => (
+                    <tr key={`${e.date}-${e.equipment}-${e.hours}-${i}`}>
+                      <td>{e.date}</td>
+                      <td>
+                        <strong>{e.equipment}</strong>
+                      </td>
+                      <td>{e.hours}</td>
+                      <td>
+                        <b className={`icpdf-pill ${e.kind === "MRU" ? "is-high" : "is-ext"}`}>{e.kind}</b>
+                      </td>
+                      <td>{e.note}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </>
         ) : (
           <PendingBanner monthLabel={monthLabel} extra="No se digitalizaron FO-GE-033 del mes." />
@@ -503,123 +576,109 @@ export function InformeConfiabilidadPdfDeck({ month, monthLabel }: Props) {
       </PdfSlide>
 
       <PdfSlide page={9} title="Plan de mantenimiento" kicker={kicker(9, "Plan de mantenimiento")}>
-        <div className="icpdf-kpis icpdf-kpis-5">
-          <article>
-            <span>Programados</span>
-            <strong>{model.programmed.length}</strong>
-            <small>{model.mto?.programmedCount ?? 0} en sábana</small>
-          </article>
-          <article className="tone-blue">
-            <span>Ejecutados</span>
-            <strong>{model.executed.length}</strong>
-            <small>
-              {model.programmed.length
-                ? `${((model.executed.length / model.programmed.length) * 100).toFixed(1)} %`
-                : "—"}{" "}
-              cumplimiento
-            </small>
-          </article>
-          <article className="tone-violet">
-            <span>Pendientes</span>
-            <strong>{model.pending.length}</strong>
-            <small>{model.mto?.pendingCount ?? 0} por cerrar</small>
-          </article>
-          <article className="tone-orange">
-            <span>Cumplimiento</span>
-            <strong>
-              {model.programmed.length
-                ? `${((model.executed.length / model.programmed.length) * 100).toFixed(1)} %`
-                : "—"}
-            </strong>
-            <small>Plan {monthLabel}</small>
-          </article>
-          <article className="is-ok">
-            <span>Horas MTO</span>
-            <strong>{n(model.mto?.executedHoursMto)}</strong>
-            <small>
-              de {n(model.mto?.plannedHoursMto)} h plan · {n(model.mto?.executedManHours)} h-hombre
-            </small>
-          </article>
-        </div>
-        <div className="icpdf-charts">
-          <article>
-            <h4>Intervenciones por equipo</h4>
-            <div className="icpdf-chart">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={model.equipChart} margin={{ top: 12, right: 4, left: 0, bottom: 8 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={GRID} vertical={false} />
-                  <XAxis dataKey="equipment" tick={TICK} interval={0} angle={-18} textAnchor="end" height={36} />
-                  <YAxis tick={TICK} width={22} allowDecimals={false} />
-                  <Tooltip />
-                  <Bar dataKey="count" fill="#0f766e" radius={[3, 3, 0, 0]}>
-                    <LabelList dataKey="share" position="top" fontSize={8} formatter={(v) => `${v}%`} />
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </article>
-          <article>
-            <h4>Horas MTO por semana</h4>
-            <div className="icpdf-chart">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={model.weekChart} margin={{ top: 8, right: 4, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={GRID} vertical={false} />
-                  <XAxis dataKey="week" tick={TICK} />
-                  <YAxis tick={TICK} width={26} />
-                  <Tooltip />
-                  <Legend wrapperStyle={{ fontSize: 9 }} />
-                  <Bar dataKey="planned" name="Plan h MTO" fill="#6366f1" radius={[3, 3, 0, 0]} />
-                  <Bar dataKey="executed" name="Ejec h MTO" fill="#16a34a" radius={[3, 3, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </article>
-        </div>
-        <div className="icpdf-split">
-          <div className="icpdf-table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Fecha</th>
-                  <th>Equipo</th>
-                  <th>Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(model.pending.length ? model.pending : model.recent).map((row) => (
-                  <tr key={`${row.date}-${row.equipment}`}>
-                    <td>{row.date.slice(5)}</td>
-                    <td>{row.equipment}</td>
-                    <td>{row.statusLabel}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <div className="icpdf-mto">
+          <div className="icpdf-kpis icpdf-kpis-4">
+            <article>
+              <span>Programados</span>
+              <strong>{model.programmed.length}</strong>
+            </article>
+            <article className="tone-blue">
+              <span>Ejecutados</span>
+              <strong>{model.executed.length}</strong>
+              <small>
+                {model.programmed.length
+                  ? `${((model.executed.length / model.programmed.length) * 100).toFixed(0)} %`
+                  : ""}
+              </small>
+            </article>
+            <article className="tone-violet">
+              <span>Pendientes</span>
+              <strong>{model.pending.length}</strong>
+            </article>
+            <article className="is-ok">
+              <span>Horas MTO</span>
+              <strong>{n(model.mto?.executedHoursMto)}</strong>
+              <small>de {n(model.mto?.plannedHoursMto)} h</small>
+            </article>
           </div>
-          {month === "Ago" ? (
+          <div className="icpdf-minicharts">
+            <article>
+              <h4>Intervenciones por equipo</h4>
+              <ul className="icpdf-bars">
+                {model.equipChart.map((row) => (
+                  <li key={row.equipment}>
+                    <span>{row.equipment}</span>
+                    <b style={{ width: `${(row.count / Math.max(model.equipChart[0]?.count ?? 1, 1)) * 100}%` }} />
+                    <em>{row.count}</em>
+                  </li>
+                ))}
+              </ul>
+            </article>
+            <article>
+              <h4>Horas MTO por semana</h4>
+              <div className="icpdf-weeks">
+                {model.weekChart.map((w) => {
+                  const max = Math.max(...model.weekChart.flatMap((x) => [x.planned, x.executed]), 1);
+                  return (
+                    <div key={w.week}>
+                      <div className="icpdf-weeks-col">
+                        <i className="is-plan" style={{ height: `${(w.planned / max) * 100}%` }} title={`Plan ${w.planned}`} />
+                        <i className="is-exec" style={{ height: `${(w.executed / max) * 100}%` }} title={`Ejec ${w.executed}`} />
+                      </div>
+                      <span>{w.week}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="icpdf-weeks-leg">
+                <i className="is-plan" /> Plan · <i className="is-exec" /> Ejecutado
+              </p>
+            </article>
+          </div>
+          <div className="icpdf-split">
             <div className="icpdf-table-wrap">
               <table>
                 <thead>
                   <tr>
-                    <th>Semana 31 ago–6 sep</th>
-                    <th>Cód.</th>
-                    <th>h</th>
+                    <th>Pendiente</th>
+                    <th>Equipo</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {AGOSTO_WEEKLY_PLANNING.jobs.map((j) => (
-                    <tr key={`${j.date}-${j.equipment}`}>
-                      <td>
-                        {j.weekday} · {j.equipment}
-                      </td>
-                      <td>{j.code}</td>
-                      <td>{j.hours}</td>
+                  {(model.pending.length ? model.pending : model.recent).map((row) => (
+                    <tr key={`${row.date}-${row.equipment}`}>
+                      <td>{row.date.slice(5)}</td>
+                      <td>{row.equipment}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-          ) : null}
+            {month === "Ago" ? (
+              <div className="icpdf-table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>31 ago–6 sep</th>
+                      <th>Cód.</th>
+                      <th>h</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {AGOSTO_WEEKLY_PLANNING.jobs.map((j) => (
+                      <tr key={`${j.date}-${j.equipment}`}>
+                        <td>
+                          {j.weekday} · {j.equipment}
+                        </td>
+                        <td>{j.code}</td>
+                        <td>{j.hours}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : null}
+          </div>
         </div>
       </PdfSlide>
 
