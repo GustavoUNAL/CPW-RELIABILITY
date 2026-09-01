@@ -30,8 +30,13 @@ const EXTRA_MONTH_LABELS: Record<string, string> = {
   Dic: "Diciembre",
 };
 
-function withInformesMonths(order: readonly string[], page: PageKey, leafId: string) {
-  if (page === "informes" || leafId.startsWith("inf-")) {
+function withLatestCloseMonths(order: readonly string[], page: PageKey, leafId: string) {
+  if (
+    page === "informes" ||
+    page === "dashboard" ||
+    leafId.startsWith("inf-") ||
+    leafId.startsWith("dash-")
+  ) {
     return Array.from(new Set([...order, ...INFORMES_EXTRA_MONTHS]));
   }
   return [...order];
@@ -164,6 +169,7 @@ export const INTEGRATED_DUAL_LEAVES = new Set([
   "conf-formulas",
   "conf-formulas-revision",
   "inf-conf-resumen",
+  "inf-conf-presentacion",
   "inf-conf-conciliacion",
   "inf-conf-confiabilidad",
   "inf-conf-maquinas",
@@ -177,6 +183,8 @@ export const INTEGRATED_DUAL_LEAVES = new Set([
   "inf-conf-conclusiones",
   "inf-conf-facturacion",
   "dash-resumen",
+  "dash-laminas",
+  "dash-indicadores",
   "admin-usuarios",
   "admin-uso",
   "dash-mto",
@@ -321,7 +329,7 @@ export function resolveViewContext(page: PageKey, leafId: string): ViewContext {
     const union = Array.from(new Set([...GRAN_TIERRA_MONTH_ORDER, ...COPOWER_MONTH_ORDER]));
     return {
       report: "dual",
-      monthOrder: withInformesMonths(union, page, leafId),
+      monthOrder: withLatestCloseMonths(union, page, leafId),
       reportLabel: leafId.startsWith("cfg-campos")
         ? "Campo · Costayaco / Vonú"
         : "Gran Tierra + COPOWER · vista integrada",
@@ -332,7 +340,7 @@ export function resolveViewContext(page: PageKey, leafId: string): ViewContext {
     const union = Array.from(new Set([...GRAN_TIERRA_MONTH_ORDER, ...COPOWER_MONTH_ORDER]));
     return {
       report: "dual",
-      monthOrder: withInformesMonths(union, page, leafId),
+      monthOrder: withLatestCloseMonths(union, page, leafId),
       reportLabel: "Gran Tierra + COPOWER",
       reportShort: "Dual",
     };

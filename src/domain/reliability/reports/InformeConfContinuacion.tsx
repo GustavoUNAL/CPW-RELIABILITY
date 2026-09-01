@@ -422,12 +422,12 @@ export function InformeConfInventarioSection({
     <CollapsibleSlide
       n={10}
       title={`Mínimos de inventario · ${monthLabel}`}
-      sub={`Cobertura · ${INVENTORY_MINIMUMS.items.length} ítems`}
-      badge="Activos"
+      sub={`Bodega Costayaco · ${INVENTORY_MINIMUMS.items.length} ítems · ${INVENTORY_MINIMUMS.extractedAt}`}
+      badge="Bodega"
       className="inf-conf-slide-one"
       narrative={<SlideNarrative month={month} monthLabel={monthLabel} slide="inventario" />}
     >
-      <InventoryMinimumsDashboard hideCatalogTable embedded slide />
+      <InventoryMinimumsDashboard embedded report />
     </CollapsibleSlide>
   );
 }

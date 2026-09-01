@@ -1,6 +1,9 @@
 import {
   AlertTriangle,
+  ArrowDownToLine,
+  ArrowUpFromLine,
   CheckCircle2,
+  ClipboardList,
   Package,
   PackageMinus,
   PackageSearch,
@@ -48,6 +51,8 @@ const FAMILY_COLOR: Record<string, string> = {
   JINAN: "#0f766e",
   MATERIALES: "#64748b",
   "SIN CLASIFICAR": "#94a3b8",
+  "MATERIALES ELÉCTRICOS": "#a78bfa",
+  HERRAMIENTA: "#f59e0b",
 };
 
 function ToneBadge({ label, color }: { label: string; color: string }) {
@@ -80,6 +85,7 @@ export function InventoryMinimumsDashboard({
   hideCatalogTable = false,
   embedded = false,
   slide = false,
+  report = false,
 }: {
   /** Oculta la tabla detallada familia / descripción / gap (p. ej. informe §9). */
   hideCatalogTable?: boolean;
@@ -87,6 +93,8 @@ export function InventoryMinimumsDashboard({
   embedded?: boolean;
   /** Vista compacta de un slide: KPIs + críticos top. */
   slide?: boolean;
+  /** Informe: kardex completo (catálogo, movimientos y REVISAR). */
+  report?: boolean;
 } = {}) {
   const [query, setQuery] = useState("");
   const [family, setFamily] = useState("Todos");
@@ -201,7 +209,15 @@ export function InventoryMinimumsDashboard({
       });
   }, [enriched, family, coverage, query]);
 
-  const criticalRows = slide ? planningCritical.slice(0, 6) : planningCritical;
+  const compact = slide && !report;
+  const criticalRows = compact ? planningCritical.slice(0, 6) : planningCritical;
+  const movements = INVENTORY_MINIMUMS.movements ?? [];
+  const entradas = movements.filter((m) => m.kind === "entrada");
+  const salidas = movements.filter((m) => m.kind === "salida");
+  const reviewItems = enriched.filter((i) => i.review);
+  const unitsOnHand = enriched.reduce((acc, i) => acc + i.onHand, 0);
+  const unitsIn = enriched.reduce((acc, i) => acc + (i.received ?? 0), 0);
+  const unitsOut = enriched.reduce((acc, i) => acc + (i.issued ?? 0), 0);
   const catalogIds = useMemo(() => new Set(enriched.map((i) => i.id)), [enriched]);
   const uncatalogedCritical = planningCritical.filter((s) => !catalogIds.has(s.id)).length;
 
@@ -211,7 +227,7 @@ export function InventoryMinimumsDashboard({
         <Package size={16} />
         <span>Ítems catalogados</span>
         <strong>{kpis.total}</strong>
-        <small>{kpis.families} tipos de máquina</small>
+        <small>{kpis.families} familias · {unitsOnHand.toLocaleString("es-CO")} ud. en bodega</small>
       </div>
       <div className="exec-kpi">
         <AlertTriangle size={16} />
@@ -233,6 +249,28 @@ export function InventoryMinimumsDashboard({
         <span>Sobre mínimo</span>
         <strong style={{ color: COVERAGE_META.ok.color }}>{kpis.ok}</strong>
       </div>
+      {report ? (
+        <>
+          <div className="exec-kpi">
+            <ArrowUpFromLine size={16} />
+            <span>Entradas kardex</span>
+            <strong>{entradas.length}</strong>
+            <small>{unitsIn.toLocaleString("es-CO")} ud. recibidas</small>
+          </div>
+          <div className="exec-kpi">
+            <ArrowDownToLine size={16} />
+            <span>Salidas kardex</span>
+            <strong>{salidas.length}</strong>
+            <small>{unitsOut.toLocaleString("es-CO")} ud. despachadas</small>
+          </div>
+          <div className="exec-kpi">
+            <ClipboardList size={16} />
+            <span>A revisar</span>
+            <strong>{reviewItems.length}</strong>
+            <small>Hoja REVISAR</small>
+          </div>
+        </>
+      ) : null}
     </div>
   );
 
@@ -240,11 +278,11 @@ export function InventoryMinimumsDashboard({
     criticalRows.length > 0 ? (
       <section className="op-panel" style={{ marginTop: "0.55rem" }}>
         <div className="op-panel-head">
-          <h4>Críticos del plan</h4>
+          <h4>{report ? "Sin existencia o bajo mínimo" : "Críticos del plan"}</h4>
           <span className="muted">
-            {slide
-              ? `${criticalRows.length} de ${planningCritical.length} · RCA/IP GTE`
-              : `${planningCritical.length} · ligados a RCA/IP GTE`}
+            {compact
+              ? `${criticalRows.length} de ${planningCritical.length}`
+              : `${planningCritical.length} ítems`}
           </span>
         </div>
         <div className="table-wrap">
@@ -256,7 +294,7 @@ export function InventoryMinimumsDashboard({
                 <th>P/N</th>
                 <th>Exist. / Mín.</th>
                 <th>Equipo</th>
-                {!slide ? <th>Evento</th> : null}
+                {!compact ? <th>Evento</th> : null}
               </tr>
             </thead>
             <tbody>
@@ -289,7 +327,7 @@ export function InventoryMinimumsDashboard({
                     </strong>
                   </td>
                   <td>{s.asset}</td>
-                  {!slide ? (
+                  {!compact ? (
                     <td>
                       <small className="muted">{s.linkedEvent}</small>
                     </td>
@@ -300,14 +338,14 @@ export function InventoryMinimumsDashboard({
           </table>
         </div>
         <p className="muted" style={{ marginTop: "0.35rem", fontSize: "0.7rem" }}>
-          Universo distinto al de los KPI: {planningCritical.length} críticos del plan de los cuales{" "}
-          {uncatalogedCritical} no están en el catálogo de {kpis.total} ítems, por eso su conteo de
-          faltantes no coincide con «Sin existencia» y «Bajo mínimo».
+          Universo del kardex: {planningCritical.length} ítems bajo mínimo o agotados sobre{" "}
+          {kpis.total} del cierre
+          {uncatalogedCritical ? ` · ${uncatalogedCritical} extras de plan fuera de catálogo` : ""}.
         </p>
       </section>
     ) : null;
 
-  if (slide) {
+  if (compact) {
     return (
       <div className="inf-conf-embed inv-dashboard--slide">
         {kpiRow}
@@ -327,8 +365,8 @@ export function InventoryMinimumsDashboard({
               <span className="source-badge gte">CYC</span>
             </div>
             <p className="muted" style={{ marginTop: "0.35rem" }}>
-              Catálogo {INVENTORY_MINIMUMS.items.length} ítems · actualizado con consumos críticos junio 2026
-              (escape CPW01, intercooler CPW06, flexibles) · {INVENTORY_MINIMUMS.extractedAt}
+              Catálogo {INVENTORY_MINIMUMS.items.length} ítems · cierre bodega Costayaco ·{" "}
+              {INVENTORY_MINIMUMS.extractedAt}
             </p>
           </>
         )}
@@ -427,7 +465,107 @@ export function InventoryMinimumsDashboard({
           </article>
         </div>
 
-        {hideCatalogTable ? null : (
+        {report ? (
+          <div className="fac-tpl-bill" style={{ marginTop: "0.85rem" }}>
+            <article className="op-panel">
+              <div className="op-panel-head">
+                <h4>Salidas de bodega</h4>
+                <span className="muted">{salidas.length} movimientos</span>
+              </div>
+              <div className="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Fecha</th>
+                      <th>P/N</th>
+                      <th>Descripción</th>
+                      <th>Cant.</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {salidas.map((m, i) => (
+                      <tr key={`sal-${m.date}-${m.description}-${i}`}>
+                        <td>{m.date || "—"}</td>
+                        <td>
+                          <code style={{ fontSize: "0.78rem" }}>{m.partNumber}</code>
+                        </td>
+                        <td>{m.description}</td>
+                        <td>{m.qty}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </article>
+            <article className="op-panel">
+              <div className="op-panel-head">
+                <h4>Entradas a bodega</h4>
+                <span className="muted">{entradas.length} movimientos</span>
+              </div>
+              <div className="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Fecha</th>
+                      <th>P/N</th>
+                      <th>Descripción</th>
+                      <th>Cant.</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {entradas.map((m, i) => (
+                      <tr key={`ent-${m.date}-${m.description}-${i}`}>
+                        <td>{m.date || "—"}</td>
+                        <td>
+                          <code style={{ fontSize: "0.78rem" }}>{m.partNumber}</code>
+                        </td>
+                        <td>{m.description}</td>
+                        <td>{m.qty}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </article>
+          </div>
+        ) : null}
+
+        {report && reviewItems.length > 0 ? (
+          <section className="op-panel" style={{ marginTop: "0.75rem" }}>
+            <div className="op-panel-head">
+              <h4>Hoja REVISAR</h4>
+              <span className="muted">{reviewItems.length} ítems marcados para revisión</span>
+            </div>
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Familia</th>
+                    <th>Descripción</th>
+                    <th>P/N</th>
+                    <th>Existencia</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {reviewItems.map((r) => (
+                    <tr key={`rev-${r.id}`}>
+                      <td>{r.family}</td>
+                      <td>{r.description}</td>
+                      <td>
+                        <code style={{ fontSize: "0.78rem" }}>{r.partNumber}</code>
+                      </td>
+                      <td>{r.onHand}</td>
+                      <td>{r.status}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        ) : null}
+
+        {hideCatalogTable && !report ? null : (
           <>
             <div className="inv-filters" style={{ marginTop: "0.85rem" }}>
               <label className="ev-bitacora-filter inv-search">
@@ -482,6 +620,8 @@ export function InventoryMinimumsDashboard({
                     <th>N° parte</th>
                     <th>Stock mínimo</th>
                     <th>Existencia</th>
+                    <th>Entradas</th>
+                    <th>Salidas</th>
                     <th>Gap</th>
                     <th>Cobertura</th>
                     <th>Estado</th>
@@ -503,6 +643,8 @@ export function InventoryMinimumsDashboard({
                         <td>
                           <strong style={{ color: meta.color }}>{r.onHand}</strong>
                         </td>
+                        <td>{r.received ?? 0}</td>
+                        <td>{r.issued ?? 0}</td>
                         <td
                           style={{
                             color: r.gap < 0 ? "#dc2626" : r.gap === 0 ? "#d97706" : "var(--text-muted)",
@@ -519,7 +661,7 @@ export function InventoryMinimumsDashboard({
                   })}
                   {rows.length === 0 ? (
                     <tr>
-                      <td colSpan={8} className="muted">
+                      <td colSpan={10} className="muted">
                         Sin ítems para el filtro actual.
                       </td>
                     </tr>

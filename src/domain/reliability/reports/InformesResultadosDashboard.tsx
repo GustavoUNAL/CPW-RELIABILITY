@@ -38,6 +38,7 @@ import {
 } from "./InformeConfContinuacion";
 import { GRAN_TIERRA_MONTHLY_DATA, type GranTierraMonthKey } from "./granTierraMonthly";
 import { InformeMonthCoverageBanner } from "./InformeMonthCoverageBanner";
+import { InformeConfiabilidadPdfDeck } from "./InformeConfiabilidadPdfDeck";
 
 type Props = {
   leafId: string;
@@ -227,6 +228,13 @@ export function InformesResultadosDashboard({ leafId, month, monthLabel }: Props
     const hasGte = month in GRAN_TIERRA_MONTHLY_DATA;
     const gteMonth = (hasGte ? month : "Jul") as GranTierraMonthKey;
     const reportMonth = month;
+    if (leafId === "inf-conf-presentacion") {
+      return (
+        <div className="dash-module inf-resultados icpdf-page">
+          <InformeConfiabilidadPdfDeck month={reportMonth} monthLabel={monthLabel} />
+        </div>
+      );
+    }
     if (leafId === "inf-conf-conciliacion") {
       return (
         <div className="dash-module exec-dashboard inf-resultados">
@@ -354,7 +362,7 @@ export function InformesResultadosDashboard({ leafId, month, monthLabel }: Props
             </p>
           </div>
         </header>
-        <InventoryMinimumsDashboard />
+        <InventoryMinimumsDashboard report />
         <p className="muted inf-source-note">
           Catálogo: {INVENTORY_MINIMUMS.items.length} ítems · {INVENTORY_MINIMUMS.sourceFile}
         </p>

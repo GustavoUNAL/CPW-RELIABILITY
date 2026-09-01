@@ -27,7 +27,8 @@ export const PROJECT_NAV_TREE: NavModule[] = [
     label: "Dashboard",
     description: "Vistas ejecutivas y operativas por audiencia",
     children: [
-      { id: "dash-resumen", label: "Resumen general" },
+      { id: "dash-resumen", label: "14 láminas" },
+      { id: "dash-indicadores", label: "Indicadores GTE / COPOWER" },
       { id: "dash-contrato", label: "Cumplimiento de metas contractuales" },
       { id: "dash-operacion", label: "Operación COPOWER" },
       { id: "dash-operacion-gte", label: "Operación Gran Tierra" },
@@ -270,6 +271,7 @@ export const PROJECT_NAV_TREE: NavModule[] = [
         id: "inf-confiabilidad",
         label: "Confiabilidad",
         children: [
+          { id: "inf-conf-presentacion", label: "Informe mensual" },
           { id: "inf-conf-resumen", label: "Indicadores y eventos" },
           { id: "inf-conf-conciliacion", label: "Slide conciliación Disp." },
           { id: "inf-conf-confiabilidad", label: "Slide conciliación Conf." },

@@ -4,6 +4,8 @@ import { portfolioSummary } from "./degradationRiskEngine";
 import { buildEnergyEfficiency, REPORT_HEATING_VALUE } from "./energyEfficiency";
 import { enrichEventLog } from "../events/eventLogUtils";
 import { GRAN_TIERRA_MONTHLY_DATA, type GranTierraMonthKey } from "./granTierraMonthly";
+import { COPOWER_MONTHLY_DATA, type CopowerMonthKey } from "./copowerMonthly";
+import { INVENTORY_MINIMUMS } from "./inventoryMinimumsData";
 import { getInventoryItemsWithOverrides } from "./inventoryPlanningCritical";
 import { MAINTENANCE_PLANS } from "./maintenancePlansData";
 import { RCA_COSTAYACO_EVENTOS } from "../rca/data";
@@ -73,6 +75,7 @@ export function buildSlideNarratives(
   month: string,
   monthLabel: string,
 ): Record<SlideNarrativeKey, string> {
+  const cpw = COPOWER_MONTHLY_DATA[month as CopowerMonthKey];
   const gte = GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey];
   const disp = buildDisponibilidadAnalisis(month);
   const periodo = monthLabel.toLowerCase();
@@ -85,33 +88,69 @@ export function buildSlideNarratives(
         (mto.pendingCount ? `, con ${mto.pendingCount} pendientes` : "") +
         "."
       : "Aún no hay sábana de mantenimiento para el periodo.";
+    const invItems = getInventoryItemsWithOverrides();
+    const invSin = invItems.filter((i) => i.onHand <= 0).length;
+    const invBajo = invItems.filter((i) => i.onHand > 0 && i.onHand < i.stockMin).length;
+    const invMoves = INVENTORY_MINIMUMS.movements?.length ?? 0;
     const pending = {
       sistemicos:
-        `El informe de ${periodo} se abre con las fuentes que sí llegaron: sábana de mantenimiento y ` +
-        `planeación semanal. Faltan Data Soporte GTE, horas concertadas, RCA y el totalizador de gas ` +
-        `Moqueta, así que no se publican disponibilidad, confiabilidad ni generación oficiales para no ` +
-        `repetir las cifras de julio.`,
+        (cpw
+          ? `El informe de ${periodo} se abre con el consolidado de horas concertadas del 01 al 22: ` +
+            `${n1(cpw.kpi.generationMwh)} MWh, disponibilidad COPOWER ${pct2(disp.dispCpw)} ` +
+            `(OP ${n0(disp.fleetCpw.op)} h + SB ${n0(disp.fleetCpw.sb)} h sobre ${n0(disp.programmed)} h ` +
+            `calendario) y ${n0(cpw.summary.copowerFailures)} fallas imputables. `
+          : `El informe de ${periodo} se abre con las fuentes que sí llegaron: sábana de mantenimiento y ` +
+            `planeación semanal. `) +
+        `Faltan Data Soporte GTE, el tramo 23–31, RCA y el totalizador de gas Moqueta, así que no se ` +
+        `publican los indicadores oficiales de Gran Tierra ni se copian las cifras de julio.`,
       horasEventos:
-        `Sin bitácora ni horas concertadas de ${periodo} no hay MTBF, MTTR ni desglose OP/SB del mes. ` +
-        pendingMto,
+        cpw
+          ? `Sobre el corte 01–22 hay ${n0(cpw.summary.hoursOperated)} h de operación, ` +
+            `${n0(cpw.summary.hoursStandby)} h stand-by, ${n0(cpw.summary.hoursPreventive)} h preventivo y ` +
+            `${n0(cpw.summary.hoursFailureClient)} h de paradas externas, con ${n0(cpw.summary.totalEvents)} ` +
+            `registros en bitácora y ${n0(cpw.summary.copowerFailures)} fallas COPOWER. ${pendingMto}`
+          : `Sin bitácora ni horas concertadas de ${periodo} no hay MTBF, MTTR ni desglose OP/SB del mes. ` +
+            pendingMto,
       disponibilidad:
-        `La disponibilidad oficial de ${periodo} queda pendiente del Data Soporte GTE y de la sábana de ` +
-        `horas concertadas. ${pendingMto}`,
+        disp.dispCpw != null
+          ? `La disponibilidad COPOWER del 01–22 es ${pct2(disp.dispCpw)} sobre horas concertadas. ` +
+            `La cifra oficial de Gran Tierra sigue pendiente del Data Soporte. ${pendingMto}`
+          : `La disponibilidad oficial de ${periodo} queda pendiente del Data Soporte GTE y de la sábana de ` +
+            `horas concertadas. ${pendingMto}`,
       desgloseHoras:
-        `El desglose de horas de ${periodo} requiere el Excel de horas concertadas, que todavía no está ` +
-        `en el repositorio.`,
+        cpw
+          ? `El desglose 01–22 sale del consolidado concertado: OP ${n0(disp.fleetCpw.op)} h, ` +
+            `SB ${n0(disp.fleetCpw.sb)} h, PP ${n0(disp.fleetCpw.pp)} h y PF cliente ` +
+            `${n0(disp.fleetCpw.pf)} h. Falta el tramo 23–31.`
+          : `El desglose de horas de ${periodo} requiere el Excel de horas concertadas, que todavía no está ` +
+            `en el repositorio.`,
       confiabilidad:
-        `No hay FO-GE-033 ni bitácora de ${periodo} cargados. La confiabilidad contractual no se calcula ` +
-        `hasta que existan esos registros.`,
+        cpw
+          ? `En el consolidado 01–22 no hay fallas imputables a COPOWER (${n0(cpw.summary.copowerFailures)} ` +
+            `FO en horas concertadas, ${n1(cpw.summary.hoursFailureCopower)} h PF contratista). La ` +
+            `confiabilidad contractual del corte es ${pct2(cpw.kpi.reliability)}. Siguen pendientes los ` +
+            `FO-GE-033 oficiales del mes.`
+          : `No hay FO-GE-033 ni bitácora de ${periodo} cargados. La confiabilidad contractual no se calcula ` +
+            `hasta que existan esos registros.`,
       maquinas:
-        `El desempeño por máquina de ${periodo} se publicará cuando llegue el anexo GTE y las horas ` +
-        `concertadas. Hasta entonces el seguimiento operativo sale de la sábana de mantenimiento.`,
+        cpw
+          ? `El desempeño por máquina del 01–22 se calcula sobre horas concertadas (OP + SB) / calendario. ` +
+            `El anexo GTE de indicadores por unidad sigue pendiente.`
+          : `El desempeño por máquina de ${periodo} se publicará cuando llegue el anexo GTE y las horas ` +
+            `concertadas. Hasta entonces el seguimiento operativo sale de la sábana de mantenimiento.`,
       fallas:
-        `No se digitalizaron FO-GE-033 de ${periodo}. Cuando existan se incorporan a esta lámina con el ` +
-        `mismo criterio de frontera de responsabilidad usado en junio y julio.`,
+        cpw
+          ? `No se digitalizaron FO-GE-033 de ${periodo}. El consolidado 01–22 registra ` +
+            `${n0(cpw.summary.hoursFailureClient)} h de paradas externas (MRU / gas Moqueta / CCM) y ` +
+            `${n0(cpw.summary.copowerFailures)} fallas imputables a COPOWER.`
+          : `No se digitalizaron FO-GE-033 de ${periodo}. Cuando existan se incorporan a esta lámina con el ` +
+            `mismo criterio de frontera de responsabilidad usado en junio y julio.`,
       repetitivos:
-        `Sin bitácora de ${periodo} no hay recurrencia que consolidar. El patrón de cascadas MRU de meses ` +
-        `previos se mantiene como hipótesis de seguimiento, no como conteo del mes.`,
+        cpw
+          ? `La recurrencia del 01–22 se lee sobre ${n0(cpw.eventLog.length)} registros del consolidado ` +
+            `concertado, concentrados en paradas externas por MRU y baja presión de gas Moqueta.`
+          : `Sin bitácora de ${periodo} no hay recurrencia que consolidar. El patrón de cascadas MRU de meses ` +
+            `previos se mantiene como hipótesis de seguimiento, no como conteo del mes.`,
       mantenimiento: mto
         ? `Durante ${periodo} se ejecutaron ${mto.executedCount} de ${mto.programmedCount} intervenciones ` +
           `programadas, acumulando ${n0(mto.executedHoursMto)} horas de mantenimiento frente a ` +
@@ -122,23 +161,28 @@ export function buildSlideNarratives(
             : ".")
         : `Sin sábana de mantenimiento cargada para ${periodo}.`,
       inventario:
-        `El inventario comprende ${n0(getInventoryItemsWithOverrides().length)} ítems catalogados. El ` +
-        `cruce de faltantes no cambia con el mes: se priorizan los críticos ligados a RCA/IP vigentes.`,
+        `El cierre de bodega Costayaco queda registrado: ${n0(invItems.length)} ítems del kardex, ` +
+        `${invSin} sin existencia, ${invBajo} bajo el mínimo heredado y ${n0(invMoves)} movimientos ` +
+        `de entrada/salida. La hoja REVISAR marca ${invItems.filter((i) => i.review).length} referencias.`,
       degradacion:
-        `El índice de salud APM se conserva como baseline de junio. Sin horas ni fallas de ${periodo} no ` +
-        `se recalcula el riesgo operativo del mes.`,
+        `El índice de salud APM se conserva como baseline de junio. Sin FO oficiales de ${periodo} no ` +
+        `se recalcula el riesgo operativo del mes completo.`,
       eficiencia:
         `La hoja «Agosto 2026» del log de Moqueta no trae lecturas de agosto (las fechas son de abril). ` +
         `El heat rate del mes queda pendiente de un totalizador real y del Data Soporte.`,
       conclusiones:
-        `El cierre de ${periodo} se limita a mantenimiento: ${pendingMto} Las acciones inmediatas son ` +
-        `completar las intervenciones pendientes (permisos de trabajo, 350 h OP y CPW02 M8), incorporar ` +
-        `las fuentes oficiales de GTE y no usar julio como proxy de los indicadores del mes.`,
+        (cpw
+          ? `El corte 01–22 cierra con ${n1(cpw.kpi.generationMwh)} MWh y disponibilidad COPOWER ` +
+            `${pct2(disp.dispCpw)}, sin fallas imputables. `
+          : "") +
+        `El mantenimiento cierra ${pendingMto} Las acciones inmediatas son completar las intervenciones ` +
+        `pendientes, incorporar Data Soporte GTE y el tramo 23–31, y no usar julio como proxy de los ` +
+        `indicadores oficiales.`,
       facturacion:
         `El formato «Nuevo Fac» ya está digitalizado para ${periodo}: encabezado OPEX/CAPEX, bloques ` +
         `diarios OP/SB/PE/M/FS/TR, dashboard, novedades y tarifas. El ejemplo lleno es Ecuador (julio, ` +
-        `CW7581). Putumayo Norte usará Costayaco y Vonú en los mismos bloques cuando existan horas ` +
-        `concertadas y Data Soporte; hasta entonces el recuadro de valor queda en blanco.`,
+        `CW7581). Putumayo Norte usará Costayaco y Vonú en los mismos bloques; el consolidado 01–22 ya ` +
+        `alimenta horas, y el recuadro de valor oficial espera Data Soporte.`,
     };
     return pending;
   }
@@ -261,8 +305,9 @@ export function buildSlideNarratives(
         `ejecutadas contra el plan del periodo.`,
 
     inventario:
-      `El inventario comprende ${n0(invTotal)} ítems catalogados, de los cuales ${invSin} se encuentran sin ` +
-      `existencia y ${invBajo} por debajo del mínimo establecido. Estos ${invSin + invBajo} elementos ` +
+      `El inventario de bodega Costayaco cierra en ${n0(invTotal)} ítems, de los cuales ${invSin} se encuentran sin ` +
+      `existencia y ${invBajo} por debajo del mínimo heredado. El kardex registra ` +
+      `${n0(INVENTORY_MINIMUMS.movements?.length)} movimientos de entrada y salida. Estos ${invSin + invBajo} elementos ` +
       `representan el riesgo inmediato de suministro y deben priorizarse para evitar que una ` +
       `indisponibilidad de repuestos se convierta en una limitación para las actividades de mantenimiento.`,
 

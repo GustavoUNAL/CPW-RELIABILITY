@@ -12,6 +12,7 @@ import {
   MapPin,
   Maximize2,
   Menu,
+  Presentation,
   Shield,
   UserRound,
   X,
@@ -129,7 +130,7 @@ function App() {
   const sessionStartedAtRef = useRef(Date.now());
   const pageStartedAtRef = useRef(Date.now());
   const lastHeartbeatPageAtRef = useRef(Date.now());
-  const viewRef = useRef({ page: boot.page, leaf: boot.leaf, label: "Resumen general" });
+  const viewRef = useRef({ page: boot.page, leaf: boot.leaf, label: "14 láminas" });
   const skipUrlPushRef = useRef(false);
 
   useEffect(() => {
@@ -543,6 +544,20 @@ function App() {
         </div>
         <button
           type="button"
+          className="laminas-jump-btn mobile-laminas-btn"
+          onClick={() => {
+            setNavOpen(false);
+            if (activePage === "dashboard" && (activeLeafId === "dash-resumen" || activeLeafId === "dash-laminas")) {
+              document.getElementById("lamina-1")?.scrollIntoView({ behavior: "smooth", block: "start" });
+              return;
+            }
+            selectLeaf("dashboard", "dash-resumen");
+          }}
+        >
+          14 láminas
+        </button>
+        <button
+          type="button"
           className="mobile-logout-btn"
           onClick={handleLogout}
           aria-label="Cerrar sesión"
@@ -729,6 +744,20 @@ function App() {
             Sesión de <strong>{session.name}</strong>
             <span className="muted"> · {ROLE_LABELS[session.role]}</span>
           </p>
+          <button
+            type="button"
+            className="laminas-jump-btn"
+            onClick={() => {
+              if (activePage === "dashboard" && (activeLeafId === "dash-resumen" || activeLeafId === "dash-laminas")) {
+                document.getElementById("lamina-1")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                return;
+              }
+              selectLeaf("dashboard", "dash-resumen");
+            }}
+          >
+            <Presentation size={16} />
+            14 láminas
+          </button>
         </div>
         <PlatformContent
           page={activePage}

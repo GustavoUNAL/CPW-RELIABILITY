@@ -15,6 +15,7 @@
     "etl:concertacion-informes": "node scripts/etl-concertacion.mjs",
     "etl:gte-julio": "node scripts/etl-gte-julio.mjs",
     "etl:copower-julio": "node scripts/etl-copower-julio-concertacion.mjs",
+    "etl:copower-agosto": "node scripts/etl-copower-agosto-concertacion.mjs",
     "audit:data": "node scripts/audit-data.mjs"
   },
   "keywords": [],

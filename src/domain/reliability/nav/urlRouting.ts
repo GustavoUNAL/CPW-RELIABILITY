@@ -28,6 +28,8 @@ const PATH_TO_MODULE = Object.fromEntries(
 export const LEAF_PATH: Record<string, string> = {
   // dashboard
   "dash-resumen": "resumen",
+  "dash-laminas": "laminas",
+  "dash-indicadores": "indicadores",
   "dash-contrato": "contrato",
   "dash-operacion": "operacion-copower",
   "dash-operacion-gte": "operacion-gte",
@@ -142,6 +144,7 @@ export const LEAF_PATH: Record<string, string> = {
   "inf-rg-implementaciones": "implementaciones",
   "inf-rg-cargabilidad": "cargabilidad",
   "inf-conf-facturacion": "facturacion",
+  "inf-conf-presentacion": "informe-mensual",
 
   // admin
   "admin-usuarios": "usuarios",

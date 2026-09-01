@@ -52,7 +52,7 @@ export const AGOSTO_WEEKLY_PLANNING = {
 
 export function informeMonthCoverage(month: string) {
   const hasGte = month !== "Ago";
-  const hasConcertacion = month === "May" || month === "Jun" || month === "Jul";
+  const hasConcertacion = month === "May" || month === "Jun" || month === "Jul" || month === "Ago";
   const hasGas = month === "Jun" || month === "Jul";
   const hasRca = month === "Jun" || month === "Jul";
   const hasMaintenance = true;
@@ -67,8 +67,8 @@ export function informeMonthCoverage(month: string) {
     pendingSources:
       month === "Ago"
         ? [
-            "Data Soporte GTE (disponibilidad y generación oficiales)",
-            "Horas concertadas 01–31 agosto",
+            "Data Soporte GTE (disponibilidad y generación oficiales del mes completo)",
+            "Horas concertadas 23–31 agosto (el consolidado llega al 22)",
             "FO-GE-033 / RCA del mes",
             "Cromatografía y totalizador Moqueta de agosto (la hoja «Agosto 2026» trae fechas de abril)",
           ]
