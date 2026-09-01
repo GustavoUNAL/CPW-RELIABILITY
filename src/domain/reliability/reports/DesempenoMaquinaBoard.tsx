@@ -2,6 +2,7 @@ import { CONTRACTUAL_KPI_TARGETS } from "../contracts/gteOrders";
 import type { GenerationByEquipmentRow, MachineIndicatorRow } from "../types";
 import { COPOWER_MONTHLY_DATA, type CopowerMonthKey } from "./copowerMonthly";
 import { buildDisponibilidadAnalisis } from "./DisponibilidadAnalisisBoard";
+import { SlideNarrative } from "./SlideNarrative";
 import {
   GRAN_TIERRA_MONTHLY_DATA,
   type GranTierraMonthKey,
@@ -303,6 +304,7 @@ export function DesempenoMaquinaBoard({ month, monthLabel }: Props) {
 
   return (
     <section className="panel">
+      <SlideNarrative month={month} monthLabel={period} slide="maquinas" />
       <details className="card disp-analisis maq-board maq-board-slide inf-conf-collapse" open>
         <summary className="inf-conf-collapse-sum">
           <div className="inf-conf-collapse-sum-main">

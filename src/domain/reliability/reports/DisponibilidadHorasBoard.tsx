@@ -14,6 +14,7 @@ import {
 } from "recharts";
 import { COPOWER_MONTHLY_DATA, type CopowerMonthKey } from "./copowerMonthly";
 import { buildDisponibilidadAnalisis } from "./DisponibilidadAnalisisBoard";
+import { SlideNarrative } from "./SlideNarrative";
 
 type Props = {
   month: string;
@@ -118,6 +119,7 @@ export function DisponibilidadHorasBoard({ month, monthLabel }: Props) {
 
   return (
     <section className="panel">
+      <SlideNarrative month={month} monthLabel={monthLabel ?? month} slide="desgloseHoras" />
       <details className="card disp-analisis hours-viz inf-conf-collapse" open>
         <summary className="inf-conf-collapse-sum">
           <div className="inf-conf-collapse-sum-main">

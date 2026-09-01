@@ -141,6 +141,7 @@ export const LEAF_PATH: Record<string, string> = {
   "inf-rg-pruebas-dinamicas": "pruebas-dinamicas",
   "inf-rg-implementaciones": "implementaciones",
   "inf-rg-cargabilidad": "cargabilidad",
+  "inf-conf-facturacion": "facturacion",
 
   // admin
   "admin-usuarios": "usuarios",

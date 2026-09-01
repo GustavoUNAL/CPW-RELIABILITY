@@ -281,6 +281,7 @@ export const PROJECT_NAV_TREE: NavModule[] = [
           { id: "inf-conf-degradacion", label: "11 · Degradación y riesgos" },
           { id: "inf-conf-eficiencia", label: "12 · Eficiencia energética" },
           { id: "inf-conf-conclusiones", label: "13 · Conclusiones" },
+          { id: "inf-conf-facturacion", label: "14 · Formato de facturación" },
         ],
       },
     ],

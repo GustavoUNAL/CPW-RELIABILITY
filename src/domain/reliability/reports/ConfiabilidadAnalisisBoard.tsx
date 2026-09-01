@@ -7,6 +7,7 @@ import {
   type GranTierraMonthKey,
 } from "./granTierraMonthly";
 import { RCA_DELIVERED_DOCUMENTS } from "./rcaDocuments";
+import { SlideNarrative } from "./SlideNarrative";
 
 type Props = {
   month: string;
@@ -158,7 +159,8 @@ export function buildConfiabilidadAnalisis(month: string) {
     };
   });
   const imputables = rows.filter((r) => r.imputable);
-  const contractualConf = imputables.length === 0 ? 1 : null;
+  const hasOpsSource = Boolean(gte || cpw);
+  const contractualConf = hasOpsSource && imputables.length === 0 ? 1 : null;
   const pfContr = cpw?.summary.hoursFailureCopower ?? 0;
   const gteConf = gte?.kpi.reliability ?? null;
 
@@ -180,6 +182,7 @@ export function ConfiabilidadAnalisisBoard({ month, monthLabel }: Props) {
 
   return (
     <section className="panel">
+      <SlideNarrative month={month} monthLabel={period} slide="confiabilidad" />
       <details className="card disp-analisis conf-analisis inf-conf-collapse" open>
         <summary className="inf-conf-collapse-sum">
           <div className="inf-conf-collapse-sum-main">

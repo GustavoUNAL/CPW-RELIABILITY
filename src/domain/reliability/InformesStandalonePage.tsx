@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { ArrowLeft, Maximize2 } from "lucide-react";
+import { ArrowLeft, Maximize2, Menu, X } from "lucide-react";
 import {
   ROLE_LABELS,
   clearSession,
@@ -27,6 +27,16 @@ import { PlatformContent } from "./reports/PlatformContent";
 
 const INFORMES_MODULE = PROJECT_NAV_TREE.find((m) => m.key === "informes");
 const DEFAULT_LEAF = firstLeafId(INFORMES_MODULE?.children ?? []) ?? "inf-rg-indisponibilidad";
+const MOBILE_MQ = "(max-width: 900px)";
+
+function findLeafLabel(nodes: NavNode[], id: string): string | null {
+  for (const node of nodes) {
+    if (node.id === id) return node.label;
+    const nested = node.children ? findLeafLabel(node.children, id) : null;
+    if (nested) return nested;
+  }
+  return null;
+}
 
 function leafFromLocation(): string {
   const parsed = parsePath();
@@ -42,7 +52,7 @@ function leafFromLocation(): string {
 export function InformesStandalonePage() {
   const [session, setSession] = useState<SessionUser | null>(() => loadSession());
   const [theme, setTheme] = useState<"light" | "dark">("light");
-  const [selectedMonth, setSelectedMonth] = useState("Jul");
+  const [selectedMonth, setSelectedMonth] = useState("Ago");
   const [fullReport, setFullReport] = useState(isFullReportPath);
   const [activeLeafId, setActiveLeafId] = useState(() =>
     isFullReportPath() ? FULL_REPORT_LEAF : leafFromLocation(),
@@ -51,6 +61,34 @@ export function InformesStandalonePage() {
     "inf-resultados": true,
     "inf-confiabilidad": true,
   });
+  const [navOpen, setNavOpen] = useState(false);
+  const [isMobileNav, setIsMobileNav] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia(MOBILE_MQ);
+    const onChange = () => {
+      setIsMobileNav(mq.matches);
+      if (!mq.matches) setNavOpen(false);
+    };
+    onChange();
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  // Con el cajón abierto el fondo no debe desplazarse detrás del menú.
+  useEffect(() => {
+    if (!navOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setNavOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [navOpen]);
 
   useEffect(() => {
     document.body.classList.toggle("theme-light", theme === "light");
@@ -90,13 +128,8 @@ export function InformesStandalonePage() {
   const openFullReport = () => {
     setFullReport(true);
     setActiveLeafId(FULL_REPORT_LEAF);
+    setNavOpen(false);
     window.history.pushState({ page: "informes", leaf: FULL_REPORT_LEAF }, "", FULL_REPORT_PATH);
-    window.scrollTo({ top: 0 });
-  };
-
-  const closeFullReport = () => {
-    setFullReport(false);
-    pushAppUrl("informes", FULL_REPORT_LEAF);
     window.scrollTo({ top: 0 });
   };
 
@@ -112,6 +145,7 @@ export function InformesStandalonePage() {
   const selectLeaf = (leafId: string) => {
     setActiveLeafId(leafId);
     pushAppUrl("informes", leafId);
+    setNavOpen(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -155,10 +189,6 @@ export function InformesStandalonePage() {
     return (
       <div className={`app-shell ${theme} informes-report-only`}>
         <main className="main informes-report-page" id={FULL_REPORT_DOM_ID}>
-          <button type="button" className="informes-report-exit" onClick={closeFullReport}>
-            <ArrowLeft size={14} />
-            <span>Salir de la vista limpia</span>
-          </button>
           <PlatformContent
             page="informes"
             leafId={FULL_REPORT_LEAF}
@@ -171,8 +201,63 @@ export function InformesStandalonePage() {
   }
 
   return (
-    <div className={`app-shell ${theme} informes-standalone`}>
-      <aside className="sidebar informes-standalone-sidebar">
+    <div className={`app-shell ${theme} informes-standalone${navOpen ? " nav-open" : ""}`}>
+      <header className="mobile-topbar">
+        <button
+          type="button"
+          className="mobile-menu-btn"
+          aria-label={navOpen ? "Cerrar menú" : "Abrir menú"}
+          aria-expanded={navOpen}
+          aria-controls="informes-sidebar"
+          onClick={() => setNavOpen((v) => !v)}
+        >
+          {navOpen ? <X size={22} /> : <Menu size={22} />}
+        </button>
+        <div className="mobile-topbar-copy">
+          <p className="eyebrow">COPOWER · Informes</p>
+          <strong>{findLeafLabel(INFORMES_MODULE?.children ?? [], activeLeafId) ?? "Informe"}</strong>
+          <span>Periodo {monthLabel}</span>
+        </div>
+        <button
+          type="button"
+          className="mobile-menu-btn"
+          aria-label="Abrir el informe completo en una sola página"
+          onClick={openFullReport}
+        >
+          <Maximize2 size={18} />
+        </button>
+      </header>
+
+      <button
+        type="button"
+        className={`nav-backdrop${navOpen ? " open" : ""}`}
+        aria-label="Cerrar menú"
+        tabIndex={navOpen ? 0 : -1}
+        aria-hidden={!navOpen}
+        onClick={() => setNavOpen(false)}
+      />
+
+      <aside
+        id="informes-sidebar"
+        className={`sidebar informes-standalone-sidebar${navOpen ? " open" : ""}`}
+        aria-hidden={isMobileNav && !navOpen ? true : undefined}
+      >
+        <div className="sidebar-mobile-head">
+          <div className="brand">
+            <p className="eyebrow">COPOWER</p>
+            <h1>Informes</h1>
+            <p className="brand-sub">{PROJECT_TITLE}</p>
+          </div>
+          <button
+            type="button"
+            className="mobile-menu-btn sidebar-close-btn"
+            aria-label="Cerrar menú"
+            onClick={() => setNavOpen(false)}
+          >
+            <X size={18} />
+          </button>
+        </div>
+
         <div className="brand brand-desktop">
           <p className="eyebrow">COPOWER</p>
           <h1>Informes</h1>

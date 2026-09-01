@@ -4,6 +4,7 @@ import {
   type GranTierraMonthKey,
 } from "./granTierraMonthly";
 import { MAINTENANCE_PLANS } from "./maintenancePlansData";
+import { SlideNarrative } from "./SlideNarrative";
 
 type Props = {
   month: string;
@@ -119,6 +120,7 @@ export function DisponibilidadAnalisisBoard({ month, monthLabel }: Props) {
 
   return (
     <section className="panel">
+      <SlideNarrative month={month} monthLabel={monthLabel ?? month} slide="disponibilidad" />
       <details className="card disp-analisis inf-conf-collapse" open>
         <summary className="inf-conf-collapse-sum">
           <div className="inf-conf-collapse-sum-main">

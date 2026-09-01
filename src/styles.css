@@ -12505,6 +12505,9 @@ tr.row-focal td {
     transform: translateX(-105%);
     visibility: hidden;
     pointer-events: none;
+    /* Opaco: el cajón flota sobre el contenido y no debe transparentarlo. */
+    background: var(--bg-soft);
+    box-shadow: 0 0 2.5rem rgb(0 0 0 / 35%);
   }
 
   .app-shell:not(.login-shell) > .sidebar.open {
@@ -13868,35 +13871,6 @@ tr.row-focal td {
   width: 100%;
 }
 
-.informes-report-exit {
-  position: sticky;
-  top: 0.5rem;
-  z-index: 20;
-  float: right;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.35rem 0.6rem;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--panel);
-  font-size: 0.72rem;
-  font-weight: 650;
-  color: var(--text-muted);
-  cursor: pointer;
-}
-
-.informes-report-exit:hover {
-  color: var(--text);
-  border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
-}
-
-@media print {
-  .informes-report-exit {
-    display: none;
-  }
-}
-
 .informes-standalone-actions {
   display: grid;
   gap: 0.4rem;
@@ -13915,16 +13889,9 @@ tr.row-focal td {
 }
 
 @media (max-width: 900px) {
-  .informes-standalone {
-    grid-template-columns: 1fr;
-  }
-
-  .informes-standalone-sidebar {
-    position: relative;
-    height: auto;
-    width: 100%;
-    border-right: none;
-    border-bottom: 1px solid var(--border);
+  /* La navegación pasa al cajón compartido (.mobile-topbar + .sidebar.open). */
+  .informes-standalone-head {
+    display: none;
   }
 }
 
@@ -14398,6 +14365,38 @@ tr.row-focal td {
   margin-bottom: 0;
 }
 
+/*
+ * Cuerpo de texto que antecede a cada lámina.
+ *
+ * Va fuera de la tarjeta para que el informe se lea como un documento: primero
+ * el párrafo, luego la lámina en el papel de figura.
+ */
+.inf-slide-narrative {
+  flex: 0 0 auto;
+  margin: 0 0 0.7rem;
+  padding: 0 0.15rem;
+  max-width: 110ch;
+  font-size: 0.86rem;
+  line-height: 1.65;
+  text-align: justify;
+  text-wrap: pretty;
+  hyphens: auto;
+  color: color-mix(in srgb, var(--text) 88%, transparent);
+}
+
+/* En los slide decks a pantalla completa el párrafo cede espacio a los gráficos. */
+.panel:has(> .inf-rep-slide-deck) > .inf-slide-narrative {
+  margin-bottom: 0.5rem;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.panel:has(> .inf-slide-narrative) .rep-slide {
+  min-height: calc(100dvh - 13.5rem);
+  max-height: calc(100dvh - 13.5rem);
+  grid-template-rows: auto minmax(11rem, 1fr) auto;
+}
+
 .inf-conf-vs-box--compact {
   padding: 0.55rem 0.75rem;
 }
@@ -14869,6 +14868,488 @@ tr.row-focal td {
   .rep-slide-charts {
     min-height: 20rem;
     grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   Informe de confiabilidad · lectura en móvil
+   Las láminas están diseñadas para proyección a pantalla completa. En un
+   teléfono ese encuadre no cabe, así que el informe se sirve como documento
+   scrollable: una columna, gráficos con altura propia y tablas deslizables.
+   ========================================================================== */
+
+@media (max-width: 900px) {
+  .main {
+    padding: 0.9rem 0.85rem 1.4rem;
+  }
+
+  .informes-report-page {
+    padding: 0.75rem 0.8rem 1.5rem;
+  }
+
+  /* El encuadre de proyección se libera: la lámina crece con su contenido. */
+  .panel:has(> .inf-slide-narrative) .rep-slide,
+  .rep-slide {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+  }
+
+  .rep-slide-kpis,
+  .inf-conf-fallas-kpis,
+  .inf-conf-concl-kpis,
+  .hours-viz-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .exec-core-grid,
+  .exec-core-grid--4,
+  .exec-core-grid--5,
+  .exec-kpi-row,
+  .disp-kpi-row,
+  .disp-kpi-row-3,
+  .rep-slide-charts,
+  .mto-slide-charts,
+  .eff-slide-charts,
+  .rep-slide-tables,
+  .eff-slide-tables,
+  .dash-chart-grid,
+  .inf-conf-concl-grid,
+  .inf-kpi-grid,
+  .hours-viz-grid,
+  .hours-viz-row3,
+  .hours-viz-mix,
+  .rca-cover-info-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Los gráficos de la lámina 4 quedan ilegibles con la altura de proyección. */
+  .hours-viz-chart,
+  .hours-viz-chart-short,
+  .hours-viz-chart-mid,
+  .hours-viz-chart-tall,
+  .hours-viz-chart-pie {
+    height: 15rem;
+  }
+
+  /* Calendario y matriz de riesgo son cuadrículas fijas: se deslizan, no se aplastan. */
+  :has(> .ev-cal-grid),
+  .dr-matrix {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .ev-cal-grid,
+  .dr-matrix-row {
+    min-width: 26rem;
+  }
+
+  /* Sin alto de rejilla, cada gráfico necesita el suyo o Recharts colapsa a 0. */
+  .rep-slide-chart {
+    min-height: 17rem;
+  }
+
+  .rep-slide-chart-body,
+  .rep-slide-chart--pairs .rep-slide-chart-body {
+    min-height: 13rem;
+  }
+
+  .rep-slide-chart--pairs {
+    max-height: none;
+  }
+
+  .rep-slide-tables,
+  .eff-slide-tables,
+  .eff-slide-tables .rep-slide-table-panel .table-wrap {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .maq-table-slide,
+  .rep-slide-table-panel .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Las tablas anchas se deslizan en vez de comprimir las columnas. */
+  .maq-table-slide table,
+  .rep-slide-table-panel table {
+    min-width: 34rem;
+  }
+
+  .inf-slide-narrative {
+    max-width: none;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    text-align: left;
+  }
+
+  /* Sin la altura fija de la lámina el pie del KPI cabe entero, sin recortar. */
+  .rep-slide-kpis small {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  /* Las insignias no se encogen y estrujaban el título a una palabra por línea. */
+  .inf-conf-collapse > .inf-conf-collapse-sum {
+    flex-wrap: wrap;
+  }
+
+  .inf-conf-collapse-sum-main {
+    flex: 1 1 100%;
+  }
+
+  .inf-conf-collapse-sum-side {
+    order: -1;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 380px) {
+  .rep-slide-kpis,
+  .inf-conf-fallas-kpis,
+  .inf-conf-concl-kpis,
+  .hours-viz-kpis {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .maq-source-table > header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* ==========================================================================
+   14 · Formato de facturación (plantilla Nuevo Fac)
+   ========================================================================== */
+
+.fac-tpl {
+  display: grid;
+  gap: 1.1rem;
+}
+
+.fac-tpl-sheet {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(16rem, 0.8fr);
+  gap: 0.75rem;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface, var(--panel)) 92%, transparent);
+}
+
+.fac-tpl-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 0.55rem 0.75rem;
+}
+
+.fac-tpl-meta span,
+.fac-tpl-values span,
+.fac-tpl-sign span {
+  display: block;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.fac-tpl-meta strong,
+.fac-tpl-values strong,
+.fac-tpl-sign strong {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.92rem;
+  letter-spacing: -0.02em;
+}
+
+.fac-tpl-values {
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  border: 1px dashed color-mix(in srgb, var(--accent) 45%, var(--border));
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.fac-tpl-values > div {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.4rem;
+  margin: 0.45rem 0 0.35rem;
+}
+
+.fac-tpl-values article {
+  padding: 0.4rem 0.5rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--panel) 70%, transparent);
+}
+
+.fac-tpl-values small,
+.fac-tpl-note,
+.fac-tpl-hint,
+.fac-tpl-unit-foot {
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.fac-tpl-note {
+  margin: 0.25rem 0 0.55rem;
+  max-width: 92ch;
+}
+
+.fac-tpl-anatomy {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 0.55rem;
+}
+
+.fac-tpl-anatomy li {
+  display: grid;
+  grid-template-columns: 1.6rem minmax(0, 1fr);
+  gap: 0.5rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface, var(--panel)) 90%, transparent);
+}
+
+.fac-tpl-anatomy li > span {
+  width: 1.6rem;
+  height: 1.6rem;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  color: var(--accent);
+}
+
+.fac-tpl-anatomy strong {
+  display: block;
+  font-size: 0.82rem;
+}
+
+.fac-tpl-anatomy p {
+  margin: 0.2rem 0 0;
+  font-size: 0.76rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+.fac-tpl-codes {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 0.45rem;
+}
+
+.fac-tpl-codes li {
+  display: grid;
+  grid-template-columns: 2.4rem minmax(0, 1fr);
+  gap: 0.5rem;
+  align-items: start;
+}
+
+.fac-tpl-codes b {
+  display: grid;
+  place-items: center;
+  height: 1.7rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+}
+
+.fac-tpl-codes p {
+  margin: 0.12rem 0 0;
+  font-size: 0.74rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+.fac-tpl-units {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.fac-tpl-unit {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--surface, var(--panel)) 92%, transparent);
+}
+
+.fac-tpl-unit-head,
+.fac-tpl-unit-foot {
+  padding: 0.5rem 0.7rem;
+}
+
+.fac-tpl-unit-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.82rem;
+}
+
+.fac-tpl-unit-head span {
+  color: var(--text-muted);
+}
+
+.fac-tpl-grid-wrap {
+  overflow-x: auto;
+}
+
+.fac-tpl-grid {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: collapse;
+  font-size: 0.62rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.fac-tpl-grid th,
+.fac-tpl-grid td {
+  min-width: 1.55rem;
+  height: 1.45rem;
+  padding: 0;
+  text-align: center;
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+}
+
+.fac-tpl-grid th:first-child,
+.fac-tpl-grid .fac-h-sum {
+  min-width: 2.4rem;
+  font-weight: 700;
+  background: color-mix(in srgb, var(--panel-soft, var(--panel)) 80%, transparent);
+}
+
+.fac-h--op.is-on {
+  background: color-mix(in srgb, #5fbf88 calc(var(--fac-a, 0.55) * 100%), transparent);
+  color: #e9fff4;
+}
+.fac-h--sb.is-on {
+  background: color-mix(in srgb, #d4a017 calc(var(--fac-a, 0.55) * 100%), transparent);
+  color: #fff6d8;
+}
+.fac-h--pe.is-on {
+  background: color-mix(in srgb, #3d7ea6 calc(var(--fac-a, 0.55) * 100%), transparent);
+  color: #e4f3ff;
+}
+.fac-h--m.is-on {
+  background: color-mix(in srgb, #8b6bd4 calc(var(--fac-a, 0.55) * 100%), transparent);
+  color: #f3eaff;
+}
+.fac-h--fs.is-on {
+  background: color-mix(in srgb, #e05a5a calc(var(--fac-a, 0.55) * 100%), transparent);
+  color: #ffe8e8;
+}
+.fac-h--tr.is-on {
+  background: color-mix(in srgb, #8a9aab calc(var(--fac-a, 0.55) * 100%), transparent);
+  color: #eef3f7;
+}
+
+.fac-tpl-table table {
+  font-size: 0.78rem;
+}
+
+.fac-tpl-hint {
+  display: block;
+  margin-top: 0.15rem;
+}
+
+.fac-tpl-bill {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
+  gap: 0.75rem;
+}
+
+.fac-tpl-map {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: 0.75rem;
+}
+
+.fac-tpl-map article {
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface, var(--panel)) 92%, transparent);
+}
+
+.fac-tpl-map ul {
+  margin: 0.4rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.28rem;
+}
+
+.fac-tpl-map li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  font-size: 0.8rem;
+}
+
+.fac-tpl-map small {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+.fac-owner {
+  flex: 0 0 auto;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.08rem 0.35rem;
+  border-radius: 999px;
+}
+
+.fac-owner--gte {
+  background: color-mix(in srgb, #3d7ea6 28%, transparent);
+  color: #cfe6f5;
+}
+
+.fac-owner--cpw {
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
+  color: #c8f5ee;
+}
+
+.fac-tpl-sign {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 0.65rem;
+  padding-top: 0.4rem;
+  border-top: 1px dashed var(--border);
+}
+
+.fac-tpl-sign div {
+  min-height: 4.2rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+@media (max-width: 900px) {
+  .fac-tpl-sheet {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 

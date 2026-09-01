@@ -29,12 +29,15 @@ import {
   InformeConfContinuacion,
   InformeConfDegradacionSection,
   InformeConfEficienciaSection,
+  InformeConfFacturacionSection,
   InformeConfFallasGroup,
   InformeConfInventarioSection,
   InformeConfMantenimientoSection,
+  InformeConfPlaneacionSemanalSection,
   InformeConfRepetitivosSection,
 } from "./InformeConfContinuacion";
 import { GRAN_TIERRA_MONTHLY_DATA, type GranTierraMonthKey } from "./granTierraMonthly";
+import { InformeMonthCoverageBanner } from "./InformeMonthCoverageBanner";
 
 type Props = {
   leafId: string;
@@ -221,7 +224,9 @@ function EventsTable({
 
 export function InformesResultadosDashboard({ leafId, month, monthLabel }: Props) {
   if (leafId === "inf-conf-resumen" || leafId.startsWith("inf-conf-")) {
-    const gteMonth = (month in GRAN_TIERRA_MONTHLY_DATA ? month : "Jul") as GranTierraMonthKey;
+    const hasGte = month in GRAN_TIERRA_MONTHLY_DATA;
+    const gteMonth = (hasGte ? month : "Jul") as GranTierraMonthKey;
+    const reportMonth = month;
     if (leafId === "inf-conf-conciliacion") {
       return (
         <div className="dash-module exec-dashboard inf-resultados">
@@ -260,7 +265,9 @@ export function InformesResultadosDashboard({ leafId, month, monthLabel }: Props
     if (leafId === "inf-conf-mantenimiento" || leafId === "inf-conf-malos") {
       return (
         <div className="dash-module exec-dashboard inf-resultados inf-viewport-page">
-          <InformeConfMantenimientoSection month={gteMonth} monthLabel={monthLabel} slideViewport />
+          <InformeMonthCoverageBanner month={reportMonth} monthLabel={monthLabel} />
+          <InformeConfMantenimientoSection month={reportMonth} monthLabel={monthLabel} slideViewport />
+          <InformeConfPlaneacionSemanalSection month={reportMonth} monthLabel={monthLabel} />
         </div>
       );
     }
@@ -288,7 +295,16 @@ export function InformesResultadosDashboard({ leafId, month, monthLabel }: Props
     if (leafId === "inf-conf-conclusiones") {
       return (
         <div className="dash-module exec-dashboard inf-resultados">
-          <ConclusionesConfiabilidadBoard month={gteMonth} monthLabel={monthLabel} />
+          <InformeMonthCoverageBanner month={reportMonth} monthLabel={monthLabel} />
+          <ConclusionesConfiabilidadBoard month={reportMonth} monthLabel={monthLabel} />
+        </div>
+      );
+    }
+    if (leafId === "inf-conf-facturacion") {
+      return (
+        <div className="dash-module exec-dashboard inf-resultados">
+          <InformeMonthCoverageBanner month={reportMonth} monthLabel={monthLabel} />
+          <InformeConfFacturacionSection month={reportMonth} monthLabel={monthLabel} />
         </div>
       );
     }
@@ -302,12 +318,17 @@ export function InformesResultadosDashboard({ leafId, month, monthLabel }: Props
           </div>
           <span className="source-badge gte">GTE</span>
         </header>
-        <GteResumen month={gteMonth} only={["sistemicos", "horas"]} />
-        <DisponibilidadAnalisisBoard month={gteMonth} monthLabel={monthLabel} />
-        <DisponibilidadHorasBoard month={gteMonth} monthLabel={monthLabel} />
-        <ConfiabilidadAnalisisBoard month={gteMonth} monthLabel={monthLabel} />
-        <DesempenoMaquinaBoard month={gteMonth} monthLabel={monthLabel} />
-        <InformeConfContinuacion month={gteMonth} monthLabel={monthLabel} />
+        <InformeMonthCoverageBanner month={reportMonth} monthLabel={monthLabel} />
+        {hasGte ? (
+          <>
+            <GteResumen month={gteMonth} only={["sistemicos", "horas"]} />
+            <DisponibilidadAnalisisBoard month={gteMonth} monthLabel={monthLabel} />
+            <DisponibilidadHorasBoard month={gteMonth} monthLabel={monthLabel} />
+            <ConfiabilidadAnalisisBoard month={gteMonth} monthLabel={monthLabel} />
+            <DesempenoMaquinaBoard month={gteMonth} monthLabel={monthLabel} />
+          </>
+        ) : null}
+        <InformeConfContinuacion month={reportMonth} monthLabel={monthLabel} />
       </div>
     );
   }

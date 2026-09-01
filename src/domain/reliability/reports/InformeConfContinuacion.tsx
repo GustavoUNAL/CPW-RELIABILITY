@@ -7,6 +7,7 @@ import { buildEnergyEfficiency } from "./energyEfficiency";
 import { buildUnitEfficiency } from "./unitEfficiency";
 import { MantenimientoInformeSlide } from "./MantenimientoInformeSlide";
 import { RepetitivosInformeSlide } from "./RepetitivosInformeSlide";
+import { SlideNarrative } from "./SlideNarrative";
 import { InventoryMinimumsDashboard } from "./InventoryMinimumsDashboard";
 import { DegradationRiskDashboard } from "./DegradationRiskDashboard";
 import { EXEC_JUN } from "./executiveJune2026";
@@ -25,6 +26,8 @@ import type { RcaEventoFalla } from "../rca/types";
 import { INVENTORY_MINIMUMS } from "./inventoryMinimumsData";
 import { getPlanningCriticalSpares } from "./inventoryPlanningCritical";
 import { MAINTENANCE_PLANS } from "./maintenancePlansData";
+import { AGOSTO_WEEKLY_PLANNING } from "./agostoWeeklyPlanning";
+import { FacturacionTemplateBoard } from "./FacturacionTemplateBoard";
 import {
   buildGteDegradationRiskPortfolio,
   topDegrading,
@@ -61,6 +64,7 @@ export function CollapsibleSlide({
   children,
   className = "",
   id,
+  narrative,
 }: {
   n: number;
   title: string;
@@ -70,9 +74,12 @@ export function CollapsibleSlide({
   children: ReactNode;
   className?: string;
   id?: string;
+  /** Texto corrido que antecede a la lámina, como el cuerpo de un informe. */
+  narrative?: ReactNode;
 }) {
   return (
     <section className="panel" id={id}>
+      {narrative}
       <details className={`card disp-analisis maq-board-slide inf-conf-sec inf-conf-collapse ${className}`.trim()} open={defaultOpen}>
         <summary className="inf-conf-collapse-sum">
           <div className="inf-conf-collapse-sum-main">
@@ -203,6 +210,7 @@ export function InformeConfFallasSection({ month, monthLabel }: MonthProps) {
       sub="Resumen de formatos de ocurrencia FO-GE-033"
       badge="GTE"
       className="inf-conf-fallas-unified"
+      narrative={<SlideNarrative month={month} monthLabel={monthLabel} slide="fallas" />}
     >
       <div className="inf-conf-fallas-kpis" aria-label="Indicadores demostrados del periodo">
         <article>
@@ -306,6 +314,7 @@ export function InformeConfFallasGroup({ month, monthLabel }: MonthProps) {
       <InformeConfFallasSection month={month} monthLabel={monthLabel} />
       <InformeConfRepetitivosSection month={month} monthLabel={monthLabel} />
       <InformeConfMantenimientoSection month={month} monthLabel={monthLabel} />
+      <InformeConfPlaneacionSemanalSection month={month} monthLabel={monthLabel} />
     </>
   );
 }
@@ -324,6 +333,7 @@ export function InformeConfRepetitivosSection({
       sub="Recurrencia por equipo y categoría"
       badge="GTE"
       className={`inf-conf-slide-one inf-rep-viewport-slide${slideViewport ? " inf-rep-slide-deck" : ""}`}
+      narrative={<SlideNarrative month={month} monthLabel={monthLabel} slide="repetitivos" />}
     >
       <InformeConfRepetitivosBody month={month} monthLabel={monthLabel} slideViewport={slideViewport} />
     </CollapsibleSlide>
@@ -344,14 +354,70 @@ export function InformeConfMantenimientoSection({
       sub="Plan vs ejecución · horas MTO e intervenciones"
       badge="MTO"
       className={`inf-conf-slide-one inf-mto-viewport-slide${slideViewport ? " inf-rep-slide-deck" : ""}`}
+      narrative={<SlideNarrative month={month} monthLabel={monthLabel} slide="mantenimiento" />}
     >
       <InformeConfMantenimientoBody month={month} monthLabel={monthLabel} />
     </CollapsibleSlide>
   );
 }
 
+/** Planeación semanal siguiente al cierre (solo agosto 2026). */
+export function InformeConfPlaneacionSemanalSection({ month, monthLabel }: MonthProps) {
+  if (month !== "Ago") return null;
+  const plan = AGOSTO_WEEKLY_PLANNING;
+  return (
+    <CollapsibleSlide
+      n={9}
+      title={`Planeación semanal · ${monthLabel}`}
+      sub={plan.periodLabel}
+      badge="Plan"
+      className="inf-conf-slide-one"
+    >
+      <p className="rep-slide-note">
+        Fuente: {plan.sourceFile.split("/").pop()} · Revisó {plan.reviewedBy} ({plan.reviewedAt}) · Aprobó{" "}
+        {plan.approvedBy}.
+      </p>
+      <div className="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Equipo</th>
+              <th>Código</th>
+              <th>Horas</th>
+              <th>Alcance</th>
+            </tr>
+          </thead>
+          <tbody>
+            {plan.jobs.map((job) => (
+              <tr key={`${job.date}-${job.equipment}`}>
+                <td>
+                  {job.weekday} {job.date.slice(8)}/{job.date.slice(5, 7)}
+                </td>
+                <td>
+                  <strong>{job.equipment}</strong>
+                </td>
+                <td>{job.code}</td>
+                <td>{job.hours} h</td>
+                <td>{job.focus}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="rep-slide-note">{plan.note}</p>
+    </CollapsibleSlide>
+  );
+}
+
 /** 10 · Mínimos de inventario */
-export function InformeConfInventarioSection({ monthLabel }: { monthLabel: string }) {
+export function InformeConfInventarioSection({
+  month = "Jul",
+  monthLabel,
+}: {
+  month?: string;
+  monthLabel: string;
+}) {
   return (
     <CollapsibleSlide
       n={10}
@@ -359,6 +425,7 @@ export function InformeConfInventarioSection({ monthLabel }: { monthLabel: strin
       sub={`Cobertura · ${INVENTORY_MINIMUMS.items.length} ítems`}
       badge="Activos"
       className="inf-conf-slide-one"
+      narrative={<SlideNarrative month={month} monthLabel={monthLabel} slide="inventario" />}
     >
       <InventoryMinimumsDashboard hideCatalogTable embedded slide />
     </CollapsibleSlide>
@@ -366,7 +433,13 @@ export function InformeConfInventarioSection({ monthLabel }: { monthLabel: strin
 }
 
 /** 11 · Tendencias de degradación y riesgos */
-export function InformeConfDegradacionSection({ monthLabel }: { monthLabel: string }) {
+export function InformeConfDegradacionSection({
+  month = "Jul",
+  monthLabel,
+}: {
+  month?: string;
+  monthLabel: string;
+}) {
   return (
     <CollapsibleSlide
       n={11}
@@ -374,6 +447,7 @@ export function InformeConfDegradacionSection({ monthLabel }: { monthLabel: stri
       sub="Baseline APM junio · contraste operativo"
       badge="APM"
       className="inf-conf-slide-one"
+      narrative={<SlideNarrative month={month} monthLabel={monthLabel} slide="degradacion" />}
     >
       <DegradationRiskDashboard
         monthLabel={`${monthLabel} · baseline junio`}
@@ -398,6 +472,7 @@ export function InformeConfEficienciaSection({
       sub="Heat rate medido del gas Moqueta · CPW04–CPW06"
       badge="Gas MQT"
       className={`inf-conf-slide-one inf-eff-viewport-slide${slideViewport ? " inf-rep-slide-deck" : ""}`}
+      narrative={<SlideNarrative month={month} monthLabel={monthLabel} slide="eficiencia" />}
     >
       <EficienciaInformeSlide month={month} monthLabel={monthLabel} />
     </CollapsibleSlide>
@@ -408,7 +483,7 @@ export function InformeConfEficienciaSection({
 export function ConclusionesConfiabilidadBoard({ month, monthLabel }: MonthProps) {
   const gte = GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey];
   const disp = buildDisponibilidadAnalisis(month);
-  const prefix = month === "Jul" ? "2026-07" : month === "Jun" ? "2026-06" : "";
+  const prefix = MONTH_ISO[month] ? `2026-${MONTH_ISO[month]}` : "";
   const fos = RCA_COSTAYACO_EVENTOS.filter((e) => (e.fecha ?? "").startsWith(prefix));
   const dispGte = gte?.kpi.availability != null ? gte.kpi.availability * 100 : null;
   const confGte = gte?.kpi.reliability != null ? gte.kpi.reliability * 100 : null;
@@ -486,6 +561,7 @@ export function ConclusionesConfiabilidadBoard({ month, monthLabel }: MonthProps
       sub="Cierre del informe de confiabilidad"
       badge="Orden 1"
       className="inf-conf-conclusiones"
+      narrative={<SlideNarrative month={month} monthLabel={monthLabel} slide="conclusiones" />}
     >
       <div className="inf-conf-concl-kpis">
         <article>
@@ -646,15 +722,36 @@ export function ConclusionesConfiabilidadBoard({ month, monthLabel }: MonthProps
   );
 }
 
-/** Bloque completo 7–12 para el resumen de Informes · Confiabilidad */
+/** 14 · Formato de facturación (plantilla Nuevo Fac) */
+export function InformeConfFacturacionSection({
+  month,
+  monthLabel,
+}: MonthProps) {
+  return (
+    <CollapsibleSlide
+      id="inf-conf-facturacion"
+      n={14}
+      title={`Formato de facturación · ${monthLabel}`}
+      sub="Plantilla Nuevo Fac · cómo se llena el soporte"
+      badge="OPEX/CAPEX"
+      className="inf-conf-slide-one"
+      narrative={<SlideNarrative month={month} monthLabel={monthLabel} slide="facturacion" />}
+    >
+      <FacturacionTemplateBoard />
+    </CollapsibleSlide>
+  );
+}
+
+/** Bloque completo 7–14 para el resumen de Informes · Confiabilidad */
 export function InformeConfContinuacion({ month, monthLabel }: MonthProps) {
   return (
     <>
       <InformeConfFallasGroup month={month} monthLabel={monthLabel} />
-      <InformeConfInventarioSection monthLabel={monthLabel} />
-      <InformeConfDegradacionSection monthLabel={monthLabel} />
+      <InformeConfInventarioSection month={month} monthLabel={monthLabel} />
+      <InformeConfDegradacionSection month={month} monthLabel={monthLabel} />
       <InformeConfEficienciaSection month={month} monthLabel={monthLabel} slideViewport={false} />
       <ConclusionesConfiabilidadBoard month={month} monthLabel={monthLabel} />
+      <InformeConfFacturacionSection month={month} monthLabel={monthLabel} />
     </>
   );
 }

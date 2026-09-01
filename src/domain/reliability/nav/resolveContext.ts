@@ -21,6 +21,22 @@ export type ViewContext = {
   fixedPeriod?: boolean;
 };
 
+const INFORMES_EXTRA_MONTHS = ["Ago"] as const;
+const EXTRA_MONTH_LABELS: Record<string, string> = {
+  Ago: "Agosto",
+  Sep: "Septiembre",
+  Oct: "Octubre",
+  Nov: "Noviembre",
+  Dic: "Diciembre",
+};
+
+function withInformesMonths(order: readonly string[], page: PageKey, leafId: string) {
+  if (page === "informes" || leafId.startsWith("inf-")) {
+    return Array.from(new Set([...order, ...INFORMES_EXTRA_MONTHS]));
+  }
+  return [...order];
+}
+
 const CPW_LEAVES = new Set([
   "cfg-empresas-copower",
   "bd-op-copower",
@@ -159,6 +175,7 @@ export const INTEGRATED_DUAL_LEAVES = new Set([
   "inf-conf-degradacion",
   "inf-conf-eficiencia",
   "inf-conf-conclusiones",
+  "inf-conf-facturacion",
   "dash-resumen",
   "admin-usuarios",
   "admin-uso",
@@ -304,7 +321,7 @@ export function resolveViewContext(page: PageKey, leafId: string): ViewContext {
     const union = Array.from(new Set([...GRAN_TIERRA_MONTH_ORDER, ...COPOWER_MONTH_ORDER]));
     return {
       report: "dual",
-      monthOrder: union,
+      monthOrder: withInformesMonths(union, page, leafId),
       reportLabel: leafId.startsWith("cfg-campos")
         ? "Campo · Costayaco / Vonú"
         : "Gran Tierra + COPOWER · vista integrada",
@@ -315,7 +332,7 @@ export function resolveViewContext(page: PageKey, leafId: string): ViewContext {
     const union = Array.from(new Set([...GRAN_TIERRA_MONTH_ORDER, ...COPOWER_MONTH_ORDER]));
     return {
       report: "dual",
-      monthOrder: union,
+      monthOrder: withInformesMonths(union, page, leafId),
       reportLabel: "Gran Tierra + COPOWER",
       reportShort: "Dual",
     };
@@ -356,7 +373,7 @@ export function monthLabelFor(month: string): string {
   if (COPOWER_MONTH_ORDER.includes(month as CopowerMonthKey)) {
     return copowerMonthLabel(month as CopowerMonthKey);
   }
-  return month;
+  return EXTRA_MONTH_LABELS[month] ?? month;
 }
 
 export function monthOptionLabel(month: string, ctx: ViewContext): string {
@@ -368,19 +385,21 @@ export function monthOptionLabel(month: string, ctx: ViewContext): string {
     const cpw = COPOWER_MONTH_ORDER.includes(month as CopowerMonthKey)
       ? copowerMonthLabel(month as CopowerMonthKey)
       : null;
-    return gte ?? cpw ?? month;
+    return gte ?? cpw ?? EXTRA_MONTH_LABELS[month] ?? month;
   }
   return monthLabelFor(month);
 }
 
 export function defaultMonth(ctx: ViewContext): string {
   if (ctx.monthOrder.includes("YTD2026")) return "YTD2026";
-  const preferred = ctx.monthOrder.includes("Jul")
-    ? "Jul"
-    : ctx.monthOrder.includes("Jun")
-      ? "Jun"
-      : ctx.monthOrder[ctx.monthOrder.length - 1];
-  return preferred ?? "Jul";
+  const preferred = ctx.monthOrder.includes("Ago")
+    ? "Ago"
+    : ctx.monthOrder.includes("Jul")
+      ? "Jul"
+      : ctx.monthOrder.includes("Jun")
+        ? "Jun"
+        : ctx.monthOrder[ctx.monthOrder.length - 1];
+  return preferred ?? "Ago";
 }
 
 export type GenerationSection = "dashboard" | "diaria" | "mensual" | "equipos" | "utilizacion" | "horas";

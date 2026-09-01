@@ -29,6 +29,7 @@ import {
   REPORT_HEATING_VALUE,
 } from "./energyEfficiency";
 import { RCA_COSTAYACO_EVENTOS } from "../rca/data";
+import { SlideNarrative } from "./SlideNarrative";
 import {
   GRAN_TIERRA_MONTH_ORDER,
   GRAN_TIERRA_MONTHLY_DATA,
@@ -161,8 +162,7 @@ export function GteResumen({ month, only }: Props) {
     return summary;
   }, [gteEventLog]);
   const reportedFoCount = useMemo(() => {
-    const ym =
-      month === "Jul" ? "2026-07" : month === "Jun" ? "2026-06" : null;
+    const ym = month === "Jul" ? "2026-07" : month === "Jun" ? "2026-06" : null;
     if (!ym) return 0;
     return RCA_COSTAYACO_EVENTOS.filter(
       (e) => e.fecha?.startsWith(ym) && !/BLANK|-XX-/i.test(e.id),
@@ -469,6 +469,7 @@ export function GteResumen({ month, only }: Props) {
 
       {showSistemicos ? (
       <section className="panel">
+        <SlideNarrative month={month} monthLabel={data.label} slide="sistemicos" />
         <details className="card inf-conf-collapse" open>
           <summary className="inf-conf-collapse-sum">
             <div className="inf-conf-collapse-sum-main">
@@ -643,6 +644,7 @@ export function GteResumen({ month, only }: Props) {
 
       {showHoras ? (
       <section className="panel">
+        <SlideNarrative month={month} monthLabel={data.label} slide="horasEventos" />
         <details className="card inf-conf-collapse" open>
           <summary className="inf-conf-collapse-sum">
             <div className="inf-conf-collapse-sum-main">
