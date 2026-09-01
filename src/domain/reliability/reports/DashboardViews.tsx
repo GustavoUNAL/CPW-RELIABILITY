@@ -48,9 +48,9 @@ const INFORME_PDF_SLIDES = [
   { n: 7, title: "Fallas" },
   { n: 8, title: "Repetitivos" },
   { n: 9, title: "Mantenimiento" },
-  { n: 10, title: "Inventario" },
-  { n: 11, title: "Degradación" },
-  { n: 12, title: "Eficiencia" },
+  { n: 10, title: "Bodega Costayaco" },
+  { n: 11, title: "Riesgo operativo" },
+  { n: 12, title: "Desempeño energético" },
   { n: 13, title: "Conclusiones" },
   { n: 14, title: "Acciones" },
 ] as const;

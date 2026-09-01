@@ -89,9 +89,12 @@ export function buildSlideNarratives(
         "."
       : "Aún no hay sábana de mantenimiento para el periodo.";
     const invItems = getInventoryItemsWithOverrides();
-    const invSin = invItems.filter((i) => i.onHand <= 0).length;
-    const invBajo = invItems.filter((i) => i.onHand > 0 && i.onHand < i.stockMin).length;
-    const invMoves = INVENTORY_MINIMUMS.movements?.length ?? 0;
+    const invStock = invItems.reduce((sum, i) => sum + i.onHand, 0);
+    const invReview = invItems.filter((i) => i.review).length;
+    const invAgotado = invItems.filter((i) => i.status === "AGOTADO" || i.onHand <= 0).length;
+    const invMoves = INVENTORY_MINIMUMS.movements ?? [];
+    const invMovesIn = invMoves.filter((m) => m.kind === "entrada").length;
+    const invMovesOut = invMoves.filter((m) => m.kind === "salida").length;
     const pending = {
       sistemicos:
         (cpw
@@ -161,9 +164,10 @@ export function buildSlideNarratives(
             : ".")
         : `Sin sábana de mantenimiento cargada para ${periodo}.`,
       inventario:
-        `El cierre de bodega Costayaco queda registrado: ${n0(invItems.length)} ítems del kardex, ` +
-        `${invSin} sin existencia, ${invBajo} bajo el mínimo heredado y ${n0(invMoves)} movimientos ` +
-        `de entrada/salida. La hoja REVISAR marca ${invItems.filter((i) => i.review).length} referencias.`,
+        `El cierre de bodega Costayaco queda registrado: ${n0(invItems.length)} ítems, ` +
+        `${n0(invStock)} unidades en STOCK, ${n0(invMoves.length)} movimientos ` +
+        `(${n0(invMovesIn)} entradas / ${n0(invMovesOut)} salidas) y ${n0(invReview)} referencias a revisar. ` +
+        `El mínimo ya está alineado al cierre; quedan ${n0(invAgotado)} agotadas.`,
       degradacion:
         `El índice de salud APM se conserva como baseline de junio. Sin FO oficiales de ${periodo} no ` +
         `se recalcula el riesgo operativo del mes completo.`,
@@ -223,8 +227,12 @@ export function buildSlideNarratives(
 
   const inventory = getInventoryItemsWithOverrides();
   const invTotal = inventory.length;
-  const invSin = inventory.filter((i) => i.onHand <= 0).length;
-  const invBajo = inventory.filter((i) => i.onHand > 0 && i.onHand < i.stockMin).length;
+  const invStock = inventory.reduce((sum, i) => sum + i.onHand, 0);
+  const invReview = inventory.filter((i) => i.review).length;
+  const invAgotado = inventory.filter((i) => i.status === "AGOTADO" || i.onHand <= 0).length;
+  const invMoves = INVENTORY_MINIMUMS.movements ?? [];
+  const invMovesIn = invMoves.filter((m) => m.kind === "entrada").length;
+  const invMovesOut = invMoves.filter((m) => m.kind === "salida").length;
 
   const apm = portfolioSummary(buildGteDegradationRiskPortfolio());
   const worstAsset = topDegrading(buildGteDegradationRiskPortfolio(), 1)[0] ?? null;
@@ -305,11 +313,10 @@ export function buildSlideNarratives(
         `ejecutadas contra el plan del periodo.`,
 
     inventario:
-      `El inventario de bodega Costayaco cierra en ${n0(invTotal)} ítems, de los cuales ${invSin} se encuentran sin ` +
-      `existencia y ${invBajo} por debajo del mínimo heredado. El kardex registra ` +
-      `${n0(INVENTORY_MINIMUMS.movements?.length)} movimientos de entrada y salida. Estos ${invSin + invBajo} elementos ` +
-      `representan el riesgo inmediato de suministro y deben priorizarse para evitar que una ` +
-      `indisponibilidad de repuestos se convierta en una limitación para las actividades de mantenimiento.`,
+      `El inventario de bodega Costayaco cierra en ${n0(invTotal)} ítems y ${n0(invStock)} unidades en STOCK. ` +
+      `El kardex registra ${n0(invMoves.length)} movimientos (${n0(invMovesIn)} entradas / ${n0(invMovesOut)} salidas) ` +
+      `y ${n0(invReview)} referencias a revisar. El mínimo ya está alineado al cierre; el riesgo inmediato ` +
+      `son las ${n0(invAgotado)} agotadas, que deben reponerse para no limitar el preventivo.`,
 
     degradacion:
       `El análisis de condición permite identificar los activos con mayor nivel de riesgo y orientar las ` +

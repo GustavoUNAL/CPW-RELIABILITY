@@ -15795,6 +15795,23 @@ tr.row-focal td {
   font-size: 1rem;
 }
 
+.icpdf-exec {
+  gap: 0.38rem;
+  justify-content: space-between;
+}
+
+.icpdf-exec .icpdf-kpis {
+  flex: 1;
+}
+
+.icpdf-exec .icpdf-kpis article {
+  padding: 0.28rem 0.42rem;
+}
+
+.icpdf-exec .icpdf-kpis strong {
+  font-size: 1.12rem;
+}
+
 .icpdf-minicharts {
   display: grid;
   grid-template-columns: 1.15fr 1fr;
@@ -15912,6 +15929,15 @@ tr.row-focal td {
 .icpdf-mto .icpdf-table-wrap td,
 .icpdf-mto .icpdf-table-wrap th {
   padding: 0.16rem 0.28rem;
+}
+
+.icpdf-bars b.is-ok { background: #0f766e; }
+.icpdf-bars b.is-rev { background: #c2410c; }
+.icpdf-bars b.is-low { background: #b45309; }
+.icpdf-bars b.is-out { background: #b91c1c; }
+
+.icpdf-mto .icpdf-bars li {
+  grid-template-columns: 5.6rem minmax(0, 1fr) 2.6rem;
 }
 
 .icpdf-split {
