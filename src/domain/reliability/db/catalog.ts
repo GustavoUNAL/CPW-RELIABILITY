@@ -34,7 +34,7 @@ export const DATASET_CATALOG: readonly DatasetEntry[] = [
     consumers: ["dash-operacion", "bd-ev-copower", "an-repetitivos-copower", "cmp-periodo-copower"],
     period: "Ene–Ago 2026",
     notes:
-      "Julio: horas concertadas 01–31. Agosto: consolidado 01–22 (archivo titulado 01–23; 0 fallas COPOWER). GTE oficial de agosto pendiente.",
+      "Julio: horas concertadas 01–31. Agosto: consolidado 01–31 (0 fallas COPOWER). GTE oficial de agosto pendiente.",
   },
   {
     id: "gte-monthly",
@@ -93,7 +93,7 @@ export const DATASET_CATALOG: readonly DatasetEntry[] = [
     ],
     period: "May–Ago 2026",
     notes:
-      "Fuente propia de Informes. Agosto: consolidado 01–22. No alinear 1:1 con COPOWER/GTE monthly (criterios y cortes distintos).",
+      "Fuente propia de Informes. Agosto: consolidado 01–31. No alinear 1:1 con COPOWER/GTE monthly (criterios y cortes distintos).",
   },
   {
     id: "rca-costayaco-junio",

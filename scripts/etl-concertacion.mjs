@@ -20,7 +20,7 @@ if (!XLSX_NAME) {
 const XLSX_PATH = path.join(DIR, XLSX_NAME);
 const AGO_XLSX = path.join(
   ROOT,
-  "data/Agosto/Consolidado de Horas concertadas del 01 al 23 de Agosto.xlsx",
+  "data/Agosto/Consolidado de Horas concertadas del 01 al 31 de Agosto.xlsx",
 );
 const OUT = path.join(ROOT, "src/domain/reliability/reports/concertacionHoursData.ts");
 
@@ -316,7 +316,7 @@ const payload = {
     .replace(/\\/g, "/"),
   extractedAt: new Date().toISOString().slice(0, 10),
   notes:
-    "Horas concertadas GTE. Julio 01–31; May–Jun parcial 12–28; agosto 01–22 (archivo titulado 01–23). Disponibilidad de pack = OP / (OP+SB+MMT+ext).",
+    "Horas concertadas GTE. Julio 01–31; May–Jun parcial 12–28; agosto 01–31. Disponibilidad de pack = OP / (OP+SB+MMT+ext).",
   months: packs,
   generation3m: gen3m,
 };

@@ -1,7 +1,6 @@
 /**
- * ETL: Horas concertadas agosto 2026 (01–22) → snapshot COPOWER.
- * Fuente: data/Agosto/Consolidado de Horas concertadas del 01 al 23 de Agosto.xlsx
- * El archivo se titula 01–23 pero las filas llegan al 22 (22 días × 15 unidades).
+ * ETL: Horas concertadas agosto 2026 (01–31) → snapshot COPOWER.
+ * Fuente: data/Agosto/Consolidado de Horas concertadas del 01 al 31 de Agosto.xlsx
  *
  * Uso: node scripts/etl-copower-agosto-concertacion.mjs
  */
@@ -12,11 +11,13 @@ import XLSX from "xlsx";
 const ROOT = path.resolve(import.meta.dirname, "..");
 const XLSX_PATH = path.join(
   ROOT,
-  "data/Agosto/Consolidado de Horas concertadas del 01 al 23 de Agosto.xlsx",
+  "data/Agosto/Consolidado de Horas concertadas del 01 al 31 de Agosto.xlsx",
 );
 const MONTHLY = path.join(ROOT, "src/domain/reliability/reports/copowerMonthly.ts");
 
 const DIESEL = new Set(["G101V", "G102J", "G102K", "G102A", "G102E", "G102I"]);
+/** Retiro oficial GTE: correo 21/08/2026 16:35. El 22–31 no entra al Tcal. */
+const DIESEL_LAST_DAY = "2026-08-21";
 
 function num(v) {
   if (v == null || v === "") return 0;
@@ -66,10 +67,14 @@ function pick(r, ...names) {
   }
   return null;
 }
-function risk(fallas, disp) {
+function metaPct(campo) {
+  return campo === "VONU" ? 90 : 98;
+}
+function risk(fallas, disp, campo) {
+  const meta = metaPct(campo);
   if (fallas >= 1) return "RIESGO MEDIO";
-  if (disp != null && disp < 95) return "RIESGO ALTO";
-  if (disp != null && disp < 98) return "RIESGO MEDIO";
+  if (disp != null && disp < meta - 5) return "RIESGO ALTO";
+  if (disp != null && disp < meta) return "RIESGO MEDIO";
   return "RIESGO BAJO";
 }
 
@@ -90,6 +95,7 @@ for (const r of rows) {
   if (!date || !date.startsWith("2026-08")) continue;
   const tag = normTag(pick(r, "TAG de la unidad"));
   if (!tag) continue;
+  if (DIESEL.has(tag) && date > DIESEL_LAST_DAY) continue;
   const campo = str(pick(r, "Campo")).toUpperCase() || "COSTAYACO";
   const fuel = str(pick(r, "Tipo de combustible Primario")).toUpperCase();
   const kwh = num(pick(r, "KWH generados"));
@@ -199,9 +205,13 @@ const machineIndicators = units.map((u) => {
     fallas,
     mtbfLabel: String(mtbf),
     mttrHours: mttr,
-    riesgoTecnico: risk(fallas, disp),
-    cumplimiento: disp == null ? "N/A" : disp >= 98 ? "CUMPLE" : "NO CUMPLE",
-    detalle: `Horas concertadas GTE 01–22 ago · OP ${r1(u.horasOperacion)} h · ext ${r1(u.horasPFCli)} h · fallas ${fallas}`,
+    riesgoTecnico: risk(fallas, disp, u.campo),
+    cumplimiento: disp == null ? "N/A" : disp >= metaPct(u.campo) ? "CUMPLE" : "NO CUMPLE",
+    detalle: DIESEL.has(u.equipo)
+      ? `Alcance diésel 01–21 ago (retiro GTE) · OP ${r1(u.horasOperacion)} h · fallas ${fallas}`
+      : `Horas concertadas 01–31 ago · OP ${r1(u.horasOperacion)} h · ext ${r1(u.horasPFCli)} h · fallas ${fallas}${
+          u.campo === "VONU" ? " · meta Vonú ≥90 %" : ""
+        }`,
   };
 });
 
@@ -218,8 +228,9 @@ const consumos = units.map((u) => ({
 }));
 
 const snap = {
-  label: "Agosto 2026 · corte 01–22",
-  sourceFile: "data/Agosto/Consolidado de Horas concertadas del 01 al 23 de Agosto.xlsx",
+  label: "Agosto 2026",
+  sourceFile:
+    "data/Agosto/Consolidado de Horas concertadas del 01 al 31 de Agosto.xlsx · diésel Tcal 01–21 (retiro GTE 21/08)",
   summary: {
     copowerFailures,
     totalEvents: eventLog.length,

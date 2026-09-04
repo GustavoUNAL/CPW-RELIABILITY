@@ -98,17 +98,17 @@ export function buildSlideNarratives(
     const pending = {
       sistemicos:
         (cpw
-          ? `El informe de ${periodo} se abre con el consolidado de horas concertadas del 01 al 22: ` +
+          ? `El informe de ${periodo} se abre con el consolidado de horas concertadas del 01 al 31: ` +
             `${n1(cpw.kpi.generationMwh)} MWh, disponibilidad COPOWER ${pct2(disp.dispCpw)} ` +
             `(OP ${n0(disp.fleetCpw.op)} h + SB ${n0(disp.fleetCpw.sb)} h sobre ${n0(disp.programmed)} h ` +
             `calendario) y ${n0(cpw.summary.copowerFailures)} fallas imputables. `
           : `El informe de ${periodo} se abre con las fuentes que sí llegaron: sábana de mantenimiento y ` +
             `planeación semanal. `) +
-        `Faltan Data Soporte GTE, el tramo 23–31, RCA y el totalizador de gas Moqueta, así que no se ` +
+        `Faltan Data Soporte GTE, RCA y el totalizador de gas Moqueta, así que no se ` +
         `publican los indicadores oficiales de Gran Tierra ni se copian las cifras de julio.`,
       horasEventos:
         cpw
-          ? `Sobre el corte 01–22 hay ${n0(cpw.summary.hoursOperated)} h de operación, ` +
+          ? `Sobre el corte 01–31 hay ${n0(cpw.summary.hoursOperated)} h de operación, ` +
             `${n0(cpw.summary.hoursStandby)} h stand-by, ${n0(cpw.summary.hoursPreventive)} h preventivo y ` +
             `${n0(cpw.summary.hoursFailureClient)} h de paradas externas, con ${n0(cpw.summary.totalEvents)} ` +
             `registros en bitácora y ${n0(cpw.summary.copowerFailures)} fallas COPOWER. ${pendingMto}`
@@ -116,20 +116,20 @@ export function buildSlideNarratives(
             pendingMto,
       disponibilidad:
         disp.dispCpw != null
-          ? `La disponibilidad COPOWER del 01–22 es ${pct2(disp.dispCpw)} sobre horas concertadas. ` +
+          ? `La disponibilidad COPOWER del 01–31 es ${pct2(disp.dispCpw)} sobre horas concertadas. ` +
             `La cifra oficial de Gran Tierra sigue pendiente del Data Soporte. ${pendingMto}`
           : `La disponibilidad oficial de ${periodo} queda pendiente del Data Soporte GTE y de la sábana de ` +
             `horas concertadas. ${pendingMto}`,
       desgloseHoras:
         cpw
-          ? `El desglose 01–22 sale del consolidado concertado: OP ${n0(disp.fleetCpw.op)} h, ` +
+          ? `El desglose 01–31 sale del consolidado concertado: OP ${n0(disp.fleetCpw.op)} h, ` +
             `SB ${n0(disp.fleetCpw.sb)} h, PP ${n0(disp.fleetCpw.pp)} h y PF cliente ` +
-            `${n0(disp.fleetCpw.pf)} h. Falta el tramo 23–31.`
+            `${n0(disp.fleetCpw.pf)} h.`
           : `El desglose de horas de ${periodo} requiere el Excel de horas concertadas, que todavía no está ` +
             `en el repositorio.`,
       confiabilidad:
         cpw
-          ? `En el consolidado 01–22 no hay fallas imputables a COPOWER (${n0(cpw.summary.copowerFailures)} ` +
+          ? `En el consolidado 01–31 no hay fallas imputables a COPOWER (${n0(cpw.summary.copowerFailures)} ` +
             `FO en horas concertadas, ${n1(cpw.summary.hoursFailureCopower)} h PF contratista). La ` +
             `confiabilidad contractual del corte es ${pct2(cpw.kpi.reliability)}. Siguen pendientes los ` +
             `FO-GE-033 oficiales del mes.`
@@ -137,20 +137,20 @@ export function buildSlideNarratives(
             `hasta que existan esos registros.`,
       maquinas:
         cpw
-          ? `El desempeño por máquina del 01–22 se calcula sobre horas concertadas (OP + SB) / calendario. ` +
+          ? `El desempeño por máquina del 01–31 se calcula sobre horas concertadas (OP + SB) / calendario. ` +
             `El anexo GTE de indicadores por unidad sigue pendiente.`
           : `El desempeño por máquina de ${periodo} se publicará cuando llegue el anexo GTE y las horas ` +
             `concertadas. Hasta entonces el seguimiento operativo sale de la sábana de mantenimiento.`,
       fallas:
         cpw
-          ? `No se digitalizaron FO-GE-033 de ${periodo}. El consolidado 01–22 registra ` +
+          ? `No se digitalizaron FO-GE-033 de ${periodo}. El consolidado 01–31 registra ` +
             `${n0(cpw.summary.hoursFailureClient)} h de paradas externas (MRU / gas Moqueta / CCM) y ` +
             `${n0(cpw.summary.copowerFailures)} fallas imputables a COPOWER.`
           : `No se digitalizaron FO-GE-033 de ${periodo}. Cuando existan se incorporan a esta lámina con el ` +
             `mismo criterio de frontera de responsabilidad usado en junio y julio.`,
       repetitivos:
         cpw
-          ? `La recurrencia del 01–22 se lee sobre ${n0(cpw.eventLog.length)} registros del consolidado ` +
+          ? `La recurrencia del 01–31 se lee sobre ${n0(cpw.eventLog.length)} registros del consolidado ` +
             `concertado, concentrados en paradas externas por MRU y baja presión de gas Moqueta.`
           : `Sin bitácora de ${periodo} no hay recurrencia que consolidar. El patrón de cascadas MRU de meses ` +
             `previos se mantiene como hipótesis de seguimiento, no como conteo del mes.`,
@@ -176,16 +176,16 @@ export function buildSlideNarratives(
         `El heat rate del mes queda pendiente de un totalizador real y del Data Soporte.`,
       conclusiones:
         (cpw
-          ? `El corte 01–22 cierra con ${n1(cpw.kpi.generationMwh)} MWh y disponibilidad COPOWER ` +
+          ? `El corte 01–31 cierra con ${n1(cpw.kpi.generationMwh)} MWh y disponibilidad COPOWER ` +
             `${pct2(disp.dispCpw)}, sin fallas imputables. `
           : "") +
         `El mantenimiento cierra ${pendingMto} Las acciones inmediatas son completar las intervenciones ` +
-        `pendientes, incorporar Data Soporte GTE y el tramo 23–31, y no usar julio como proxy de los ` +
+        `pendientes, incorporar Data Soporte GTE, y no usar julio como proxy de los ` +
         `indicadores oficiales.`,
       facturacion:
         `El formato «Nuevo Fac» ya está digitalizado para ${periodo}: encabezado OPEX/CAPEX, bloques ` +
         `diarios OP/SB/PE/M/FS/TR, dashboard, novedades y tarifas. El ejemplo lleno es Ecuador (julio, ` +
-        `CW7581). Putumayo Norte usará Costayaco y Vonú en los mismos bloques; el consolidado 01–22 ya ` +
+        `CW7581). Putumayo Norte usará Costayaco y Vonú en los mismos bloques; el consolidado 01–31 ya ` +
         `alimenta horas, y el recuadro de valor oficial espera Data Soporte.`,
     };
     return pending;

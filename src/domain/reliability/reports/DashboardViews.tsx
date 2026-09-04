@@ -38,23 +38,6 @@ import { getInventoryItemsWithOverrides } from "./inventoryPlanningCritical";
 import { InformeMonthCoverageBanner } from "./InformeMonthCoverageBanner";
 import { InformeConfiabilidadPdfDeck } from "./InformeConfiabilidadPdfDeck";
 
-const INFORME_PDF_SLIDES = [
-  { n: 1, title: "Portada" },
-  { n: 2, title: "Resumen ejecutivo" },
-  { n: 3, title: "Disponibilidad" },
-  { n: 4, title: "Máquinas" },
-  { n: 5, title: "Generación" },
-  { n: 6, title: "Confiabilidad" },
-  { n: 7, title: "Fallas" },
-  { n: 8, title: "Repetitivos" },
-  { n: 9, title: "Mantenimiento" },
-  { n: 10, title: "Bodega Costayaco" },
-  { n: 11, title: "Riesgo operativo" },
-  { n: 12, title: "Desempeño energético" },
-  { n: 13, title: "Conclusiones" },
-  { n: 14, title: "Acciones" },
-] as const;
-
 const META = CONTRACTUAL_KPI_TARGETS.reliability;
 const META_PCT = META * 100;
 const COLOR_GTE = "#818cf8";
@@ -321,13 +304,6 @@ function DualValueCard({
 export function DashboardLaminasPage({ month, monthLabel }: { month: string; monthLabel: string }) {
   return (
     <div className="dash-module icpdf-page dash-laminas-page">
-      <nav className="dash-laminas-index" aria-label="Índice de láminas">
-        {INFORME_PDF_SLIDES.map((s) => (
-          <a key={s.n} href={`#lamina-${s.n}`}>
-            {s.n}. {s.title}
-          </a>
-        ))}
-      </nav>
       <InformeConfiabilidadPdfDeck month={month} monthLabel={monthLabel} />
     </div>
   );

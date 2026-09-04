@@ -68,7 +68,6 @@ export function informeMonthCoverage(month: string) {
       month === "Ago"
         ? [
             "Data Soporte GTE (disponibilidad y generación oficiales del mes completo)",
-            "Horas concertadas 23–31 agosto (el consolidado llega al 22)",
             "FO-GE-033 / RCA del mes",
             "Cromatografía y totalizador Moqueta de agosto (la hoja «Agosto 2026» trae fechas de abril)",
           ]
