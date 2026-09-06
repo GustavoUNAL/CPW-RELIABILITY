@@ -44,6 +44,27 @@ export type ViewContext = {
   fixedPeriod?: boolean;
 };
 
+const INFORMES_EXTRA_MONTHS = ["Ago"] as const;
+const EXTRA_MONTH_LABELS: Record<string, string> = {
+  Ago: "Agosto",
+  Sep: "Septiembre",
+  Oct: "Octubre",
+  Nov: "Noviembre",
+  Dic: "Diciembre",
+};
+
+function withLatestCloseMonths(order: readonly string[], page: PageKey, leafId: string) {
+  if (
+    page === "informes" ||
+    page === "dashboard" ||
+    leafId.startsWith("inf-") ||
+    leafId.startsWith("dash-")
+  ) {
+    return Array.from(new Set([...order, ...INFORMES_EXTRA_MONTHS]));
+  }
+  return [...order];
+}
+
 const CPW_LEAVES = new Set([
   "cfg-empresas-copower",
   "bd-op-copower",
@@ -184,6 +205,7 @@ export const INTEGRATED_DUAL_LEAVES = new Set([
   "conf-formulas",
   "conf-formulas-revision",
   "inf-conf-resumen",
+  "inf-conf-presentacion",
   "inf-conf-conciliacion",
   "inf-conf-confiabilidad",
   "inf-conf-maquinas",
@@ -195,7 +217,10 @@ export const INTEGRATED_DUAL_LEAVES = new Set([
   "inf-conf-degradacion",
   "inf-conf-eficiencia",
   "inf-conf-conclusiones",
+  "inf-conf-facturacion",
   "dash-resumen",
+  "dash-laminas",
+  "dash-indicadores",
   "admin-usuarios",
   "admin-uso",
   "dash-mto",
@@ -364,9 +389,10 @@ export function resolveViewContext(page: PageKey, leafId: string): ViewContext {
     };
   }
   if (INTEGRATED_DUAL_LEAVES.has(leafId) || leafId.startsWith("cfg-campos")) {
+    const union = Array.from(new Set([...GRAN_TIERRA_MONTH_ORDER, ...COPOWER_MONTH_ORDER]));
     return {
       report: "dual",
-      monthOrder: PLATFORM_MONTH_ORDER,
+      monthOrder: withLatestCloseMonths(union, page, leafId),
       reportLabel: leafId.startsWith("cfg-campos")
         ? "Campo · Costayaco / Vonú"
         : "Gran Tierra + COPOWER · vista integrada",
@@ -374,9 +400,10 @@ export function resolveViewContext(page: PageKey, leafId: string): ViewContext {
     };
   }
   if (isDualLeaf(page, leafId)) {
+    const union = Array.from(new Set([...GRAN_TIERRA_MONTH_ORDER, ...COPOWER_MONTH_ORDER]));
     return {
       report: "dual",
-      monthOrder: PLATFORM_MONTH_ORDER,
+      monthOrder: withLatestCloseMonths(union, page, leafId),
       reportLabel: "Gran Tierra + COPOWER",
       reportShort: "Dual",
     };
@@ -420,11 +447,20 @@ export function monthLabelFor(month: string): string {
   if (COPOWER_MONTH_ORDER.includes(month as CopowerMonthKey)) {
     return copowerMonthLabel(month as CopowerMonthKey);
   }
-  return month;
+  return EXTRA_MONTH_LABELS[month] ?? month;
 }
 
-export function monthOptionLabel(month: string, _ctx: ViewContext): string {
+export function monthOptionLabel(month: string, ctx: ViewContext): string {
   if (month === "YTD2026") return "Ene – 18 Jul 2026 (199 días)";
+  if (ctx.report === "dual") {
+    const gte = GRAN_TIERRA_MONTH_ORDER.includes(month as GranTierraMonthKey)
+      ? granTierraMonthLabel(month as GranTierraMonthKey)
+      : null;
+    const cpw = COPOWER_MONTH_ORDER.includes(month as CopowerMonthKey)
+      ? copowerMonthLabel(month as CopowerMonthKey)
+      : null;
+    return gte ?? cpw ?? EXTRA_MONTH_LABELS[month] ?? month;
+  }
   return monthLabelFor(month);
 }
 

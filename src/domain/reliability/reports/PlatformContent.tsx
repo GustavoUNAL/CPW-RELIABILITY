@@ -31,7 +31,7 @@ import { InventoryMinimumsDashboard } from "./InventoryMinimumsDashboard";
 import { ActionTrackingDashboard } from "./ActionTrackingDashboard";
 import { OperationalPlanningDashboard } from "./OperationalPlanningDashboard";
 import { MonthlyReportDashboard } from "./MonthlyReportDashboard";
-import { DashboardMantenimiento, DashboardOverview } from "./DashboardViews";
+import { DashboardMantenimiento, DashboardLaminasPage, DashboardOverview } from "./DashboardViews";
 import { FuentesCompareResumen } from "./FuentesCompareResumen";
 import { IndicatorFormulasDashboard } from "./IndicatorFormulasDashboard";
 import { GenerationDashboard } from "./GenerationDashboard";
@@ -747,7 +747,7 @@ function PlatformBody({
       return <DashboardMantenimiento month={month} monthLabel={monthLabel} />;
     }
     if (leafId === "ga-inventario") {
-      return <InventoryMinimumsDashboard />;
+      return <InventoryMinimumsDashboard report />;
     }
   }
 
@@ -781,8 +781,12 @@ function PlatformBody({
     );
   }
 
-  if (leafId === "conf-dashboard" || leafId === "dash-resumen") {
+  if (leafId === "conf-dashboard" || leafId === "dash-indicadores") {
     return <DashboardOverview month={month} monthLabel={monthLabel} />;
+  }
+
+  if (leafId === "dash-resumen" || leafId === "dash-laminas") {
+    return <DashboardLaminasPage month={month} monthLabel={monthLabel} />;
   }
 
   if (leafId === "an-evolucion" || leafId === "an-evolucion-copower" || leafId === "an-evolucion-gte") {
@@ -952,7 +956,10 @@ function PlatformBody({
   }
 
   if (page === "dashboard") {
-    if (leafId === "dash-resumen") {
+    if (leafId === "dash-resumen" || leafId === "dash-laminas") {
+      return <DashboardLaminasPage month={month} monthLabel={monthLabel} />;
+    }
+    if (leafId === "dash-indicadores") {
       return <DashboardOverview month={month} monthLabel={monthLabel} />;
     }
     if (leafId === "dash-contrato") {

@@ -1,9 +1,5 @@
 import { INVENTORY_MINIMUMS, type InventoryMinItem } from "./inventoryMinimumsData";
 
-/**
- * Ajustes de existencia para repuestos críticos ligados a fallas junio 2026
- * (bitácora GTE · RCA / IP). Se aplican sobre el catálogo ETL sin reescribirlo.
- */
 export type InventoryStockOverride = {
   id: string;
   onHand: number;
@@ -23,53 +19,13 @@ export type PlanningCriticalSpare = {
   urgency: "Crítica" | "Alta" | "Media";
 };
 
-/** Existencias reales post-consumo junio (escape CPW01, intercooler CPW06, etc.). */
-export const INVENTORY_STOCK_OVERRIDES: InventoryStockOverride[] = [
-  {
-    id: "INV-0182",
-    onHand: 0,
-    status: "AGOTADO",
-    note: "Consumido 05-jun CPW01 · flexible escape · RCA-002 / IP-GTE-002",
-  },
-  {
-    id: "INV-0036",
-    onHand: 0,
-    status: "AGOTADO",
-    note: "Sin cobertura de juntas flexibles · riesgo reincidencia CPW01",
-  },
-  {
-    id: "INV-0085",
-    onHand: 1,
-    status: "BAJO",
-    note: "Manguera metálica flexible bajo mínimo tras correctivos junio",
-  },
-  {
-    id: "INV-0180",
-    onHand: 0,
-    status: "AGOTADO",
-    note: "Flexible turbo sin existencia · cobertura flota J420",
-  },
-  {
-    id: "INV-0105",
-    onHand: 2,
-    status: "BAJO",
-    note: "Empaque intercooler parcial tras cambio CPW06 03-jun · RCA-003",
-  },
-  {
-    id: "INV-0120",
-    onHand: 1,
-    status: "BAJO",
-    note: "Empaque intercooler J420 bajo mínimo · CPW06",
-  },
-  {
-    id: "INV-0121",
-    onHand: 0,
-    status: "AGOTADO",
-    note: "Empaque intercooler 326970 agotado",
-  },
-];
+/**
+ * El cierre de bodega Costayaco (agosto) ya incorpora consumos. No se pisan
+ * existencias con ajustes de junio.
+ */
+export const INVENTORY_STOCK_OVERRIDES: InventoryStockOverride[] = [];
 
-/** Ítems adicionales no listados en el ETL o críticos eléctricos del plan julio. */
+/** Ítems de plan operacional que no aparecen en el kardex de bodega. */
 export const PLANNING_EXTRA_SPARES: PlanningCriticalSpare[] = [
   {
     id: "INV-PLAN-K4",
@@ -106,18 +62,8 @@ export const PLANNING_EXTRA_SPARES: PlanningCriticalSpare[] = [
   },
 ];
 
-const OVERRIDE_BY_ID = new Map(INVENTORY_STOCK_OVERRIDES.map((o) => [o.id, o]));
-
 export function applyInventoryOverrides(items: InventoryMinItem[]): InventoryMinItem[] {
-  return items.map((item) => {
-    const o = OVERRIDE_BY_ID.get(item.id);
-    if (!o) return item;
-    return {
-      ...item,
-      onHand: o.onHand,
-      status: o.status ?? item.status,
-    };
-  });
+  return items;
 }
 
 export function getInventoryItemsWithOverrides(): InventoryMinItem[] {
@@ -130,16 +76,22 @@ function urgencyFromGap(onHand: number, stockMin: number): PlanningCriticalSpare
   return "Media";
 }
 
-const CRITICAL_IDS = new Set(INVENTORY_STOCK_OVERRIDES.map((o) => o.id));
+function assetFromText(text: string): string {
+  const m = text.match(/CPW-?\s?\d{2}|JIN-?\s?\d+|G10\d[A-Z]?/i);
+  return m?.[0]?.replace(/\s+/g, "") ?? "Flota";
+}
 
-/** Repuestos mínimos críticos para el plan operacional julio (base junio GTE). */
+/** Repuestos en riesgo: agotados o bajo el mínimo heredado, más extras de plan. */
 export function getPlanningCriticalSpares(): PlanningCriticalSpare[] {
   const fromCatalog = getInventoryItemsWithOverrides()
-    .filter((i) => CRITICAL_IDS.has(i.id) || i.onHand < i.stockMin || i.onHand <= 0)
-    .filter((i) => CRITICAL_IDS.has(i.id))
+    .filter((i) => i.onHand <= 0 || i.onHand < i.stockMin)
     .map((i) => {
-      const note = OVERRIDE_BY_ID.get(i.id)?.note ?? "Stock bajo mínimo";
-      const assetMatch = note.match(/CPW\d{2}/);
+      const why =
+        i.onHand <= 0
+          ? i.issued > 0
+            ? `Agotado en kardex (${i.issued} salidas)`
+            : "Sin existencia en el cierre de bodega"
+          : `Bajo mínimo (${i.onHand} vs ${i.stockMin})`;
       return {
         id: i.id,
         family: i.family,
@@ -147,13 +99,21 @@ export function getPlanningCriticalSpares(): PlanningCriticalSpare[] {
         partNumber: i.partNumber,
         stockMin: i.stockMin,
         onHand: i.onHand,
-        linkedEvent: note,
-        asset: assetMatch?.[0] ?? "Flota",
+        linkedEvent: why,
+        asset: assetFromText(i.description),
         urgency: urgencyFromGap(i.onHand, i.stockMin),
       } satisfies PlanningCriticalSpare;
     });
 
-  return [...PLANNING_EXTRA_SPARES, ...fromCatalog].sort((a, b) => {
+  const catalogText = new Set(
+    fromCatalog.map((i) => `${i.partNumber}|${i.description}`.toLowerCase()),
+  );
+  const extras = PLANNING_EXTRA_SPARES.filter((s) => {
+    const key = `${s.partNumber}|${s.description}`.toLowerCase();
+    return !catalogText.has(key);
+  });
+
+  return [...extras, ...fromCatalog].sort((a, b) => {
     const u = { Crítica: 0, Alta: 1, Media: 2 };
     return u[a.urgency] - u[b.urgency] || a.description.localeCompare(b.description, "es");
   });

@@ -18,6 +18,10 @@ if (!XLSX_NAME) {
   process.exit(1);
 }
 const XLSX_PATH = path.join(DIR, XLSX_NAME);
+const AGO_XLSX = path.join(
+  ROOT,
+  "data/Agosto/Consolidado de Horas concertadas del 01 al 31 de Agosto.xlsx",
+);
 const OUT = path.join(ROOT, "src/domain/reliability/reports/concertacionHoursData.ts");
 
 const MONTH_MAP = {
@@ -124,10 +128,19 @@ for (const row of julRows) {
   byKey.set(`${row.date}|${row.tag}`, row);
 }
 
+if (fs.existsSync(AGO_XLSX)) {
+  const agoWb = XLSX.readFile(AGO_XLSX, { cellDates: true });
+  const agoSheet = agoWb.Sheets[agoWb.SheetNames[0]];
+  for (const row of parseSheet(agoSheet)) {
+    if (!row.date.startsWith("2026-08")) continue;
+    byKey.set(`${row.date}|${row.tag}`, row);
+  }
+}
+
 const allRows = [...byKey.values()].sort((a, b) => a.date.localeCompare(b.date) || a.tag.localeCompare(b.tag));
 
 /** Solo meses con datos útiles para la plataforma. */
-const KEEP = new Set(["May", "Jun", "Jul"]);
+const KEEP = new Set(["May", "Jun", "Jul", "Ago"]);
 const months = {};
 
 for (const row of allRows) {
@@ -284,7 +297,7 @@ for (const [mk, raw] of Object.entries(months)) {
   };
 }
 
-const gen3m = ["May", "Jun", "Jul"].map((mk) => {
+const gen3m = ["May", "Jun", "Jul", "Ago"].map((mk) => {
   const p = packs[mk];
   if (!p) return { month: mk, gasKwh: 0, dieselKwh: 0 };
   let gas = 0;
@@ -297,10 +310,13 @@ const gen3m = ["May", "Jun", "Jul"].map((mk) => {
 });
 
 const payload = {
-  sourceFile: path.relative(ROOT, XLSX_PATH).replace(/\\/g, "/"),
+  sourceFile: [path.relative(ROOT, XLSX_PATH), fs.existsSync(AGO_XLSX) ? path.relative(ROOT, AGO_XLSX) : null]
+    .filter(Boolean)
+    .join(" + ")
+    .replace(/\\/g, "/"),
   extractedAt: new Date().toISOString().slice(0, 10),
   notes:
-    "Horas concertadas GTE. Julio desde hoja 01–31; May–Jun desde hoja parcial 12–28. Disponibilidad = (calendario − SB − MMT − externas) / calendario.",
+    "Horas concertadas GTE. Julio 01–31; May–Jun parcial 12–28; agosto 01–31. Disponibilidad de pack = OP / (OP+SB+MMT+ext).",
   months: packs,
   generation3m: gen3m,
 };
@@ -398,6 +414,7 @@ export function getConcertacionMonth(monthKey: string): ConcertacionMonthPack | 
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
 fs.writeFileSync(OUT, body);
 const jul = packs.Jul;
+const ago = packs.Ago;
 console.log(
-  `OK → ${path.relative(ROOT, OUT)} · meses ${Object.keys(packs).join(",")} · Jul días ${jul?.dayCount} · kWh ${jul?.totals.kwh} · fallas ${jul?.totals.failures}`,
+  `OK → ${path.relative(ROOT, OUT)} · meses ${Object.keys(packs).join(",")} · Jul días ${jul?.dayCount} · Ago días ${ago?.dayCount} · Ago kWh ${ago?.totals.kwh} · Ago fallas ${ago?.totals.failures}`,
 );

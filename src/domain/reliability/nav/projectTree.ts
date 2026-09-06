@@ -27,7 +27,8 @@ export const PROJECT_NAV_TREE: NavModule[] = [
     label: "Dashboard",
     description: "Vistas ejecutivas y operativas por audiencia",
     children: [
-      { id: "dash-resumen", label: "Resumen general" },
+      { id: "dash-resumen", label: "14 láminas" },
+      { id: "dash-indicadores", label: "Indicadores GTE / COPOWER" },
       { id: "dash-contrato", label: "Cumplimiento de metas contractuales" },
       { id: "dash-operacion", label: "Operación COPOWER" },
       { id: "dash-operacion-gte", label: "Operación Gran Tierra" },
@@ -289,6 +290,7 @@ export const PROJECT_NAV_TREE: NavModule[] = [
         id: "inf-confiabilidad",
         label: "Confiabilidad",
         children: [
+          { id: "inf-conf-presentacion", label: "Informe mensual" },
           { id: "inf-conf-resumen", label: "Indicadores y eventos" },
           { id: "inf-conf-conciliacion", label: "Slide conciliación Disp." },
           { id: "inf-conf-confiabilidad", label: "Slide conciliación Conf." },
@@ -296,10 +298,11 @@ export const PROJECT_NAV_TREE: NavModule[] = [
           { id: "inf-conf-fallas", label: "7 · Análisis de fallas" },
           { id: "inf-conf-repetitivos", label: "8 · Eventos repetitivos" },
           { id: "inf-conf-mantenimiento", label: "9 · Mantenimiento" },
-          { id: "inf-conf-inventario", label: "10 · Mínimos de inventario" },
-          { id: "inf-conf-degradacion", label: "11 · Degradación y riesgos" },
-          { id: "inf-conf-eficiencia", label: "12 · Eficiencia energética" },
+          { id: "inf-conf-inventario", label: "10 · Bodega Costayaco" },
+          { id: "inf-conf-degradacion", label: "Riesgo operativo" },
+          { id: "inf-conf-eficiencia", label: "11 · Desempeño energético" },
           { id: "inf-conf-conclusiones", label: "13 · Conclusiones" },
+          { id: "inf-conf-facturacion", label: "14 · Formato de facturación" },
         ],
       },
       {

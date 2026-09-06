@@ -32,6 +32,11 @@ import {
 } from "./granTierraMonthly";
 import type { MachineIndicatorRow } from "../types";
 import { MAINTENANCE_PLANS } from "./maintenancePlansData";
+import { AGOSTO_WEEKLY_PLANNING, informeMonthCoverage } from "./agostoWeeklyPlanning";
+import { INVENTORY_MINIMUMS } from "./inventoryMinimumsData";
+import { getInventoryItemsWithOverrides } from "./inventoryPlanningCritical";
+import { InformeMonthCoverageBanner } from "./InformeMonthCoverageBanner";
+import { InformeConfiabilidadPdfDeck } from "./InformeConfiabilidadPdfDeck";
 
 const META = CONTRACTUAL_KPI_TARGETS.reliability;
 const META_PCT = META * 100;
@@ -296,6 +301,14 @@ function DualValueCard({
   );
 }
 
+export function DashboardLaminasPage({ month, monthLabel }: { month: string; monthLabel: string }) {
+  return (
+    <div className="dash-module icpdf-page dash-laminas-page">
+      <InformeConfiabilidadPdfDeck month={month} monthLabel={monthLabel} />
+    </div>
+  );
+}
+
 function DashChartPanel({
   title,
   subtitle,
@@ -319,7 +332,8 @@ function DashChartPanel({
 function buildTrendSeries(month: string) {
   const gteIdx = GRAN_TIERRA_MONTH_ORDER.indexOf(month as GranTierraMonthKey);
   const cpwIdx = COPOWER_MONTH_ORDER.indexOf(month as CopowerMonthKey);
-  const end = Math.max(gteIdx >= 0 ? gteIdx : 0, cpwIdx >= 0 ? cpwIdx : 0);
+  const lastKnown = COPOWER_MONTH_ORDER.length - 1;
+  const end = gteIdx < 0 && cpwIdx < 0 ? lastKnown : Math.max(gteIdx, cpwIdx, 0);
   const months = COPOWER_MONTH_ORDER.slice(0, end + 1);
 
   return months.map((m) => {
@@ -358,6 +372,19 @@ type MonthProps = { month: string; monthLabel: string };
 export function DashboardOverview({ month, monthLabel }: MonthProps) {
   const gte = GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey] ?? null;
   const cpw = COPOWER_MONTHLY_DATA[month as CopowerMonthKey] ?? null;
+  const coverage = informeMonthCoverage(month);
+  const sabana = MAINTENANCE_PLANS.monthlySummary.find((m) => m.monthKey === month) ?? null;
+  const sabanaExec = MAINTENANCE_PLANS.executions.filter((e) => e.programmed && e.monthKey === month);
+  const invItems = getInventoryItemsWithOverrides();
+  const invSin = invItems.filter((i) => i.onHand <= 0).length;
+  const invBajo = invItems.filter((i) => i.onHand > 0 && i.onHand < i.stockMin).length;
+  const invReview = invItems.filter((i) => i.review).length;
+  const mtoPct =
+    sabana && sabana.programmedCount > 0
+      ? `${((sabana.executedCount / sabana.programmedCount) * 100).toFixed(0)} %`
+      : "N/D";
+  const weeklyJobs = month === "Ago" ? AGOSTO_WEEKLY_PLANNING.jobs : [];
+  const hasContractual = Boolean(gte || cpw);
   const effCampo = useMemo(() => {
     const pack = loadOperacionPack();
     return eficienciaCampoSnapshot(pack.resumenDiario, month);
@@ -519,18 +546,12 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
     });
   }
 
-  if (!gte && !cpw) {
-    return (
-      <div className="dash-module exec-dashboard">
-        <header className="exec-header dash-hero">
-          <div>
-            <p className="eyebrow">Dashboard · Resumen general</p>
-            <h2>{monthLabel}</h2>
-          </div>
-        </header>
-        <p className="empty-state">Sin datos GTE ni COPOWER cargados para este periodo.</p>
-      </div>
-    );
+  if (coverage.pendingSources.length > 0) {
+    alerts.push({
+      active: true,
+      title: `Fuentes oficiales de ${monthLabel} pendientes`,
+      detail: coverage.pendingSources.join(" · "),
+    });
   }
 
   return (
@@ -540,7 +561,9 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
           <p className="eyebrow">Dashboard · Resumen general</p>
           <h2>{monthLabel}</h2>
           <p className="muted">
-            Vista integrada · GTE (contractual) y COPOWER (operación diaria) en una sola lectura
+            {hasContractual
+              ? "Vista integrada · GTE (contractual) y COPOWER (operación diaria) en una sola lectura"
+              : `Cierre operativo de ${monthLabel} · sábana de mantenimiento e inventario Costayaco. Disponibilidad y generación quedan en — hasta Data Soporte GTE.`}
           </p>
         </div>
         <div className="dash-source-badges">
@@ -548,6 +571,51 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
           <span className="source-badge cpw">CPW</span>
         </div>
       </header>
+
+      <InformeMonthCoverageBanner month={month} monthLabel={monthLabel} />
+
+      {sabana ? (
+        <section className="panel">
+          <article className="card">
+            <p className="eyebrow">Cierre operativo · {sabana.monthLabel}</p>
+            <div className="dash-core-grid">
+              <CoreCard
+                label="MTO programados"
+                value={`${sabana.executedCount}/${sabana.programmedCount}`}
+                hint={`${mtoPct} cumplimiento · ${sabana.pendingCount} pendientes`}
+                tone={sabana.pendingCount > 0 ? "warn" : "ok"}
+              />
+              <CoreCard
+                label="Horas MTO"
+                value={`${Math.round(sabana.executedHoursMto)} / ${Math.round(sabana.plannedHoursMto)} h`}
+                hint={`${Math.round(sabana.executedManHours)} h-hombre ejecutadas`}
+              />
+              <CoreCard
+                label="Inventario bodega"
+                value={String(invItems.length)}
+                hint={`${invSin} sin existencia · ${invBajo} bajo mínimo · ${invReview} a revisar`}
+                tone={invSin > 0 ? "bad" : invBajo > 0 ? "warn" : "ok"}
+              />
+            </div>
+            {sabanaExec.some((e) => e.status === "pendiente") ? (
+              <p className="dash-side-note muted">
+                Pendiente:{" "}
+                {sabanaExec
+                  .filter((e) => e.status === "pendiente")
+                  .map((e) => e.equipment)
+                  .join(" · ")}
+                .
+              </p>
+            ) : null}
+            {weeklyJobs.length > 0 ? (
+              <p className="dash-side-note muted">
+                Planeación {AGOSTO_WEEKLY_PLANNING.periodLabel}:{" "}
+                {weeklyJobs.map((j) => `${j.equipment} ${j.code} (${j.weekday})`).join(" · ")}.
+              </p>
+            ) : null}
+          </article>
+        </section>
+      ) : null}
 
       <section className="dash-source-strip">
         <div className="dash-source-strip-item dash-source-strip-item--gte">
@@ -562,6 +630,8 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
         </div>
       </section>
 
+      {hasContractual ? (
+        <>
       <section className="dash-integrated-hero">
         <DualValueCard
           label="Disponibilidad"
@@ -609,11 +679,17 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
           : ""}
         ). {EFICIENCIA_FORMULA}
       </p>
+        </>
+      ) : null}
 
       <section className="dash-chart-grid">
         <DashChartPanel
           title="Tendencia disponibilidad y confiabilidad"
-          subtitle="Ene – mes seleccionado · línea punteada = meta 98%"
+          subtitle={
+            hasContractual
+              ? "Ene – mes seleccionado · línea punteada = meta 98%"
+              : "Ene – Jul 2026 (último mes con Data Soporte) · línea punteada = meta 98%"
+          }
           wide
         >
           <ResponsiveContainer width="100%" height={300}>
@@ -637,6 +713,7 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
           </ResponsiveContainer>
         </DashChartPanel>
 
+        {hasContractual ? (
         <DashChartPanel title="Disp / Conf del mes (%)" subtitle={monthLabel}>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={kpiPctBarData} margin={{ top: 8, right: 8, left: 0, bottom: 4 }}>
@@ -651,7 +728,9 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
             </BarChart>
           </ResponsiveContainer>
         </DashChartPanel>
+        ) : null}
 
+        {hasContractual ? (
         <DashChartPanel title="Generación, fallas y eventos" subtitle="Escalas distintas · leer tabla para Δ exacto">
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={kpiVolBarData} margin={{ top: 8, right: 8, left: 0, bottom: 4 }}>
@@ -665,8 +744,12 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
             </BarChart>
           </ResponsiveContainer>
         </DashChartPanel>
+        ) : null}
 
-        <DashChartPanel title="Generación acumulada (MWh)" subtitle="Tendencia mensual integrada">
+        <DashChartPanel
+          title="Generación acumulada (MWh)"
+          subtitle={hasContractual ? "Tendencia mensual integrada" : "Ene – Jul 2026 (último mes con Data Soporte)"}
+        >
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={trendData} margin={{ top: 8, right: 12, left: 0, bottom: 4 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
@@ -682,7 +765,11 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
 
         <DashChartPanel
           title="Tendencia MTBF y MTTR"
-          subtitle="Ene – mes seleccionado · comparación GTE vs COPOWER"
+          subtitle={
+            hasContractual
+              ? "Ene – mes seleccionado · comparación GTE vs COPOWER"
+              : "Ene – Jul 2026 (último mes con Data Soporte)"
+          }
           wide
         >
           <ResponsiveContainer width="100%" height={300}>
@@ -876,6 +963,7 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
         ) : null}
       </section>
 
+      {hasContractual ? (
       <section className="panel">
         <article className="card">
           <div className="dash-block-head">
@@ -924,6 +1012,7 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
           </div>
         </article>
       </section>
+      ) : null}
 
       {alerts.length > 0 ? (
         <section className="panel">
@@ -950,6 +1039,7 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
         </section>
       ) : null}
 
+      {hasContractual ? (
       <section className="panel">
         <article className="card">
           <div className="dash-block-head">
@@ -1011,11 +1101,25 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
           ) : null}
         </article>
       </section>
+      ) : null}
 
       <aside className="exec-source-note">
         <p>
-          <strong>Fuentes:</strong> {gte?.sourceFile ?? "GTE N/D"} · {cpw?.sourceFile ?? "COPOWER N/D"}. GTE =
-          base contractual; COPOWER = operación diaria. Δ positivo en % indica valor CPW mayor que GTE.
+          {hasContractual ? (
+            <>
+              <strong>Fuentes:</strong> {gte?.sourceFile ?? "GTE N/D"} · {cpw?.sourceFile ?? "COPOWER N/D"}. GTE =
+              base contractual; COPOWER = operación diaria. Δ positivo en % indica valor CPW mayor que GTE.
+            </>
+          ) : (
+            <>
+              <strong>Fuentes de {monthLabel}:</strong> sábana Putumayo ({MAINTENANCE_PLANS.sourceFile}) · kardex
+              Costayaco ({INVENTORY_MINIMUMS.sourceFile}
+              {INVENTORY_MINIMUMS.movements?.length
+                ? ` · ${INVENTORY_MINIMUMS.movements.length} movimientos`
+                : ""}
+              ). Data Soporte GTE y reporte diario COPOWER pendientes: no se copian KPIs de julio.
+            </>
+          )}
         </p>
       </aside>
     </div>

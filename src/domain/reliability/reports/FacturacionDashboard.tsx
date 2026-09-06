@@ -177,7 +177,8 @@ function DocHeader() {
 }
 
 function IndicadoresTablas() {
-  const rows = PACK.units.map((u) => PACK.kpiByTag[u.tag]).filter(Boolean);
+  const kpiByTag = PACK.kpiByTag as Record<string, (typeof PACK.kpiByTag)[keyof typeof PACK.kpiByTag]>;
+  const rows = PACK.units.map((u) => kpiByTag[u.tag]).filter(Boolean);
   const cpw = PACK.units.filter((u) => u.owner === "CPW");
   return (
     <div className="fac-pair">
@@ -244,7 +245,7 @@ function IndicadoresTablas() {
             </thead>
             <tbody>
               {cpw.map((u) => {
-                const k = PACK.kpiByTag[u.tag];
+                const k = kpiByTag[u.tag];
                 return (
                   <tr key={u.tag}>
                     <td>{u.campo}</td>
