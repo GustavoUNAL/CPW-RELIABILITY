@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>FO-GE-033 No. 64 · CPW-07 · 06-sep-2026</title>
+  <style>
+    @page { size: letter; margin: 12mm 12mm 14mm; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 11px/1.35 "Calibri", "Segoe UI", sans-serif; color: #172D49; }
+    h1, h2, h3 { margin: 0; }
+    .page { page-break-after: always; }
+    .page:last-child { page-break-after: auto; }
+    header.form { display: grid; grid-template-columns: 1fr auto 1fr; gap: 6px; align-items: end; border-bottom: 3px solid #172D49; padding-bottom: 6px; }
+    header.form strong { font-size: 13px; letter-spacing: .02em; }
+    header.form small { color: #4a5a70; }
+    .meta { display: flex; justify-content: space-between; font-size: 10px; margin-top: 4px; }
+    table.box { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    table.box th, table.box td { border: 1px solid #9aa7b5; padding: 4px 6px; vertical-align: top; }
+    table.box th { background: #eef2f6; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: .04em; }
+    .k { color: #4a5a70; font-size: 10px; }
+    .sec { margin-top: 8px; background: #172D49; color: #fff; font-size: 10px; letter-spacing: .06em; padding: 3px 7px; text-transform: uppercase; }
+    .body { border: 1px solid #9aa7b5; border-top: 0; padding: 7px 8px; text-align: justify; }
+    .chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 6px 0; }
+    .chip { border: 1px solid #9aa7b5; padding: 2px 8px; }
+    .chip.on { background: #172D49; color: #fff; border-color: #172D49; }
+    table.act td { font-size: 10.5px; }
+    footer.sign { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 16px; }
+    footer.sign p { margin: 0 0 28px; font-size: 10px; color: #4a5a70; }
+    footer.sign b { display: block; border-top: 1px solid #172D49; padding-top: 4px; }
+    img.ev { width: 100%; border: 1px solid #9aa7b5; margin-top: 6px; }
+    caption, .cap { font-size: 10px; color: #4a5a70; margin: 2px 0 10px; }
+    .warn { background: #fff6e8; border-left: 3px solid #c0392b; padding: 5px 8px; margin-top: 6px; }
+  </style>
+</head>
+<body>
+  <section class="page">
+    <header class="form">
+      <div>
+        <div class="k">PROCESO: GENERACIÓN DE ENERGÍA</div>
+        <small>FECHA DEL FORMATO: 24-01-2026</small>
+      </div>
+      <strong>REPORTE DE MANTENIMIENTO<br />CENTROS DE GENERACIÓN</strong>
+      <div style="text-align:right">
+        <div><b>CÓDIGO: FO-GE-033</b></div>
+        <div>VERSIÓN: 01 · PÁGINA 1 DE 2</div>
+      </div>
+    </header>
+    <div class="meta">
+      <span>No. reporte: <b>64</b></span>
+      <span>Tipo: Preventivo · <b>Correctivo</b> · Verificación</span>
+      <span>Fecha del evento: <b>06-sep-2026</b></span>
+    </div>
+
+    <table class="box">
+      <tr><th colspan="4">Información del equipo</th></tr>
+      <tr>
+        <td><span class="k">Equipo</span><br />Grupo electrógeno a gas Jenbacher J320</td>
+        <td><span class="k">Código</span><br />CPW-07</td>
+        <td><span class="k">Marca / modelo</span><br />Jenbacher J320 GS-C185</td>
+        <td><span class="k">Serial</span><br />1060033</td>
+      </tr>
+      <tr>
+        <td><span class="k">Ubicación</span><br />Colombia — Costayaco</td>
+        <td><span class="k">Usuario</span><br />Gran Tierra Energy</td>
+        <td><span class="k">Responsable</span><br />Técnico de O&amp;M</td>
+        <td><span class="k">Horas del equipo</span><br />2.154</td>
+      </tr>
+    </table>
+
+    <div class="sec">Antecedentes</div>
+    <div class="body">
+      Salida de línea de CPW-07 el 06-09-2026 en Costayaco, en isla. El AGC registra <b>dos shutdowns</b> el mismo turno:
+      08:33:52 (P = 900–923 kW) y 08:45:01–08:45:11 (P = 738–824 kW). A las 08:38:35 aparece <i>Any DG missing</i> / CAN ID 25 caído.
+      Reingreso real con GB ON a las 08:48:54. El flash de operación (parada 08:45 / arranque 08:52) solo cubre el segundo disparo.
+      Entre ambos trips el interruptor abre y cierra varias veces (08:36, 08:37, 08:39, 08:40, 08:43).
+      Antecedente: el mismo modo <i>P&gt; → U&gt; → Shd Comun IE650</i> se repite en el log de agosto–septiembre.
+    </div>
+
+    <div class="sec">Descripción de la falla</div>
+    <div class="body">
+      A las 08:45:01 el AGC dispara 1450 P&gt; etapa 1 (738 kW, 924 A, 464 V). Ocho segundos después, 1460 P&gt; etapa 2 (824 kW, 1033 A).
+      A las 08:45:11, ya sin corriente, aparecen 1160 G U&gt; (542 V) y 3000 Shd Comun IE650.
+      DIA.NE registra en paralelo <i>Generador Sobre Carga Shutdown</i> y <i>Generador Sobre Voltaje Shutdown</i> (08:46:21; desfase de reloj ≈ 1 min).
+      El sobrevoltaje ocurre con I = 0 A: es el rebote de isla al abrir el interruptor, no la causa.
+      La tendencia de knocking (cilindros 1–20, 08:40–08:52) sube desde ≈ 08:44 y pica al shutdown: detonación generalizada.
+      Doce minutos antes ya había un shutdown idéntico a 923 kW.
+    </div>
+
+    <div class="sec">Análisis de la falla</div>
+    <div class="body">
+      <b>Causa raíz:</b> deterioro / obstrucción del intercooler y suciedad en la válvula turbo bypass, con carcasa de admisión averiada.
+      El motor entra en knock, no sostiene carga y el AGC dispara P&gt;.
+      Lo confirma la prueba posterior: opera estable ≈ 7 h y vuelve a oscilar al superar 600 kW; se inspecciona intercooler y se encuentra obstruido por deterioro.
+      El relato de “incremento súbito de demanda en isla” no explica el trip de las 08:33 ni el knock previo.
+      El CAN missing de las 08:38 puede haber sumado un escalón al segundo trip; no explica la recurrencia ni la pérdida de capacidad bajo 600 kW.
+      <div class="warn"><b>Clasificación:</b> falla imputable al grupo (admisión / intercooler). No es PF cliente. La protección actuó; el modo de falla es del equipo.</div>
+    </div>
+
+    <div class="sec">Acciones correctivas / preventivas</div>
+    <div class="body">
+      <div class="chips">
+        <span class="chip">Electrónico</span>
+        <span class="chip">Eléctrico</span>
+        <span class="chip">Hidráulico</span>
+        <span class="chip">Neumático</span>
+        <span class="chip on">Mecánico</span>
+      </div>
+      Revisión de alarmas y eventos AGC en ventana 08:20–09:10. Desmonte y limpieza de válvula turbo bypass.
+      Pendiente toma de presión Compushet a la entrada del intercooler (tapón 1/4 NPT).
+      Carcasa de admisión averiada enviada a Bucaramanga. Reset de alarmas y reingreso 08:48:33–08:48:54.
+      No se cambiaron partes en sitio. Hasta el cierre del repuesto, no cargar CPW-07 por encima de 600 kW.
+    </div>
+
+    <div class="sec">Pruebas de funcionamiento</div>
+    <div class="body">
+      Tras el reingreso se probaron con carga: estable cerca de 7 h y oscila al superar 600 kW.
+      Parada 08:45:11 · GB ON 08:48:54 · fuera de línea ≈ 4 min (0,06 h). El flash redondeó el arranque a 08:52.
+    </div>
+
+    <div class="sec">Acciones de mejora</div>
+    <table class="box act">
+      <tr><th>Ítem</th><th>Descripción</th><th>Responsable</th><th>Fecha</th><th>Cumplimiento</th><th>Seguimiento</th></tr>
+      <tr>
+        <td>1</td>
+        <td>Reparar / reponer carcasa de admisión e intercooler. No superar 600 kW hasta el cierre.</td>
+        <td>David Cornejo / O&amp;M</td>
+        <td>06-sep-26</td>
+        <td>En curso</td>
+        <td>Repuesto en Bucaramanga</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>Instalar toma Compushet en entrada de intercooler y seguir knock / P&gt; en AGC.</td>
+        <td>Técnico O&amp;M Costayaco</td>
+        <td>sep-26</td>
+        <td>Pendiente</td>
+        <td>Facilidad 1/4 NPT instalada</td>
+      </tr>
+    </table>
+
+    <footer class="sign">
+      <p>Elaboró (análisis)<br /><b>Gustavo Arteaga · Confiabilidad</b></p>
+      <p>Responsable del mantenimiento<br /><b>David Cornejo · Coordinador O&amp;M</b></p>
+    </footer>
+  </section>
+
+  <section class="page">
+    <header class="form">
+      <div><div class="k">PROCESO: GENERACIÓN DE ENERGÍA</div></div>
+      <strong>FO-GE-033 No. 64 · EVIDENCIA</strong>
+      <div style="text-align:right"><b>PÁGINA 2 DE 2</b></div>
+    </header>
+    <p class="cap">Soporte recortado a la ventana 06-sep-2026 08:20–09:10. No se adjunta el histórico agosto–septiembre del .xls; ese archivo queda en el expediente interno.</p>
+    <p class="cap"><b>DIA.NE — shutdown sobrecarga y sobrevoltaje</b></p>
+    <img class="ev" src="soporte/CPW-07_DIA-NE_shutdown_sobrecarga_sobrevoltaje.png" alt="DIA.NE shutdown" />
+    <p class="cap"><b>Knocking cilindros 1–20 · 08:40–08:52</b> — la intensidad sube antes del segundo trip.</p>
+    <img class="ev" src="soporte/CPW-07_knocking_cilindros_1-20_08-40_08-52.jpeg" alt="Knocking 20 cilindros" />
+  </section>
+</body>
+</html>
