@@ -1,0 +1,198 @@
+                                                                                                                    NOMBRE                                                                                                            TIPO
+                            DOCUMENTO:
+                                                                                                      Indicadores de Generación ACR pad 4                                                                                           Formato
+                            CODIFICACIÓN:                                                                            ago-26         1de4                                                        ORIGEN:                                           Interno
+                            REVISIÓN:                                                           A prueba                        PÁGINA:                                                         SECUENCIAL:                                      OP-KPI-004
+
+
+
+
+Factores de carga y eventos operativos relevantes: Durante el mes de Agosto los equipos J420 operan con un perfil de carga promedio de 1.170 kW contra 1.172 kW del mes
+anterior los J320 con un promedio de 850 kW y los Jinan con 410 kW para un total de energía entregada al cliente de 3.746.118 kWh contra 3.450.513 kWh del mes anterior, la
+disponibilidad de cada equipo estuvo por encima del 98% a excepción de los equiposa 801 y 802 los cuales presentaron eventos de mantenimientos y falla estos equipos estuvieron
+soportados por la J320-1, la disponibilidad deL SISTEMA N con 98,21% impactada principalmente por los mantenimientos ejecutados en el periodo, en total se programaron 4
+mantenimientos y se ejecutaron 4 mantenimientos durante el periodo de Agosto 2026 para mantener la confiablidad del centro de generación, el 23 de agosto entrarón en
+operación los equipos 805T-806T-807T como generacíon temprana en la ampliación del centro de generación pad 4, El 31 de agosto se liberó el equipo Gen 801 para iniciar con el
+mantenimiento programado de cambio de control, mantenimientos de motor y generador.
+El consumo de gas estuvo en promedio de 8,71 ft3/kWh con un consumo total de 32.412.130 ft3 y una eficiencia de 38,78%
+
+Observaciones de operación y estado general de los equipos: En resumen de la operación ingresarón los equipos 805T-806T-807T para el aumento de energía solicitada,
+finalizando mes se iniciaron actividaes de mantenimeinto de cambio de control del gen 801 y se estima continuar con con los equipos restantes Gen 802 y Gen 804 una vez ingrese
+a la operación el Gen 801, y asi seguir manteniendo la confiabilidad del centro de generación ACR PAD4.
+
+
+
+
+                                                                                          RESUMEN DE GENERACION ACR PAD AGOSTO 2026
+
+                                                                                        Mantenimie Mantenimie                Horas          Consumo
+              Energía   Potencia        Horas            Horas                                                                                                               Consumo de Confiabilid Disponibili                     Cantidad
+  Equipo                                                               Horas Mtto          ntos       ntos                  Fuera de          de gas            %Eff                                                                            MTBF          MTTR
+             generada   Promedio      Operativas         Stanby                                                                                                                gas FT3     ad          dad                          de fallas
+                                                                                        planeados Ejecutados                servicio         ft3/kWh
+
+ GEN 801     682.200     1170           587,16             83,1            0,16               0                 0             73,58             8,63            38,8           5.887.386           90,11%          90,09%                  3    195,72        24,53
+ GEN 802     708.100     1140           628,77             7,43             106                1                1               1,8             8,63           38,84           6.110.903           99,76%          85,51%                  2    314,39        0,90
+ GEN 803     806.047     1171           721,16            18,48            4,00                2                2              0,36             8,62           38,88           6.948.125           99,95%          99,41%                  1    721,16        0,36
+ GEN 804     883.200     1189           739,40            4,00                0                0                0               0,6             8,69            38,6           7.675.891           99,92%           99,92%                 1    739,40        0,60
+ GE 805T     193.433     867            223,20            5,80                0                0                0                0              8,64            38,8           1.671.261          100,00%          100,00%                 0      SF          0,00
+ GE 806T     59.820      404            148,16            67,00               0                0                0              0,84             8,90            37,7            532.398            99,44%           99,89%                 1    148,16        0,84
+ GE 807T     72.336      413            175,00            64,00               0                0                0                0              8,90            37,7            643.790           100,00%          100,00%                 1    175,00        0,00
+ GEN J320    340.982      832           410,00           334,00               0                1                1                0              8,63            38,8           2.942.675          100,00%          100,00%                 0     SF           0,00
+SISTEMA N 3.746.118       898           4.216,7          583,81           110,16               4                4             77,18             8,71            38,78         32.412.430           99,26%           98,21%                 9    468,5         8,58
+
+
+
+
+                                La información contenida en este documento es de propiedad de COPOWER. LTDA., por lo tanto está prohibido su uso, reproducción total o parcial por medio físico y/o electrónico sin previa autorización.
+                                                                                                                                                        NOMBRE                                                                                                                        TIPO
+                                                               DOCUMENTO:
+                                                                                                                                          Indicadores de Generación ACR pad 4                                                                                                       Formato
+                                                               CODIFICACIÓN:                                                                             ago-26                                                                             ORIGEN:                                                               Interno
+                                                               REVISIÓN:                                                            A prueba                        PÁGINA:
+                                                                                                                                                                        2de4                                                                SECUENCIAL:                                                          OP-KPI-004
+
+                                                                                                     RESUEMEN GRAFICO DE DESEMPEÑO OPERATIVO DISPONIBILIDAD Y CONFIABILIDAD
+
+          Energía Generada kWh-Agosto                                                                           Disponibilidad Enero a Agosto                                                                 Disponibilidad %-Agosto                                    Potencia Promedio kW-Agosto
+
+                           Energía generada                                                                                  DISPONIBILIDAD
+                                                                                        100,0%
+SISTEMA N                                                       3.746.118
+                                                                                                                                                                                                                 99,41% 99,92%100,00%99,89%100,00%100,00%          1170 1140 1171 1189
+ GEN J320       340.982                                                                  90,0%
+  GE 807T       72.336
+                                                                                                                                                                                                                                                                                                        867                                     898
+                                                                                         80,0%                                                                                                                                                                                                                                         832
+  GE 806T       59.820
+                                                                                                                                                                                               90,09%
+  GE 805T       193.433
+
+ GEN 804          883.200
+                                                                                         70,0%                                                                                                          85,51%
+                                                                                                                                                                                                                                                                                                                 404        413
+ GEN 803         806.047
+                                                                                         60,0%
+ GEN 802        708.100                                                                              MARZO        ABRIL          MAYO              JUNIO           JULIO            AGOSTO
+ GEN 801        682.200                                                                                 GEN 801      GEN 802        GEN 803          GEN 804           SISTEMA N
+                                                                                                                                                                                                 GEN      GEN     GEN    GEN GE 805T GE 806TGE 807T GEN            GEN 801GEN 802GEN 803GEN 804 GE 805T GE 806T GE 807T                GEN SISTEMA
+            0             1.000.000         2.000.000     3.000.000         4.000.000                   J320         805T           806T             807T                                        801      802     803    804                        J320                                                                               J320   N
+
+
+                 Consumo Gas ft3- Agosto                                                              Acumulados de kWh/consumo de gas ft3                                                           Cumplimiento de mantenimientos                                          Cantidad de fallas-Agosto
+
+                                  Consumo de gas FT3                                                                                                                                                 INDICADOR PREVENTIVO MENSUAL                                                     2500
+
+ 90,11%     99,76%       99,95%    99,92%
+                                                                                                                                                                                   32412430   120%
+                                                                                                                                                                                                                                                                                      2000
+                                                                                                      28424911       29543639           27642661            29927563
+                                                                                         32000000
+                                                                                                                                                                                                                                                                                                                                                   9
+                                                                                         28000000                                                                                             100%     100%                100%                   100%                                1500
+
+                                                                                         24000000
+                                                                                                                                                                                              80%                                                                                     1000
+                                                                                         20000000
+
+5.887.386 6.110.903 6.948.125 7.675.891 1.671.261 532.398 643.790 2.942.675              16000000                                                                                                                                                                                         500
+                                                                                                                                                                                              60%
+                                                                                         12000000
+                                                                                                      3349816        3348400             3219300            3452513         3746118                                                                                                         0
+                                                                                          8000000                                                                                                                                                                                                                                    SIST
+                                                                                                                                                                                              40%                                                                                                GEN GEN GEN GEN GE GE GE GEN
+                                                                                                                                                                                                                                                                                                                                     EMA
+                                                                                          4000000                                                                                                                                                                       3                        801 802 803 804 805T 806T 807T J320
+                                                                                                                                                                                                                                                                                                                                      N
+                                                                                                                                                                                                                                                                       Horas Operativas
+                                                                                                                                                                                                                                                                               2                587,16 28,77 21,16739,40223,20148,16175,00410,004.216,
+                                                                                                 0                                                                                            20%
+                                                                                                                                                                                                                                                                       Horas Stanby              83,1 7,43 18,48 4,00 5,80 67,0064,00334,00583,81
+                                                                                                       ABRIL              MAYO             JUNIO               JULIO           AGOSTO                                                                                                     1         1        0          1       1           0
+                                                                                                                                                                                                                                                                       Horas Mtto                0,16 106 4,00      0       0     0     0       0 110,16
+  GEN       GEN           GEN       GEN        GE        GE       GE         GEN
+                                                                                                                                                                                               0%            0%     0%              0%     0%               0%         Horas Fuera de servicio 73,58 1,8 0,36 0,6           0   0,84    0       0 77,18
+  801       802           803       804       805T      806T     807T        J320                                   kW/h Generado            Consumo gas Ft3                                         Enero Febrero Marzo   Abril   Mayo   Junio   Julio   Agosto
+
+
+
+
+                                                                 La información contenida en este documento es de propiedad de COPOWER. LTDA., por lo tanto está prohibido su uso, reproducción total o parcial por medio físico y/o electrónico sin previa autorización.
+                                                                                                                               NOMBRE                                                                                                                 TIPO
+                                     DOCUMENTO:
+                                                                                                                 Indicadores de Generación ACR pad 4                                                                                                Formato
+                                     CODIFICACIÓN:                                                                              ago-26                                                                                     ORIGEN:                             Interno
+                                     REVISIÓN:                                                             A prueba                        PÁGINA:
+                                                                                                                                               3de4                                                                        SECUENCIAL:                        OP-KPI-004
+
+  Disponibilidad-Cofiabilidad N-Agosto                                                 Eficiencia % diaria Agosto                                                       Cumplimiento Plan de Mtto- Agosto                                Cromatografias entregadas por el cliente
+
+                 SISTEMA N                                                                      Eficiencia Agosto %
+                                                                                                                                                                                                  2
+           99,26%                                       45,00%                                                                                                                               2
+                                                        44,00%                                                                                                     2                                                                               Campo        PCI BTU/ft3 - LVH
+                                                        43,00%                                                                                                    1,5                   1                                                   ACR PAD 4               1.018,0
+                                                                                                                                                                                   1                                               1
+                                                        42,00%                                                                                                     1
+
+                                                        41,00%                                                                                                    0,5         0                             0
+                                                                                                                                                                          0                            0         0     0    0
+                                                        40,00%
+                            98,21%                                                                                                                                 0
+                                                        39,00%                                                                                                          GEN       GEN       GEN       GEN        GE   GE   GE    GEN
+                                                        38,00%                                                                                                          801       802       803       804       805T 806T 807T   J320
+                                                        37,00%
+                                                        36,00%
+                                                                                                                                                                                            Mantenimientos planeados
+         Confiabilidad   Disponibilidad                 35,00%
+                                                                  1 2   3   4 5   6   7 8   9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31                             Mantenimientos Ejecutados
+
+
+
+
+Listado de fallas :
+Gen 801: 3 fallas, asociadas a perdida de excitación del generador, como plan de acción es el mantenimiento preventivo al generador, el cual ya se esta ejecutando
+Gen 802: 4 fallas externas por knocking por cambios frecuentes del suministro de gas
+          2 fallas, asociadas a ruido valvular y ajustes en bujia 12 afectada por el shutdown general del dia 17 de agosto.
+Gen 803: 4 fallas externas por knocking presentados en cambios fecuentes del suministro de gas
+          1 fallas, asociadas a perdida de comunicación de modulo por ajustes post cambio de control
+Gen 804: 1 falla, asociadas a perdida de sincronismo por variación en el voltaje de red, se corrige cambiando el modo de governación del avr a PF
+Gen 806T 1 falla, asociada a falla AVR, se corrige ajustando setpoint de programación por pruebas del equipo
+Gen 807T 1 falla, asociada a oscilacíon y perdida de potencia por ajustes previos de gas equipo en prueba, se salio cuando cambiaron las condiciones de gas
+Plan de acción: Continuar en el mes de Septiembre con los mantenimientos de cambio de controles y mantenimientos mecanicos mayores como descarbonización de camaras de
+combustión y mantenimiento preventivo a alternadores, continuar con las rutinas de predictivos windrock, muestreo de aceite.
+Estado de stock de repuestos criticos según plan de mantenimiento: Según plan de mantenimiento se cuenta con los repuestos necesarios para los proximos
+mantenimientos, tenemos repuestos disponibles en campo, en bodega San Martin y otros repuestos en bodega Bucaramanga para respuesta rápida a diferentes fallas, en junio se
+recibio pedido de repuestos para completas el stock.
+
+Aspectos sociales, ambientales y HSEQ:
+La disposición de residuos se maneja con empresa local SAPS, y residuos liquidos aceites usados con EMARACK empresas locales de San Martin.
+
+
+
+
+                                                                                                                                REGISTRO DE FIRMAS
+
+
+
+
+                                      La información contenida en este documento es de propiedad de COPOWER. LTDA., por lo tanto está prohibido su uso, reproducción total o parcial por medio físico y/o electrónico sin previa autorización.
+                                                                                                                  NOMBRE                                                                                                            TIPO
+                             DOCUMENTO:
+                                                                                                    Indicadores de Generación ACR pad 4                                                                                           Formato
+                             CODIFICACIÓN:                                                                         ago-26                                                                     ORIGEN:                                        Interno
+                             REVISIÓN:                                                        A prueba                        PÁGINA:
+                                                                                                                                  4de4                                                        SECUENCIAL:                                   OP-KPI-004
+
+
+                     Elaborado por:                                                                                    Revisado por:                                                                                          Aprobado por:
+Fecha:                       5/09/2026                 Fecha:                                                                                    5/09/2026                                    Fecha:                                5/09/2026
+Nombre y Apellido:           Octavio Lizarazo          Nombre y Apellido:                                                                                                                     Nombre y Apellido:
+Empresa / Cargo:                                       Empresa / Cargo:
+                             Copower/Coordinador generación                                                                                                                                   Empresa / Cargo:
+
+
+
+
+                              La información contenida en este documento es de propiedad de COPOWER. LTDA., por lo tanto está prohibido su uso, reproducción total o parcial por medio físico y/o electrónico sin previa autorización.
+
