@@ -36,7 +36,7 @@ export const FAC_HOUR_CODES = [
 export type FacHourCode = (typeof FAC_HOUR_CODES)[number]["code"];
 
 export const FAC_TEMPLATE_META = {
-  sourceFile: "data/AGOSTO /template/Ejemplo formato de facturacion.xlsx",
+  sourceFile: "data/Agosto/template/Ejemplo formato de facturacion.xlsx",
   sheets: ["Julio 2026", "Nuevo Fac", "Pantallazo"],
   activeFormat: "Nuevo Fac",
   filledExample: "Julio 2026",

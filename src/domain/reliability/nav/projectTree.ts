@@ -27,7 +27,7 @@ export const PROJECT_NAV_TREE: NavModule[] = [
     label: "Dashboard",
     description: "Vistas ejecutivas y operativas por audiencia",
     children: [
-      { id: "dash-resumen", label: "14 láminas" },
+      { id: "dash-resumen", label: "15 láminas" },
       { id: "dash-indicadores", label: "Indicadores GTE / COPOWER" },
       { id: "dash-contrato", label: "Cumplimiento de metas contractuales" },
       { id: "dash-operacion", label: "Operación COPOWER" },
@@ -129,6 +129,7 @@ export const PROJECT_NAV_TREE: NavModule[] = [
         id: "conf-eventos",
         label: "Eventos de falla",
         children: [
+          { id: "bd-fo-bitacora", label: "Bitácora FO · GTE" },
           {
             id: "conf-bitacoras",
             label: "Fallas",

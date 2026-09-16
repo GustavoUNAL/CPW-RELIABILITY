@@ -10,6 +10,7 @@ import {
 } from "./granTierraMonthly";
 import { CopowerIndicatorsDashboard } from "./CopowerIndicatorsPanel";
 import { FailureEventsView } from "./FailureEventsView";
+import { FoBitacoraView } from "./FoBitacoraView";
 import { FailureClassificationView } from "./FailureClassificationView";
 import { EventInsightsDashboard } from "./EventInsightsDashboard";
 import { OperacionModule, operacionSectionFromLeaf } from "../operacion/OperacionModule";
@@ -501,6 +502,7 @@ function PlatformBody({
 
   if (
 
+    leafId === "bd-fo-bitacora" ||
     leafId.startsWith("bd-ev") ||
     leafId.startsWith("an-repetitivos") ||
     leafId.startsWith("an-badactors") ||
@@ -514,6 +516,13 @@ function PlatformBody({
     leafId === "an-criticos" ||
     leafId === "bd-fallas"
   ) {
+    if (leafId === "bd-fo-bitacora") {
+      return (
+        <ScreenShell report="dual" headless>
+          <FoBitacoraView />
+        </ScreenShell>
+      );
+    }
     if (leafId === "bd-ev-dual") {
       const mode = report === "gran_tierra" ? "gte" : "copower";
       return (

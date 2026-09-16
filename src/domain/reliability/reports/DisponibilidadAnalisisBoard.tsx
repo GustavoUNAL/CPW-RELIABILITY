@@ -92,7 +92,12 @@ export function gteAvailabilityTerms(hours: {
 export function buildDisponibilidadAnalisis(month: string) {
   const cpw = COPOWER_MONTHLY_DATA[month as CopowerMonthKey];
   const gte = GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey];
-  const fleetCpw = sumHours(cpw?.generationByEquipment ?? []);
+  /** Con Data Soporte oficial del mes, las horas de flota siguen a GTE. */
+  const fleetCpw = sumHours(
+    (gte?.generationByEquipment ?? cpw?.generationByEquipment ?? []) as Parameters<
+      typeof sumHours
+    >[0],
+  );
   const fleetGte = sumHours(gte?.generationByEquipment ?? []);
   const gteFormula = gteAvailabilityTerms(fleetGte);
   const dispCpw = fleetCpw.cal > 0 ? (fleetCpw.op + fleetCpw.sb) / fleetCpw.cal : null;

@@ -137,7 +137,7 @@ function App() {
   const sessionStartedAtRef = useRef(Date.now());
   const pageStartedAtRef = useRef(Date.now());
   const lastHeartbeatPageAtRef = useRef(Date.now());
-  const viewRef = useRef({ page: boot.page, leaf: boot.leaf, label: "14 láminas" });
+  const viewRef = useRef({ page: boot.page, leaf: boot.leaf, label: "15 láminas" });
   const skipUrlPushRef = useRef(false);
 
   useEffect(() => {
@@ -561,7 +561,7 @@ function App() {
             selectLeaf("dashboard", "dash-resumen");
           }}
         >
-          14 láminas
+          15 láminas
         </button>
         <button
           type="button"
@@ -763,7 +763,7 @@ function App() {
             }}
           >
             <Presentation size={16} />
-            14 láminas
+            15 láminas
           </button>
         </div>
         <PlatformContent

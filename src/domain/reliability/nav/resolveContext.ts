@@ -11,7 +11,7 @@ import {
 } from "../reports/granTierraMonthly";
 import type { PlanningSection } from "../reports/operationalPlanningTypes";
 
-/** Meses del selector. Incluye agosto aunque GTE aún no tenga anexo oficial. */
+/** Meses del selector. Agosto incluye Presentación GTE (Data Soporte + Análisis Indicadores). */
 export const PLATFORM_MONTH_ORDER = [
   "Ene",
   "Feb",
@@ -147,6 +147,7 @@ const DUAL_LEAVES = new Set([
   "cfg-campos-resumen",
   "cfg-campos",
   "bd-ev-dual",
+  "bd-fo-bitacora",
   "cq-auditoria",
   "cq-validacion",
   "cq-faltantes",
@@ -327,6 +328,15 @@ const CONCERTACION_LEAVES = new Set([
 ]);
 
 export function resolveViewContext(page: PageKey, leafId: string): ViewContext {
+  if (leafId === "bd-fo-bitacora") {
+    return {
+      report: "dual",
+      monthOrder: PLATFORM_MONTH_ORDER,
+      reportLabel: "Bitácora FO · Gran Tierra",
+      reportShort: "FO",
+      fixedPeriod: true,
+    };
+  }
   if (leafId.startsWith("inf-cpw-")) {
     return {
       report: "copower",

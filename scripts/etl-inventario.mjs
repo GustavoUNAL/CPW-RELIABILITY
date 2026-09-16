@@ -1,7 +1,7 @@
 /**
  * ETL de inventario bodega Costayaco → inventoryMinimumsData.ts
  *
- * Preferencia: data/Agosto (o AGOSTO) «INVENTARIO FINAL BODEGA…».
+ * Preferencia: data/Agosto «INVENTARIO FINAL BODEGA…».
  * El xlsx original pesa cientos de MB por fotos; se lee una copia sin media.
  *
  * STOCK = existencia actual (onHand).

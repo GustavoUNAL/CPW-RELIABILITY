@@ -86,7 +86,7 @@ export const RCA_DELIVERED_DOCUMENTS: RcaDeliveredDocument[] = [
     elaboratedBy: "Jose Luis Alvarez",
     reviewedBy: "David Cornejo",
     approvedBy: "GTE",
-    notes: "Fuente data/Julio/RCA. Falla externa a los grupos.",
+    notes: "Fuente data/Julio/fallas/12. Falla externa a los grupos.",
   },
   {
     id: "DOC-FO-060",
@@ -106,7 +106,7 @@ export const RCA_DELIVERED_DOCUMENTS: RcaDeliveredDocument[] = [
     elaboratedBy: "Javier Montes",
     reviewedBy: "David Cornejo",
     approvedBy: "GTE",
-    notes: "Fuente data/Julio/RCA. Reingreso 20:21 según horas concertadas.",
+    notes: "Fuente data/Julio/fallas/21. Reingreso 20:21 según horas concertadas.",
   },
   {
     id: "DOC-FO-061",
@@ -126,7 +126,7 @@ export const RCA_DELIVERED_DOCUMENTS: RcaDeliveredDocument[] = [
     elaboratedBy: "Jose Luis Alvarez",
     reviewedBy: "David Cornejo",
     approvedBy: "GTE",
-    notes: "Fuente data/Julio/RCA. Causa formal MRU aún por definir.",
+    notes: "Fuente data/Julio/fallas/21. Causa formal MRU aún por definir.",
   },
   {
     id: "DOC-FO-062",
@@ -146,7 +146,7 @@ export const RCA_DELIVERED_DOCUMENTS: RcaDeliveredDocument[] = [
     elaboratedBy: "Javier Alberto Montes Losada",
     reviewedBy: "David Cornejo",
     approvedBy: "GTE",
-    notes: "Fuente data/Julio/RCA/app.pdf. Mismo modo EEP que junio.",
+    notes: "Fuente data/Julio/fallas/24/app.pdf. Mismo modo EEP que junio.",
   },
   {
     id: "DOC-FO-063",
@@ -166,7 +166,7 @@ export const RCA_DELIVERED_DOCUMENTS: RcaDeliveredDocument[] = [
     elaboratedBy: "Javier Alberto Montes Losada",
     reviewedBy: "David Cornejo",
     approvedBy: "GTE",
-    notes: "Fuente data/Julio/RCA. Cuarta cascada MRU de julio.",
+    notes: "Fuente data/Julio/fallas/25. Cuarta cascada MRU de julio.",
   },
 ];
 
@@ -182,4 +182,4 @@ export const RCA_DELIVERED_CASE_COUNT = new Set(
   RCA_DELIVERED_DOCUMENTS.filter((d) => d.status === "Entregado").map((d) => d.linkedRcaId),
 ).size;
 
-export const RCA_FOLDER_LABEL = "data/RCA + data/Julio/RCA";
+export const RCA_FOLDER_LABEL = "data/RCA + data/Julio/fallas";

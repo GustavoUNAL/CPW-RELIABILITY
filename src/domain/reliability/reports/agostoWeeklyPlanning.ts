@@ -51,7 +51,7 @@ export const AGOSTO_WEEKLY_PLANNING = {
 };
 
 export function informeMonthCoverage(month: string) {
-  const hasGte = month !== "Ago";
+  const hasGte = month === "May" || month === "Jun" || month === "Jul" || month === "Ago";
   const hasConcertacion = month === "May" || month === "Jun" || month === "Jul" || month === "Ago";
   const hasGas = month === "Jun" || month === "Jul";
   const hasRca = month === "Jun" || month === "Jul";
@@ -67,8 +67,7 @@ export function informeMonthCoverage(month: string) {
     pendingSources:
       month === "Ago"
         ? [
-            "Data Soporte GTE (disponibilidad y generación oficiales del mes completo)",
-            "FO-GE-033 / RCA del mes",
+            "FO-GE-033 / RCA del mes (agosto sin eventos correctivos imputables)",
             "Cromatografía y totalizador Moqueta de agosto (la hoja «Agosto 2026» trae fechas de abril)",
           ]
         : [],

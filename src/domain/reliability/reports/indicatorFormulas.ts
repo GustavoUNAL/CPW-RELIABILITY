@@ -167,7 +167,7 @@ export const INDICATOR_FORMULAS: IndicatorFormulaDef[] = [
     threshold: "Obligatorio (4% factura si falta)",
     frequency: "Por evento",
     source: INDICATOR_FORMULAS_SOURCE,
-    gteHow: "Julio: 5 FO-GE-033 oficiales en data/Julio/RCA.",
+    gteHow: "Julio: 5 FO-GE-033 oficiales en data/Julio/fallas/{12,21,24,25}.",
     copowerHow: "Mismas 5 fichas en RCA Costayaco + PDFs en public/rca.",
   },
 ];
@@ -347,7 +347,7 @@ export function reviewIndicatorFormulas(month: string): FormulaReviewRow[] {
       tone: month === "Jul" && foCount === 5 ? "ok" : foCount > 0 ? "ok" : "na",
       verdict:
         month === "Jul"
-          ? "5 FO-GE-033 en data/Julio/RCA (MRU 12/21/24/25 + detonación CPW-04)."
+          ? "5 FO-GE-033 en data/Julio/fallas (MRU 12/21/24/25 + detonación CPW-04)."
           : "Conteo desde el pack RCA Costayaco del mes.",
     },
   ];

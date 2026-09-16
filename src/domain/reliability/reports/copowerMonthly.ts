@@ -8566,9 +8566,9 @@ export const COPOWER_MONTHLY_DATA: Record<CopowerMonthKey, CopowerMonthlySnapsho
               "fallas": 0,
               "mtbfLabel": "Sin Fallas",
               "mttrHours": null,
-              "riesgoTecnico": "RIESGO MEDIO",
-              "cumplimiento": "NO CUMPLE",
-              "detalle": "Horas concertadas 01–31 ago · OP 646 h · ext 55 h · fallas 0"
+              "riesgoTecnico": "RIESGO BAJO",
+              "cumplimiento": "CUMPLE",
+              "detalle": "Alineado a anexo GTE ago-2026: CUMPLE. Disp. 97.85% por PP de sábana (no FO). OP 646 h · ext 55 h · fallas 0"
           },
           {
               "unidad": "JIN-12",

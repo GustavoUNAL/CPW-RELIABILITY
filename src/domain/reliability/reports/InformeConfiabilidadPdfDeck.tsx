@@ -750,6 +750,12 @@ export function InformeConfiabilidadPdfDeck({ month, monthLabel }: Props) {
       .sort((a, b) => b.date.localeCompare(a.date))
       .slice(0, 6);
 
+    const sistemaN = (gte?.machineIndicators ?? cpw?.machineIndicators ?? []).filter((m) =>
+      /SISTEMA/i.test(m.unidad),
+    );
+    const sistemaCyc = sistemaN.find((m) => m.campo === "COSTAYACO") ?? null;
+    const sistemaVonu = sistemaN.find((m) => m.campo === "VONU") ?? null;
+
     return {
       gte,
       cpw,
@@ -777,6 +783,8 @@ export function InformeConfiabilidadPdfDeck({ month, monthLabel }: Props) {
       unitRows,
       fieldCyc,
       fieldVonu,
+      sistemaCyc,
+      sistemaVonu,
       cycGasN,
       cycDieselN,
       cycRel,
@@ -854,7 +862,9 @@ export function InformeConfiabilidadPdfDeck({ month, monthLabel }: Props) {
       <PdfSlide page={1} cover>
         <div className="icpdf-cover">
           <div className="icpdf-cover-hero">
-            <p className="icpdf-cover-kicker">INFORME MENSUAL · CONCILIADO CON DATA SOPORTE GTE</p>
+            <p className="icpdf-cover-kicker">
+              INFORME MENSUAL · v4 · CIERRE CON PRESENTACIÓN GTE
+            </p>
             <h1>INFORME DE CONFIABILIDAD</h1>
             <p className="icpdf-cover-month">{model.period} 2026</p>
             <hr />
@@ -866,9 +876,10 @@ export function InformeConfiabilidadPdfDeck({ month, monthLabel }: Props) {
             </p>
           </div>
           <p className="icpdf-cover-blurb">
-            Base: Data Soporte GTE PUTN agosto 2026 y horas concertadas. A% = (OP + SB) / Tcal ·
-            R% = (Tcal − FO) / Tcal · Tcal = 24 h/día · PF cliente no resta. Gas 01–31 · diésel
-            01–21. Meta Costayaco ≥ 98 % · Vonú ≥ 90 %.
+            Base: Análisis Indicadores Copower PUTN AGO 2026 (Carlos A. Villamizar) + Data Soporte
+            GTE. Sistema N Costayaco 100 % · Vonú 95,83 %. A% pack = (OP + SB) / Tcal · R% = (Tcal −
+            FO) / Tcal · Tcal = 24 h/día. Gas 01–31 · diésel 01–21 (retiro Coordinador). Meta
+            Costayaco ≥ 98 % · Vonú ≥ 90 %. 0 eventos correctivos.
           </p>
         </div>
       </PdfSlide>
@@ -885,10 +896,10 @@ export function InformeConfiabilidadPdfDeck({ month, monthLabel }: Props) {
                 </small>
               </article>
               <article className={model.disp.dispCpw != null && model.disp.dispCpw < META ? "is-warn" : "is-ok"}>
-                <span>Disponibilidad</span>
+                <span>Disponibilidad pack</span>
                 <strong>{pct(model.disp.dispCpw)}</strong>
                 <small>
-                  {n(model.disp.cpwAvailable, 0)} / {n(model.disp.programmed, 0)} h
+                  {n(model.disp.cpwAvailable, 0)} / {n(model.disp.programmed, 0)} h · OP+SB
                 </small>
               </article>
               <article className="is-ok">
@@ -898,25 +909,43 @@ export function InformeConfiabilidadPdfDeck({ month, monthLabel }: Props) {
                   {n((model.gte ?? model.cpw)?.summary.copowerFailures)} fallas · {n(model.eventLog.length)} bitácora
                 </small>
               </article>
-              <article className="tone-orange">
-                <span>Paradas externas</span>
-                <strong>{n(model.disp.fleetCpw.pf, 0)} h</strong>
-                <small>MRU / Moqueta / CCM</small>
+              <article className={model.disp.fleetCpw.pf > 0 ? "tone-orange" : "is-ok"}>
+                <span>{model.disp.fleetCpw.pf > 0 ? "Paradas externas" : "PF contratista"}</span>
+                <strong>{n(model.disp.fleetCpw.pfContr ?? model.disp.fleetCpw.pf, 0)} h</strong>
+                <small>
+                  {model.disp.fleetCpw.pf > 0
+                    ? "MRU / Moqueta / CCM"
+                    : "0 FO · GTE Data Soporte"}
+                </small>
               </article>
             </div>
             {model.unitRows.length ? (
               <div className="icpdf-kpis icpdf-kpis-4">
                 <article className="tone-blue">
-                  <span>Costayaco</span>
-                  <strong>{pct(model.fieldCyc.disp)}</strong>
+                  <span>Sistema N · Costayaco</span>
+                  <strong>
+                    {model.sistemaCyc
+                      ? `${model.sistemaCyc.disponibilidadPct.toFixed(2)} %`
+                      : pct(model.fieldCyc.disp)}
+                  </strong>
                   <small>
-                    {n(model.fieldCyc.units)} und · uso {pct(model.fieldCyc.uso, 1)}
+                    {model.sistemaCyc
+                      ? `vs jul 80,65 % · Conf. ${model.sistemaCyc.confiabilidadPct.toFixed(0)} %`
+                      : `${n(model.fieldCyc.units)} und · uso ${pct(model.fieldCyc.uso, 1)}`}
                   </small>
                 </article>
                 <article className={model.fieldVonu.disp != null && model.fieldVonu.disp < META_VONU ? "is-warn" : "is-ok"}>
-                  <span>Vonú</span>
-                  <strong>{pct(model.fieldVonu.disp)}</strong>
-                  <small>PP {n(model.fieldVonu.pp)} h</small>
+                  <span>Sistema N · Vonú</span>
+                  <strong>
+                    {model.sistemaVonu
+                      ? `${model.sistemaVonu.disponibilidadPct.toFixed(2)} %`
+                      : pct(model.fieldVonu.disp)}
+                  </strong>
+                  <small>
+                    {model.sistemaVonu
+                      ? `meta ≥ 90 % · ${model.sistemaVonu.cumplimiento}`
+                      : `PP ${n(model.fieldVonu.pp)} h`}
+                  </small>
                 </article>
                 <article className="tone-violet">
                   <span>Uso de flota</span>
@@ -1603,10 +1632,21 @@ export function InformeConfiabilidadPdfDeck({ month, monthLabel }: Props) {
             </div>
             <EventFreq days={model.logDays} />
             <p className="icpdf-conf-foot">
-              <strong>Panorama general.</strong> Por salidas de MRU, mal actor del mes, se dejó de
-              generar {n(model.mruLostKwh)} kWh ({n(model.mruLostKwh / 1000, 1)} MWh). Si se
-              estabiliza, ese volumen se recupera y el PF cliente baja de{" "}
-              {n(model.disp.fleetCpw.pf, 0)} h a {n(model.pfIfNoMru, 0)} h.
+              <strong>Panorama general.</strong>{" "}
+              {model.disp.fleetCpw.pf > 0 ? (
+                <>
+                  Por salidas de MRU, mal actor del mes, se dejó de generar {n(model.mruLostKwh)} kWh (
+                  {n(model.mruLostKwh / 1000, 1)} MWh). Si se estabiliza, ese volumen se recupera y el
+                  PF cliente baja de {n(model.disp.fleetCpw.pf, 0)} h a {n(model.pfIfNoMru, 0)} h.
+                </>
+              ) : (
+                <>
+                  Data Soporte GTE no imputa PF cliente: las salidas de gas / CCM quedan en stand-by
+                  u observación. Aun así la bitácora registra {n(model.mruCause.count)} menciones
+                  MRU en el mes; el foco de septiembre es estabilizar MRU y no mezclar esas ventanas
+                  con FO.
+                </>
+              )}
             </p>
           </div>
         ) : (
@@ -1701,7 +1741,7 @@ export function InformeConfiabilidadPdfDeck({ month, monthLabel }: Props) {
           </div>
           {month === "Ago" ? (
             <p className="icpdf-conf-foot">
-              Próxima semana (31 ago–6 sep):{" "}
+              Planeación semanal Costayaco:{" "}
               {AGOSTO_WEEKLY_PLANNING.jobs.map((j) => `${j.equipment} ${j.code}`).join(" · ")}.
             </p>
           ) : null}
@@ -2049,59 +2089,117 @@ export function InformeConfiabilidadPdfDeck({ month, monthLabel }: Props) {
         </div>
       </PdfSlide>
 
-      <PdfSlide page={13} title="Conclusiones" kicker={kicker(13, "Conclusiones")}>
+      <PdfSlide page={13} title="Gestión HSE semanal" kicker={kicker(13, "HSE semanal")}>
+        <div className="icpdf-mto icpdf-hse">
+          <div className="icpdf-kpis icpdf-kpis-4">
+            <article className="is-ok">
+              <span>Incidentes</span>
+              <strong>0</strong>
+              <small>Ambiental / FAC / vehicular</small>
+            </article>
+            <article className="tone-blue">
+              <span>Flash HSE</span>
+              <strong>1</strong>
+              <small>6 asistentes</small>
+            </article>
+            <article className="tone-violet">
+              <span>SIMOPS</span>
+              <strong>6</strong>
+              <small>empresas participantes</small>
+            </article>
+            <article className="is-ok">
+              <span>Safety cards</span>
+              <strong>0 / 0</strong>
+              <small>reportes · abiertos</small>
+            </article>
+          </div>
+
+          <div className="icpdf-hse-grid">
+            <article>
+              <h4>Focus de la semana</h4>
+              <ul>
+                <li>
+                  <b>Productos químicos</b>
+                  <span>Reglas de Oro — manejo seguro de químicos</span>
+                </li>
+                <li>
+                  <b>Bloqueo y etiquetado</b>
+                  <span>Trabajo seguro LOTO + CAP (cuidado de manos)</span>
+                </li>
+                <li>
+                  <b>Cuidado de manos</b>
+                  <span>Selección de guante, puntos de atrapamiento y línea de peligro</span>
+                </li>
+              </ul>
+              <p className="icpdf-hse-meta">
+                Empresa COPOWER · HSE Andrea Escalante · Coordinador David Cornejo · Costayaco /
+                Cohembi
+              </p>
+            </article>
+            <article className="icpdf-hse-photos">
+              <figure>
+                <img src="/informe-chrome/hse-ago/focus-bloqueo-1.jpg" alt="Focus LOTO / CAP" />
+                <figcaption>Focus · bloqueo y etiquetado</figcaption>
+              </figure>
+              <figure>
+                <img src="/informe-chrome/hse-ago/cap-costayaco.jpg" alt="CAP Costayaco" />
+                <figcaption>CAP · Costayaco</figcaption>
+              </figure>
+              <figure>
+                <img src="/informe-chrome/hse-ago/cap-cohembi.jpg" alt="CAP Cohembi" />
+                <figcaption>CAP · Cohembi</figcaption>
+              </figure>
+              <figure>
+                <img src="/informe-chrome/hse-ago/manos-1.jpg" alt="Cuidado de manos" />
+                <figcaption>Cuidado de manos</figcaption>
+              </figure>
+            </article>
+          </div>
+          <p className="icpdf-conf-foot">
+            Fuente: <em>INF. SEMANAL GESTIÓN HSE — COPOWER</em>. Sin incidentes laborales en la
+            ventana. Misión Vida: intervenciones CAP/HIP en Costayaco y Cohembi.
+          </p>
+        </div>
+      </PdfSlide>
+
+      <PdfSlide page={14} title="Conclusiones" kicker={kicker(14, "Conclusiones y recomendaciones GTE")}>
         <ol className="icpdf-close-list">
           <li>
-            <strong>Cierre operativo.</strong>{" "}
-            {model.gte ? (
-              <>
-                GTE publica {pct(model.disp.dispOficial)} y COPOWER {pct(model.disp.dispCpw)} con la
-                misma base OP + SB. El parque entrega {n(model.gte.kpi.generationMwh, 1)} MWh.
-              </>
-            ) : (
-              <>
-                Tras conciliar el Data Soporte GTE, el parque cierra con{" "}
-                {n(model.cpw?.kpi.generationMwh ?? model.genMwh, 1)} MWh y disponibilidad{" "}
-                {pct(model.disp.dispCpw)} (Tcal 24 h/día). Costayaco sostiene el sistema en paralelo
-                con R% {pct(model.cycRel.r)} y cero fallas a cargo de COPOWER.
-              </>
-            )}
+            <strong>Cierre favorable (GTE).</strong> Agosto cierra sin eventos correctivos en
+            Costayaco ni Vonú. Confiabilidad 100 % en todas las unidades y sistemas. El parque
+            entrega {n((model.gte ?? model.cpw)?.kpi.generationMwh ?? model.genMwh, 1)} MWh.
+            Sistema N Costayaco pasa de 80,65 % (julio) a{" "}
+            {model.sistemaCyc
+              ? `${model.sistemaCyc.disponibilidadPct.toFixed(2)} %`
+              : pct(model.disp.dispOficial)}
+            ; Sistema CPW +5,73 % en energía vs julio.
           </li>
           <li>
-            <strong>Lo que no cumple no es falla.</strong>{" "}
-            {model.noCumple.length
-              ? `${model.noCumple.map((u) => u.id).join(", ")} ${model.noCumple.length === 1 ? "queda" : "quedan"} bajo la meta de Costayaco (≥ ${(META * 100).toFixed(0)} %) por preventivo (${n(
-                  model.noCumple.reduce((s, u) => s + (u.pp ?? 0), 0),
-                  0,
-                )} h PP), no por FO. Vonú cumple ≥ ${(META_VONU * 100).toFixed(0)} %. El PF cliente (${n(model.disp.fleetCpw.pf, 0)} h) no resta ni A% ni R%.`
-              : `Todas las unidades cumplen la meta de A%. El PF cliente (${n(
-                  model.disp.fleetCpw.pf,
-                  0,
-                )} h) no resta disponibilidad ni confiabilidad.`}
+            <strong>PP ≠ falla.</strong> Las indisponibilidades individuales (p. ej. JIN-11 97,85 %)
+            corresponden a sábana de mantenimiento programado, no a FO. El anexo GTE marca{" "}
+            {model.noCumple.length === 0 ? "todas las unidades CUMPLE" : `${model.noCumple.map((u) => u.id).join(", ")} fuera de meta`}
+            . Bajo configuración N no hubo pérdida de función requerida.
           </li>
           <li>
-            <strong>El riesgo es el gas.</strong> {n(model.mruCause.count)} salidas MRU restaron{" "}
-            {n(model.mruCause.hours, 0)} h PF y {n(model.mruLostKwh / 1000, 0)} MWh. Si se estabiliza
-            la MRU, el PF cliente bajaría de {n(model.disp.fleetCpw.pf, 0)} h a{" "}
-            {n(model.pfIfNoMru, 0)} h. Baja presión no se contabiliza como falla.
+            <strong>Vonú controlada.</strong> Sistema N Vonú{" "}
+            {model.sistemaVonu
+              ? `${model.sistemaVonu.disponibilidadPct.toFixed(2)} %`
+              : pct(model.fieldVonu.disp)}{" "}
+            (bajo julio, dentro de meta ≥ 90 %). Sin señal correctiva; la baja se mantiene trazable
+            a intervención / no disponibilidad documentada.
           </li>
           <li>
-            <strong>Mantenimiento y bodega.</strong> Plan MTO {n(model.executed.length)}/
-            {n(model.programmed.length)} cerrado
-            {model.pending.length ? ` · ${n(model.pending.length)} reprogramados` : ""}
-            {model.mto
-              ? ` · ${n(model.mto.executedHoursMto)} de ${n(model.mto.plannedHoursMto)} h`
-              : ""}
-            . Bodega con mínimos alineados al corte
-            {model.invAgotado
-              ? `; ${n(model.invAgotado)} referencias en OC o bodega principal`
-              : ""}
-            .
+            <strong>Diésel · 21 días.</strong> G101V / G102J / G102K solo se evalúan hasta la
+            solicitud de retiro del Coordinador GTE. No comparar mes completo vs julio sin
+            normalizar. Documentar la transición al salir del parque en septiembre.
           </li>
           <li>
-            <strong>Acción de septiembre.</strong> Reemplazo AGC 150 → AGC-4: se conservan
-            sincronización, protección y gestión de potencia, con una plataforma más configurable y
-            escalable.
+            <strong>Recomendaciones finales GTE.</strong> (1) Sostener la
+            disponibilidad sistémica recuperada de Costayaco. (2) Segregar y conciliar horas de PP
+            de sábana frente a eventos correctivos. (3) Cerrar trazabilidad de intervenciones
+            ejecutadas. (4) Reemplazo AGC 150 por AGC-4 (sincronización, protección y PMS). Plan MTO{" "}
+            {n(model.executed.length)}/{n(model.programmed.length)}
+            {model.pending.length ? ` · ${n(model.pending.length)} reprogramados` : ""}.
           </li>
         </ol>
       </PdfSlide>

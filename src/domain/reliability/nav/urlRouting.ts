@@ -82,6 +82,7 @@ export const LEAF_PATH: Record<string, string> = {
   // confiabilidad
   "cmp-fuentes": "resumen",
   "proc-clasif": "clasificacion-fallas",
+  "bd-fo-bitacora": "fallas/bitacora",
   "bd-ev-copower": "fallas/copower",
   "bd-ev-gte": "fallas/gte",
   "bd-ev-dual": "fallas/comparativo",
