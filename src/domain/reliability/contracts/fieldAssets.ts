@@ -1,4 +1,4 @@
-/** Activos por campo — data/contratos (costayaco.pdf + vonus.pdf) + flota operativa. */
+/** Activos por campo — data/Costayaco/contratos (costayaco.pdf + vonus.pdf) + flota operativa. */
 
 export type FieldKey = "costayaco" | "vonu";
 

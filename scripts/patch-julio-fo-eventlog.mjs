@@ -59,7 +59,7 @@ const GTE_HEADERS = [
       "12:58 Cascada MRU por sobrepresión manifold CYC (CPW-01/02/03/07, JIN-10/11). Reingreso 14:39–15:23.",
     downtimeHours: 2.42,
     responsible: "GTE",
-    notes: "EVT-2026-07-25-MRU · FO-GE-033 No. 63 · data/Julio/RCA",
+    notes: "EVT-2026-07-25-MRU · FO-GE-033 No. 63 · data/Costayaco/Julio/RCA",
   },
   {
     date: "2026-07-24",
@@ -69,7 +69,7 @@ const GTE_HEADERS = [
       "07:08 Cascada MRU por disparo reconectador EEP 34.5 kV Junín–Mocoa (CPW-01/02/03/07, JIN-10). Reingreso CPW ~08:40–09:00; JIN-10 19:09.",
     downtimeHours: 1.87,
     responsible: "Externo",
-    notes: "EVT-2026-07-24-MRU · FO-GE-033 No. 62 · data/Julio/RCA",
+    notes: "EVT-2026-07-24-MRU · FO-GE-033 No. 62 · data/Costayaco/Julio/RCA",
   },
   {
     date: "2026-07-21",
@@ -79,7 +79,7 @@ const GTE_HEADERS = [
       "17:55 Cascada MRU por alto nivel de GLP (CPW-01/02/03/07, JIN-10). Reingreso 21:11–22:32. FS máx. 4,62 h.",
     downtimeHours: 4.62,
     responsible: "GTE",
-    notes: "EVT-2026-07-21-MRU · FO-GE-033 No. 61 · data/Julio/RCA",
+    notes: "EVT-2026-07-21-MRU · FO-GE-033 No. 61 · data/Costayaco/Julio/RCA",
   },
   {
     date: "2026-07-21",
@@ -89,7 +89,7 @@ const GTE_HEADERS = [
       "15:16 Detonación alta en un cilindro (gas MQT). Stand-by hasta 20:21 (5,08 h). Deslastre 1040→850 kW.",
     downtimeHours: 5.08,
     responsible: "GTE + COPOWER",
-    notes: "EVT-2026-07-21-CPW04 · FO-GE-033 No. 60 · data/Julio/RCA",
+    notes: "EVT-2026-07-21-CPW04 · FO-GE-033 No. 60 · data/Costayaco/Julio/RCA",
   },
   {
     date: "2026-07-12",
@@ -99,7 +99,7 @@ const GTE_HEADERS = [
       "05:28 Cascada MRU por baja presión de aceite Quincy (CPW-01/03/07, JIN-10/11/12). Reingreso 07:16–08:00. FS máx. 2,53 h.",
     downtimeHours: 2.53,
     responsible: "GTE",
-    notes: "EVT-2026-07-12-MRU · FO-GE-033 No. 58 · data/Julio/RCA",
+    notes: "EVT-2026-07-12-MRU · FO-GE-033 No. 58 · data/Costayaco/Julio/RCA",
   },
 ];
 

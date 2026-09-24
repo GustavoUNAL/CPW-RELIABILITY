@@ -42,7 +42,7 @@ function ContractTable({ rows, title }: { rows: CompanyContractRow[]; title: str
                 <td>
                   <strong>{r.orderNo}</strong>
                   <br />
-                  <small className="muted">{r.sourceFile.replace("data/contratos/", "")}</small>
+                  <small className="muted">{r.sourceFile.replace("data/Costayaco/contratos/", "")}</small>
                 </td>
                 <td>{r.object}</td>
                 <td>{r.term}</td>
@@ -124,7 +124,7 @@ export function CopowerCompanyView() {
 
       <FactGrid facts={COPOWER_PROFILE.facts} />
 
-      <ContractTable rows={COPOWER_PROFILE.activeOrders} title="Órdenes activas con Gran Tierra (data/contratos)" />
+      <ContractTable rows={COPOWER_PROFILE.activeOrders} title="Órdenes activas con Gran Tierra (data/Costayaco/contratos)" />
 
       <p className="muted company-footnote">
         La Orden <strong>1200005030</strong> (costayaco.pdf) define metas de disponibilidad y confiabilidad sistémica ≥
@@ -160,7 +160,7 @@ export function GteCompanyView() {
 
       <FactGrid facts={GTE_PROFILE.facts} />
 
-      <ContractTable rows={GTE_PROFILE.contractOrders} title="Marco contractual en carpeta data/contratos" />
+      <ContractTable rows={GTE_PROFILE.contractOrders} title="Marco contractual en carpeta data/Costayaco/contratos" />
 
       <p className="muted company-footnote">{GTE_PROFILE.reliabilityNote}</p>
     </ScreenShell>

@@ -31,7 +31,7 @@ function normAsset(id: string) {
   return id.toUpperCase().replace(/[^A-Z0-9]/g, "");
 }
 
-/** Solo RCA con PDF formal (carpeta data/RCA → public/rca). */
+/** Solo RCA con PDF formal (carpeta data/Costayaco/RCA → public/rca). */
 export function rcaHasFormalDocument(rca: RcaCaseDetail): boolean {
   return (rca.pdfUrls?.length ?? 0) > 0;
 }
@@ -337,7 +337,7 @@ export function buildGteJuneRcaCases(): RcaCaseDetail[] {
         "Preventivas: validar ajustes 50/51, 59, 81O/81U; protocolo de coordinación con EEP; respaldo de eventos eléctricos.",
       ],
       result:
-        "PDF formal Sec. 30 entregado a GTE (2 archivos en data/RCA). Elaboró Daniel Durán · Revisó David Cornejo · Aprobó Wilson Oliveros (22-jun-26). Sin plan IP dedicado (evento distinto al 28-jun).",
+        "PDF formal Sec. 30 entregado a GTE (2 archivos en data/Costayaco/RCA). Elaboró Daniel Durán · Revisó David Cornejo · Aprobó Wilson Oliveros (22-jun-26). Sin plan IP dedicado (evento distinto al 28-jun).",
       linkedPlanId: null,
       category: "Red eléctrica / salida de máquina",
       responsible: "Daniel Durán · Ing. Confiabilidad",

@@ -71,8 +71,8 @@ if (!src.includes("Jul: \"Julio\"")) {
   );
 }
 src = src.replace(
-  "/** Datos por mes desde data/GTE. May/Jun: KPIs oficiales de informe; Ene–Abr: estimados Excel. */",
-  "/** Datos por mes desde data/GTE y data/Julio/GTE. May–Jul: KPIs oficiales de informe; Ene–Abr: estimados Excel. */",
+  "/** Datos por mes desde data/Costayaco/GTE. May/Jun: KPIs oficiales de informe; Ene–Abr: estimados Excel. */",
+  "/** Datos por mes desde data/Costayaco/GTE y data/Costayaco/Julio/GTE. May–Jul: KPIs oficiales de informe; Ene–Abr: estimados Excel. */",
 );
 
 const endMarker = "\n};\n\nexport const GRAN_TIERRA_KPI_FROM_MONTHS";

@@ -833,7 +833,7 @@ function FormalRcaEventsSection({
     <section className="ev-formal-rca-section" aria-label="Eventos con RCA formal">
       <header className="ev-formal-rca-head">
         <div>
-          <p className="eyebrow">RCA formal · PDF en data/RCA</p>
+          <p className="eyebrow">RCA formal · PDF en data/Costayaco/RCA</p>
           <h3>Eventos con RCA entregado</h3>
           <p className="muted">
             {events.length} registro(s) · orden cronológico

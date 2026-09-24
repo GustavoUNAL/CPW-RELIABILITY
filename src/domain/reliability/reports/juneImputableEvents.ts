@@ -164,7 +164,7 @@ export const JUNE_2026_AUDIT_ROWS: AuditRow[] = [
   {
     indicator: "RCA / reportes de falla entregados",
     pdfValue: "1 de 7 (caso formal · 2 PDF revisiones)",
-    excelValue: "data/RCA · salida de la máquina 22-jun (Sec. 30)",
+    excelValue: "data/Costayaco/RCA · salida de la máquina 22-jun (Sec. 30)",
     match: true,
     note: "Único RCA formal en carpeta: Shutdown Costayaco / salida de la máquina · EEP. El resto de fallas no tiene PDF entregado.",
   },

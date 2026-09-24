@@ -9,7 +9,7 @@ import path from "node:path";
 import XLSX from "xlsx";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
-const DIR = path.join(ROOT, "data", "Julio", "GTE");
+const DIR = path.join(ROOT, "data", "Costayaco", "Julio", "GTE");
 const OUT = path.join(ROOT, "scripts", "_extracted_julio_gte.json");
 
 const XLSX_NAME = fs
@@ -238,7 +238,7 @@ const totalGenerationKwh = round1(units.reduce((s, u) => s + u.energiaKwh, 0));
 
 const snap = {
   label: "Julio",
-  sourceFile: `data/Julio/GTE/${XLSX_NAME}`,
+  sourceFile: `data/Costayaco/Julio/GTE/${XLSX_NAME}`,
   summary: {
     copowerFailures,
     totalEvents: events.length,

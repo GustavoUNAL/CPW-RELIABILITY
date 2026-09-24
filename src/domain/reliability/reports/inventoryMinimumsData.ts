@@ -32,7 +32,7 @@ export type InventoryMinPack = {
 };
 
 export const INVENTORY_MINIMUMS: InventoryMinPack = {
-  "sourceFile": "data/Agosto/INVENTARIO FINAL BODEGA COSTAYACO.xlsx",
+  "sourceFile": "data/Costayaco/Agosto/INVENTARIO FINAL BODEGA COSTAYACO.xlsx",
   "sheet": "Hoja1",
   "extractedAt": "2026-09-01",
   "notes": "Cierre bodega Costayaco. STOCK = existencia actual. ENTRADAS/SALIDAS del kardex. Mínimo heredado del catálogo previo por P/N.",

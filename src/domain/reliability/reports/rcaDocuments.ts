@@ -1,4 +1,4 @@
-/** Catálogo de PDF RCA entregados (fuente: data/RCA → servidos desde /public/rca). */
+/** Catálogo de PDF RCA entregados (fuente: data/Costayaco/RCA → servidos desde /public/rca). */
 
 export type RcaDeliveredDocument = {
   id: string;
@@ -23,7 +23,7 @@ export type RcaDeliveredDocument = {
 };
 
 /**
- * Documentos formales en data/RCA.
+ * Documentos formales en data/Costayaco/RCA.
  * Ambos PDF = mismo evento Sec. 30 (22-jun-2026 · salida de la máquina / Shutdown Costayaco).
  */
 export const RCA_DELIVERED_DOCUMENTS: RcaDeliveredDocument[] = [
@@ -66,7 +66,7 @@ export const RCA_DELIVERED_DOCUMENTS: RcaDeliveredDocument[] = [
     elaboratedBy: "Daniel Durán · Ing. Confiabilidad",
     reviewedBy: "David Cornejo · Coordinador O&M",
     approvedBy: "Wilson Oliveros · Líder Operaciones Gen",
-    notes: "Segunda copia del mismo RCA Sec. 30 en carpeta data/RCA.",
+    notes: "Segunda copia del mismo RCA Sec. 30 en carpeta data/Costayaco/RCA.",
   },
   {
     id: "DOC-FO-058",
@@ -86,7 +86,7 @@ export const RCA_DELIVERED_DOCUMENTS: RcaDeliveredDocument[] = [
     elaboratedBy: "Jose Luis Alvarez",
     reviewedBy: "David Cornejo",
     approvedBy: "GTE",
-    notes: "Fuente data/Julio/fallas/12. Falla externa a los grupos.",
+    notes: "Fuente data/Costayaco/Julio/fallas/12. Falla externa a los grupos.",
   },
   {
     id: "DOC-FO-060",
@@ -106,7 +106,7 @@ export const RCA_DELIVERED_DOCUMENTS: RcaDeliveredDocument[] = [
     elaboratedBy: "Javier Montes",
     reviewedBy: "David Cornejo",
     approvedBy: "GTE",
-    notes: "Fuente data/Julio/fallas/21. Reingreso 20:21 según horas concertadas.",
+    notes: "Fuente data/Costayaco/Julio/fallas/21. Reingreso 20:21 según horas concertadas.",
   },
   {
     id: "DOC-FO-061",
@@ -126,7 +126,7 @@ export const RCA_DELIVERED_DOCUMENTS: RcaDeliveredDocument[] = [
     elaboratedBy: "Jose Luis Alvarez",
     reviewedBy: "David Cornejo",
     approvedBy: "GTE",
-    notes: "Fuente data/Julio/fallas/21. Causa formal MRU aún por definir.",
+    notes: "Fuente data/Costayaco/Julio/fallas/21. Causa formal MRU aún por definir.",
   },
   {
     id: "DOC-FO-062",
@@ -146,7 +146,7 @@ export const RCA_DELIVERED_DOCUMENTS: RcaDeliveredDocument[] = [
     elaboratedBy: "Javier Alberto Montes Losada",
     reviewedBy: "David Cornejo",
     approvedBy: "GTE",
-    notes: "Fuente data/Julio/fallas/24/app.pdf. Mismo modo EEP que junio.",
+    notes: "Fuente data/Costayaco/Julio/fallas/24/app.pdf. Mismo modo EEP que junio.",
   },
   {
     id: "DOC-FO-063",
@@ -166,7 +166,7 @@ export const RCA_DELIVERED_DOCUMENTS: RcaDeliveredDocument[] = [
     elaboratedBy: "Javier Alberto Montes Losada",
     reviewedBy: "David Cornejo",
     approvedBy: "GTE",
-    notes: "Fuente data/Julio/fallas/25. Cuarta cascada MRU de julio.",
+    notes: "Fuente data/Costayaco/Julio/fallas/25. Cuarta cascada MRU de julio.",
   },
 ];
 
@@ -174,12 +174,12 @@ export function docsForRca(rcaId: string): RcaDeliveredDocument[] {
   return RCA_DELIVERED_DOCUMENTS.filter((d) => d.linkedRcaId === rcaId);
 }
 
-/** Archivos PDF en data/RCA (revisiones cuentan por separado). */
+/** Archivos PDF en data/Costayaco/RCA (revisiones cuentan por separado). */
 export const RCA_DELIVERED_COUNT = RCA_DELIVERED_DOCUMENTS.filter((d) => d.status === "Entregado").length;
 
-/** Casos RCA distintos con PDF en data/RCA. */
+/** Casos RCA distintos con PDF en data/Costayaco/RCA. */
 export const RCA_DELIVERED_CASE_COUNT = new Set(
   RCA_DELIVERED_DOCUMENTS.filter((d) => d.status === "Entregado").map((d) => d.linkedRcaId),
 ).size;
 
-export const RCA_FOLDER_LABEL = "data/RCA + data/Julio/fallas";
+export const RCA_FOLDER_LABEL = "data/Costayaco/RCA + data/Costayaco/Julio/fallas";

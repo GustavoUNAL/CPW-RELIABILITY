@@ -46,7 +46,7 @@ export const EQUIPOS: Equipo[] = [
 export const EQUIPO_BY_ID = Object.fromEntries(EQUIPOS.map((e) => [e.id, e])) as Record<string, Equipo>;
 
 export const DEFAULT_SOURCE_XLSX =
-  "data/Datos COPOWER/Reporte_Diario_Costayaco_Vonu 2026 actualizado 34.xlsx";
+  "data/Costayaco/Datos COPOWER/Reporte_Diario_Costayaco_Vonu 2026 actualizado 34.xlsx";
 
 /** Columnas fijas en hojas horarias (índices 0-based del Excel). */
 export const HOURLY_COLS = {

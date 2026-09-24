@@ -1,7 +1,7 @@
 /**
  * ETL de inventario bodega Costayaco → inventoryMinimumsData.ts
  *
- * Preferencia: data/Agosto «INVENTARIO FINAL BODEGA…».
+ * Preferencia: data/Costayaco/Agosto «INVENTARIO FINAL BODEGA…».
  * El xlsx original pesa cientos de MB por fotos; se lee una copia sin media.
  *
  * STOCK = existencia actual (onHand).
@@ -17,7 +17,7 @@ import { execFileSync } from "node:child_process";
 import XLSX from "xlsx";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
-const DATA = path.join(ROOT, "data");
+const DATA = path.join(ROOT, "data", "Costayaco");
 const OUT = path.join(ROOT, "src/domain/reliability/reports/inventoryMinimumsData.ts");
 const PREV_OUT = OUT;
 

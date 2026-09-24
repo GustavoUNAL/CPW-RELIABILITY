@@ -1,5 +1,5 @@
 /** Generado por scripts/etl-facturacion-ecuador.mjs — no editar a mano. */
-export const FACTURACION_SOURCE = "data/Agosto/ejemplo formato/Copia de Ejemplo formato de facturacion.xlsx";
+export const FACTURACION_SOURCE = "data/Costayaco/Agosto/ejemplo formato/Copia de Ejemplo formato de facturacion.xlsx";
 
 export type HourState = "OP" | "SB" | "PE" | "M" | "FS" | "TR";
 export type OwnerKind = "GTE" | "CPW";
@@ -68,7 +68,7 @@ export type FacturacionEvento = {
 };
 
 export const FACTURACION_JULIO_2026 = {
-  "sourceFile": "data/Agosto/ejemplo formato/Copia de Ejemplo formato de facturacion.xlsx",
+  "sourceFile": "data/Costayaco/Agosto/ejemplo formato/Copia de Ejemplo formato de facturacion.xlsx",
   "document": {
     "nombre": "Facturación Copower Ecuador – GTE",
     "tipo": "Soporte de facturación",

@@ -29,6 +29,10 @@ En datos y ETL el código de campo es `ACORDIONERO` (`FieldKey = "acordionero"`)
 3. ETL → snapshot mensual (mismo patrón que PUTN, filtrado por este campo).
 4. Revisar en la app: **Campos → Acordionero**.
 
+## GitHub vs local
+
+Versionar FO, GTE liviano, informes y `extract/`. Inventarios Excel enormes (`INVENTARIO*.xlsx`) quedan solo locales (ver `data/README.md` y `.gitignore`).
+
 ## Estado
 
-Estructura lista. Sin Data Soporte ni horas cargadas aún: la UI del campo muestra perfil pendiente hasta que entren datos.
+Estructura lista. Agosto 2026: Data Soporte ACRD + Análisis Indicadores en `GTE/`; informe Pad 4 en `informes/`; fallas G-801 en `fallas/G-801/`.

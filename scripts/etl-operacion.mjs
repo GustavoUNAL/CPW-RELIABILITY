@@ -9,7 +9,7 @@ import XLSX from "xlsx";
 const ROOT = path.resolve(import.meta.dirname, "..");
 const DEFAULT_XLSX = path.join(
   ROOT,
-  "data/Datos COPOWER/Reporte_Diario_Costayaco_Vonu 2026 actualizado 34.xlsx",
+  "data/Costayaco/Datos COPOWER/Reporte_Diario_Costayaco_Vonu 2026 actualizado 34.xlsx",
 );
 const OUT = path.join(ROOT, "src/domain/reliability/operacion/data/operacionPack.json");
 

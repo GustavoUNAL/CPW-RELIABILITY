@@ -250,7 +250,7 @@ export const GTE_CONTRACT_ORDERS: ContractOrderSummary[] = [
   {
     id: "orden_1",
     shortName: "Orden 1",
-    sourceFile: "data/contratos/costayaco.pdf",
+    sourceFile: "data/Costayaco/contratos/costayaco.pdf",
     title: "Generación 8MW — Costayaco + Vonú",
     fields: "Costayaco y Vonú",
     term: "3 años desde acta de inicio",
@@ -262,7 +262,7 @@ export const GTE_CONTRACT_ORDERS: ContractOrderSummary[] = [
   {
     id: "orden_2",
     shortName: "Orden 2",
-    sourceFile: "data/contratos/vonus.pdf",
+    sourceFile: "data/Costayaco/contratos/vonus.pdf",
     title: "Renta de equipos diésel/gas — Costayaco + Vonú",
     fields: "Costayaco y Vonú",
     term: "13 meses desde acta de inicio",

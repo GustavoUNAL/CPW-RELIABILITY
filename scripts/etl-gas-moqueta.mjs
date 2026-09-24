@@ -1,7 +1,7 @@
 /**
  * ETL de eficiencia energética · gas Moqueta (MQT).
  *
- * Cruza el totalizador de gas de `data/eficiencia/parametros operacion gas moquta.xlsx`
+ * Cruza el totalizador de gas de `data/Costayaco/eficiencia/parametros operacion gas moquta.xlsx`
  * con la energía diaria del Data Soporte de GTE para las unidades alimentadas por MQT.
  * El heat rate resultante es medido; el poder calorífico (cromatografía) es el único
  * parámetro externo y vive en `energyEfficiency.ts`.
@@ -12,7 +12,7 @@ import fs from "node:fs";
 import path from "node:path";
 import XLSX from "xlsx";
 
-const GAS_FILE = "data/eficiencia/parametros operacion gas moquta.xlsx";
+const GAS_FILE = "data/Costayaco/eficiencia/parametros operacion gas moquta.xlsx";
 const OUT = "src/domain/reliability/reports/gasMoquetaData.ts";
 
 /** Unidades reguladas por Medenus aguas abajo del filtro de Moqueta. */
@@ -51,7 +51,7 @@ const MONTHS = [
     sheet: "Junio 2026",
     cols: { date: 0, hour: 1, pressureMqt: 4, totalizer: 9, today: 10, flow: 12 },
     dataSoporte: {
-      file: "data/GTE/Junio/Data Soporte Cálculo Copower PUTN Junio 2026 (1).xlsx",
+      file: "data/Costayaco/GTE/Junio/Data Soporte Cálculo Copower PUTN Junio 2026 (1).xlsx",
       sheet: "Hoja1",
     },
   },
@@ -62,7 +62,7 @@ const MONTHS = [
     sheet: "Julio 2026",
     cols: { date: 0, hour: 1, pressureMqt: 4, totalizer: 9, today: 10, flow: 12 },
     dataSoporte: {
-      file: "data/Julio/GTE/Data Soporte Cálculo Copower PUTN Julio 2026.xlsx",
+      file: "data/Costayaco/Julio/GTE/Data Soporte Cálculo Copower PUTN Julio 2026.xlsx",
       sheet: "Hoja1",
     },
   },

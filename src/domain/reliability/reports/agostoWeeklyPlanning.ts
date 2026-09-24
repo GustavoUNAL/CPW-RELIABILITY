@@ -1,4 +1,4 @@
-/** Planeación semanal Costayaco · 31 ago – 6 sep 2026. Fuente: data/Agosto PDF. */
+/** Planeación semanal Costayaco · 31 ago – 6 sep 2026. Fuente: data/Costayaco/Agosto PDF. */
 
 export type WeeklyPlanningJob = {
   date: string;
@@ -10,7 +10,7 @@ export type WeeklyPlanningJob = {
 };
 
 export const AGOSTO_WEEKLY_PLANNING = {
-  sourceFile: "data/Agosto/PLANEACION MANTENIMIENTOS SEMANA DEL 31 AL 6 SEP 2026.pdf",
+  sourceFile: "data/Costayaco/Agosto/PLANEACION MANTENIMIENTOS SEMANA DEL 31 AL 6 SEP 2026.pdf",
   title: "Planeación semanal de mantenimiento Costayaco",
   periodLabel: "31 de agosto – 6 de septiembre 2026",
   elaboratedBy: "Juan Carlos Pabón",

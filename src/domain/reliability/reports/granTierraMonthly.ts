@@ -80,11 +80,11 @@ export function generationBreakdown(snapshot: {
   };
 }
 
-/** Datos por mes desde data/GTE, data/Julio/GTE y data/Agosto/Presentación GTE. May–Ago: KPIs oficiales; Ene–Abr: estimados Excel. */
+/** Datos por mes desde data/Costayaco/GTE, data/Costayaco/Julio/GTE y data/Costayaco/Agosto/Presentación GTE. May–Ago: KPIs oficiales; Ene–Abr: estimados Excel. */
 export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMonthlySnapshot> = {
   "Ene": {
     "label": "Enero",
-    "sourceFile": "data/GTE/Enero/Data Soporte Cálculo Copower PUTN Enero 2026 (8).xlsx",
+    "sourceFile": "data/Costayaco/GTE/Enero/Data Soporte Cálculo Copower PUTN Enero 2026 (8).xlsx",
     "summary": {
       "copowerFailures": 4,
       "totalEvents": null,
@@ -544,7 +544,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
   },
   "Feb": {
     "label": "Febrero",
-    "sourceFile": "data/GTE/Febrero/Data Soporte Cálculo Copower PUTN Febrero 2026 (3).xlsx",
+    "sourceFile": "data/Costayaco/GTE/Febrero/Data Soporte Cálculo Copower PUTN Febrero 2026 (3).xlsx",
     "summary": {
       "copowerFailures": 4,
       "totalEvents": null,
@@ -1027,7 +1027,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
   },
   "Mar": {
     "label": "Marzo",
-    "sourceFile": "data/GTE/Marzo/Data Soporte Cálculo Copower PUTN Marzo 2026 (8).xlsx",
+    "sourceFile": "data/Costayaco/GTE/Marzo/Data Soporte Cálculo Copower PUTN Marzo 2026 (8).xlsx",
     "summary": {
       "copowerFailures": 9,
       "totalEvents": null,
@@ -1744,7 +1744,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
   },
   "Abr": {
     "label": "Abril",
-    "sourceFile": "data/GTE/Abril /Data Soporte Cálculo Copower PUTN Abril 2026.xlsx",
+    "sourceFile": "data/Costayaco/GTE/Abril /Data Soporte Cálculo Copower PUTN Abril 2026.xlsx",
     "summary": {
       "copowerFailures": 4,
       "totalEvents": null,
@@ -2315,7 +2315,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
   },
   "May": {
     "label": "Mayo",
-    "sourceFile": "data/GTE/Mayo/Data Soporte Cálculo Copower PUTN Mayo 2026.xlsx",
+    "sourceFile": "data/Costayaco/GTE/Mayo/Data Soporte Cálculo Copower PUTN Mayo 2026.xlsx",
     "summary": {
       "copowerFailures": 7,
       "totalEvents": null,
@@ -2913,7 +2913,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
   },
   "Jun": {
     "label": "Junio",
-    "sourceFile": "data/GTE/Junio/Data Soporte Cálculo Copower PUTN Junio 2026 (1).xlsx",
+    "sourceFile": "data/Costayaco/GTE/Junio/Data Soporte Cálculo Copower PUTN Junio 2026 (1).xlsx",
     "summary": {
       "copowerFailures": 7,
       "totalEvents": 42,
@@ -3745,7 +3745,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
   },
   "Jul": {
       "label": "Julio",
-      "sourceFile": "data/Julio/GTE/Data Soporte Cálculo Copower PUTN Julio 2026.xlsx",
+      "sourceFile": "data/Costayaco/Julio/GTE/Data Soporte Cálculo Copower PUTN Julio 2026.xlsx",
       "summary": {
           "copowerFailures": 3,
           "totalEvents": 109,
@@ -4188,7 +4188,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
               "cause": "12:58 Cascada MRU por sobrepresión manifold CYC (CPW-01/02/03/07, JIN-10/11). Reingreso 14:39–15:23.",
               "downtimeHours": 2.42,
               "responsible": "GTE",
-              "notes": "EVT-2026-07-25-MRU · FO-GE-033 No. 63 · data/Julio/RCA"
+              "notes": "EVT-2026-07-25-MRU · FO-GE-033 No. 63 · data/Costayaco/Julio/RCA"
           },
           {
               "date": "2026-07-24",
@@ -4197,7 +4197,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
               "cause": "07:08 Cascada MRU por disparo reconectador EEP 34.5 kV Junín–Mocoa (CPW-01/02/03/07, JIN-10). Reingreso CPW ~08:40–09:00; JIN-10 19:09.",
               "downtimeHours": 1.87,
               "responsible": "Externo",
-              "notes": "EVT-2026-07-24-MRU · FO-GE-033 No. 62 · data/Julio/RCA"
+              "notes": "EVT-2026-07-24-MRU · FO-GE-033 No. 62 · data/Costayaco/Julio/RCA"
           },
           {
               "date": "2026-07-21",
@@ -4206,7 +4206,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
               "cause": "17:55 Cascada MRU por alto nivel de GLP (CPW-01/02/03/07, JIN-10). Reingreso 21:11–22:32. FS máx. 4,62 h.",
               "downtimeHours": 4.62,
               "responsible": "GTE",
-              "notes": "EVT-2026-07-21-MRU · FO-GE-033 No. 61 · data/Julio/RCA"
+              "notes": "EVT-2026-07-21-MRU · FO-GE-033 No. 61 · data/Costayaco/Julio/RCA"
           },
           {
               "date": "2026-07-21",
@@ -4215,7 +4215,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
               "cause": "15:16 Detonación alta en un cilindro (gas MQT). Stand-by hasta 20:21 (5,08 h). Deslastre 1040→850 kW.",
               "downtimeHours": 5.08,
               "responsible": "GTE + COPOWER",
-              "notes": "EVT-2026-07-21-CPW04 · FO-GE-033 No. 60 · data/Julio/RCA"
+              "notes": "EVT-2026-07-21-CPW04 · FO-GE-033 No. 60 · data/Costayaco/Julio/RCA"
           },
           {
               "date": "2026-07-12",
@@ -4224,7 +4224,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
               "cause": "05:28 Cascada MRU por baja presión de aceite Quincy (CPW-01/03/07, JIN-10/11/12). Reingreso 07:16–08:00. FS máx. 2,53 h.",
               "downtimeHours": 2.53,
               "responsible": "GTE",
-              "notes": "EVT-2026-07-12-MRU · FO-GE-033 No. 58 · data/Julio/RCA"
+              "notes": "EVT-2026-07-12-MRU · FO-GE-033 No. 58 · data/Costayaco/Julio/RCA"
           },
           {
               "date": "2026-07-09",
@@ -5181,7 +5181,7 @@ export const GRAN_TIERRA_MONTHLY_DATA: Record<GranTierraMonthKey, GranTierraMont
 ,
   Ago: {
     "label": "Agosto",
-    "sourceFile": "data/Agosto/Presentación GTE/Data Soporte Cálculo Copower PUTN Agosto 2026.xlsx",
+    "sourceFile": "data/Costayaco/Agosto/Presentación GTE/Data Soporte Cálculo Copower PUTN Agosto 2026.xlsx",
     "summary": {
       "copowerFailures": 0,
       "totalEvents": 128,

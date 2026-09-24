@@ -3,11 +3,11 @@ import { GRAN_TIERRA_MONTHLY_DATA, type GranTierraMonthKey } from "./granTierraM
 
 /** Libro original (recuadro roto). */
 export const DPTO_GENERACION_SOURCE_ORIGINAL =
-  "data/Agosto/data_juanpabon/Reporte Diario de Operaciones GTE Archivo base AGOSTO PARCIAL actualizado.xlsx";
+  "data/Costayaco/Agosto/data_juanpabon/Reporte Diario de Operaciones GTE Archivo base AGOSTO PARCIAL actualizado.xlsx";
 
 /** Libro con tarjetas KPI reenganchadas al Total general (Hoja1 fila 20). */
 export const DPTO_GENERACION_SOURCE =
-  "data/Agosto/data_juanpabon/Reporte Diario de Operaciones GTE AGOSTO PARCIAL - KPIs flota corregidos.xlsx";
+  "data/Costayaco/Agosto/data_juanpabon/Reporte Diario de Operaciones GTE AGOSTO PARCIAL - KPIs flota corregidos.xlsx";
 
 export const DPTO_DASHBOARD_MONTH: CopowerMonthKey = "Ago";
 
@@ -522,12 +522,12 @@ export type IndicadoresCompare = {
 
 /** Bitácora oficial de agosto: el archivo dice 01–23; las filas cierran el 22. */
 export const CONCERTACION_AGO_SOURCE =
-  "data/Agosto/Concertación de horas/Consolidado de Horas concertadas del 01 al 23 de Agosto.xlsx";
+  "data/Costayaco/Agosto/Concertación de horas/Consolidado de Horas concertadas del 01 al 23 de Agosto.xlsx";
 
-export const SABANA_AGO_SOURCE = "data/Agosto/mantenimiento /SABANA MMTOS GEN PUTUMAYO 1 (1).xlsx";
+export const SABANA_AGO_SOURCE = "data/Costayaco/Agosto/mantenimiento /SABANA MMTOS GEN PUTUMAYO 1 (1).xlsx";
 
 export const MTO_PDF_SEMANA_SOURCE =
-  "data/Agosto/mantenimiento /PLANEACION MANTENIMIENTOS SEMANA DEL 31 AL 6 SEP 2026.pdf";
+  "data/Costayaco/Agosto/mantenimiento /PLANEACION MANTENIMIENTOS SEMANA DEL 31 AL 6 SEP 2026.pdf";
 
 /**
  * Cruce 01–22: columna de equipo en GENERACIÓN PUTUMAYO (horas MTO / H-H)

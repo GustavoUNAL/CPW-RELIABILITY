@@ -102,11 +102,11 @@ export type MaintenancePlansPack = {
 };
 
 export const MAINTENANCE_PLANS: MaintenancePlansPack = {
-  "sourceFile": "data/Julio/SABANA MMTOS GEN PUTUMAYO Julio 2026 Mes de Julio.xlsx",
+  "sourceFile": "data/Costayaco/Julio/SABANA MMTOS GEN PUTUMAYO Julio 2026 Mes de Julio.xlsx",
   "sheet": "GENERACIÓN PUTUMAYO",
   "extractedAt": "2026-08-28",
   "title": "Sábana de mantenimientos · Generación Putumayo",
-  "notes": "Agosto 2026 desde data/Agosto/mantenimiento. Julio desde sábana oficial del mes. Ene–Jun y Sep–Dic desde sábana anual.",
+  "notes": "Agosto 2026 desde data/Costayaco/Agosto/mantenimiento. Julio desde sábana oficial del mes. Ene–Jun y Sep–Dic desde sábana anual.",
   "fleet": [
     {
       "equipment": "CPW02",

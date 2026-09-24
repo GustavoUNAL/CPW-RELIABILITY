@@ -5,7 +5,7 @@ import { dirname, resolve } from "node:path";
 const BASE = process.env.INFORME_URL ?? "http://localhost:5175/informes/informe-mensual";
 const OUT = resolve(
   process.env.INFORME_PDF ??
-    "data/Agosto/Informe mensual COPOWER - Agosto 2026.pdf",
+    "data/Costayaco/Agosto/Informe mensual COPOWER - Agosto 2026.pdf",
 );
 const EXE =
   process.env.CHROME_FOR_TESTING ??

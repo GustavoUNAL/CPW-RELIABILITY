@@ -69,7 +69,7 @@ export const DATASET_CATALOG: readonly DatasetEntry[] = [
     consumers: ["mto-dashboard", "mto-optimizacion"],
     period: "2026 · julio ejecutado",
     notes:
-      "Sábana anual + overlay data/Julio/SABANA MMTOS GEN PUTUMAYO Julio 2026. Planes y optimización leen MAINTENANCE_PLANS.",
+      "Sábana anual + overlay data/Costayaco/Julio/SABANA MMTOS GEN PUTUMAYO Julio 2026. Planes y optimización leen MAINTENANCE_PLANS.",
   },
   {
     id: "inventory-minimums",

@@ -4,7 +4,7 @@
     "cliente": "GTE",
     "operador": "COPOWER LTDA.",
     "periodo": "julio 2026",
-    "fuente": "data/Julio/RCA · FO-GE-033 No. 58, 60, 61, 62 y 63",
+    "fuente": "data/Costayaco/Julio/RCA · FO-GE-033 No. 58, 60, 61, 62 y 63",
     "generado": "2026-08-11-julio-fo",
     "flota": {
       "unidades": ["CPW-01", "CPW-02", "CPW-03", "CPW-04", "CPW-07", "JIN-10", "JIN-11", "JIN-12"],
@@ -91,7 +91,7 @@
         "Solicitar SOE/informe Soenergy del Quincy"
       ],
       "relacionados": ["EVT-2026-07-21-MRU", "EVT-2026-07-24-MRU", "EVT-2026-07-25-MRU"],
-      "fuente": "FO-GE-033 No. 58 · 12-jul-2026 · Jose Luis Alvarez / David Cornejo · data/Julio/RCA"
+      "fuente": "FO-GE-033 No. 58 · 12-jul-2026 · Jose Luis Alvarez / David Cornejo · data/Costayaco/Julio/RCA"
     },
     {
       "id": "EVT-2026-07-21-CPW04",
@@ -167,7 +167,7 @@
         "Confirmar si el No. de reporte es 60 (cuerpo) o 54 (nombre de archivo)"
       ],
       "relacionados": ["EVT-2026-07-21-MRU"],
-      "fuente": "FO-GE-033 No. 60 (archivo CPW 04 #54) · 21-jul-2026 15:16 · data/Julio/RCA"
+      "fuente": "FO-GE-033 No. 60 (archivo CPW 04 #54) · 21-jul-2026 15:16 · data/Costayaco/Julio/RCA"
     },
     {
       "id": "EVT-2026-07-21-MRU",
@@ -243,7 +243,7 @@
         "Causa MRU 'aún por definir' — pedir informe Soenergy"
       ],
       "relacionados": ["EVT-2026-07-21-CPW04", "EVT-2026-07-12-MRU", "EVT-2026-07-24-MRU", "EVT-2026-07-25-MRU"],
-      "fuente": "FO-GE-033 No. 61 · 21-jul-2026 17:55 · Jose Luis Alvarez / David Cornejo · data/Julio/RCA"
+      "fuente": "FO-GE-033 No. 61 · 21-jul-2026 17:55 · Jose Luis Alvarez / David Cornejo · data/Costayaco/Julio/RCA"
     },
     {
       "id": "EVT-2026-07-24-MRU",
@@ -319,7 +319,7 @@
         "El archivo fuente se llama app.pdf (FO No. 62)"
       ],
       "relacionados": ["EVT-2026-07-12-MRU", "EVT-2026-07-21-MRU", "EVT-2026-07-25-MRU"],
-      "fuente": "FO-GE-033 No. 62 · 24-jul-2026 · Javier Alberto Montes Losada / David Cornejo · data/Julio/RCA/app.pdf"
+      "fuente": "FO-GE-033 No. 62 · 24-jul-2026 · Javier Alberto Montes Losada / David Cornejo · data/Costayaco/Julio/RCA/app.pdf"
     },
     {
       "id": "EVT-2026-07-25-MRU",
@@ -393,7 +393,7 @@
         "Nombre de archivo #55 vs No. 63 en el cuerpo del FO"
       ],
       "relacionados": ["EVT-2026-07-12-MRU", "EVT-2026-07-21-MRU", "EVT-2026-07-24-MRU"],
-      "fuente": "FO-GE-033 No. 63 (archivo MRU #55) · 25-jul-2026 12:58 · Javier Alberto Montes Losada / David Cornejo · data/Julio/RCA"
+      "fuente": "FO-GE-033 No. 63 (archivo MRU #55) · 25-jul-2026 12:58 · Javier Alberto Montes Losada / David Cornejo · data/Costayaco/Julio/RCA"
     }
   ],
   "analisis_transversal": {

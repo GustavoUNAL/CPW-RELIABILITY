@@ -41,13 +41,13 @@ export function copowerMonthLabel(month: CopowerMonthKey): string {
 }
 
 export const COPOWER_SOURCE_FILE =
-  "data/Datos COPOWER/Reporte_Diario_Costayaco_Vonu 2026 actualizado 34.xlsx";
+  "data/Costayaco/Datos COPOWER/Reporte_Diario_Costayaco_Vonu 2026 actualizado 34.xlsx";
 
 /** Datos operativos COPOWER desde Resumen OP + Eventos + Consumos del reporte diario. */
 export const COPOWER_MONTHLY_DATA: Record<CopowerMonthKey, CopowerMonthlySnapshot> = {
   "Ene": {
     "label": "Enero 2026",
-    "sourceFile": "data/Datos COPOWER/Reporte_Diario_Costayaco_Vonu 2026 actualizado 34.xlsx",
+    "sourceFile": "data/Costayaco/Datos COPOWER/Reporte_Diario_Costayaco_Vonu 2026 actualizado 34.xlsx",
     "summary": {
       "copowerFailures": 0,
       "totalEvents": 0,
@@ -518,7 +518,7 @@ export const COPOWER_MONTHLY_DATA: Record<CopowerMonthKey, CopowerMonthlySnapsho
   },
   "Feb": {
     "label": "Febrero 2026",
-    "sourceFile": "data/Datos COPOWER/Reporte_Diario_Costayaco_Vonu 2026 actualizado 34.xlsx",
+    "sourceFile": "data/Costayaco/Datos COPOWER/Reporte_Diario_Costayaco_Vonu 2026 actualizado 34.xlsx",
     "summary": {
       "copowerFailures": 0,
       "totalEvents": 0,
@@ -1013,7 +1013,7 @@ export const COPOWER_MONTHLY_DATA: Record<CopowerMonthKey, CopowerMonthlySnapsho
   },
   "Mar": {
     "label": "Marzo 2026",
-    "sourceFile": "data/Datos COPOWER/Reporte_Diario_Costayaco_Vonu 2026 actualizado 34.xlsx",
+    "sourceFile": "data/Costayaco/Datos COPOWER/Reporte_Diario_Costayaco_Vonu 2026 actualizado 34.xlsx",
     "summary": {
       "copowerFailures": 0,
       "totalEvents": 0,
@@ -1508,7 +1508,7 @@ export const COPOWER_MONTHLY_DATA: Record<CopowerMonthKey, CopowerMonthlySnapsho
   },
   "Abr": {
     "label": "Abril 2026",
-    "sourceFile": "data/Datos COPOWER/Reporte_Diario_Costayaco_Vonu 2026 actualizado 34.xlsx",
+    "sourceFile": "data/Costayaco/Datos COPOWER/Reporte_Diario_Costayaco_Vonu 2026 actualizado 34.xlsx",
     "summary": {
       "copowerFailures": 0,
       "totalEvents": 0,
@@ -1955,7 +1955,7 @@ export const COPOWER_MONTHLY_DATA: Record<CopowerMonthKey, CopowerMonthlySnapsho
   },
   "May": {
     "label": "Mayo 2026",
-    "sourceFile": "data/Datos COPOWER/Reporte_Diario_Costayaco_Vonu 2026 actualizado 34.xlsx",
+    "sourceFile": "data/Costayaco/Datos COPOWER/Reporte_Diario_Costayaco_Vonu 2026 actualizado 34.xlsx",
     "summary": {
       "copowerFailures": 36,
       "totalEvents": 98,
@@ -3285,7 +3285,7 @@ export const COPOWER_MONTHLY_DATA: Record<CopowerMonthKey, CopowerMonthlySnapsho
   },
   "Jun": {
     "label": "Junio 2026",
-    "sourceFile": "data/Datos COPOWER/Reporte_Diario_Costayaco_Vonu 2026 actualizado 34.xlsx",
+    "sourceFile": "data/Costayaco/Datos COPOWER/Reporte_Diario_Costayaco_Vonu 2026 actualizado 34.xlsx",
     "summary": {
       "copowerFailures": 60,
       "totalEvents": 196,
@@ -5548,7 +5548,7 @@ export const COPOWER_MONTHLY_DATA: Record<CopowerMonthKey, CopowerMonthlySnapsho
   },
   "Jul": {
       "label": "Julio 2026",
-      "sourceFile": "data/Julio/Horas concertadas con GTE (del 01 al 31 julio 2026).xlsx",
+      "sourceFile": "data/Costayaco/Julio/Horas concertadas con GTE (del 01 al 31 julio 2026).xlsx",
       "summary": {
           "copowerFailures": 3,
           "totalEvents": 233,
@@ -8175,7 +8175,7 @@ export const COPOWER_MONTHLY_DATA: Record<CopowerMonthKey, CopowerMonthlySnapsho
 
   "Ago": {
       "label": "Agosto 2026",
-      "sourceFile": "data/Agosto/Consolidado de Horas concertadas del 01 al 31 de Agosto.xlsx · diésel Tcal 01–21 (retiro GTE 21/08)",
+      "sourceFile": "data/Costayaco/Agosto/Consolidado de Horas concertadas del 01 al 31 de Agosto.xlsx · diésel Tcal 01–21 (retiro GTE 21/08)",
       "summary": {
           "copowerFailures": 0,
           "totalEvents": 199,

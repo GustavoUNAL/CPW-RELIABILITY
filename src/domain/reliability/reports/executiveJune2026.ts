@@ -49,7 +49,7 @@ export const EXEC_JUN = {
   hoursPp: 28,
   hoursPfContr: 18.22,
   hoursPfCli: 179.38,
-  /** Casos RCA formales con PDF en data/RCA (1 caso · 2 revisiones del 22-jun salida de la máquina). */
+  /** Casos RCA formales con PDF en data/Costayaco/RCA (1 caso · 2 revisiones del 22-jun salida de la máquina). */
   rcaDelivered: 1,
   rcaRequired: 7,
   excelFailureRows: 10,
@@ -145,7 +145,7 @@ export const EXEC_TREND_CHART = [
 ] as const;
 
 export const EXEC_TREND_FOOTER =
-  "Ene–Abr: Excel Data Soporte de cada mes (carpeta data/GTE — SISTEMA N Costayaco, PF_contr). Mayo: PDF oficial (variación citada en informe junio). Junio: PDF oficial — Análisis Indicadores Copower PUTN Jun 2026 (Gran Tierra).";
+  "Ene–Abr: Excel Data Soporte de cada mes (carpeta data/Costayaco/GTE — SISTEMA N Costayaco, PF_contr). Mayo: PDF oficial (variación citada en informe junio). Junio: PDF oficial — Análisis Indicadores Copower PUTN Jun 2026 (Gran Tierra).";
 
 export const EXEC_ORDEN1_VALUE_NOTE =
   "Orden de Servicio Costayaco (Orden 1) · valor estimado: COP $5.000.000.000 · cláusula penal 15% = COP $750.000.000";

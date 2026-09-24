@@ -1,7 +1,7 @@
 /**
  * ETL agosto 2026: concertación 01–23 → copowerMonthly + concertacionHoursData.
  *
- * Fuente: data/Agosto/Concertación de horas/Consolidado de Horas concertadas del 01 al 23 de Agosto.xlsx
+ * Fuente: data/Costayaco/Agosto/Concertación de horas/Consolidado de Horas concertadas del 01 al 23 de Agosto.xlsx
  * Uso: node scripts/etl-agosto.mjs
  */
 import fs from "node:fs";
@@ -9,10 +9,10 @@ import path from "node:path";
 import XLSX from "xlsx";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
-const AGOSTO_DIR = path.join(ROOT, "data", "Agosto");
+const AGOSTO_DIR = path.join(ROOT, "data", "Costayaco", "Agosto");
 const concFolder = fs.readdirSync(AGOSTO_DIR).find((d) => /concert/i.test(d));
 if (!concFolder) {
-  console.error("No se encontró carpeta de concertación en data/Agosto");
+  console.error("No se encontró carpeta de concertación en data/Costayaco/Agosto");
   process.exit(1);
 }
 const xlsxName = fs
@@ -458,7 +458,7 @@ const pack = JSON.parse(concSrc.slice(jsonAssign, jsonEnd + 2));
 pack.sourceFile = `${pack.sourceFile} · ${REL_SOURCE}`;
 pack.extractedAt = new Date().toISOString().slice(0, 10);
 pack.notes =
-  "Horas concertadas GTE. May–Jul desde archivo de julio; agosto 01–23 desde data/Agosto. Ventana parcial (no cierra el mes).";
+  "Horas concertadas GTE. May–Jul desde archivo de julio; agosto 01–23 desde data/Costayaco/Agosto. Ventana parcial (no cierra el mes).";
 pack.months.Ago = agoPack;
 const agoGen = {
   month: "Ago",

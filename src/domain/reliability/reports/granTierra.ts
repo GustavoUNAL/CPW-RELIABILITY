@@ -4,7 +4,7 @@ export const granTierraReport: ReportDataset = {
   title: "Reporte Gran Tierra Energy",
   subtitle:
     "Indicadores oficiales donde hay fuente (julio y junio PDF; mayo sistémico citado en informe de junio). Ene–Abr: horas/fallas/energía del Excel Data Soporte.",
-  source: "data/GTE (Ene–Jun) + data/Julio/GTE (XLSX Data Soporte + PDF Análisis Indicadores JUL 2026)",
+  source: "data/Costayaco/GTE (Ene–Jun) + data/Costayaco/Julio/GTE (XLSX Data Soporte + PDF Análisis Indicadores JUL 2026)",
   // kpiData es fallback; la app GTE usa GRAN_TIERRA_KPI_FROM_MONTHS.
   kpiData: [
     { month: "Ene", availability: null, reliability: null, maintainability: null, generationMwh: 0, operationalLossesMwh: null, contractualCompliance: null },

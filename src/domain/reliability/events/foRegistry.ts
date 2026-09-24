@@ -112,7 +112,7 @@ export const FO_REGISTRY: FoRegistryEntry[] = [
     pfCliHours: 0,
     pfContrHours: 3.92,
     fallaEvento: 1,
-    folder: "data/RCA/Reporte de falla/",
+    folder: "data/Costayaco/RCA/Reporte de falla/",
     note: "Enviado. GTE imputó PF_contr. ≈ 2.620 kWh.",
   },
   {
@@ -132,7 +132,7 @@ export const FO_REGISTRY: FoRegistryEntry[] = [
     pfCliHours: null,
     pfContrHours: 0,
     fallaEvento: 0,
-    folder: "data/RCA/",
+    folder: "data/Costayaco/RCA/",
     note: "RCA Sec. 30 entregado. No es FO-GE-033. No baja Conf COPOWER.",
   },
   {
@@ -152,7 +152,7 @@ export const FO_REGISTRY: FoRegistryEntry[] = [
     pfCliHours: 0,
     pfContrHours: 3,
     fallaEvento: 1,
-    folder: "data/RCA/Reporte de falla/",
+    folder: "data/Costayaco/RCA/Reporte de falla/",
     note: "FO enviado como externo. GTE imputó 1 h CPW-04 + 2 h CPW-05 PF_contr. Reclamar: no es órgano COPOWER.",
   },
   {
@@ -172,7 +172,7 @@ export const FO_REGISTRY: FoRegistryEntry[] = [
     pfCliHours: 0,
     pfContrHours: 2.3,
     fallaEvento: 1,
-    folder: "data/RCA/Reporte de falla/",
+    folder: "data/Costayaco/RCA/Reporte de falla/",
     note: "GTE imputó 2,30 h PF_contr. Riesgo de penalización; RCA pendiente.",
   },
   {
@@ -192,7 +192,7 @@ export const FO_REGISTRY: FoRegistryEntry[] = [
     pfCliHours: 0.38,
     pfContrHours: 0,
     fallaEvento: 0,
-    folder: "data/RCA/Reporte de falla/",
+    folder: "data/Costayaco/RCA/Reporte de falla/",
     note: "Enviado. PF_cli · no baja Conf COPOWER.",
   },
   {
@@ -212,7 +212,7 @@ export const FO_REGISTRY: FoRegistryEntry[] = [
     pfCliHours: 0,
     pfContrHours: 0,
     fallaEvento: 0,
-    folder: "data/Julio/fallas/12/",
+    folder: "data/Costayaco/Julio/fallas/12/",
     note: "Entregado GTE. SB · Falla_evento 0. ≈ 6.936 kWh.",
   },
   {
@@ -232,7 +232,7 @@ export const FO_REGISTRY: FoRegistryEntry[] = [
     pfCliHours: 5,
     pfContrHours: 0,
     fallaEvento: 0,
-    folder: "data/Julio/fallas/21/",
+    folder: "data/Costayaco/Julio/fallas/21/",
     note: "Padre del evento 02-sep. Concertación imputó PF_cli, no falla COPOWER. Archivo #54.",
   },
   {
@@ -252,7 +252,7 @@ export const FO_REGISTRY: FoRegistryEntry[] = [
     pfCliHours: 32,
     pfContrHours: 0,
     fallaEvento: 0,
-    folder: "data/Julio/fallas/21/",
+    folder: "data/Costayaco/Julio/fallas/21/",
     note: "Entregado. PF_cli · no baja Conf COPOWER. ≈ 11.872 kWh.",
   },
   {
@@ -272,7 +272,7 @@ export const FO_REGISTRY: FoRegistryEntry[] = [
     pfCliHours: 0,
     pfContrHours: 0,
     fallaEvento: 0,
-    folder: "data/Julio/fallas/24/",
+    folder: "data/Costayaco/Julio/fallas/24/",
     note: "Entregado (app.pdf). SB · no baja Conf COPOWER.",
   },
   {
@@ -292,7 +292,7 @@ export const FO_REGISTRY: FoRegistryEntry[] = [
     pfCliHours: 0,
     pfContrHours: 0,
     fallaEvento: 0,
-    folder: "data/Julio/fallas/25/",
+    folder: "data/Costayaco/Julio/fallas/25/",
     note: "Entregado (archivo #55). SB · Falla_evento 0.",
   },
   {
@@ -312,7 +312,7 @@ export const FO_REGISTRY: FoRegistryEntry[] = [
     pfCliHours: 3.33,
     pfContrHours: 0,
     fallaEvento: 0,
-    folder: "data/Septiembre/fallas/02/",
+    folder: "data/Costayaco/Septiembre/fallas/02/",
     note: "Pack listo. Imputar 3,33 h SB · PF_cli · Falla 0 · Correctivo 0. Mismo modo que FO No. 60.",
   },
   {
@@ -332,7 +332,7 @@ export const FO_REGISTRY: FoRegistryEntry[] = [
     pfCliHours: 0,
     pfContrHours: 0.06,
     fallaEvento: 1,
-    folder: "data/Septiembre/entrega/FO-GE-033-2026-09-06-CPW07/",
+    folder: "data/Costayaco/Septiembre/entrega/FO-GE-033-2026-09-06-CPW07/",
     note: "Pack en entrega. El FO declara falla imputable al grupo (no PF_cli). Fuera de línea ≈ 4 min.",
   },
 ];

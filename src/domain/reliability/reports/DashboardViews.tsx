@@ -533,7 +533,7 @@ export function DashboardOverview({ month, monthLabel }: MonthProps) {
     alerts.push({
       active: pendingRca > 0,
       title: "RCA formales pendientes de entrega",
-      detail: `${EXEC_JUN.rcaDelivered}/${EXEC_JUN.rcaRequired} casos con PDF en data/RCA · restan ${pendingRca} · riesgo multa 4% adicional`,
+      detail: `${EXEC_JUN.rcaDelivered}/${EXEC_JUN.rcaRequired} casos con PDF en data/Costayaco/RCA · restan ${pendingRca} · riesgo multa 4% adicional`,
     });
   }
 

@@ -7,10 +7,10 @@ import path from "node:path";
 import XLSX from "xlsx";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
-const dataRoot = path.join(ROOT, "data");
+const dataRoot = path.join(ROOT, "data", "Costayaco");
 const maintDir = fs.readdirSync(dataRoot).find((d) => /^mantenimiento$/i.test(d.trim()));
 if (!maintDir) {
-  console.error("No se encontró carpeta data/Mantenimiento");
+  console.error("No se encontró carpeta data/Costayaco/Mantenimiento");
   process.exit(1);
 }
 const xlsxName = fs
@@ -461,9 +461,9 @@ const payload = {
   extractedAt: new Date().toISOString().slice(0, 10),
   title: "Sábana de mantenimientos · Generación Putumayo",
   notes: AGOSTO_PATH
-    ? "Agosto 2026 desde data/Agosto/mantenimiento. Julio desde sábana oficial del mes. Ene–Jun y Sep–Dic desde sábana anual."
+    ? "Agosto 2026 desde data/Costayaco/Agosto/mantenimiento. Julio desde sábana oficial del mes. Ene–Jun y Sep–Dic desde sábana anual."
     : JULIO_PATH
-      ? "Julio 2026 ejecutado desde sábana oficial del mes. Ene–Jun y Ago–Dic desde sábana anual data/Mantenimiento."
+      ? "Julio 2026 ejecutado desde sábana oficial del mes. Ene–Jun y Ago–Dic desde sábana anual data/Costayaco/Mantenimiento."
       : "Calendario diario 2026, control de ejecución y catálogo de periodicidad.",
   fleet: units.map((u) => ({ equipment: u.equipment, model: u.model })),
   catalog,

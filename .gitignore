@@ -1,15 +1,33 @@
-node_modules
-dist
-.pycache
+# Dependencias y build
+node_modules/
+dist/
+.pycache/
 *.tsbuildinfo
 *.DS_Store
+.pw-browsers/
+logs/
+
+# IDE / local
+.vscode/
+.idea/
+
+# Temporales Excel
 ~$*.xlsx
-# Excel de inventario (~100MB+) — regenerar con npm run etl:inventario
+
+# --- Fuentes pesadas (solo local; ver data/README.md) ---
+# Inventarios de bodega (~100MB–400MB). Regenerar snapshot: npm run etl:inventario
 **/INVENTARIO*.xlsx
+
+# Reportes diarios Costayaco–Vonú (~60MB+). ETL lee la copia local.
+**/Reporte_Diario*.xlsx
+**/Reporte Diario*.xlsx
+
+# Analytics / carpetas de trabajo no versionadas
+data/analytics/
 data/mantenimiento\ /
 
-logs/
-data/analytics/
-.pw-browsers/
-vite
-confiabilidad@1.0.0
+# Dumps de controlador (opcional; suelen ir dentro de zips de falla)
+*.usw
+
+# Borradores locales
+**/para basarse*.xlsx

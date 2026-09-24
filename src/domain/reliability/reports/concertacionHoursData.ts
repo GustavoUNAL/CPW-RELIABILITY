@@ -82,7 +82,7 @@ export type ConcertacionPack = {
 };
 
 export const CONCERTACION_HOURS: ConcertacionPack = {
-  "sourceFile": "data/concertacion horas/Horas concertadas con GTE del 01 al 31 julio 2026.xlsx + data/Agosto/Consolidado de Horas concertadas del 01 al 31 de Agosto.xlsx",
+  "sourceFile": "data/Costayaco/concertacion horas/Horas concertadas con GTE del 01 al 31 julio 2026.xlsx + data/Costayaco/Agosto/Consolidado de Horas concertadas del 01 al 31 de Agosto.xlsx",
   "extractedAt": "2026-09-02",
   "notes": "Horas concertadas GTE. Julio 01–31; May–Jun parcial 12–28; agosto 01–31. Disponibilidad de pack = OP / (OP+SB+MMT+ext).",
   "months": {

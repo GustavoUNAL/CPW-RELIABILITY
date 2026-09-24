@@ -34,7 +34,7 @@ export const COPOWER_PROFILE = {
   activeOrders: [
     {
       orderNo: "1200005030",
-      sourceFile: "data/contratos/costayaco.pdf",
+      sourceFile: "data/Costayaco/contratos/costayaco.pdf",
       object: "Generación a gas 8 MW en renta — Costayaco + Vonú (13,8 kV / 0,48 kV)",
       term: "01.12.2025 → 30.11.2028",
       estimatedValue: "COP $5.000 MM (referencia multas / cláusula penal)",
@@ -44,7 +44,7 @@ export const COPOWER_PROFILE = {
     },
     {
       orderNo: "9000007071",
-      sourceFile: "data/contratos/vonus.pdf",
+      sourceFile: "data/Costayaco/contratos/vonus.pdf",
       object: "Renta generadores gas/diésel y equipos periféricos — Costayaco + Vonú",
       term: "01.09.2025 → 30.09.2026",
       estimatedValue: "COP $3.000 MM (referencia multas / cláusula penal)",

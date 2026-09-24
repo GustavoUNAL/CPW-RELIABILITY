@@ -111,7 +111,7 @@ export function MarcoContractual({ leaf, report, month, monthLabel }: Props) {
   const mttr = snap?.summary.mttrHours ?? null;
   const failures = snap?.summary.copowerFailures ?? 0;
   const band = reliability == null ? null : getReliabilityDeduction(reliability);
-  const sourceFile = snap?.sourceFile ?? (isGte ? "data/GTE" : "Reporte diario COPOWER");
+  const sourceFile = snap?.sourceFile ?? (isGte ? "data/Costayaco/GTE" : "Reporte diario COPOWER");
 
   const rcaRequired = month === "Jun" && isGte ? EXEC_JUN.rcaRequired : null;
   const rcaDelivered = month === "Jun" && isGte ? EXEC_JUN.rcaDelivered : null;
@@ -685,7 +685,7 @@ export function MarcoContractual({ leaf, report, month, monthLabel }: Props) {
               </>
             ) : (
               <>
-                <p className="muted">Fuente: contratos / órdenes en data/contratos · validación vs fecha del informe.</p>
+                <p className="muted">Fuente: contratos / órdenes en data/Costayaco/contratos · validación vs fecha del informe.</p>
                 <div className="table-scroll">
                   <table className="contract-matrix">
                     <thead>

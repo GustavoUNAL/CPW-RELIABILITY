@@ -129,12 +129,12 @@ try {
   else ok("rca", `${real.length} fichas reales · ${eventos.length - real.length} plantilla(s)`);
   if (real.length < 9) warn("rca", `Pocas fichas reales (${real.length})`);
 
-  const dataCopy = "data/RCA/eventos_falla_costayaco_junio_2026.json";
+  const dataCopy = "data/Costayaco/RCA/eventos_falla_costayaco_junio_2026.json";
   if (exists(dataCopy)) {
     const a = read("src/domain/reliability/rca/eventos_falla_costayaco_junio_2026.json");
     const b = read(dataCopy);
-    if (a === b) ok("rca", "Copia data/RCA sincronizada con seed src/");
-    else warn("rca", "data/RCA/eventos… diverge del seed en src/ — usar solo src como verdad");
+    if (a === b) ok("rca", "Copia data/Costayaco/RCA sincronizada con seed src/");
+    else warn("rca", "data/Costayaco/RCA/eventos… diverge del seed en src/ — usar solo src como verdad");
   }
 } catch (e) {
   error("rca", String(e.message || e));
@@ -236,11 +236,11 @@ try {
       }
     }
     if (
-      exists("data/concertacion horas/Horas concertadas con GTE del 01 al 31 julio 2026.xlsx")
+      exists("data/Costayaco/concertacion horas/Horas concertadas con GTE del 01 al 31 julio 2026.xlsx")
     ) {
       ok("concertacion", "Excel fuente horas concertadas presente");
     } else {
-      warn("concertacion", "Falta Excel fuente en data/concertacion horas/");
+      warn("concertacion", "Falta Excel fuente en data/Costayaco/concertacion horas/");
     }
   }
 } catch (e) {
