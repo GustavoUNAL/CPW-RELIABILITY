@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Informe de confiabilidad · Acordionero Pad 4 · Septiembre 2026</title>
+<!--
+  Archivo para editar. Cada lámina es un <article class="slide">.
+  Indicadores contractuales: anexo GTE de septiembre (N+1).
+  Fondo: slide-bg.png
+-->
+<style>
+@page { size: 10in 7.5in; margin: 0; }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: #fff; }
+body { font-family: Arial, Helvetica, sans-serif; color: #1e293b; }
+.slide {
+  position: relative; width: 10in; height: 7.5in; overflow: hidden;
+  page-break-after: always; break-after: page;
+  background: #fff url("slide-bg.png") 0 0 / 100% 100% no-repeat;
+}
+.slide:last-child { page-break-after: auto; break-after: auto; }
+.pad {
+  position: absolute; z-index: 1; left: 0.42in; right: 0.42in; top: 1.05in; bottom: 1.12in;
+  display: flex; flex-direction: column; gap: 0.07in;
+}
+h2.title { margin: 0; color: #1E3A5F; font-size: 16pt; font-weight: 700; line-height: 1.05; }
+.kpis { display: grid; gap: 6px; }
+.k6 { grid-template-columns: repeat(6, 1fr); }
+.k4 { grid-template-columns: repeat(4, 1fr); }
+.k3 { grid-template-columns: repeat(3, 1fr); }
+.kpis article { background: #fff; border: 1px solid #e6ebf1; border-radius: 8px; padding: 5px 8px 4px; min-width: 0; }
+.kpis article.ok { background: #ecfdf5; }
+.kpis article.warn { background: #fff7ed; }
+.kpis article.bad { background: #ffedd5; }
+.kpis article.blue { background: #eff6ff; }
+.kpis span { display: block; font-size: 6.7pt; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #64748b; }
+.kpis strong { display: block; margin-top: 1px; font-size: 13.5pt; letter-spacing: -0.03em; color: #0f172a; line-height: 1.05; }
+.kpis small { display: block; margin-top: 1px; font-size: 7pt; color: #64748b; line-height: 1.25; }
+.sites { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+.sites article { background: #fff; border: 1px solid #e6ebf1; border-radius: 8px; padding: 6px 9px 7px; }
+.sites article.p { border-top: 3px solid #1E3A5F; }
+.sites article.c { border-top: 3px solid #c2410c; }
+.sites article.v { border-top: 3px solid #0f766e; }
+.sites h3 { margin: 0; font-size: 10pt; color: #1E3A5F; }
+.sites .sub { margin: 1px 0 4px; font-size: 7pt; color: #64748b; }
+.sites dl { margin: 0; display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; }
+.sites dt { font-size: 7.4pt; color: #64748b; }
+.sites dd { margin: 0; font-size: 9.5pt; font-weight: 700; text-align: right; color: #0f172a; font-variant-numeric: tabular-nums; }
+.sites dd.ok { color: #047857; }
+.sites dd.warn { color: #9a3412; }
+.trend { flex: 1; min-height: 0; background: #fff; border: 1px solid #e6ebf1; border-radius: 8px; padding: 6px 10px 4px; display: flex; flex-direction: column; }
+.trend-head { display: flex; justify-content: space-between; align-items: baseline; }
+.trend-head h4 { margin: 0; font-size: 8pt; color: #1E3A5F; }
+.trend svg { flex: 1; min-height: 0; width: 100%; height: 100%; display: block; }
+.leg { margin: 0; font-size: 7pt; color: #64748b; }
+.mbars { flex: 1; display: flex; align-items: stretch; gap: 10px; min-height: 0; padding-top: 2px; }
+.mbars div { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; }
+.mbars strong { font-size: 7pt; color: #1E3A5F; margin-bottom: 2px; }
+.mbars b { flex: 1; width: 100%; min-height: 0; display: flex; align-items: flex-end; justify-content: center; }
+.mbars i { display: block; width: 70%; max-width: 36px; border-radius: 3px 3px 0 0; background: #1E3A5F; }
+.mbars i.now { background: #C0392B; }
+.mbars span { font-size: 7.5pt; color: #64748b; margin-top: 3px; height: 14px; }
+.split { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 8px; flex: 1; min-height: 0; }
+.split.eq { grid-template-columns: 1fr 1fr; }
+.panel { background: #fff; border: 1px solid #e6ebf1; border-radius: 8px; padding: 7px 10px; min-height: 0; display: flex; flex-direction: column; }
+.panel h3 { margin: 0 0 6px; font-size: 8pt; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: #1E3A5F; }
+.hlist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.hlist li { display: grid; grid-template-columns: 52px 1fr 52px; gap: 8px; align-items: center; font-size: 9pt; color: #334155; }
+.hlist b { display: block; height: 8px; background: #1E3A5F; border-radius: 2px; }
+.hlist b.bad { background: #c2410c; }
+.hlist em { font-style: normal; text-align: right; font-variant-numeric: tabular-nums; }
+.hlist.wide li { grid-template-columns: 86px 1fr 48px; font-size: 12pt; }
+.hlist.wide b { height: 18px; border-radius: 3px; }
+.panel > .hlist.pack { flex: none; justify-content: flex-start; gap: 22px; }
+.hlist.parts li { grid-template-columns: 118px 1fr 28px; font-size: 10pt; }
+.hlist.parts b { height: 12px; }
+.hlist.parts small { display: block; font-size: 7pt; color: #94a3b8; font-weight: 600; }
+.stack { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
+.stack article { flex: 1; background: #fff; border: 1px solid #e6ebf1; border-radius: 8px; padding: 8px 12px; display: flex; flex-direction: column; justify-content: center; }
+.stack h3 { margin: 0; font-size: 12pt; color: #1E3A5F; }
+.stack p { margin: 3px 0 0; font-size: 9pt; line-height: 1.3; color: #475569; }
+.vbars { flex: 1; display: flex; align-items: flex-end; justify-content: space-between; gap: 6px; min-height: 1.6in; }
+.vbars div { flex: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
+.vbars i { display: block; width: 100%; max-width: 26px; border-radius: 3px 3px 0 0; background: #1E3A5F; }
+.vbars i.bad { background: #c2410c; }
+.vbars strong { font-size: 7pt; color: #1E3A5F; margin-bottom: 2px; }
+.vbars span { font-size: 6.5pt; color: #64748b; margin-top: 3px; }
+.vbars.modos { min-height: 0; }
+.vbars.modos i { max-width: 78px; }
+.vbars.modos strong { font-size: 12pt; }
+.vbars.modos span { font-size: 11pt; color: #1E3A5F; font-weight: 700; }
+table { width: 100%; border-collapse: collapse; background: #fff; }
+table.mto { border: 1px solid #e6ebf1; border-radius: 8px; overflow: hidden; }
+table.mto th { background: #1E3A5F; color: #fff; text-align: left; font-size: 7pt; letter-spacing: 0.03em; text-transform: uppercase; padding: 4px 6px; border: 0; }
+table.mto td { font-size: 8pt; padding: 2px 6px; border-bottom: 1px solid #eef2f6; vertical-align: middle; }
+.pad > table.mto:last-child,
+.panel > table.mto,
+.panel > table.evt { flex: 1 1 auto; height: auto; min-height: 0; }
+.panel > .hlist { flex: 1; justify-content: space-between; }
+.split.tight { flex: 0 0 auto; align-items: start; }
+.split.tight .hlist { flex: none; justify-content: flex-start; gap: 6px; }
+.split.tight .hlist li { font-size: 11pt; grid-template-columns: 58px 1fr 58px; }
+.split.tight .hlist b { height: 16px; border-radius: 3px; }
+table.mto tr.bloque td { background: #eff6ff; font-weight: 700; }
+table.mto td.num, table.mto th.num { text-align: right; font-variant-numeric: tabular-nums; }
+td.bad { color: #9a3412; font-weight: 700; }
+td.ok { color: #047857; font-weight: 700; }
+.hours { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
+.hours li { display: grid; grid-template-columns: 46px 1fr 52px; gap: 6px; align-items: center; font-size: 8pt; }
+.track { display: flex; height: 11px; background: #eef2f6; border-radius: 3px; overflow: hidden; }
+.track i { display: block; height: 100%; }
+.track .op { background: #1E3A5F; }
+.track .sb { background: #7eb6c9; }
+.track .mt { background: #e8a87c; }
+.track .fs { background: #c2410c; }
+.key { display: flex; gap: 12px; margin: 0 0 6px; font-size: 7.5pt; color: #64748b; }
+.key i { display: inline-block; width: 10px; height: 8px; margin-right: 3px; vertical-align: middle; border-radius: 1px; }
+.cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.card { background: #fff; border: 1px solid #e6ebf1; border-radius: 8px; padding: 6px 8px 5px; }
+.card.bad { background: #fff7ed; border-color: #fdba74; }
+.card header { display: flex; justify-content: space-between; align-items: baseline; }
+.card h3 { margin: 0; font-size: 9.5pt; color: #1E3A5F; }
+.card header em { font-style: normal; font-size: 7pt; font-weight: 800; }
+.card header em.no { color: #9a3412; }
+.card header em.si { color: #047857; }
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin-top: 3px; }
+.metrics b { display: block; font-size: 9pt; color: #0f172a; }
+.metrics span { font-size: 6pt; font-weight: 800; letter-spacing: 0.03em; color: #94a3b8; }
+.metrics .bad b { color: #9a3412; }
+.card p { margin: 3px 0 0; font-size: 6.5pt; line-height: 1.3; color: #64748b; }
+table.evt { border: 1px solid #e6ebf1; border-radius: 8px; overflow: hidden; }
+table.evt th { background: #1E3A5F; color: #fff; text-align: left; font-size: 7pt; letter-spacing: 0.03em; text-transform: uppercase; padding: 4px 6px; }
+table.evt td { font-size: 7.3pt; padding: 2px 6px; border-bottom: 1px solid #eef2f6; vertical-align: top; line-height: 1.25; }
+table.evt td.hora { text-align: right; font-weight: 700; color: #1E3A5F; font-variant-numeric: tabular-nums; white-space: nowrap; }
+table.evt td:first-child { white-space: nowrap; width: 1%; }
+table.evt td b { color: #1E3A5F; }
+table.evt tr.cop td:first-child { box-shadow: inset 3px 0 0 #c2410c; }
+table.evt tr.ext td:first-child { box-shadow: inset 3px 0 0 #94a3b8; }
+ol.conc { margin: 0.06in 0 0; padding: 0 0 0 1.35em; flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: space-between; }
+ol.conc li { font-size: 14.5pt; line-height: 1.28; color: #334155; }
+ol.conc li::marker { color: #C0392B; font-weight: 800; }
+ol.conc strong { display: block; margin: 0 0 3px; color: #1E3A5F; font-size: 16pt; line-height: 1.15; }
+.cover { position: absolute; z-index: 1; inset: 0; display: flex; flex-direction: column; }
+.hero { padding: 1.95in 1.05in 0; }
+.kicker { margin: 0; color: #C0392B; font-weight: 800; letter-spacing: 0.08em; font-size: 13pt; }
+.hero h1 { margin: 6px 0 0; color: #172D49; font-size: 28pt; line-height: 1.02; }
+.month { margin: 8px 0 0; color: #C0392B; font-weight: 800; letter-spacing: 0.04em; font-size: 16pt; }
+.hero hr { width: 2.1in; margin: 10px 0 12px; border: 0; border-top: 3px solid #0a6b73; }
+.hero h2 { margin: 0; color: #1E3A5F; font-size: 12pt; }
+.author { margin: 12px 0 0; color: #172D49; font-size: 10pt; line-height: 1.4; }
+.method { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; flex: 1; min-height: 0; }
+.method.note { flex: 0 0 auto; margin-bottom: 0.04in; }
+.method.note article { justify-content: flex-start; gap: 4px; padding: 10px 14px 12px; }
+.pad > table.mto.grow { flex: 1 1 auto; height: auto; min-height: 0; }
+.method article { min-height: 0; }
+.method article > table.mto { flex: 1 1 auto; height: auto; min-height: 0; margin-top: 6px; }
+.method article { background: #fff; border: 1px solid #e6ebf1; border-radius: 8px; padding: 8px 10px 10px; display: flex; flex-direction: column; justify-content: space-between; gap: 6px; }
+.method article.d { border-top: 3px solid #1E3A5F; }
+.method article.a { border-top: 3px solid #c2410c; }
+.method h4 { margin: 0; font-size: 9pt; color: #1E3A5F; }
+.regla { margin: 0; font-size: 8pt; line-height: 1.3; color: #475569; }
+.frac-row { display: flex; align-items: center; gap: 8px; }
+.frac { display: flex; flex-direction: column; align-items: center; min-width: 130px; color: #1E3A5F; font-size: 8.5pt; font-weight: 700; text-align: center; line-height: 1.15; }
+.frac i { display: block; width: 100%; height: 1.5px; margin: 2px 0; background: #1E3A5F; }
+.frac-row em { font-style: normal; font-size: 14pt; font-weight: 700; color: #0f172a; }
+.pn { position: absolute; z-index: 2; right: 0.42in; bottom: 0.22in; color: #fff; font-size: 9pt; font-weight: 700; }
+table.mto.cfg { flex: 1 1 auto; height: auto; min-height: 0; }
+table.mto.cfg td { padding: 2px 6px; font-size: 7.6pt; }
+table.mto.cfg th { padding: 3px 6px; }
+table.mto.cfg tr.j420 td { background: #fff7ed; }
+table.mto.cfg tr.j320 td { background: #f8fbff; }
+table.mto.cfg tr.jin td { background: #f0fdf4; }
+.flota { flex: 0 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 0.04in; }
+.flota article { border: 1px solid #e6ebf1; border-radius: 8px; overflow: hidden; background: #fff; display: flex; flex-direction: column; }
+.flota header { text-align: center; padding: 4px 8px 3px; }
+.flota article.j420 header { background: #fff1e4; }
+.flota article.j320 header { background: #e7f2fb; }
+.flota article.jin header { background: #e8f6ec; }
+.flota h3 { margin: 0; font-size: 11pt; color: #1E3A5F; }
+.flota header p { margin: 0; font-size: 7.2pt; color: #334155; line-height: 1.25; }
+.flota .cuerpo { display: grid; grid-template-rows: auto auto; align-items: center; gap: 4px; padding: 4px 6px 6px; }
+.flota img { width: 100%; max-width: 100%; height: auto; max-height: 1.62in; object-fit: contain; object-position: center; display: block; }
+.flota ul { position: relative; z-index: 1; display: flex; flex-wrap: wrap; justify-content: center; align-content: center; gap: 4px; margin: 0; padding: 0; list-style: none; border: 0; background: transparent; }
+.flota li { font-size: 9pt; line-height: 1.15; padding: 3px 7px; text-align: center; color: #1E3A5F; border: 1px solid #d5e0ea; border-radius: 4px; font-weight: 700; background: #fff; }
+.flota li.lab { background: #1E3A5F; color: #fff; border-color: #1E3A5F; font-size: 7.5pt; letter-spacing: 0.03em; }
+.days { flex: 1; min-height: 0; background: #fff; border: 1px solid #e6ebf1; border-radius: 8px; padding: 4px 8px 2px; display: flex; flex-direction: column; }
+.bars { display: flex; align-items: flex-end; gap: 2px; flex: 1; min-height: 1.15in; }
+.bars > div { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
+.bars span { display: block; width: 100%; border-radius: 2px 2px 0 0; background: #1E3A5F; }
+.bars em { font-style: normal; font-size: 6pt; color: #64748b; height: 11px; }
+.bars span.peak { background: #0f766e; }
+.gen { flex: 1; min-height: 0; display: grid; grid-template-rows: 1.05fr 0.95fr; gap: 8px; }
+.pairs { background: #fff; border: 1px solid #e6ebf1; border-radius: 8px; padding: 6px 10px 4px; display: flex; flex-direction: column; min-height: 0; }
+.pairrow { flex: 1; min-height: 0; display: flex; align-items: stretch; gap: 8px; }
+.pairrow > div { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; }
+.pairrow .cols { flex: 1; width: 100%; min-height: 0; display: flex; align-items: flex-end; justify-content: center; gap: 5px; }
+.pairrow .cols i { display: block; width: 18px; border-radius: 3px 3px 0 0; min-height: 4px; }
+.pairrow .cols i.ago { background: #cbd5e1; }
+.pairrow .cols i.sep { background: #1E3A5F; }
+.pairrow .cols i.sep.down { background: #c2410c; }
+.pairrow strong { font-size: 8pt; line-height: 1; margin-bottom: 3px; }
+.pairrow strong.up { color: #047857; }
+.pairrow strong.down { color: #9a3412; }
+.pairrow span { font-size: 8pt; font-weight: 700; color: #1E3A5F; margin-top: 3px; }
+.pairrow em { font-style: normal; font-size: 6.5pt; color: #64748b; }
+.chips { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.chips li { background: #fff; border: 1px solid #e6ebf1; border-radius: 8px; padding: 6px 8px; }
+.chips strong { display: block; font-size: 13pt; color: #0f172a; }
+.chips span { display: block; margin-top: 2px; font-size: 7.2pt; line-height: 1.3; color: #475569; }
+.chips.big { flex: 1; min-height: 0; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 8px; }
+.chips.big li { padding: 12px 16px; display: flex; flex-direction: column; justify-content: center; }
+.chips.big strong { font-size: 16pt; }
+.chips.big span { font-size: 11pt; line-height: 1.35; margin-top: 8px; }
+.chips.big i { display: block; height: 8px; margin-top: 10px; border-radius: 3px; background: #1E3A5F; }
+.chips.big li.warn i { background: #c2410c; }
+@media screen { html, body { background: #e8eef4; } body { padding: 12px 0 24px; } }
+@media print {
+  .slide { zoom: 1 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+</head>
+<body>
+
+<article class="slide">
+  <div class="cover"><div class="hero">
+    <p class="kicker">INFORME MENSUAL · INDICADORES ACR PAD 4</p>
+    <h1>INDICADORES DE CONFIABILIDAD</h1>
+    <p class="month">SEPTIEMBRE 2026</p><hr>
+    <h2>PARQUE DE GENERACIÓN ACORDIONERO · PAD 4</h2>
+    <p class="author">Gustavo Arteaga<br>innovacion.confiabilidad@copower.com.co</p>
+  </div></div>
+  <span class="pn">1</span>
+</article>
+
+<!-- LÁMINA 2 · Cifras del anexo GTE, esquema N+1 -->
+<article class="slide">
+  <div class="pad">
+    <h2 class="title">Resumen ejecutivo</h2>
+    <div class="sites">
+      <article class="p">
+        <h3>N+1 operacional</h3>
+        <p class="sub">Bloque completo · 01–30 sep</p>
+        <dl>
+          <dt>Energía</dt><dd>3.860,1 MWh</dd>
+          <dt>Disponibilidad</dt><dd class="ok">100 %</dd>
+          <dt>Confiabilidad</dt><dd class="ok">100 %</dd>
+          <dt>Fallas</dt><dd>15</dd>
+          <dt>MTBF / MTTR</dt><dd>382 / 1,30 h</dd>
+        </dl>
+      </article>
+      <article class="v">
+        <h3>N+1 probabilístico</h3>
+        <p class="sub">Misma energía · meta ≥ 98 %</p>
+        <dl>
+          <dt>Disponibilidad</dt><dd class="ok">99,93 %</dd>
+          <dt>Confiabilidad</dt><dd class="ok">99,98 %</dd>
+          <dt>Stand-by</dt><dd>1.716,5 h</dd>
+          <dt>Vs agosto</dt><dd class="ok">+3,04 %</dd>
+          <dt>kWh de más</dt><dd>+113.936</dd>
+        </dl>
+      </article>
+      <article class="c">
+        <h3>Frecuencia</h3>
+        <p class="sub">Eventos registrados en el mes</p>
+        <dl>
+          <dt>Eventos</dt><dd>15</dd>
+          <dt>Horas fuera</dt><dd>19,5 h</dd>
+          <dt>G803</dt><dd>5 eventos</dd>
+          <dt>G802 disp.</dt><dd>97,06 %</dd>
+          <dt>MTTR G802</dt><dd>4,38 h</dd>
+        </dl>
+      </article>
+    </div>
+    <div class="trend">
+      <div class="trend-head">
+        <h4>Energía del parque · MWh</h4>
+        <p class="leg">Sep · 3.860 MWh · cierre GTE</p>
+      </div>
+      <svg viewBox="0 0 920 340" preserveAspectRatio="xMidYMid meet" role="img">
+        <line x1="78" y1="48" x2="908" y2="48" stroke="#e8eef4"/>
+        <text x="70" y="52" text-anchor="end" font-size="11" fill="#94a3b8" font-family="Arial">4.000</text>
+        <line x1="78" y1="140" x2="908" y2="140" stroke="#e8eef4"/>
+        <text x="70" y="144" text-anchor="end" font-size="11" fill="#94a3b8" font-family="Arial">3.500</text>
+        <line x1="78" y1="232" x2="908" y2="232" stroke="#e8eef4"/>
+        <text x="70" y="236" text-anchor="end" font-size="11" fill="#94a3b8" font-family="Arial">3.000</text>
+        <line x1="78" y1="308" x2="908" y2="308" stroke="#e2e8f0"/>
+        <rect x="77" y="152.9" width="50" height="155.1" rx="3" fill="#1E3A5F"/>
+        <rect x="173" y="248.7" width="50" height="59.3" rx="3" fill="#1E3A5F"/>
+        <rect x="269" y="147.5" width="50" height="160.5" rx="3" fill="#1E3A5F"/>
+        <rect x="365" y="167.6" width="50" height="140.4" rx="3" fill="#1E3A5F"/>
+        <rect x="461" y="149.6" width="50" height="158.4" rx="3" fill="#1E3A5F"/>
+        <rect x="557" y="191.7" width="50" height="116.3" rx="3" fill="#1E3A5F"/>
+        <rect x="653" y="149" width="50" height="159" rx="3" fill="#1E3A5F"/>
+        <rect x="749" y="94.7" width="50" height="213.3" rx="3" fill="#1E3A5F"/>
+        <rect x="845" y="73.8" width="50" height="234.2" rx="3" fill="#0f766e"/>
+        <path d="M 102 152.9 C 150 152.9, 150 248.7, 198 248.7 C 246 248.7, 246 147.5, 294 147.5 C 342 147.5, 342 167.6, 390 167.6 C 438 167.6, 438 149.6, 486 149.6 C 534 149.6, 534 191.7, 582 191.7 C 630 191.7, 630 149, 678 149 C 726 149, 726 94.7, 774 94.7 C 822 94.7, 822 73.8, 870 73.8" fill="none" stroke="#5eead4" stroke-width="2.6"/>
+        <circle cx="102" cy="152.9" r="3.5" fill="#fff" stroke="#0f766e" stroke-width="2"/>
+        <circle cx="198" cy="248.7" r="3.5" fill="#fff" stroke="#0f766e" stroke-width="2"/>
+        <circle cx="294" cy="147.5" r="3.5" fill="#fff" stroke="#0f766e" stroke-width="2"/>
+        <circle cx="390" cy="167.6" r="3.5" fill="#fff" stroke="#0f766e" stroke-width="2"/>
+        <circle cx="486" cy="149.6" r="3.5" fill="#fff" stroke="#0f766e" stroke-width="2"/>
+        <circle cx="582" cy="191.7" r="3.5" fill="#fff" stroke="#0f766e" stroke-width="2"/>
+        <circle cx="678" cy="149" r="3.5" fill="#fff" stroke="#0f766e" stroke-width="2"/>
+        <circle cx="774" cy="94.7" r="3.5" fill="#fff" stroke="#0f766e" stroke-width="2"/>
+        <circle cx="870" cy="73.8" r="4.2" fill="#fff" stroke="#0f766e" stroke-width="2.4"/>
+        <text x="102" y="170" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Arial">3.430</text>
+        <text x="198" y="266" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Arial">2.909</text>
+        <text x="294" y="165" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Arial">3.459</text>
+        <text x="390" y="185" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Arial">3.350</text>
+        <text x="486" y="167" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Arial">3.448</text>
+        <text x="582" y="209" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Arial">3.219</text>
+        <text x="678" y="166" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Arial">3.451</text>
+        <text x="774" y="112" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Arial">3.746</text>
+        <text x="870" y="91" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Arial">3.860</text>
+        <text x="102" y="328" text-anchor="middle" font-size="12" fill="#64748b" font-family="Arial">Ene</text>
+        <text x="198" y="328" text-anchor="middle" font-size="12" fill="#64748b" font-family="Arial">Feb</text>
+        <text x="294" y="328" text-anchor="middle" font-size="12" fill="#64748b" font-family="Arial">Mar</text>
+        <text x="390" y="328" text-anchor="middle" font-size="12" fill="#64748b" font-family="Arial">Abr</text>
+        <text x="486" y="328" text-anchor="middle" font-size="12" fill="#64748b" font-family="Arial">May</text>
+        <text x="582" y="328" text-anchor="middle" font-size="12" fill="#64748b" font-family="Arial">Jun</text>
+        <text x="678" y="328" text-anchor="middle" font-size="12" fill="#64748b" font-family="Arial">Jul</text>
+        <text x="774" y="328" text-anchor="middle" font-size="12" fill="#64748b" font-family="Arial">Ago</text>
+        <text x="870" y="328" text-anchor="middle" font-size="12" fill="#64748b" font-family="Arial">Sep</text>
+      </svg>
+    </div>
+  </div>
+  <span class="pn">2</span>
+</article>
+
+<!-- LÁMINA 3 · Configuración, igual que Costayaco: tabla + foto por familia -->
+<article class="slide">
+  <div class="pad">
+    <h2 class="title">Configuración de equipos</h2>
+    <table class="mto cfg">
+      <thead><tr><th>Equipo</th><th>Modelo</th><th>Fabricante</th><th class="num">Instalada kW</th><th class="num">Potencia media kW</th></tr></thead>
+      <tbody>
+        <tr class="j420"><td>G801</td><td>J420C</td><td>Jenbacher</td><td class="num">1.400</td><td class="num">1.175</td></tr>
+        <tr class="j420"><td>G802</td><td>J420C</td><td>Jenbacher</td><td class="num">1.400</td><td class="num">1.132</td></tr>
+        <tr class="j420"><td>G803</td><td>J420C</td><td>Jenbacher</td><td class="num">1.400</td><td class="num">1.136</td></tr>
+        <tr class="j420"><td>G804</td><td>J420C</td><td>Jenbacher</td><td class="num">1.400</td><td class="num">1.190</td></tr>
+        <tr class="j320"><td>G805T</td><td>J320C</td><td>Jenbacher</td><td class="num">1.000</td><td class="num">850</td></tr>
+        <tr class="j320"><td>J320</td><td>J320C</td><td>Jenbacher</td><td class="num">1.000</td><td class="num">862</td></tr>
+        <tr class="jin"><td>G806T</td><td>JINAN</td><td>Jinan</td><td class="num">500</td><td class="num">399</td></tr>
+        <tr class="jin"><td>G807T</td><td>JINAN</td><td>Jinan</td><td class="num">500</td><td class="num">388</td></tr>
+      </tbody>
+    </table>
+    <div class="flota">
+      <article class="j420">
+        <header><h3>Jenbacher J420</h3><p>Instalada 1.400 kW</p><p>Potencia media 1.156 kW</p></header>
+        <div class="cuerpo"><img src="equipo-j420.png" alt="Grupo electrógeno Jenbacher J420"><ul><li class="lab">Equipos</li><li>G801</li><li>G802</li><li>G803</li><li>G804</li></ul></div>
+      </article>
+      <article class="j320">
+        <header><h3>Jenbacher J320</h3><p>Instalada 1.000 kW</p><p>Potencia media 856 kW</p></header>
+        <div class="cuerpo"><img src="equipo-j320.png" alt="Grupo electrógeno Jenbacher J320"><ul><li class="lab">Equipos</li><li>G805T</li><li>J320</li></ul></div>
+      </article>
+      <article class="jin">
+        <header><h3>Jinan</h3><p>Instalada 500 kW</p><p>Potencia media 395 kW</p></header>
+        <div class="cuerpo"><img src="equipo-jinan.png" alt="Grupo electrógeno Jinan"><ul><li class="lab">Equipos</li><li>G806T</li><li>G807T</li></ul></div>
+      </article>
+    </div>
+  </div>
+  <span class="pn">3</span>
+</article>
+
+<article class="slide">
+  <div class="pad">
+    <h2 class="title">Desempeño por máquina</h2>
+    <table class="mto grow">
+      <thead><tr><th>Unidad</th><th>Campo</th><th class="num">Energía kWh</th><th class="num">Stand-by h</th><th class="num">Disp.</th><th class="num">Conf.</th><th class="num">Fallas</th><th class="num">MTBF h</th><th class="num">MTTR h</th></tr></thead>
+      <tbody>
+        <tr><td>G801</td><td>Acordionero</td><td class="num">346.558</td><td class="num">413,1</td><td class="num">99,83 %</td><td class="num">99,94 %</td><td class="num">3</td><td class="num">101,90</td><td class="num">0,15</td></tr>
+        <tr><td>G802</td><td>Acordionero</td><td class="num">726.800</td><td class="num">27,15</td><td class="num">97,06 %</td><td class="num">98,17 %</td><td class="num">3</td><td class="num">223,90</td><td class="num">4,38</td></tr>
+        <tr><td>G803</td><td>Acordionero</td><td class="num">751.304</td><td class="num">1,05</td><td class="num">98,73 %</td><td class="num">99,42 %</td><td class="num">5</td><td class="num">141,96</td><td class="num">0,84</td></tr>
+        <tr><td>G804</td><td>Acordionero</td><td class="num">819.800</td><td class="num">25,5</td><td class="num">99,93 %</td><td class="num">99,93 %</td><td class="num">1</td><td class="num">694,00</td><td class="num">0,50</td></tr>
+        <tr><td>G805T</td><td>Acordionero</td><td class="num">523.440</td><td class="num">103,8</td><td class="num">99,97 %</td><td class="num">100 %</td><td class="num">0</td><td class="num">Sin fallas</td><td class="num">0</td></tr>
+        <tr><td>G806T</td><td>Acordionero</td><td class="num">82.657</td><td class="num">512,9</td><td class="num">99,99 %</td><td class="num">99,99 %</td><td class="num">1</td><td class="num">207,00</td><td class="num">0,10</td></tr>
+        <tr><td>G807T</td><td>Acordionero</td><td class="num">60.571</td><td class="num">564</td><td class="num">100 %</td><td class="num">100 %</td><td class="num">0</td><td class="num">Sin fallas</td><td class="num">0</td></tr>
+        <tr><td>J320</td><td>Acordionero</td><td class="num">548.924</td><td class="num">69</td><td class="num">99,43 %</td><td class="num">99,85 %</td><td class="num">2</td><td class="num">323,45</td><td class="num">0,55</td></tr>
+        <tr class="bloque"><td>N+1 operacional</td><td>Acordionero</td><td class="num">3.860.054</td><td class="num">1.716,5</td><td class="num">100 %</td><td class="num">100 %</td><td class="num">15</td><td class="num">381,57</td><td class="num">1,30</td></tr>
+        <tr class="bloque"><td>N+1 probabilístico</td><td>Acordionero</td><td class="num">3.860.054</td><td class="num">1.716,5</td><td class="num">99,93 %</td><td class="num">99,98 %</td><td class="num">15</td><td class="num">381,57</td><td class="num">1,30</td></tr>
+      </tbody>
+    </table>
+    <h4 style="margin:2px 0 0;color:#1E3A5F;font-size:9pt">Compromiso contractual</h4>
+    <div class="method note">
+      <article class="d"><h4>Disponibilidad y confiabilidad ≥ 98 %</h4><p class="regla">El bloque operacional cierra en 100 % y el probabilístico en 99,93 % y 99,98 %. G802 cierra en 97,06 % de disponibilidad y 98,17 % de confiabilidad.</p></article>
+      <article class="a"><h4>Frecuencia del mes</h4><p class="regla">Septiembre registra 15 fallas. G803 registra 5, G801 y G802 registran 3 cada uno. G805T y G807T cierran sin fallas.</p></article>
+    </div>
+  </div>
+  <span class="pn">4</span>
+</article>
+
+<article class="slide">
+  <div class="pad">
+    <h2 class="title">Confiabilidad</h2>
+    <p class="regla">Meta de confiabilidad: 98 %. El bloque cierra en 100 % operacional y 99,98 % probabilístico. En el mes se registran 15 fallas.</p>
+    <div class="kpis k4">
+      <article class="ok"><span>N+1 operacional</span><strong>100 %</strong><small>probabilístico 99,98 %</small></article>
+      <article><span>MTBF</span><strong>381,57 h</strong><small>sistema N+1</small></article>
+      <article><span>MTTR</span><strong>1,30 h</strong><small>G802 · 4,38 h</small></article>
+      <article><span>Fallas</span><strong>15</strong><small>registradas en el mes</small></article>
+    </div>
+    <table class="mto">
+      <thead><tr><th>Unidad</th><th class="num">Fallas</th><th class="num">MTBF</th><th class="num">MTTR</th><th>Cierre</th></tr></thead>
+      <tbody>
+        <tr class="bloque"><td>N+1</td><td class="num">15</td><td class="num">381,57 h</td><td class="num">1,30 h</td><td>15 eventos</td></tr>
+        <tr><td>G803</td><td class="num">5</td><td class="num">141,96 h</td><td class="num">0,84 h</td><td>5 eventos</td></tr>
+        <tr><td>G801</td><td class="num">3</td><td class="num">101,90 h</td><td class="num">0,15 h</td><td>3 eventos</td></tr>
+        <tr><td>G802</td><td class="num">3</td><td class="num">223,90 h</td><td class="num">4,38 h</td><td>3 eventos</td></tr>
+        <tr><td>J320</td><td class="num">2</td><td class="num">323,45 h</td><td class="num">0,55 h</td><td>2 eventos</td></tr>
+        <tr><td>G804</td><td class="num">1</td><td class="num">694,00 h</td><td class="num">0,50 h</td><td>1 evento</td></tr>
+        <tr><td>G806T</td><td class="num">1</td><td class="num">207,00 h</td><td class="num">0,10 h</td><td>1 evento</td></tr>
+        <tr><td>G805T</td><td class="num">0</td><td class="num">Sin fallas</td><td class="num">0</td><td>Sin eventos</td></tr>
+        <tr><td>G807T</td><td class="num">0</td><td class="num">Sin fallas</td><td class="num">0</td><td>Sin eventos</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <span class="pn">5</span>
+</article>
+
+<article class="slide">
+  <div class="pad">
+    <h2 class="title">Disponibilidad</h2>
+    <div class="kpis k3">
+      <article class="ok"><span>N+1 operacional</span><strong>100 %</strong><small>el respaldo contiene el mes</small></article>
+      <article class="ok"><span>N+1 probabilístico</span><strong>99,93 %</strong><small>sobre la meta de 98 %</small></article>
+      <article><span>G802</span><strong>97,06 %</strong><small>disponibilidad del mes · confiabilidad 98,17 %</small></article>
+    </div>
+    <div class="method">
+      <article class="d">
+        <h4>Operacional</h4>
+        <p class="regla">Disponibilidad y confiabilidad del bloque cierran en 100 %. G801 venía de 90,09 % en agosto y recupera 99,83 %.</p>
+        <div class="frac-row"><div class="frac"><b>15 fallas</b><i></i><b>MTBF 381,57 h</b></div><em>100 %</em></div>
+        <p class="regla">Stand-by del bloque: 1.716,5 h. Energía: 3.860,1 MWh.</p>
+      </article>
+      <article class="a">
+        <h4>G802</h4>
+        <p class="regla">Disponibilidad 97,06 % y confiabilidad 98,17 %.</p>
+        <div class="frac-row"><div class="frac"><b>3 fallas</b><i></i><b>MTTR 4,38 h</b></div><em>97,06 %</em></div>
+        <p class="regla">Stand-by 27,2 h. MTTR 4,38 h.</p>
+      </article>
+    </div>
+    <table class="mto">
+      <thead><tr><th>Unidad</th><th class="num">Disp.</th><th class="num">Conf.</th><th class="num">Stand-by</th><th>Lectura</th></tr></thead>
+      <tbody>
+        <tr><td>G802</td><td class="num">97,06 %</td><td class="num">98,17 %</td><td class="num">27,2 h</td><td>En el mes</td></tr>
+        <tr><td>G803</td><td class="num">98,73 %</td><td class="num">99,42 %</td><td class="num">1,1 h</td><td class="ok">Sobre 98 %</td></tr>
+        <tr><td>J320</td><td class="num">99,43 %</td><td class="num">99,85 %</td><td class="num">69 h</td><td class="ok">Sobre 98 %</td></tr>
+        <tr><td>G801</td><td class="num">99,83 %</td><td class="num">99,94 %</td><td class="num">413,1 h</td><td class="ok">Recupera vs 90,09 %</td></tr>
+        <tr><td>G804</td><td class="num">99,93 %</td><td class="num">99,93 %</td><td class="num">25,5 h</td><td class="ok">Sobre 98 %</td></tr>
+        <tr><td>G805T</td><td class="num">99,97 %</td><td class="num">100 %</td><td class="num">103,8 h</td><td class="ok">Sobre 98 %</td></tr>
+        <tr><td>G806T</td><td class="num">99,99 %</td><td class="num">99,99 %</td><td class="num">512,9 h</td><td class="ok">Sobre 98 %</td></tr>
+        <tr><td>G807T</td><td class="num">100 %</td><td class="num">100 %</td><td class="num">564 h</td><td class="ok">Sobre 98 %</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <span class="pn">6</span>
+</article>
+
+<article class="slide">
+  <div class="pad">
+    <h2 class="title">Detalle de la generación</h2>
+    <div class="kpis k4">
+      <article class="blue"><span>Total sep</span><strong>3.860,1 MWh</strong><small>3.860.054 kWh</small></article>
+      <article><span>Agosto</span><strong>3.746,1 MWh</strong><small>3.746.118 kWh</small></article>
+      <article class="ok"><span>Δ</span><strong>+114 MWh</strong><small>+3,04 %</small></article>
+      <article><span>Pico diario</span><strong>152 MWh</strong><small>día 20 · media 964 kW</small></article>
+    </div>
+    <div class="gen">
+      <div class="pairs">
+        <div class="trend-head">
+          <h4>Septiembre frente a agosto · MWh</h4>
+        </div>
+        <div class="pairrow">
+          <div><strong class="down">−336</strong><div class="cols"><i class="ago" style="height:76%"></i><i class="sep down" style="height:39%"></i></div><span>G801</span><em>682 → 347</em></div>
+          <div><strong class="up">+19</strong><div class="cols"><i class="ago" style="height:79%"></i><i class="sep" style="height:81%"></i></div><span>G802</span><em>708 → 727</em></div>
+          <div><strong class="down">−55</strong><div class="cols"><i class="ago" style="height:90%"></i><i class="sep" style="height:83%"></i></div><span>G803</span><em>806 → 751</em></div>
+          <div><strong class="down">−63</strong><div class="cols"><i class="ago" style="height:98%"></i><i class="sep" style="height:91%"></i></div><span>G804</span><em>883 → 820</em></div>
+          <div><strong class="up">+330</strong><div class="cols"><i class="ago" style="height:21%"></i><i class="sep" style="height:58%"></i></div><span>G805T</span><em>193 → 523</em></div>
+          <div><strong class="up">+208</strong><div class="cols"><i class="ago" style="height:38%"></i><i class="sep" style="height:61%"></i></div><span>J320</span><em>341 → 549</em></div>
+          <div><strong class="up">+23</strong><div class="cols"><i class="ago" style="height:7%"></i><i class="sep" style="height:9%"></i></div><span>G806T</span><em>60 → 83</em></div>
+          <div><strong class="down">−12</strong><div class="cols"><i class="ago" style="height:8%"></i><i class="sep" style="height:7%"></i></div><span>G807T</span><em>72 → 61</em></div>
+        </div>
+      </div>
+      <div class="days">
+        <div class="trend-head">
+          <h4>Generación diaria · MWh</h4>
+          <p class="leg">Pico día 20 · 152 MWh · valle día 9 · 98 MWh</p>
+        </div>
+        <div class="bars">
+          <div><span style="height:81%"></span><em>1</em></div>
+          <div><span style="height:81%"></span><em></em></div>
+          <div><span style="height:81%"></span><em></em></div>
+          <div><span style="height:84%"></span><em></em></div>
+          <div><span style="height:85%"></span><em></em></div>
+          <div><span style="height:81%"></span><em></em></div>
+          <div><span style="height:84%"></span><em></em></div>
+          <div><span style="height:77%"></span><em></em></div>
+          <div><span style="height:65%"></span><em>9</em></div>
+          <div><span style="height:82%"></span><em></em></div>
+          <div><span style="height:78%"></span><em></em></div>
+          <div><span style="height:81%"></span><em></em></div>
+          <div><span style="height:85%"></span><em></em></div>
+          <div><span style="height:87%"></span><em></em></div>
+          <div><span style="height:81%"></span><em></em></div>
+          <div><span style="height:81%"></span><em></em></div>
+          <div><span style="height:90%"></span><em></em></div>
+          <div><span style="height:97%"></span><em></em></div>
+          <div><span style="height:98%"></span><em></em></div>
+          <div><span class="peak" style="height:100%"></span><em>20</em></div>
+          <div><span style="height:94%"></span><em></em></div>
+          <div><span style="height:84%"></span><em></em></div>
+          <div><span style="height:86%"></span><em></em></div>
+          <div><span style="height:92%"></span><em></em></div>
+          <div><span style="height:73%"></span><em></em></div>
+          <div><span style="height:79%"></span><em></em></div>
+          <div><span style="height:87%"></span><em></em></div>
+          <div><span style="height:89%"></span><em></em></div>
+          <div><span style="height:90%"></span><em></em></div>
+          <div><span style="height:89%"></span><em>30</em></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="pn">7</span>
+</article>
+
+<article class="slide">
+  <div class="pad">
+    <h2 class="title">Fallas de septiembre</h2>
+    <div class="kpis k4">
+      <article class="blue"><span>Total de fallas</span><strong>24</strong><small>15 de COPOWER y 9 más</small></article>
+      <article><span>COPOWER</span><strong>15</strong><small>19,5 h · atribuibles a COPOWER</small></article>
+      <article><span>Otras</span><strong>9</strong><small>0,7 h · dos solo en reloj</small></article>
+      <article class="blue"><span>G801 fuera</span><strong>413 h</strong><small>cambio de control · 1 al 18 · en stand-by</small></article>
+    </div>
+    <div class="split eq" style="flex:1;min-height:0">
+      <div class="panel">
+        <h3>Atribuibles a COPOWER · 15</h3>
+        <table class="evt">
+          <thead><tr><th>Fecha</th><th>Equipo</th><th class="num">Fuera</th><th>Evento</th></tr></thead>
+          <tbody>
+            <tr class="cop"><td>05-sep</td><td><b>G806T</b></td><td class="hora">0,1 h</td><td>Comunicación, 14:05. Queda en stand-by.</td></tr>
+            <tr class="cop"><td>06-sep</td><td><b>G804</b></td><td class="hora">0,5 h</td><td>Sincronismo, 02:32 a 03:00.</td></tr>
+            <tr class="cop"><td>11-sep</td><td><b>G803 · 3</b></td><td class="hora">4 h</td><td>Detonación, Medenus y CPU del PLC.</td></tr>
+            <tr class="cop"><td>12-sep</td><td><b>G802</b></td><td class="hora">4 h</td><td>Ignición y knocking.</td></tr>
+            <tr class="cop"><td>12-sep</td><td><b>J320</b></td><td class="hora">1 h</td><td>Alta presión de MAP.</td></tr>
+            <tr class="cop"><td>13-sep</td><td><b>G802</b></td><td class="hora">9 h</td><td>Código 3345, desde la noche anterior.</td></tr>
+            <tr class="cop"><td>19-sep</td><td><b>G801</b></td><td class="hora">0,25 h</td><td>Alta temperatura HT.</td></tr>
+            <tr class="cop"><td>21-sep</td><td><b>G803</b></td><td class="hora">0,1 h</td><td>Knocking a la 01:17.</td></tr>
+            <tr class="cop"><td>23-sep</td><td><b>J320</b></td><td class="hora">0,1 h</td><td>Potencia inversa, 21:10 a 21:12.</td></tr>
+            <tr class="cop"><td>26-sep</td><td><b>G802</b></td><td class="hora">0,15 h</td><td>Bujías 1, 12 y 13, desde las 22:15.</td></tr>
+            <tr class="cop"><td>28-sep</td><td><b>G801</b></td><td class="hora">0,1 h</td><td>Knocking, 07:43 a 07:59.</td></tr>
+            <tr class="cop"><td>30-sep</td><td><b>G801</b></td><td class="hora">0,1 h</td><td>Knocking, 04:29 a 04:37.</td></tr>
+            <tr class="cop"><td>30-sep</td><td><b>G803</b></td><td class="hora">0,1 h</td><td>Knocking, 10:19 a 10:26.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="panel">
+        <h3>Otras fallas · 9</h3>
+        <table class="evt">
+          <thead><tr><th>Fecha</th><th>Equipo</th><th class="num">Fuera</th><th>Evento</th></tr></thead>
+          <tbody>
+            <tr class="ext"><td>01-sep</td><td><b>G803</b></td><td class="hora">0,1 h</td><td>Knocking, 14:37 a 14:58.</td></tr>
+            <tr class="ext"><td>02-sep</td><td><b>G802</b></td><td class="hora">0,1 h</td><td>Knocking, 01:23 a 01:29.</td></tr>
+            <tr class="ext"><td>04-sep</td><td><b>G807T</b></td><td class="hora">0,1 h</td><td>Knocking.</td></tr>
+            <tr class="ext"><td>06-sep</td><td><b>G802</b></td><td class="hora">0,1 h</td><td>Knocking, 19:22 a 19:28.</td></tr>
+            <tr class="ext"><td>08-sep</td><td><b>G803</b></td><td class="hora">0,1 h</td><td>Knocking a las 09:00.</td></tr>
+            <tr class="ext"><td>17-sep</td><td><b>G802</b></td><td class="hora">0,1 h</td><td>Knocking.</td></tr>
+            <tr class="ext"><td>22-sep</td><td><b>G804</b></td><td class="hora">6 min</td><td>Knocking, 19:24 a 19:30.</td></tr>
+            <tr class="ext"><td>25-sep</td><td><b>G802</b></td><td class="hora">2 min</td><td>Knocking, 01:46 a 01:48.</td></tr>
+            <tr class="ext"><td>26-sep</td><td><b>G801</b></td><td class="hora">0,1 h</td><td>Knocking, 16:47 a 16:51.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <span class="pn">8</span>
+</article>
+
+<article class="slide">
+  <div class="pad">
+    <h2 class="title">Eventos repetitivos</h2>
+    <div class="kpis k4">
+      <article><span>Knocking</span><strong>7</strong><small>G803 ×5 · G801 ×2</small></article>
+      <article><span>Ignición</span><strong>3</strong><small>las tres en G802</small></article>
+      <article><span>J320</span><strong>2</strong><small>MAP y potencia inversa</small></article>
+      <article class="blue"><span>Una vez</span><strong>3</strong><small>G804 sincronismo · G806T comunicación · G801 HT</small></article>
+    </div>
+    <div class="split eq" style="flex:1;min-height:0">
+      <div class="panel">
+        <h3>Horas fuera por falla · 19,5 h</h3>
+        <ul class="hlist wide">
+          <li><span>G802</span><b class="bad" style="width:100%"></b><em>13,15</em></li>
+          <li><span>G803</span><b style="width:32%"></b><em>4,20</em></li>
+          <li><span>J320</span><b style="width:8%"></b><em>1,10</em></li>
+          <li><span>G804</span><b style="width:4%"></b><em>0,50</em></li>
+          <li><span>G801</span><b style="width:3%"></b><em>0,45</em></li>
+          <li><span>G806T</span><b style="width:2%"></b><em>0,10</em></li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Por modo · mismas 19,5 h</h3>
+        <div class="vbars modos">
+          <div><strong>13,15</strong><i class="bad" style="height:100%"></i><span>Ignición</span></div>
+          <div><strong>4,40</strong><i style="height:33%"></i><span>Knocking</span></div>
+          <div><strong>1,10</strong><i style="height:8%"></i><span>J320</span></div>
+          <div><strong>0,85</strong><i style="height:7%"></i><span>Una vez</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="pn">9</span>
+</article>
+
+<article class="slide">
+  <div class="pad">
+    <h2 class="title">Pruebas de máxima carga</h2>
+    <div class="kpis k4">
+      <article class="blue"><span>En septiembre</span><strong>2</strong><small>G801 el 23 · G803 el 25</small></article>
+      <article class="ok"><span>Cierre</span><strong>Cumple</strong><small>las dos pruebas · 60 min</small></article>
+      <article><span>Nominal 1.400</span><strong>1.250 kW</strong><small>89,3 % · San Roque · FP 0,95</small></article>
+      <article><span>Otras unidades</span><strong>6</strong><small>802 · 804 · 805T · J320 · 806T · 807T</small></article>
+    </div>
+    <div class="method" style="flex:1;min-height:0">
+      <article class="d" style="min-height:0;justify-content:space-evenly">
+        <h4>G801 · 23-sep · 14:10 a 15:10 · 60 min</h4>
+        <p class="regla">Nominal 1.400 kW. Llegó a 1.250 kW, el 89,3 %. MAP 2,65 en los tres cortes. Tensión 4.225 a 4.229 V, 180–181 A, 60 Hz, FP 0,95. Gas San Roque. Cumple la prueba.</p>
+        <table class="mto" style="flex:none;height:auto">
+          <thead><tr><th>Hora</th><th class="num">MAP</th><th class="num">Escape min–med–máx</th><th class="num">Ign.</th><th class="num">kV</th><th class="num">Consumo</th></tr></thead>
+          <tbody>
+            <tr><td>14:10</td><td class="num">2,65</td><td class="num">539–545–554</td><td class="num">22,5</td><td class="num">18,2</td><td class="num">88,5</td></tr>
+            <tr><td>14:40</td><td class="num">2,65</td><td class="num">538–545–555</td><td class="num">22,5</td><td class="num">20,1</td><td class="num">88,7</td></tr>
+            <tr><td>15:10</td><td class="num">2,65</td><td class="num">538–545–556</td><td class="num">22,6</td><td class="num">20,1</td><td class="num">89,0</td></tr>
+          </tbody>
+        </table>
+        <p class="regla">Frente al cierre de mayo: MAP 2,84 a 2,65. Escape medio 540 a 545. El gas pasa de TGI (103,5) a San Roque (89). El FP pasa de 0,83 a 0,95.</p>
+      </article>
+      <article class="d" style="min-height:0;justify-content:space-evenly">
+        <h4>G803 · 25-sep · 12:10 a 13:10 · 60 min</h4>
+        <p class="regla">Nominal 1.400 kW. Llegó a 1.250 kW, el 89,3 %. MAP de 2,88 a 2,86. Tensión 4.206 a 4.207 V, corriente de 184 a 180 A, 60 Hz, FP 0,95. Gas San Roque. Cumple la prueba.</p>
+        <table class="mto" style="flex:none;height:auto">
+          <thead><tr><th>Hora</th><th class="num">MAP</th><th class="num">Escape min–med–máx</th><th class="num">Ign.</th><th class="num">kV</th><th class="num">Consumo</th></tr></thead>
+          <tbody>
+            <tr><td>12:10</td><td class="num">2,88</td><td class="num">532–548–564</td><td class="num">22,5</td><td class="num">19,3</td><td class="num">90,5</td></tr>
+            <tr><td>12:40</td><td class="num">2,86</td><td class="num">533–548–566</td><td class="num">22,8</td><td class="num">19,5</td><td class="num">91,5</td></tr>
+            <tr><td>13:10</td><td class="num">2,86</td><td class="num">535–549–565</td><td class="num">23,0</td><td class="num">20,3</td><td class="num">92,1</td></tr>
+          </tbody>
+        </table>
+        <p class="regla">Frente al cierre de mayo: MAP 3,01 a 2,86. Escape medio 529 a 549. El gas pasa de TGI (103,9) a San Roque (92,1). El FP pasa de 0,80 a 0,95.</p>
+      </article>
+    </div>
+  </div>
+  <span class="pn">10</span>
+</article>
+
+<article class="slide">
+  <div class="pad">
+    <h2 class="title">Referencia de las pruebas de carga</h2>
+    <div class="kpis k4">
+      <article class="blue"><span>Mayo</span><strong>4</strong><small>G801 a G804 · 4 y 5 may · gas TGI</small></article>
+      <article class="ok"><span>J420 · nominal 1.400</span><strong>1.250 kW</strong><small>potencia a la que llegó la prueba</small></article>
+      <article><span>G805T · nominal 1.000</span><strong>950 kW</strong><small>potencia a la que llegó el 04-oct</small></article>
+      <article><span>G802</span><strong>Mayo</strong><small>prueba registrada en mayo</small></article>
+    </div>
+    <table class="mto">
+      <thead><tr><th>Corte</th><th>Unidad</th><th>Fecha</th><th class="num">Nominal</th><th class="num">Llegó</th><th class="num">% esperada</th><th class="num">MAP</th><th class="num">Escape</th><th class="num">FP</th><th>Gas</th><th>Cierre</th></tr></thead>
+      <tbody>
+        <tr><td>Mayo</td><td>G801</td><td>05-may</td><td class="num">1.400</td><td class="num">1.250</td><td class="num">89,3 %</td><td class="num">2,84</td><td class="num">540</td><td class="num">0,83</td><td>TGI</td><td class="ok">Cumple la prueba</td></tr>
+        <tr><td>Mayo</td><td>G802</td><td>04-may</td><td class="num">1.400</td><td class="num">1.250</td><td class="num">89,3 %</td><td class="num">2,90</td><td class="num">525</td><td class="num">−0,99</td><td>TGI</td><td class="ok">Cumple la prueba</td></tr>
+        <tr><td>Mayo</td><td>G803</td><td>05-may</td><td class="num">1.400</td><td class="num">1.250</td><td class="num">89,3 %</td><td class="num">3,01</td><td class="num">529</td><td class="num">0,80</td><td>TGI</td><td class="ok">Cumple la prueba</td></tr>
+        <tr><td>Mayo</td><td>G804</td><td>04-may</td><td class="num">1.400</td><td class="num">1.250</td><td class="num">89,3 %</td><td class="num">2,74</td><td class="num">556</td><td class="num">−0,95</td><td>TGI</td><td class="ok">Cumple la prueba</td></tr>
+        <tr class="bloque"><td>Sep</td><td>G801</td><td>23-sep</td><td class="num">1.400</td><td class="num">1.250</td><td class="num">89,3 %</td><td class="num">2,65</td><td class="num">545</td><td class="num">0,95</td><td>San Roque</td><td class="ok">Cumple la prueba</td></tr>
+        <tr class="bloque"><td>Sep</td><td>G803</td><td>25-sep</td><td class="num">1.400</td><td class="num">1.250</td><td class="num">89,3 %</td><td class="num">2,86</td><td class="num">549</td><td class="num">0,95</td><td>San Roque</td><td class="ok">Cumple la prueba</td></tr>
+        <tr><td>Oct</td><td>G804</td><td>05-oct</td><td class="num">1.400</td><td class="num">1.250</td><td class="num">89,3 %</td><td class="num">2,79</td><td class="num">561</td><td class="num">0,99</td><td>San Roque / TGI</td><td class="ok">Cumple la prueba</td></tr>
+        <tr><td>Oct</td><td>G805T</td><td>04-oct</td><td class="num">1.000</td><td class="num">950</td><td class="num">95 %</td><td class="num">2,49</td><td class="num">621</td><td class="num">0,95</td><td>TGI</td><td class="ok">Cumple la prueba</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <span class="pn">11</span>
+</article>
+
+<article class="slide">
+  <div class="pad">
+    <h2 class="title">Desempeño energético</h2>
+    <div class="kpis k4">
+      <article><span>Entrega / máquina</span><strong>483 MWh</strong><small>promedio de 8 unidades</small></article>
+      <article class="blue"><span>Gas</span><strong>8,71</strong><small>ft³/kWh · 33,58 Mft³</small></article>
+      <article><span>Eficiencia</span><strong>38,14 %</strong><small>Jinan en 37,0 %</small></article>
+      <article class="ok"><span>Vs agosto</span><strong>+3,04 %</strong><small>3.746 → 3.860 MWh</small></article>
+    </div>
+    <div class="split tight">
+      <div class="panel">
+        <h3>MWh por equipo</h3>
+        <ul class="hlist">
+          <li><span>804</span><b style="width:100%"></b><em>820</em></li>
+          <li><span>803</span><b style="width:92%"></b><em>751</em></li>
+          <li><span>802</span><b style="width:89%"></b><em>727</em></li>
+          <li><span>J320</span><b style="width:67%"></b><em>549</em></li>
+          <li><span>805T</span><b style="width:64%"></b><em>523</em></li>
+          <li><span>801</span><b class="bad" style="width:42%"></b><em>347</em></li>
+          <li><span>806T</span><b style="width:10%"></b><em>83</em></li>
+          <li><span>807T</span><b style="width:7%"></b><em>61</em></li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>kW medios del mes</h3>
+        <ul class="hlist">
+          <li><span>804</span><b style="width:100%"></b><em>1.190</em></li>
+          <li><span>801</span><b style="width:99%"></b><em>1.175</em></li>
+          <li><span>803</span><b style="width:95%"></b><em>1.136</em></li>
+          <li><span>802</span><b style="width:95%"></b><em>1.132</em></li>
+          <li><span>J320</span><b style="width:72%"></b><em>862</em></li>
+          <li><span>805T</span><b style="width:71%"></b><em>850</em></li>
+          <li><span>806T</span><b style="width:34%"></b><em>399</em></li>
+          <li><span>807T</span><b style="width:33%"></b><em>388</em></li>
+        </ul>
+      </div>
+    </div>
+    <div class="split eq" style="flex:1;min-height:0;margin-bottom:0.1in">
+      <div class="stack">
+        <article><h3>J420 · 68,5 %</h3><p>2.644 MWh. G801 a G804. Es la mayor parte de los 3.860 MWh.</p></article>
+        <article><h3>J320 · 27,8 %</h3><p>1.072 MWh. G805T y J320 sostienen el alza frente a agosto.</p></article>
+        <article><h3>Jinan · 3,7 %</h3><p>143 MWh. G806T y G807T. Ritmo del mes: 128,7 MWh/d, agosto 120,8. Pico el día 20: 152 MWh.</p></article>
+      </div>
+      <div class="panel">
+        <h3>Gas por equipo · Mft³</h3>
+        <ul class="hlist">
+          <li><span>804</span><b style="width:100%"></b><em>7,08</em></li>
+          <li><span>803</span><b style="width:94%"></b><em>6,68</em></li>
+          <li><span>802</span><b style="width:89%"></b><em>6,27</em></li>
+          <li><span>J320</span><b style="width:67%"></b><em>4,75</em></li>
+          <li><span>805T</span><b style="width:64%"></b><em>4,53</em></li>
+          <li><span>801</span><b style="width:42%"></b><em>3,00</em></li>
+          <li><span>806T</span><b style="width:10%"></b><em>0,74</em></li>
+          <li><span>807T</span><b style="width:8%"></b><em>0,54</em></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <span class="pn">12</span>
+</article>
+
+<article class="slide">
+  <div class="pad">
+    <h2 class="title">Mantenimiento ejecutado en septiembre</h2>
+    <div class="kpis k4">
+      <article class="blue"><span>G801 fuera</span><strong>413 h</strong><small>cambio de control · va en stand-by</small></article>
+      <article><span>18 al 20 sep</span><strong>Ajuste</strong><small>mezcla de G801 y G803 · no suma falla</small></article>
+      <article class="ok"><span>Preventivo</span><strong>Completado</strong><small>16,9 h PP del soporte GTE</small></article>
+      <article class="ok"><span>Disp. G801</span><strong>99,83 %</strong><small>agosto cerró en 90,09 %</small></article>
+    </div>
+    <div class="split eq">
+      <div class="panel">
+        <h3>Horas preventivas del soporte</h3>
+        <table class="mto">
+          <thead><tr><th>Eq</th><th class="num">PP h</th><th class="num">Stand-by</th><th class="num">A%</th></tr></thead>
+          <tbody>
+            <tr><td>G801</td><td class="num">0,75</td><td class="num">413</td><td class="num">99,83 %</td></tr>
+            <tr><td>G802</td><td class="num">8,0</td><td class="num">27,2</td><td class="num">97,06 %</td></tr>
+            <tr><td>G803</td><td class="num">4,95</td><td class="num">1,1</td><td class="num">98,73 %</td></tr>
+            <tr><td>G804</td><td class="num">0</td><td class="num">25,5</td><td class="num">99,93 %</td></tr>
+            <tr><td>G805T</td><td class="num">0,2</td><td class="num">103,8</td><td class="num">99,97 %</td></tr>
+            <tr><td>G806T</td><td class="num">0</td><td class="num">512,9</td><td class="num">99,99 %</td></tr>
+            <tr><td>G807T</td><td class="num">0</td><td class="num">564</td><td class="num">100 %</td></tr>
+            <tr><td>J320</td><td class="num">3,0</td><td class="num">69</td><td class="num">99,43 %</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="panel">
+        <h3>Completado en el mes</h3>
+        <table class="evt">
+          <tbody>
+            <tr><td><b>G801</b></td><td>Cambio de control del 1 al 18, 413 h en stand-by. Ajuste de mezcla el 20-sep, 0,75 h PP.</td></tr>
+            <tr><td><b>G802 · 8,0 h</b></td><td>Preventivo completado: 08-sep 3 h, 26-sep 2 h y 28-sep 3 h.</td></tr>
+            <tr><td><b>G803 · 4,95 h</b></td><td>Preventivo el 09-sep, 3,7 h, y ajuste de mezcla el 20-sep, 1,25 h.</td></tr>
+            <tr><td><b>J320 · 3,0 h</b></td><td>Vibraciones el 02-sep, 1 h, y mantenimiento de 1.000 h el 07-sep, 2 h.</td></tr>
+            <tr><td><b>G805T · 0,2 h</b></td><td>Ventana PP el 01-sep. Completada.</td></tr>
+            <tr><td><b>G807T · 48 h</b></td><td>29 y 30 sep, cambio a la J420. Quedó en stand-by.</td></tr>
+            <tr><td><b>Programa</b></td><td>El preventivo del mes se completó. G804 y G806T no tuvieron ventana PP.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <span class="pn">13</span>
+</article>
+
+<article class="slide">
+  <div class="pad">
+    <h2 class="title">Inventario y HSE</h2>
+    <div class="kpis k4">
+      <article class="ok"><span>Stock</span><strong>Con stock</strong><small>Campo · San Martín · Bucaramanga</small></article>
+      <article class="ok"><span>Incidentes</span><strong>Ninguno</strong><small>sin accidentes ni enfermedad laboral</small></article>
+      <article class="blue"><span>Charlas</span><strong>Semanales</strong><small>seguridad en la semana</small></article>
+      <article><span>Residuos</span><strong>SAPS · EMARACK</strong><small>gestores en San Martín</small></article>
+    </div>
+    <div class="split eq" style="flex:1;min-height:0;margin-bottom:0.04in">
+      <div class="stack">
+        <article><h3>Almacenes</h3><p>Tenemos stock en Campo, San Martín y Bucaramanga.</p></article>
+        <article><h3>Charlas semanales</h3><p>Seguridad durante la semana.</p></article>
+        <article><h3>Permisos de trabajo</h3><p>Gestión de permisos durante el mes.</p></article>
+        <article><h3>Inspecciones</h3><p>Inspecciones de seguridad ejecutadas.</p></article>
+        <article><h3>Productos químicos</h3><p>Fichas de seguridad actualizadas y etiquetado al día.</p></article>
+      </div>
+      <div class="stack">
+        <article><h3>Orden y aseo</h3><p>Jornada realizada en el periodo.</p></article>
+        <article><h3>Residuos</h3><p>Disposición con gestores autorizados. Sólidos con SAPS y aceites con EMARACK.</p></article>
+        <article><h3>PGIR</h3><p>Socialización del plan de gestión integral de residuos.</p></article>
+        <article><h3>Capacitación</h3><p>Aspectos e impactos ambientales.</p></article>
+        <article><h3>Informes a GTE</h3><p>Indicadores ambientales, estadísticas y dossier trimestral entregados.</p></article>
+      </div>
+    </div>
+  </div>
+  <span class="pn">14</span>
+</article>
+
+<article class="slide">
+  <div class="pad">
+    <h2 class="title">Conclusiones</h2>
+    <ol class="conc">
+      <li><strong>Septiembre registra 15 fallas.</strong> El bloque N+1 suma 19,5 h fuera de servicio.</li>
+      <li><strong>Disponibilidad y confiabilidad quedan en 100 %.</strong> La lectura probabilística cierra en 99,93 % y 99,98 %. Las dos sobre 98 %.</li>
+      <li><strong>La energía sube a 3.860.054 kWh.</strong> Son 113.936 kWh más que agosto, un 3,04 %. G805T y J320 sostienen el bloque.</li>
+      <li><strong>G803 registra cinco fallas.</strong> MTBF de 142 h. Disponibilidad 98,73 % y confiabilidad 99,42 %.</li>
+      <li><strong>G802 cierra en 97,06 % de disponibilidad.</strong> Fuera por falla: 13,15 h. El MTTR es 4,38 h.</li>
+      <li><strong>G801 recupera sus indicadores.</strong> Las 413 h son el cambio de control, del 1 al 18, en stand-by. Disponibilidad 99,83 %.</li>
+    </ol>
+  </div>
+  <span class="pn">15</span>
+</article>
+
+<script>
+function fitSlides() {
+  var s = Math.min(1, (window.innerWidth - 16) / (10 * 96));
+  document.querySelectorAll(".slide").forEach(function (el) { el.style.zoom = String(s); });
+}
+addEventListener("resize", fitSlides);
+fitSlides();
+</script>
+</body>
+</html>

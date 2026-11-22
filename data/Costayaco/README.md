@@ -1,38 +1,21 @@
 # Costayaco (Putumayo Norte / Vonú)
 
-Carpeta de trabajo del campo **Costayaco**. Separada de **Acordionero**.
-
-En datos y ETL el código de campo es `COSTAYACO` / PUTN (`FieldKey = "costayaco"` | `"vonu"`).
-
-## Qué va en cada subcarpeta
+Fuentes del campo. Vonú va en los mismos libros; el ETL parte el FieldKey.
 
 | Carpeta | Contenido |
-|---------|-----------|
-| `Agosto/`, `Julio/`, `Septiembre/`, … | Fuentes del mes: horas, informes, fallas, GTE del mes |
-| `GTE/` | Data Soporte / Análisis Indicadores PUTN por mes (Ene–…) |
-| `RCA/` | RCA formales y reportes de falla históricos |
-| `Datos COPOWER/` | Reporte diario Costayaco–Vonú (**solo local**, ~60 MB) |
-| `concertacion horas/` | Horas concertadas transversales |
-| `Mantenimiento/` | Inventarios / sábanas anuales (inventario Excel **solo local**) |
-| `contratos/`, `eficiencia/` | Anexos contractuales y parámetros |
+|---|---|
+| `activos/planos/` | Planos eléctricos por unidad |
+| `operacion/reporte-diario/` | Libro vivo del reporte diario |
+| `operacion/gas/` | Parámetros de gas Moqueta |
+| `operacion/pruebas/AAAA-MM/` | Pruebas de máxima carga |
+| `concertacion/AAAA-MM/` | Horas concertadas |
+| `GTE/AAAA-MM/` | Data Soporte y análisis de indicadores |
+| `fallas/AAAA-MM/AAAA-MM-DD_…/` | Expediente: formulario, logs, evidencias, analisis |
+| `Mantenimiento/sabana/` | Sábana anual y `AAAA-MM/` |
+| `inventarios/AAAA-MM/` | Cierre de bodega. `2026/` es el inventario anual |
+| `hse/AAAA-MM/` | Informes HSE |
+| `contratos/` | `costayaco.pdf`, `vonus.pdf` |
+| `facturacion/` | Formato de facturación |
+| `informes/AAAA-MM/` | PDF, HTML y las fotos que el HTML usa |
 
-## Solo local (no GitHub)
-
-Deja estos archivos en su sitio; Git los ignora:
-
-| Archivo típico | Ruta sugerida |
-|----------------|---------------|
-| `INVENTARIO*.xlsx` | `Mantenimiento/` o carpeta del mes |
-| `Reporte_Diario_Costayaco_Vonu*.xlsx` | `Datos COPOWER/` y/o `Julio/` (copia de trabajo) |
-
-El resto (FO, alarmas, Data Soporte GTE, informes) sí se versiona.
-
-## Convención
-
-- No mezclar aquí archivos de Acordionero / ACRD / Pad 4
-- Preferir mes en el nombre del archivo
-- Tras mover fuentes, actualizar `sourceFile` en snapshots si cambia la ruta
-
-## Relación con la app
-
-Rutas de código y ETL: `data/Costayaco/...` (antes vivían en la raíz de `data/`).
+Los zip están en `data/archivo/`. Borradores y paquetes de trabajo, en `data/inbox/Costayaco/`.
