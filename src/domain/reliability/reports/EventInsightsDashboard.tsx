@@ -33,6 +33,7 @@ import { enrichEventLog } from "../events/eventLogUtils";
 import { EventCategoryCatalogTable } from "./EventCategoryCatalogTable";
 import { JUNE_2026_IMPUTABLE_EVENTS } from "./juneImputableEvents";
 import { EXEC_JUN } from "./executiveJune2026";
+import { NovemberRecords } from "../history/NovemberRecords";
 
 type Mode = "repetitivos" | "badactors";
 
@@ -132,11 +133,9 @@ export function EventInsightsDashboard({
   slideViewport = false,
 }: Props) {
   const snap = getSnap(report, month);
-  if (!snap) return <p className="empty-state">Sin datos para {monthLabel} en esta fuente.</p>;
-
   const events = useMemo(
-    () => enrichEventLog(snap.eventLog, report === "gran_tierra" ? "gran_tierra" : "copower"),
-    [snap.eventLog, report],
+    () => (snap ? enrichEventLog(snap.eventLog, report === "gran_tierra" ? "gran_tierra" : "copower") : []),
+    [snap, report],
   );
   const classifiedEvents = useMemo(
     () =>
@@ -165,6 +164,10 @@ export function EventInsightsDashboard({
       }),
     [events, month, report],
   );
+  if (!snap) {
+    if (month === "Nov") return <NovemberRecords view={mode} month={month} monthLabel={monthLabel} />;
+    return <p className="empty-state">Sin datos para {monthLabel} en esta fuente.</p>;
+  }
   const machine = snap.machineIndicators.filter((m) => m.unidad !== "SISTEMA N");
   const totalEvents = classifiedEvents.length;
 

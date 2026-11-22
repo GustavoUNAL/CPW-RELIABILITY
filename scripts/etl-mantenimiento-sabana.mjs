@@ -13,32 +13,27 @@ if (!maintDir) {
   console.error("No se encontró carpeta data/Costayaco/Mantenimiento");
   process.exit(1);
 }
+const sabanaDir = path.join(dataRoot, maintDir, "sabana");
 const xlsxName = fs
-  .readdirSync(path.join(dataRoot, maintDir))
+  .readdirSync(sabanaDir)
   .find((f) => /SABANA|MMTOS|PUTUMAYO/i.test(f) && f.endsWith(".xlsx") && !f.startsWith("~$"));
 if (!xlsxName) {
   console.error("No se encontró el Excel de sábana de mantenimientos");
   process.exit(1);
 }
-const XLSX_PATH = path.join(dataRoot, maintDir, xlsxName);
-const JULIO_PATH = [
-  path.join(dataRoot, "Julio", "SABANA MMTOS GEN PUTUMAYO Julio 2026 Mes de Julio.xlsx"),
-  ...fs
-    .readdirSync(path.join(dataRoot, "Julio"))
-    .filter((f) => /SABANA|MMTOS/i.test(f) && f.endsWith(".xlsx") && !f.startsWith("~$"))
-    .map((f) => path.join(dataRoot, "Julio", f)),
-].find((p) => fs.existsSync(p));
-const agostoDir = fs.readdirSync(dataRoot).find((d) => /^agosto$/i.test(d.trim()));
-const agostoMaint = agostoDir
-  ? fs.readdirSync(path.join(dataRoot, agostoDir)).find((d) => /manten/i.test(d))
-  : null;
-const AGOSTO_PATH = agostoMaint
-  ? fs
-      .readdirSync(path.join(dataRoot, agostoDir, agostoMaint))
-      .filter((f) => /SABANA|MMTOS/i.test(f) && f.endsWith(".xlsx") && !f.startsWith("~$"))
-      .map((f) => path.join(dataRoot, agostoDir, agostoMaint, f))
-      .find((p) => fs.existsSync(p))
-  : null;
+const XLSX_PATH = path.join(sabanaDir, xlsxName);
+const julioCandidate = path.join(
+  sabanaDir,
+  "2026-07",
+  "SABANA MMTOS GEN PUTUMAYO Julio 2026 Mes de Julio.xlsx",
+);
+const agostoCandidate = path.join(
+  sabanaDir,
+  "2026-08",
+  "SABANA MMTOS GEN PUTUMAYO Agosto 2026.xlsx",
+);
+const JULIO_PATH = fs.existsSync(julioCandidate) ? julioCandidate : null;
+const AGOSTO_PATH = fs.existsSync(agostoCandidate) ? agostoCandidate : null;
 const OUT = path.join(ROOT, "src/domain/reliability/reports/maintenancePlansData.ts");
 
 const MONTH_MAP = {
@@ -461,9 +456,9 @@ const payload = {
   extractedAt: new Date().toISOString().slice(0, 10),
   title: "Sábana de mantenimientos · Generación Putumayo",
   notes: AGOSTO_PATH
-    ? "Agosto 2026 desde data/Costayaco/Agosto/mantenimiento. Julio desde sábana oficial del mes. Ene–Jun y Sep–Dic desde sábana anual."
+    ? "Agosto 2026 desde data/Costayaco/Mantenimiento/sabana/2026-08. Julio desde sábana oficial del mes. Ene–Jun y Sep–Dic desde sábana anual."
     : JULIO_PATH
-      ? "Julio 2026 ejecutado desde sábana oficial del mes. Ene–Jun y Ago–Dic desde sábana anual data/Costayaco/Mantenimiento."
+      ? "Julio 2026 ejecutado desde sábana oficial del mes. Ene–Jun y Ago–Dic desde sábana anual data/Costayaco/Mantenimiento/sabana."
       : "Calendario diario 2026, control de ejecución y catálogo de periodicidad.",
   fleet: units.map((u) => ({ equipment: u.equipment, model: u.model })),
   catalog,

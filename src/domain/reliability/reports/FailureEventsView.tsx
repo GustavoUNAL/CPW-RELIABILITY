@@ -21,6 +21,7 @@ import {
   type EventEditMap,
   type EventEditPatch,
 } from "../events/eventEditStore";
+import { NovemberRecords } from "../history/NovemberRecords";
 import { COPOWER_MONTHLY_DATA, type CopowerMonthKey } from "./copowerMonthly";
 import { GRAN_TIERRA_MONTHLY_DATA, type GranTierraMonthKey } from "./granTierraMonthly";
 import { buildGteJuneRcaCases, findRcaCasesForEvent, type RcaCaseDetail } from "./gteJuneRcaCases";
@@ -1125,6 +1126,11 @@ export function FailureEventsView({
   function handleSaveEvent(id: string, patch: EventEditPatch) {
     const next = upsertEventEdit(id, patch);
     setEdits(next);
+  }
+
+  if (month === "Nov") {
+    const view = mode === "copower" ? "copower" : mode === "gte" ? "gte" : "dual";
+    return <NovemberRecords view={view} month={month} monthLabel={monthLabel} />;
   }
 
   return (

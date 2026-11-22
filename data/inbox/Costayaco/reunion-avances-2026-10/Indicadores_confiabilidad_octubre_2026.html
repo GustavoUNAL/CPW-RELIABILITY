@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Indicadores de confiabilidad · octubre 2026</title>
+<style>
+:root { --navy:#1E3A5F; --red:#C0392B; --teal:#0f766e; --ink:#0f172a; --muted:#64748b; --line:#e6ebf1; }
+@page { size: 10in 7.5in; margin: 0; }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { font-family: Arial, Helvetica, sans-serif; color: #1e293b; background: #fff; }
+.slide { position: relative; width: 10in; height: 7.5in; overflow: hidden; page-break-after: always; break-after: page; background: #fff url("fondo-presentacion.png") 0 0 / 100% 100% no-repeat; }
+.slide:last-child { page-break-after: auto; }
+.pad { position: absolute; z-index: 1; left: 0.38in; right: 0.38in; top: 1.00in; bottom: 0.72in; display: flex; flex-direction: column; gap: 0.07in; }
+h2.title { margin: 0; color: var(--navy); font-size: 16pt; font-weight: 700; line-height: 1.05; }
+.sub { margin: 0; font-size: 8pt; color: #475569; line-height: 1.3; }
+.cover { position: absolute; z-index: 1; inset: 0; }
+.hero { padding: 1.95in 1.05in 0; }
+.kicker { margin: 0; color: #C0392B; font-weight: 800; letter-spacing: 0.08em; font-size: 13pt; }
+.hero h1 { margin: 6px 0 0; color: #172D49; font-size: 28pt; line-height: 1.02; }
+.month { margin: 8px 0 0; color: #C0392B; font-weight: 800; letter-spacing: 0.04em; font-size: 16pt; }
+.hero hr { width: 2.1in; margin: 10px 0 12px; border: 0; border-top: 3px solid #0a6b73; }
+.hero h2 { margin: 0; color: #1E3A5F; font-size: 12pt; }
+.author { margin: 12px 0 0; color: #172D49; font-size: 10pt; line-height: 1.4; }
+.sites { display: grid; grid-template-columns: 1.05fr 1.15fr 0.9fr; gap: 8px; }
+.sites article { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px 7px; }
+.sites article.p { border-top: 3px solid #1E3A5F; }
+.sites article.c { border-top: 3px solid #C0392B; }
+.sites article.v { border-top: 3px solid #0f766e; }
+.sites h3 { margin: 0; font-size: 10pt; color: #1E3A5F; }
+.sites .sub { margin: 1px 0 4px; font-size: 7pt; }
+.sites dl { margin: 0; display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; }
+.sites dt { font-size: 7.4pt; color: #64748b; }
+.sites dd { margin: 0; font-size: 9pt; font-weight: 700; text-align: right; color: #0f172a; font-variant-numeric: tabular-nums; }
+.sites dd.ok { color: #047857; }
+.sites dd.warn { color: #b91c1c; }
+table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+th { text-align: left; font-size: 7.2pt; letter-spacing: 0.03em; text-transform: uppercase; color: #fff; background: var(--navy); padding: 4px 6px; }
+td { padding: 3px 6px; border-bottom: 1px solid #eef2f6; font-size: 8.5pt; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.si td { font-weight: 700; }
+tr.hoy td { background: #fff7ed; }
+td.ok { color: #047857; font-weight: 700; }
+td.warn { color: #b91c1c; font-weight: 700; }
+.trend { flex: 1; min-height: 0; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 4px 8px 2px; display: flex; flex-direction: column; }
+.trend-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.trend-head h3, .panel h3 { margin: 0; font-size: 10pt; color: var(--navy); }
+.leg { margin: 0; font-size: 7.5pt; color: var(--muted); }
+.trend svg { flex: 1; width: 100%; min-height: 0; }
+.frac-row { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; }
+.frac { display: flex; flex-direction: column; align-items: center; min-width: 168px; color: var(--navy); font-size: 9pt; font-weight: 700; text-align: center; line-height: 1.15; }
+.frac i { display: block; width: 100%; height: 1.5px; margin: 2px 0; background: var(--navy); }
+.frac-row em { font-style: normal; font-size: 18pt; font-weight: 800; color: var(--teal); }
+.frac-row p { margin: 0; font-size: 8pt; line-height: 1.3; color: #334155; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex: 0.85; min-height: 0; }
+.panel { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px 7px; display: flex; flex-direction: column; min-height: 0; gap: 5px; }
+.panel.grow { flex: 1.2; }
+.hbars { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; justify-content: space-between; flex: 1; gap: 4px; }
+.hbars li { display: grid; grid-template-columns: 214px 1fr 64px; gap: 8px; align-items: center; }
+.hbars .nm { font-size: 8.5pt; font-weight: 700; color: var(--ink); line-height: 1.15; white-space: nowrap; }
+.hbars .nm small { font-weight: 600; color: var(--muted); }
+.track { height: 14px; background: #e8eef5; border-radius: 4px; overflow: hidden; }
+.track b { display: block; height: 100%; border-radius: 4px; background: var(--navy); }
+.track b.hot { background: #c2410c; }
+.track b.out { background: var(--red); }
+.track b.hoy { background: #d97706; }
+.hbars em { font-style: normal; text-align: right; font-size: 9pt; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; }
+.foot { margin: 0; font-size: 7.4pt; line-height: 1.3; color: #475569; }
+table.dense td { font-size: 7.3pt; padding: 2px 4px; line-height: 1.2; vertical-align: top; }
+table.dense th { font-size: 6.5pt; padding: 3px 4px; }
+table.dense td.w { white-space: normal; }
+.why { margin: 0; background: #fff; border: 1px solid var(--line); border-left: 4px solid #c2410c; border-radius: 8px; padding: 6px 8px; font-size: 8pt; line-height: 1.32; color: #1e293b; }
+.steps { display: flex; flex-direction: column; gap: 6px; min-height: 0; }
+.step { background: #fff; border: 1px solid var(--line); border-left: 4px solid var(--navy); border-radius: 8px; padding: 5px 8px; }
+.step.hot { border-left-color: #c2410c; }
+.step.ok { border-left-color: #047857; }
+.step b { display: block; font-size: 7pt; letter-spacing: 0.04em; text-transform: uppercase; color: #64748b; }
+.step strong { display: block; margin: 1px 0; font-size: 10pt; color: var(--navy); line-height: 1.15; }
+.step p { margin: 0; font-size: 7.6pt; line-height: 1.28; color: #334155; }
+.shotbox { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 6px; display: flex; flex-direction: column; gap: 4px; }
+.shotbox img { width: 100%; height: 2.15in; object-fit: cover; border-radius: 6px; display: block; }
+.methods { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-content: start; }
+.method { background: #fff; border: 1px solid var(--line); border-top: 3px solid var(--navy); border-radius: 8px; padding: 6px 8px 7px; display: flex; flex-direction: column; gap: 3px; min-height: 0; }
+.method.hot { border-top-color: #c2410c; }
+.method.ok { border-top-color: #047857; }
+.method h3 { margin: 0; font-size: 10.5pt; color: var(--navy); }
+.method .def { margin: 0; font-size: 7.6pt; line-height: 1.28; color: #64748b; }
+.method .res { margin: 0; font-size: 8pt; line-height: 1.3; color: #1e293b; }
+.kpis { display: grid; gap: 8px; }
+.k4 { grid-template-columns: repeat(4, 1fr); }
+.kpis article { background: #fff; border: 1px solid var(--line); border-radius: 8px; border-top: 3px solid var(--navy); padding: 6px 8px 7px; }
+.kpis article.warn { border-top-color: #c2410c; }
+.kpis article.blue { border-top-color: var(--teal); }
+.kpis article.ok { border-top-color: #047857; }
+.kpis span { display: block; font-size: 7pt; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
+.kpis strong { display: block; margin-top: 2px; font-size: 14pt; color: var(--navy); line-height: 1.05; }
+.kpis small { display: block; margin-top: 2px; font-size: 7.4pt; line-height: 1.25; color: #334155; }
+.pn { position: absolute; z-index: 2; right: 0.38in; bottom: 0.24in; font-size: 8pt; color: #fff; font-weight: 700; }
+@media screen { body { background: #d6dee8; } .slide { margin: 12px auto; box-shadow: 0 10px 28px rgb(15 23 42 / 18%); } }
+@media print { body { background: #fff; } .slide { margin: 0; box-shadow: none; print-color-adjust: exact; -webkit-print-color-adjust: exact; } }
+</style>
+</head>
+<body>
+
+<article class="slide">
+  <div class="cover"><div class="hero">
+    <p class="kicker">PRESENTACIÓN DE INDICADORES · CORTE 01–26</p>
+    <h1>INDICADORES DE CONFIABILIDAD</h1>
+    <p class="month">OCTUBRE 2026</p>
+    <hr>
+    <h2>PARQUE DE GENERACIÓN COSTAYACO</h2>
+    <p class="author">Gustavo Arteaga<br>innovacion.confiabilidad@copower.com.co</p>
+  </div></div>
+  <span class="pn">1</span>
+</article>
+
+<article class="slide">
+  <div class="pad">
+    <h2 class="title">Resumen ejecutivo</h2>
+    <p class="sub">Mismas definiciones del cierre de septiembre. El reporte de hoy, CPW07 de 11:54 a 11:56, ya está dentro de las 18 fallas y no mueve el 99,49 %.</p>
+    <div class="sites">
+      <article class="p">
+        <h3>Costayaco</h3>
+        <p class="sub">10 máquinas · 01–26 oct · MTBF sin restar stand-by</p>
+        <dl>
+          <dt>Confiabilidad R%</dt><dd class="ok">99,49 %</dd>
+          <dt>Disponibilidad</dt><dd class="ok">99,49 %</dd>
+          <dt>MTTR</dt><dd>0,18 h</dd>
+          <dt>MTBF del sistema</dt><dd>346,5 h</dd>
+          <dt>Fallas de máquina</dt><dd>18</dd>
+          <dt>Paradas externas</dt><dd class="warn">34 h 17 min</dd>
+        </dl>
+      </article>
+      <article class="c">
+        <h3>Cómo cierra cada indicador</h3>
+        <p class="sub">Tplan = 26 × 24 h = 624 h. FO = 3,21 h.</p>
+        <dl>
+          <dt>R% = (Tplan − FO) / Tplan</dt><dd class="ok">99,49 %</dd>
+          <dt>Disponibilidad del sistema</dt><dd class="ok">Igual a R%</dd>
+          <dt>MTTR = FO / fallas</dt><dd>3,21 / 18</dd>
+          <dt>MTBF = (10 × 624 − 3,21) / 18</dt><dd>346,5 h</dd>
+          <dt>FO de hoy, CPW07</dt><dd>0,03 h</dd>
+          <dt>Meta 98 %</dt><dd class="ok">Cumple</dd>
+        </dl>
+      </article>
+      <article class="v">
+        <h3>26 oct · CPW07</h3>
+        <p class="sub">Reporte del día. Modo UST.</p>
+        <dl>
+          <dt>Salida</dt><dd>11:54</dd>
+          <dt>Entrada</dt><dd>11:56</dd>
+          <dt>Tiempo fuera</dt><dd>2 min</dd>
+          <dt>Protección</dt><dd>−P&gt; 2</dd>
+          <dt>Potencia inversa</dt><dd>−196 kW</dd>
+          <dt>Gas tratado</dt><dd>113 °F</dd>
+        </dl>
+      </article>
+    </div>
+    <table>
+      <thead><tr>
+        <th>Unidad</th><th class="num">Fallas</th><th class="num">FO</th><th class="num">Conf.</th><th class="num">Disp.</th><th class="num">MTTR</th><th class="num">MTBF</th><th>Cumple</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>CPW-01</td><td class="num">0</td><td class="num">0</td><td class="num ok">100 %</td><td class="num ok">100 %</td><td class="num">—</td><td class="num">Sin fallas</td><td class="ok">Cumple</td></tr>
+        <tr><td>CPW-02</td><td class="num">1</td><td class="num">0,47 h</td><td class="num ok">99,93 %</td><td class="num ok">99,93 %</td><td class="num">0,47 h</td><td class="num">623,5 h</td><td class="ok">Cumple</td></tr>
+        <tr><td>CPW-03</td><td class="num">0</td><td class="num">0</td><td class="num ok">100 %</td><td class="num ok">100 %</td><td class="num">—</td><td class="num">Sin fallas</td><td class="ok">Cumple</td></tr>
+        <tr class="hoy"><td>CPW-04</td><td class="num">12</td><td class="num">1,46 h</td><td class="num ok">99,77 %</td><td class="num ok">99,77 %</td><td class="num">0,12 h</td><td class="num warn">51,9 h</td><td class="ok">Cumple</td></tr>
+        <tr><td>CPW-05</td><td class="num">1</td><td class="num">0,68 h</td><td class="num ok">99,89 %</td><td class="num ok">99,89 %</td><td class="num">0,68 h</td><td class="num">623,3 h</td><td class="ok">Cumple</td></tr>
+        <tr><td>CPW-06</td><td class="num">2</td><td class="num">0,32 h</td><td class="num ok">99,95 %</td><td class="num ok">99,95 %</td><td class="num">0,16 h</td><td class="num">311,8 h</td><td class="ok">Cumple</td></tr>
+        <tr class="hoy"><td>CPW-07</td><td class="num">2</td><td class="num">0,27 h</td><td class="num ok">99,96 %</td><td class="num ok">99,96 %</td><td class="num">0,14 h</td><td class="num">311,9 h</td><td class="ok">Cumple</td></tr>
+        <tr><td>CPW-10</td><td class="num">0</td><td class="num">0</td><td class="num ok">100 %</td><td class="num ok">100 %</td><td class="num">—</td><td class="num">Sin fallas</td><td class="ok">Cumple</td></tr>
+        <tr><td>CPW-11</td><td class="num">0</td><td class="num">0</td><td class="num ok">100 %</td><td class="num ok">100 %</td><td class="num">—</td><td class="num">Sin fallas</td><td class="ok">Cumple</td></tr>
+        <tr><td>CPW-12</td><td class="num">0</td><td class="num">0</td><td class="num ok">100 %</td><td class="num ok">100 %</td><td class="num">—</td><td class="num">Sin fallas</td><td class="ok">Cumple</td></tr>
+        <tr class="si"><td>Sistema</td><td class="num">18</td><td class="num">3,21 h</td><td class="num ok">99,49 %</td><td class="num ok">99,49 %</td><td class="num">0,18 h</td><td class="num">346,5 h</td><td class="ok">Cumple</td></tr>
+      </tbody>
+    </table>
+    <p class="foot">MTBF de cada máquina = (624 h − FO) / fallas. El del sistema = (10 × 624 − 3,21) / 18 = 346,5 h. Stand-by en cero: los reportes de octubre no lo traen, así que este MTBF es un techo. En septiembre CPW-01 restó 49,15 h de stand-by y quedó en 669,85 h. Las 34 h 17 min externas no entran. CPW-03 en 100 % no dice que el rodamiento esté sano: no tuvo falla en el mes.</p>
+  </div>
+  <span class="pn">2</span>
+</article>
+
+<article class="slide">
+  <div class="pad">
+    <h2 class="title">Confiabilidad y disponibilidad</h2>
+    <p class="sub">Septiembre: 99,44 %, 4 fallas, MTTR 1,01 h, MTBF 1.518,16 h, con 714,32 h de stand-by ya restadas. Octubre: la misma R% y el mismo MTTR. El MTBF de 346,5 h usa stand-by = 0 porque los reportes no lo traen.</p>
+    <div class="frac-row">
+      <div class="frac"><b>624 h − 3,21 h</b><i></i><b>Tplan 624 h</b></div>
+      <em>99,49 %</em>
+      <p>FO medido: 192,4 min en 18 fallas de máquina, incluidos los 2 min de CPW07 hoy. MTTR = 3,21 / 18 = 0,18 h. La disponibilidad del sistema resta el mismo FO, así que cierra en 99,49 %. Un mantenimiento programado bajaría la disponibilidad y dejaría la confiabilidad quieta, como CPW-03 en septiembre (90,14 % y confiabilidad 100 %). En octubre esa parada no está registrada en horas.</p>
+    </div>
+    <div class="trend">
+      <div class="trend-head">
+        <h3>R% del parque · febrero a este corte</h3>
+        <p class="leg">Confiabilidad · meta 98 % · octubre es corte a 26 días, no cierre de mes</p>
+      </div>
+      <svg viewBox="0 0 860 228" role="img">
+        <line x1="52" y1="188" x2="844" y2="188" stroke="#94a3b8" stroke-dasharray="5 4" stroke-width="1.4"/>
+        <text x="46" y="192" text-anchor="end" font-size="12" fill="#64748b" font-family="Arial">98 %</text>
+        <text x="46" y="48" text-anchor="end" font-size="12" fill="#94a3b8" font-family="Arial">100 %</text>
+        <path d="M 64.0 157.8 L 159.8 117.0 L 255.5 61.4 L 351.2 58.1 L 447.0 62.8 L 542.8 54.1 L 638.5 54.1 L 734.2 91.6 L 830.0 88.2 L 830.0 198 L 64.0 198 Z" fill="rgb(15 118 110 / 14%)"/>
+        <path d="M 64.0 157.8 L 159.8 117.0 L 255.5 61.4 L 351.2 58.1 L 447.0 62.8 L 542.8 54.1 L 638.5 54.1 L 734.2 91.6 L 830.0 88.2" fill="none" stroke="#0f766e" stroke-width="3"/>
+        <circle cx="64" cy="157.8" r="4.2" fill="#0f766e"/><circle cx="159.8" cy="117" r="4.2" fill="#0f766e"/><circle cx="255.5" cy="61.4" r="4.2" fill="#0f766e"/><circle cx="351.2" cy="58.1" r="4.2" fill="#0f766e"/><circle cx="447" cy="62.8" r="4.2" fill="#0f766e"/><circle cx="542.8" cy="54.1" r="4.2" fill="#0f766e"/><circle cx="638.5" cy="54.1" r="4.2" fill="#0f766e"/><circle cx="734.2" cy="91.6" r="4.2" fill="#0f766e"/><circle cx="830" cy="88.2" r="5.4" fill="#0f766e"/>
+        <text x="70" y="150" text-anchor="start" font-size="12" font-weight="700" fill="#0f766e" font-family="Arial">98,45</text>
+        <text x="159.8" y="109" text-anchor="middle" font-size="12" font-weight="700" fill="#0f766e" font-family="Arial">99,06</text>
+        <text x="255.5" y="52" text-anchor="middle" font-size="12" font-weight="700" fill="#0f766e" font-family="Arial">99,89</text>
+        <text x="351.2" y="49" text-anchor="middle" font-size="12" font-weight="700" fill="#0f766e" font-family="Arial">99,94</text>
+        <text x="447" y="54" text-anchor="middle" font-size="12" font-weight="700" fill="#0f766e" font-family="Arial">99,87</text>
+        <text x="590" y="44" text-anchor="middle" font-size="12" font-weight="700" fill="#0f766e" font-family="Arial">100</text>
+        <text x="734.2" y="84" text-anchor="middle" font-size="12" font-weight="700" fill="#0f766e" font-family="Arial">99,44</text>
+        <text x="824" y="80" text-anchor="end" font-size="12" font-weight="700" fill="#0f766e" font-family="Arial">99,49</text>
+        <text x="64" y="218" text-anchor="middle" font-size="13" fill="#475569" font-family="Arial">Feb</text>
+        <text x="159.8" y="218" text-anchor="middle" font-size="13" fill="#475569" font-family="Arial">Mar</text>
+        <text x="255.5" y="218" text-anchor="middle" font-size="13" fill="#475569" font-family="Arial">Abr</text>
+        <text x="351.2" y="218" text-anchor="middle" font-size="13" fill="#475569" font-family="Arial">May</text>
+        <text x="447" y="218" text-anchor="middle" font-size="13" fill="#475569" font-family="Arial">Jun</text>
+        <text x="542.8" y="218" text-anchor="middle" font-size="13" fill="#475569" font-family="Arial">Jul</text>
+        <text x="638.5" y="218" text-anchor="middle" font-size="13" fill="#475569" font-family="Arial">Ago</text>
+        <text x="734.2" y="218" text-anchor="middle" font-size="13" fill="#475569" font-family="Arial">Sep</text>
+        <text x="830" y="218" text-anchor="middle" font-size="13" fill="#475569" font-family="Arial">Oct</text>
+      </svg>
+    </div>
+    <p class="foot">CPW-04: (624 − 1,46) / 12 = 51,9 h de MTBF. Es la máquina que baja el sistema a 346,5 h. En septiembre, con 4 fallas, el sistema dio 1.518,16 h. Octubre tiene 18 fallas cortas: el MTTR sigue en 0,18 h y el MTBF cae porque las paradas se repiten. Si aparece el stand-by del mes, estos MTBF bajan.</p>
+  </div>
+  <span class="pn">3</span>
+</article>
+
+<article class="slide">
+  <div class="pad">
+    <h2 class="title">Fallas de octubre</h2>
+    <p class="sub">Doce de las 18 fallas son de CPW-04. El detalle de cada salida, con la causa del reporte, está en las dos láminas siguientes. Abajo quedan las horas de MRU, red y EEP, fuera del R%.</p>
+    <div class="row2">
+      <div class="panel">
+        <h3>Fallas por equipo</h3>
+        <ul class="hbars">
+          <li><div class="nm">CPW-04 <small>· 1,46 h</small></div><div class="track"><b class="hot" style="width:100%"></b></div><em>12</em></li>
+          <li><div class="nm">CPW-06 <small>· 0,32 h</small></div><div class="track"><b style="width:16.7%"></b></div><em>2</em></li>
+          <li><div class="nm">CPW-07 <small>· incluye hoy</small></div><div class="track"><b class="hoy" style="width:16.7%"></b></div><em>2</em></li>
+          <li><div class="nm">CPW-05 <small>· 0,68 h</small></div><div class="track"><b style="width:8.3%"></b></div><em>1</em></li>
+          <li><div class="nm">CPW-02 <small>· 0,47 h</small></div><div class="track"><b style="width:8.3%"></b></div><em>1</em></li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Minutos de FO por causa</h3>
+        <ul class="hbars">
+          <li><div class="nm">Comunicación <small>· 6</small></div><div class="track"><b style="width:100%"></b></div><em>64,6</em></li>
+          <li><div class="nm">Detonación <small>· 7</small></div><div class="track"><b class="hot" style="width:69.8%"></b></div><em>45,1</em></li>
+          <li><div class="nm">TecJet <small>· CPW-05</small></div><div class="track"><b style="width:63.5%"></b></div><em>41</em></li>
+          <li><div class="nm">Sobrecorriente <small>· CPW-02</small></div><div class="track"><b style="width:43.3%"></b></div><em>28</em></li>
+          <li><div class="nm">Potencia inversa <small>· 3, con hoy</small></div><div class="track"><b class="hoy" style="width:21.4%"></b></div><em>13,8</em></li>
+        </ul>
+      </div>
+    </div>
+    <div class="panel grow">
+      <h3>Horas externas por reporte · fuera del R% · 34 h 17 min</h3>
+      <ul class="hbars">
+        <li><div class="nm">RF05 · 06 oct <small>· tormenta</small></div><div class="track"><b class="out" style="width:100%"></b></div><em>13 h 35</em></li>
+        <li><div class="nm">RF10 · 18 oct <small>· SIN y MRU</small></div><div class="track"><b class="out" style="width:43.2%"></b></div><em>5 h 52</em></li>
+        <li><div class="nm">RF06 · 08 oct <small>· recierre EEP</small></div><div class="track"><b class="out" style="width:38.5%"></b></div><em>5 h 14</em></li>
+        <li><div class="nm">RF17 · 24 oct <small>· EEP, las cinco el 24</small></div><div class="track"><b class="out" style="width:24.6%"></b></div><em>3 h 20</em></li>
+        <li><div class="nm">RF11 · 19 oct <small>· MRU</small></div><div class="track"><b class="out" style="width:20.2%"></b></div><em>2 h 45</em></li>
+        <li><div class="nm">RF01 · 02 oct <small>· NGL</small></div><div class="track"><b class="out" style="width:13.1%"></b></div><em>1 h 47</em></li>
+        <li><div class="nm">RF02 · 02 oct <small>· lluvia</small></div><div class="track"><b class="out" style="width:12.8%"></b></div><em>1 h 44</em></li>
+      </ul>
+    </div>
+    <p class="foot">CPW07 hoy salió por potencia inversa en detonación, con gas tratado a 113 °F. Cuenta como falla de máquina, igual que las detonaciones de CPW-04. El RF16 sigue sin formato. Una salida de CPW-06 el 3 oct a las 04:31 no tiene hora de entrada y no entra en las 18.</p>
+  </div>
+  <span class="pn">4</span>
+</article>
+
+<article class="slide">
+  <div class="pad">
+    <h2 class="title">Por qué falla CPW-04</h2>
+    <p class="why">Doce fallas y 1,46 h fuera de línea. Siete son detonación con la carga alta para el gas del momento: Moqueta el 16 y el 21, gas MQT por debajo de 140 psi la noche del 17, y el salto a 1.019 kW el 18 cuando salió CPW-05. Tres son la misma pérdida de comunicación del IE650 del 3 oct, compartida con CPW-06. Dos son pérdida de par con potencia inversa: a la 01:30 del 17 la TecJet bajó de 56 % a 27 % con el gas en 145 psi, y el 22 la potencia cayó en escalón de 894 kW a −205 kW.</p>
+    <table class="dense">
+      <tr><th>Fecha</th><th>Salida</th><th class="num">Min</th><th>Carga</th><th>Causa inmediata</th><th>Causa raíz del reporte</th></tr>
+      <tr><td>03 oct</td><td>03:46–03:54</td><td class="num">7,5</td><td>—</td><td>IE650</td><td class="w">Interrupción de la comunicación del IE650, la misma alarma en CPW-06.</td></tr>
+      <tr><td>03 oct</td><td>04:07–04:24</td><td class="num">17,0</td><td>a 0 rpm</td><td>IE650</td><td class="w">La misma comunicación. La máquina llegó a 0 rpm y rearrancó.</td></tr>
+      <tr><td>03 oct</td><td>04:27–04:34</td><td class="num">6,6</td><td>—</td><td>IE650</td><td class="w">Tercer disparo de la misma alarma 3000. Volvió a las 04:34.</td></tr>
+      <tr class="hoy"><td>16 oct</td><td>14:30–14:33</td><td class="num">3,3</td><td>880 kW</td><td>Detonación</td><td class="w">Gas Moqueta. El reporte plantea bajo número de metano o la cercanía al mantenimiento del 7 sep, a 4.603 h.</td></tr>
+      <tr class="hoy"><td>16 oct</td><td>15:13–15:20</td><td class="num">7,1</td><td>847 kW</td><td>Detonación</td><td class="w">Misma condición. La carga ya se había bajado y volvió a detonar.</td></tr>
+      <tr class="hoy"><td>16 oct</td><td>15:50–15:56</td><td class="num">6,3</td><td>792 kW</td><td>Detonación</td><td class="w">Tercera detonación del día, ya en 792 kW. Total del día: 16 min 40 s.</td></tr>
+      <tr><td>17 oct</td><td>01:30–01:36</td><td class="num">6,0</td><td>900 a −196 kW</td><td>Potencia inversa</td><td class="w">La TecJet pasó de 56 % a 27 % y el caudal a menos de 5 %. El gas MQT siguió en 145 psi.</td></tr>
+      <tr class="hoy"><td>17 oct</td><td>21:06–21:15</td><td class="num">9,0</td><td>985 kW</td><td>Detonación</td><td class="w">Gas MQT en 115 psi, por debajo de los 140 psi pedidos para 1.040 kW. Detonó en todos los cilindros.</td></tr>
+      <tr class="hoy"><td>17 oct</td><td>21:24–21:34</td><td class="num">10,0</td><td>cerca de nominal</td><td>Detonación</td><td class="w">Segunda salida de la noche, gas MQT en 117 psi. Después se limitó a 900 kW.</td></tr>
+      <tr class="hoy"><td>18 oct</td><td>03:10–03:17</td><td class="num">6,5</td><td>1.019 kW</td><td>Detonación</td><td class="w">Tomó carga de CPW-05 cuando su TecJet se desajustó. Pasó de 900 a 1.019 kW y detonó.</td></tr>
+      <tr class="hoy"><td>21 oct</td><td>21:23–21:26</td><td class="num">2,9</td><td>921 kW</td><td>Detonación</td><td class="w">Gas Moqueta a 170 psi. En la tarde se había estabilizado cerca de 733 kW.</td></tr>
+      <tr><td>22 oct</td><td>00:36–00:42</td><td class="num">5,8</td><td>894 a −205 kW</td><td>Potencia inversa</td><td class="w">Caída en escalón, sin degradar la carga antes. El reporte deja en análisis válvula de gas, regulador o encendido.</td></tr>
+    </table>
+    <p class="foot">Suma 87,8 min = 1,46 h. Las causas raíz son las del FO-GE-033: donde el reporte dice hipótesis, aquí queda como hipótesis. La del 22 oct sigue en análisis.</p>
+  </div>
+  <span class="pn">5</span>
+</article>
+
+<article class="slide">
+  <div class="pad">
+    <h2 class="title">Fallas de las demás máquinas</h2>
+    <p class="sub">Seis fallas de máquina aparte de CPW-04. Cada fila trae la causa inmediata y la causa raíz que escribió el reporte.</p>
+    <table class="dense">
+      <tr><th>Máquina</th><th>Cuándo</th><th class="num">Min</th><th>Causa inmediata</th><th>Causa raíz del reporte</th></tr>
+      <tr>
+        <td>CPW-06</td><td>03 oct · 03:48–03:57</td><td class="num">9,0</td><td>IE650</td>
+        <td class="w">La misma pérdida de comunicación del IE650 de CPW-04. Salió con 834 kW. Una segunda salida a las 04:31 no tiene hora de entrada y no entra en las 18.</td>
+      </tr>
+      <tr>
+        <td>CPW-06</td><td>03 oct · 11:07–11:18</td><td class="num">10,1</td><td>Sobrepotencia P&gt;</td>
+        <td class="w">A las 11:03 se perdieron 11 nodos de la red CAN de gestión de potencia en los dos canales. El interruptor abrió en 1.122 kW, 140 %. La barra se mantuvo en 447–464 V.</td>
+      </tr>
+      <tr>
+        <td>CPW-07</td><td>03 oct · 11:08–11:22</td><td class="num">14,5</td><td>Sobrepotencia Q&gt;</td>
+        <td class="w">La misma pérdida CAN. Abrió por 837 kvar y FP 0,56. Los 612 V en bornes son el rechazo de carga, con la máquina sobreexcitada.</td>
+      </tr>
+      <tr>
+        <td>CPW-02</td><td>17 oct · 04:08–04:36</td><td class="num">28</td><td>Sobrecorriente I&gt;2</td>
+        <td class="w">234 A, en su mayor parte reactiva: 1.590 kvar frente a 655 kW. El reporte plantea sobreexcitación del AVR o de la señal de reactivos del DEIF. La barra siguió en 4.248 V.</td>
+      </tr>
+      <tr>
+        <td>CPW-05</td><td>18 oct · 03:09–03:50</td><td class="num">41</td><td>TecJet</td>
+        <td class="w">Desajuste del actuador de la válvula TecJet. Osciló entre 600 y 1.000 kW con gas MQT a 157 psi y salió en 954 kW. Operación ajustó el actuador. Esa salida cargó a CPW-04.</td>
+      </tr>
+      <tr class="hoy">
+        <td>CPW-07</td><td>26 oct · 11:54–11:56</td><td class="num">2,0</td><td>Potencia inversa</td>
+        <td class="w">Gas tratado a 113 °F, con detonación. El actuador fue a mínimo combustible, la máquina absorbió −196 kW y actuó −P&gt;2. Después se limitó a 600 kW.</td>
+      </tr>
+    </table>
+    <div class="panel" style="flex:0">
+      <h3>Máquinas sin falla de máquina en el corte</h3>
+      <p class="foot">CPW-01, CPW-03, CPW-10, CPW-11 y CPW-12 cierran con 0 fallas, confiabilidad 100 % y MTBF en “sin fallas”. Sus salidas de octubre son MRU, red o EEP y suman dentro de las 34 h 17 min externas. CPW-03 en 100 % describe paradas, no el estado del rodamiento del generador.</p>
+    </div>
+    <p class="foot">Causa inmediata es la protección que abrió. Causa raíz es la que el reporte sostiene con los logs. En CPW-02, CPW-05, CPW-06, CPW-07 y en la detonación de CPW-04 el reporte la deja como hipótesis o causa probable.</p>
+  </div>
+  <span class="pn">6</span>
+</article>
+
+<article class="slide">
+  <div class="pad">
+    <h2 class="title">Causa del rodamiento · CPW-03</h2>
+    <p class="sub">Informe Windrock del 17 jul, 12.142 h, 449 kW, 1.800 rpm. Es el único informe de rodamientos de la carpeta. El defecto y el factor que agrava la vibración están cerrados. La causa que originó el desgaste se confirma al abrir la pieza.</p>
+    <div class="row2" style="flex:1">
+      <div class="steps">
+        <div class="step hot">
+          <b>1 · Defecto confirmado</b>
+          <strong>Rodamiento del generador, lado libre, etapa 3</strong>
+          <p>2,04 g rms en aceleración, con tendencia al alza. El delta está en 92,8 Hz, frecuencia de rodamiento. El espectro vertical da 2,004 g rms. Eso es desgaste del rodamiento, ya en etapa 3.</p>
+        </div>
+        <div class="step">
+          <b>2 · Daño asociado, en seguimiento</b>
+          <strong>Lado acoplado: rodamiento y alojamiento, 0,63 g</strong>
+          <p>El informe describe deterioro del rodamiento y de su alojamiento. La pieza de la foto tiene el ánima rayada, coherente con ese alojamiento. El informe no marca si la foto es el lado libre o el acoplado.</p>
+        </div>
+        <div class="step">
+          <b>3 · Condición de la medición</b>
+          <strong>449 kW agravan la vibración leída</strong>
+          <p>El informe toma la baja carga como factor agravante de la respuesta vibratoria. Por eso pide monitoreo mensual por encima de 600 kW, o el cambio del rodamiento en 3 a 4 meses.</p>
+        </div>
+        <div class="step ok">
+          <b>4 · Causa raíz del desgaste</b>
+          <strong>Se cierra al abrir el rodamiento</strong>
+          <p>El informe fija el modo de falla y no asigna el origen del desgaste. Al desarmar se confirman referencia, holgura y estado de las pistas. La velocidad sigue tolerable: 0,106 ips contra 0,787 de ISO 8528-9.</p>
+        </div>
+      </div>
+      <div class="shotbox">
+        <img src="evidencia-alojamiento-rodamiento.jpg" alt="Alojamiento de rodamiento con el ánima rayada">
+        <p class="foot">Alojamiento con el ánima rayada. El informe describe desgaste del alojamiento en el lado acoplado y la foto no trae rótulo de lado.</p>
+        <h3>Bancadas del motor, otro componente</h3>
+        <p class="foot">Velocidad tolerable. La más alta es la bancada 6, con 0,612 ips. Seguimiento en bancadas 1, 2 y 4 y en el cojinete de biela 11, por vibración transmitida del sistema de distribución. El informe no pide cambiarlas.</p>
+        <h3>Efecto en el indicador</h3>
+        <p class="foot">En septiembre el cambio de rodamientos dejó CPW-03 en 90,14 % de disponibilidad y 100 % de confiabilidad. En octubre no hay horas de ese trabajo: 0 fallas. Del 17 jul al 24 oct sumó 2.124 h y la ventana de cambio, 17 oct a 17 nov, sigue abierta. Esta semana figura disponible.</p>
+      </div>
+    </div>
+  </div>
+  <span class="pn">7</span>
+</article>
+
+<article class="slide">
+  <div class="pad">
+    <h2 class="title">Técnicas y resultados · CPW-03</h2>
+    <p class="why"><strong>Vibraciones.</strong> Miden cuánto tiembla la máquina para detectar desgaste, desajustes o piezas deterioradas. En el generador la velocidad quedó tolerable: máximo 0,106 ips, límite ISO 8528-9 de 0,787 ips. El daño aparece en aceleración, 2,04 g en el lado libre. En el motor las bancadas también quedaron tolerables: máximo 0,612 ips en la bancada 6, desplazamiento 3,1 mils y aceleración 3,1 g transmitida desde el sistema de distribución.</p>
+    <div class="methods">
+      <article class="method">
+        <h3>Ultrasonido</h3>
+        <p class="def">Detecta señales de los eventos mecánicos de las válvulas y los pistones para identificar comportamientos anormales.</p>
+        <p class="res"><strong>Resultado.</strong> El encendido de cada cilindro salió sin condición anormal. Hay pérdida de calibración de válvulas en las culatas 6, 7, 10, 12 y 20; la 7 y la 20 quedan en criticidad media. Los cilindros 3, 12, 14, 17 y 20 muestran mayor excitación del pistón, con potencial de rayadura en camisa y pistón.</p>
+      </article>
+      <article class="method hot">
+        <h3>Análisis de frecuencias (FFT)</h3>
+        <p class="def">Permite identificar de dónde provienen las vibraciones y qué componente podría estar fallando.</p>
+        <p class="res"><strong>Resultado.</strong> En el lado libre el delta está en 92,8 Hz, frecuencia de rodamiento: etapa 3, espectro vertical 2,004 g rms. En el lado acoplado hay eventos periódicos de desgaste del rodamiento y del alojamiento, 0,63 g. En velocidad predomina 1X y el espectro no muestra condición anormal.</p>
+      </article>
+      <article class="method">
+        <h3>Análisis de aceite</h3>
+        <p class="def">Busca metales como hierro y aluminio que podrían indicar desgaste interno.</p>
+        <p class="res"><strong>Resultado.</strong> El informe pide seguir las concentraciones de hierro y aluminio por los cilindros 3, 12, 14, 17 y 20, y hacer inspección videoscópica si esas concentraciones suben. Este informe no trae el resultado de laboratorio.</p>
+      </article>
+      <article class="method ok">
+        <h3>Monitoreo de rodamientos</h3>
+        <p class="def">Evalúa su condición para anticipar daños y programar su reemplazo.</p>
+        <p class="res"><strong>Resultado.</strong> Lado libre del generador en etapa 3: monitoreo mensual sobre 600 kW o cambio en 3 a 4 meses, ventana 17 oct a 17 nov. Lado acoplado en seguimiento. Bancadas 1, 2 y 4 y cojinete de biela 11 en seguimiento, sin pedido de cambio.</p>
+      </article>
+    </div>
+  </div>
+  <span class="pn">8</span>
+</article>
+
+</body>
+</html>

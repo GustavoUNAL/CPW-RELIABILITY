@@ -2,7 +2,7 @@
  * ETL: Data Soporte + PDF Análisis Indicadores GTE agosto 2026
  * → snapshot listo para granTierraMonthly.ts
  *
- * Fuente: data/Costayaco/Agosto/Presentación GTE/
+ * Fuente: data/Costayaco/GTE/2026-08/
  * Uso: node scripts/etl-gte-agosto.mjs
  */
 import fs from "node:fs";
@@ -10,7 +10,7 @@ import path from "node:path";
 import XLSX from "xlsx";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
-const DIR = path.join(ROOT, "data", "Costayaco", "Agosto", "Presentación GTE");
+const DIR = path.join(ROOT, "data", "Costayaco", "GTE", "2026-08");
 const OUT = path.join(ROOT, "scripts", "_extracted_agosto_gte.json");
 
 const XLSX_NAME = fs
@@ -439,7 +439,7 @@ const totalGenerationKwh = round1(units.reduce((s, u) => s + u.energiaKwh, 0));
 
 const snap = {
   label: "Agosto",
-  sourceFile: `data/Costayaco/Agosto/Presentación GTE/${XLSX_NAME}`,
+  sourceFile: `data/Costayaco/GTE/2026-08/${XLSX_NAME}`,
   summary: {
     copowerFailures,
     totalEvents: events.length,

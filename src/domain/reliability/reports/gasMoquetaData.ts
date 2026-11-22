@@ -72,7 +72,7 @@ export type GasMoquetaPack = {
 };
 
 export const GAS_MOQUETA: GasMoquetaPack = {
-  "sourceFile": "data/Costayaco/eficiencia/parametros operacion gas moquta.xlsx",
+  "sourceFile": "data/Costayaco/operacion/gas/parametros operacion gas moquta.xlsx",
   "dataSoporteFiles": [
     "data/Costayaco/GTE/Junio/Data Soporte Cálculo Copower PUTN Junio 2026 (1).xlsx",
     "data/Costayaco/Julio/GTE/Data Soporte Cálculo Copower PUTN Julio 2026.xlsx"

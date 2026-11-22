@@ -1,44 +1,16 @@
 # data/
 
-Fuentes por campo. **No mezclar sitios.**
+Fuentes por campo. El mismo criterio en los dos sitios.
 
-```text
+```
 data/
-  Costayaco/     # Putumayo Norte · Vonú · PUTN
-  Acordionero/   # Pad 4 · ACRD · VMM
+  inbox/          # llega sin clasificar
+  archivo/        # zip original
+  extract/        # csv/json regenerable
+  Costayaco/      # Putumayo Norte · también Vonú
+  Acordionero/    # Pad 4
 ```
 
-Ver el `README.md` de cada carpeta.
+Dentro de cada campo: `activos`, `operacion`, `concertacion`, `GTE`, `fallas`, `Mantenimiento` o `mantenimiento`, `inventarios`, `hse`, `contratos`, `facturacion`, `informes`.
 
----
-
-## Qué va a GitHub vs qué queda solo en tu máquina
-
-| En GitHub (sí) | Solo local (no) |
-|----------------|-----------------|
-| Informes PDF/PPTX, Data Soporte GTE (Excel chicos), FO-GE-033, RCA | Inventarios `INVENTARIO*.xlsx` (100–400 MB) |
-| Zips/logs de falla razonables (&lt; ~5 MB por evento) | Reportes diarios `Reporte_Diario*.xlsx` (~60 MB) |
-| Extracciones JSON/txt en `extract/` | `node_modules/`, `dist/`, `.vscode/` |
-| Snapshots / packs que consume la app (`src/.../*.json`) | Carpetas `data/analytics/`, temporales `~$*.xlsx` |
-
-Los pesados están en `.gitignore`. **Deben existir en disco** para correr ETL; no hace falta (ni conviene) versionarlos.
-
-### Cómo recuperar / generar lo local
-
-```bash
-# Inventario → mínimos en la app
-npm run etl:inventario
-
-# Operación / reportes diarios (requiere el Excel local en Datos COPOWER o mes/)
-npm run etl:operacion   # u otros etl:* según package.json
-```
-
-Coloca los Excel grandes en las rutas documentadas en `Costayaco/README.md` (no los renombres fuera de `data/`).
-
----
-
-## Convención
-
-1. Fuentes crudas → carpeta del **campo** y del **mes**.
-2. ETL → JSON/TS que usa la UI (eso sí se commitea).
-3. Tras mover rutas, actualizar `sourceFile` en snapshots si aplica.
+Una falla vive en `fallas/AAAA-MM/AAAA-MM-DD_EQUIPO_RFxx/` con `formulario`, `logs`, `evidencias` y `analisis`. El informe publicado (pdf, html y sus fotos) se queda en `informes/AAAA-MM`.

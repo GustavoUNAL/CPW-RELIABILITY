@@ -1,4 +1,4 @@
-export { APP_USERS, ROLE_LABELS, authenticate, findUserByEmail, type AppUser, type SessionUser, type UserRole } from "./users";
+export { APP_USERS, AUTH_ENABLED, LOCAL_PREVIEW_USER, ROLE_LABELS, authenticate, findUserByEmail, type AppUser, type SessionUser, type UserRole } from "./users";
 export {
   canAccessInformes,
   defaultHomeForRole,

@@ -1,6 +1,6 @@
 /**
  * ETL: Horas concertadas GTE → concertacionHoursData.ts
- * Fuente: data/Costayaco/concertacion horas/Horas concertadas con GTE del 01 al 31 julio 2026.xlsx
+ * Fuente: data/Costayaco/concertacion/2026-07/Horas concertadas con GTE del 01 al 31 julio 2026.xlsx
  *
  * Uso: node scripts/etl-concertacion.mjs
  */
@@ -9,18 +9,17 @@ import path from "node:path";
 import XLSX from "xlsx";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
-const DIR = path.join(ROOT, "data", "Costayaco", "concertacion horas");
-const XLSX_NAME = fs
-  .readdirSync(DIR)
-  .find((f) => /Horas concertadas/i.test(f) && f.endsWith(".xlsx") && !f.startsWith("~$"));
-if (!XLSX_NAME) {
-  console.error("No se encontró Excel de horas concertadas");
+const XLSX_PATH = path.join(
+  ROOT,
+  "data/Costayaco/concertacion/2026-07/Horas concertadas con GTE del 01 al 31 julio 2026.xlsx",
+);
+if (!fs.existsSync(XLSX_PATH)) {
+  console.error("No se encontró Excel de horas concertadas de julio");
   process.exit(1);
 }
-const XLSX_PATH = path.join(DIR, XLSX_NAME);
 const AGO_XLSX = path.join(
   ROOT,
-  "data/Costayaco/Agosto/Consolidado de Horas concertadas del 01 al 31 de Agosto.xlsx",
+  "data/Costayaco/concertacion/2026-08/Consolidado de Horas concertadas del 01 al 31 de Agosto.xlsx",
 );
 const OUT = path.join(ROOT, "src/domain/reliability/reports/concertacionHoursData.ts");
 

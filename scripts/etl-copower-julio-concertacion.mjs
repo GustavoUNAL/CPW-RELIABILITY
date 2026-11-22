@@ -1,6 +1,6 @@
 /**
  * ETL: Horas concertadas julio 2026 → snapshot COPOWER (eventos + indicadores).
- * Fuente: data/Costayaco/Julio/Horas concertadas con GTE (del 01 al 31 julio 2026).xlsx
+ * Fuente: data/Costayaco/concertacion/2026-07/Horas concertadas con GTE (del 01 al 31 julio 2026).xlsx
  *
  * Uso: node scripts/etl-copower-julio-concertacion.mjs
  */
@@ -11,7 +11,7 @@ import XLSX from "xlsx";
 const ROOT = path.resolve(import.meta.dirname, "..");
 const XLSX_PATH = path.join(
   ROOT,
-  "data/Costayaco/Julio/Horas concertadas con GTE (del 01 al 31 julio 2026).xlsx",
+  "data/Costayaco/concertacion/2026-07/Horas concertadas con GTE (del 01 al 31 julio 2026).xlsx",
 );
 const OUT_JSON = path.join(ROOT, "scripts/_extracted_julio_copower.json");
 const MONTHLY = path.join(ROOT, "src/domain/reliability/reports/copowerMonthly.ts");
@@ -196,7 +196,7 @@ const consumos = units.map((u) => ({
 
 const snap = {
   label: "Julio 2026",
-  sourceFile: "data/Costayaco/Julio/Horas concertadas con GTE (del 01 al 31 julio 2026).xlsx",
+  sourceFile: "data/Costayaco/concertacion/2026-07/Horas concertadas con GTE (del 01 al 31 julio 2026).xlsx",
   summary: {
     copowerFailures,
     totalEvents: eventLog.length,

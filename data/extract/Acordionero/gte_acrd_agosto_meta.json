@@ -1,0 +1,13 @@
+{
+  "source": "data/Acordionero/GTE/Informe_Análisis_Gestión_del_Desempeño_Agosto_2026_-_Copower_ACRD/Data Soporte Cálculo Copower ACRD Agosto 2026.xlsx",
+  "sistemaN": {
+    "energiaKwh": 3746118,
+    "a": 0.9817,
+    "r": 0.9893,
+    "fallas": 9,
+    "mtbf": 309.89,
+    "mttr": 8.54
+  },
+  "rows": 184,
+  "extractedAt": "2026-09-09T16:53:01.076Z"
+}

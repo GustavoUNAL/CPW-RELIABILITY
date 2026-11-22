@@ -25,8 +25,9 @@ export const PROJECT_NAV_TREE: NavModule[] = [
   {
     key: "dashboard",
     label: "Dashboard",
-    description: "Vistas ejecutivas y operativas por audiencia",
+    description: "Historial 2026 y vistas del mes seleccionado",
     children: [
+      { id: "dash-historial", label: "Historial de confiabilidad" },
       { id: "dash-resumen", label: "15 láminas" },
       { id: "dash-indicadores", label: "Indicadores GTE / COPOWER" },
       { id: "dash-contrato", label: "Cumplimiento de metas contractuales" },
@@ -63,6 +64,11 @@ export const PROJECT_NAV_TREE: NavModule[] = [
           { id: "cfg-campos-vonu-contrato", label: "Contrato" },
           { id: "cfg-campos-vonu-activos", label: "Activos" },
         ],
+      },
+      {
+        id: "cfg-campos-pad4",
+        label: "Pad 4 · Acordionero",
+        children: [{ id: "cfg-campos-pad4-resumen", label: "Resumen" }],
       },
     ],
   },
@@ -134,6 +140,7 @@ export const PROJECT_NAV_TREE: NavModule[] = [
             id: "conf-bitacoras",
             label: "Fallas",
             children: [
+              { id: "bd-ev-pad4-1211", label: "Pad 4 · 12 nov" },
               { id: "bd-ev-copower", label: "COPOWER" },
               { id: "bd-ev-gte", label: "Gran Tierra" },
               { id: "bd-ev-dual", label: "Comparativo dual" },
@@ -334,7 +341,7 @@ export const PROJECT_NAV_TREE: NavModule[] = [
   },
 ];
 
-export const PROJECT_TITLE = "Reliability Analytics Platform";
+export const PROJECT_TITLE = "Cómo va el parque";
 
 /** Primera hoja navegable de un módulo (profundidad recursiva). */
 export function firstLeafId(nodes: NavNode[]): string | null {

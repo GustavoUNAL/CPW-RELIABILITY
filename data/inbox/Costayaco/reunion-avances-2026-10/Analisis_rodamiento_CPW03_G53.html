@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>RCA-GEN-001 · Rodamiento CPW03 / G53</title>
+<style>
+  :root { --slide-bg: url("fondo-presentacion.png"); }
+  @page { size: 10in 7.5in; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #d8dee6; }
+  body { font-family: Arial, Helvetica, sans-serif; color: #1e293b; }
+  .slide {
+    position: relative; width: 10in; height: 7.5in; overflow: hidden;
+    page-break-after: always; break-after: page; margin: 10px auto;
+    background: #fff var(--slide-bg) 0 0 / 100% 100% no-repeat;
+    box-shadow: 0 2px 12px rgba(0,0,0,.18);
+  }
+  .slide:last-child { page-break-after: auto; }
+  .pad { position: absolute; z-index: 1; left: 0.42in; right: 0.42in; top: 1.05in; bottom: 0.42in; display: flex; flex-direction: column; gap: 0.06in; }
+  h2.title { margin: 0; color: #1E3A5F; font-size: 16pt; font-weight: 700; line-height: 1.05; }
+  .pn { position: absolute; z-index: 2; right: 0.38in; bottom: 0.22in; font-size: 8pt; color: #fff; font-weight: 700; }
+  .cover { position: absolute; z-index: 1; inset: 0; display: flex; flex-direction: column; }
+  .hero { padding: 1.85in 0.95in 0; }
+  .kicker { margin: 0; color: #C0392B; font-weight: 800; letter-spacing: 0.08em; font-size: 12pt; }
+  .hero h1 { margin: 6px 0 0; color: #172D49; font-size: 26pt; line-height: 1.05; }
+  .month { margin: 8px 0 0; color: #C0392B; font-weight: 800; letter-spacing: 0.04em; font-size: 15pt; }
+  .hero hr { width: 2.1in; margin: 10px 0 12px; border: 0; border-top: 3px solid #0a6b73; }
+  .hero h2 { margin: 0; color: #1E3A5F; font-size: 12pt; font-weight: 600; }
+  .author { margin: 12px 0 0; color: #172D49; font-size: 10pt; line-height: 1.4; }
+  .kpis { display: grid; gap: 5px; }
+  .k4 { grid-template-columns: repeat(4, 1fr); }
+  .k3 { grid-template-columns: repeat(3, 1fr); }
+  .kpis article { background: #fff; border: 1px solid #e6ebf1; border-radius: 8px; padding: 4px 7px 3px; }
+  .kpis article.warn { background: #fff7ed; }
+  .kpis article.bad { background: #fef2f2; }
+  .kpis article.ok { background: #ecfdf5; }
+  .kpis span { display: block; font-size: 6.7pt; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #64748b; }
+  .kpis strong { display: block; margin-top: 1px; font-size: 12.5pt; letter-spacing: -0.03em; color: #0f172a; line-height: 1.05; }
+  .kpis small { display: block; margin-top: 1px; font-size: 7pt; color: #64748b; line-height: 1.25; }
+  p.lead { margin: 0; font-size: 9pt; line-height: 1.35; color: #1e293b; }
+  table.evt, table.mto { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #e6ebf1; border-radius: 8px; overflow: hidden; }
+  table.evt th, table.mto th { background: #1E3A5F; color: #fff; font-size: 7.2pt; padding: 4px 6px; border: 0; text-align: left; }
+  table.evt td { font-size: 7.5pt; padding: 3px 6px; border-bottom: 1px solid #eef2f6; vertical-align: top; line-height: 1.25; }
+  table.mto td { font-size: 8pt; padding: 4px 7px; border-bottom: 1px solid #eef2f6; vertical-align: top; line-height: 1.28; }
+  table.evt td.hora, table.mto td.num { font-weight: 800; color: #1E3A5F; white-space: nowrap; }
+  table.evt tr.sec td { background: #eef3f8; color: #1E3A5F; font-size: 7.2pt; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+  .src { margin-top: auto; font-size: 6.6pt; color: #64748b; }
+  .two { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 8px; min-height: 0; }
+  .box { background: #fff; border: 1px solid #e6ebf1; border-radius: 8px; padding: 6px 8px; }
+  .box h3 { margin: 0 0 3px; font-size: 9pt; color: #1E3A5F; }
+  .box p, .box li { margin: 0 0 3px; font-size: 7.6pt; line-height: 1.28; color: #334155; }
+  .box ul { margin: 0; padding-left: 14px; }
+  .box.bad { border-top: 3px solid #C0392B; }
+  .box.warn { border-top: 3px solid #c2410c; }
+  .box.ok { border-top: 3px solid #0f766e; }
+  figure { margin: 0; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  figure img { width: 100%; height: 4.55in; object-fit: contain; background: #111; border-radius: 8px; border: 1px solid #e6ebf1; }
+  figcaption { font-size: 7.2pt; color: #475569; margin-top: 3px; line-height: 1.3; }
+  @media print {
+    html, body { background: #fff; }
+    .slide { margin: 0; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+<article class="slide">
+  <div class="cover"><div class="hero">
+    <p class="kicker">ANÁLISIS DE CAUSA RAÍZ · RCA-GEN-001</p>
+    <h1>RODAMIENTO DEL GENERADOR<br>CPW03 / G53</h1>
+    <p class="month">COSTAYACO · 26 DE OCTUBRE DE 2026</p>
+    <hr>
+    <h2>Lado libre en etapa 3 desde el 17 de julio. Plazo de cambio abierto.</h2>
+    <p class="author">Gustavo Arteaga<br>Ingeniero de Confiabilidad · COPOWER<br>innovacion.confiabilidad@copower.com.co</p>
+  </div></div>
+  <span class="pn">1</span>
+</article>
+
+<article class="slide"><div class="pad">
+  <h2 class="title">Información general</h2>
+  <table class="mto">
+    <tr><th>Campo</th><th>Detalle</th></tr>
+    <tr><td>Código</td><td>RCA-GEN-001</td></tr>
+    <tr><td>Máquina</td><td>CPW03, también G53. Motor Jenbacher J420 y generador. 1.800 rpm.</td></tr>
+    <tr><td>Componente</td><td>Rodamiento del lado libre del generador. Alojamiento del lado acoplado en seguimiento.</td></tr>
+    <tr><td>Medición</td><td>17-07-2026, Windrock 6400, Nelson David Sandoval. Informe F040-1. Norma ISO 8528-9.</td></tr>
+    <tr><td>Horas en la medición</td><td>12.142 h, con la máquina en 449 kW.</td></tr>
+    <tr><td>Horas al 24-10-2026</td><td>14.266 h, formato FO-GE-033 RF17.</td></tr>
+    <tr><td>Estado</td><td>Causa directa identificada. Causa física del desgaste pendiente de confirmar al abrir el apoyo. Plan de acción definido.</td></tr>
+  </table>
+  <div class="kpis k4">
+    <article class="bad"><span>Lado libre</span><strong>Etapa 3</strong><small>2,04 g rms · 92,8 Hz</small></article>
+    <article class="warn"><span>Lado acoplado</span><strong>0,63 g</strong><small>Rodamiento y alojamiento</small></article>
+    <article class="warn"><span>Horas después</span><strong>2.124 h</strong><small>17 jul → 24 oct</small></article>
+    <article class="bad"><span>Plazo de cambio</span><strong>17 oct – 17 nov</strong><small>3 a 4 meses del informe</small></article>
+  </div>
+  <p class="src">Fuentes: informe Windrock F040-1, sábana de mantenimientos Putumayo, planeación 26 oct–1 nov 2026, FO-GE-033 de octubre y fotografía de taller.</p>
+  <span class="pn">2</span>
+</div></article>
+
+<article class="slide"><div class="pad">
+  <h2 class="title">1. Resumen ejecutivo</h2>
+  <p class="lead">El 17 de julio de 2026 el monitoreo dinámico de CPW03 clasificó el rodamiento del lado libre del generador en etapa 3. La aceleración llegó a 2,04 g rms, con incremento de tendencia y un delta en 92,8 Hz, frecuencia que el informe asocia al rodamiento. El lado acoplado quedó en 0,63 g rms, con deterioro del rodamiento y de su alojamiento. En velocidad, los dos apoyos siguen dentro de ISO 8528-9 (máximo 0,106 ips frente a 0,787). El informe no ordenó paro inmediato. Ordenó monitoreo mensual por encima de 600 kW y el reemplazo en 3 a 4 meses.</p>
+  <p class="lead">Ese plazo empezó el 17 de octubre y cierra el 17 de noviembre. Entre la medición y el 24 de octubre la máquina sumó 2.124 horas y tuvo seis salidas por gas o por la red. La planeación del 26 de octubre al 1 de noviembre deja a CPW03 disponible y no programa el cambio. La fotografía de taller muestra un alojamiento con el diámetro interior rayado y viruta de mecanizado. La pieza no identifica el lado.</p>
+  <div class="kpis k3">
+    <article class="ok"><span>Velocidad ISO</span><strong>Tolerable</strong><small>El defecto no está en los ips</small></article>
+    <article class="bad"><span>Aceleración</span><strong>Etapa 3</strong><small>Ahí está la frecuencia del rodamiento</small></article>
+    <article><span>Esta semana</span><strong>Sin parada</strong><small>CPW02 M1 y Jinan en válvulas</small></article>
+  </div>
+  <span class="pn">3</span>
+</div></article>
+
+<article class="slide"><div class="pad">
+  <h2 class="title">2. Alcance y 3. Sistema</h2>
+  <div class="two">
+    <div class="box">
+      <h3>Objetivo</h3>
+      <p>Determinar la causa directa, lo que puede afirmarse como causa raíz con la evidencia disponible, y las causas que mantienen la máquina expuesta, y dejar el plan para cerrar el hallazgo.</p>
+      <h3>Dentro del alcance</h3>
+      <ul>
+        <li>Rodamiento del lado libre, etapa 3.</li>
+        <li>Rodamiento y alojamiento del lado acoplado, en seguimiento.</li>
+        <li>Horas y salidas de CPW03 desde el 17 de julio.</li>
+        <li>Planeación del 26 de octubre al 1 de noviembre.</li>
+        <li>Fotografía del alojamiento en el banco.</li>
+      </ul>
+    </div>
+    <div class="box warn">
+      <h3>Fuera del alcance, hasta abrir</h3>
+      <ul>
+        <li>Referencia del rodamiento, juego y lubricante. No están en los documentos.</li>
+        <li>Causa física del desgaste: lubricación, alineación, carga del generador o ajuste del alojamiento. El Windrock la señala; no la cierra.</li>
+        <li>El motor. No tiene acción prioritaria. Válvulas y pistones quedan en seguimiento aparte.</li>
+      </ul>
+    </div>
+  </div>
+  <table class="evt">
+    <tr><th>Condición de la medición</th><th>Valor</th><th>Lectura</th></tr>
+    <tr><td>Velocidad y horas</td><td>1.800 rpm · 12.142 h</td><td>Punto de partida del plazo</td></tr>
+    <tr><td>Potencia</td><td>449 kW</td><td>Por debajo de los 600 kW que el informe pide para el seguimiento. La baja carga agrava la vibración.</td></tr>
+    <tr><td>Aceite / refrigerante / admisión</td><td>4,19 bar · 81,4 °C · 85,6 °C · 37,3 °C</td><td>Condición registrada. No hay análisis de aceite del generador en este paquete.</td></tr>
+    <tr><td>Puntos</td><td>Horizontal, vertical y axial</td><td>Lado acoplado y lado libre, lo más cerca posible de los rodamientos.</td></tr>
+  </table>
+  <span class="pn">4</span>
+</div></article>
+
+<article class="slide"><div class="pad">
+  <h2 class="title">4. Descripción del hallazgo</h2>
+  <table class="evt">
+    <tr><th>Apoyo</th><th>Evidencia del informe</th><th>Clasificación</th></tr>
+    <tr><td>Lado libre</td><td>2,04 g rms en aceleración. Global del espectro vertical 2,004 g rms. Horizontal 0,828 g rms. Delta en 92,8 Hz, frecuencia de rodamiento. Tendencia en aumento.</td><td>Etapa 3. Es el rodamiento a cambiar.</td></tr>
+    <tr><td>Lado acoplado</td><td>0,63 g rms. Espectro y forma de onda con deterioro del rodamiento y de su alojamiento. En velocidad predomina 1X en vertical, sin condición anormal por ese indicador.</td><td>Seguimiento. Inspeccionar al abrir.</td></tr>
+    <tr><td>Velocidad global</td><td>Acoplado: axial 0,037, horizontal 0,106, vertical 0,096 ips. Libre: 0,041, 0,088 y 0,084 ips. Límite ISO 8528-9: 0,787 ips.</td><td>Tolerable. No descarta la etapa 3.</td></tr>
+  </table>
+  <div class="two">
+    <div class="box bad">
+      <h3>Lo que pidió el informe</h3>
+      <ul>
+        <li>Ninguna acción inmediata. No parar el generador el 17 de julio.</li>
+        <li>Monitoreo mensual con carga mayor a 600 kW.</li>
+        <li>Programar el reemplazo dentro de los siguientes 3 a 4 meses.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h3>Por qué los ips no contradicen la etapa 3</h3>
+      <p>El límite de la norma que usa el informe es de velocidad. El defecto del rodamiento aparece en aceleración y en su frecuencia propia. Un apoyo puede estar en velocidad tolerable y, al mismo tiempo, en etapa 3.</p>
+    </div>
+  </div>
+  <span class="pn">5</span>
+</div></article>
+
+<article class="slide"><div class="pad">
+  <h2 class="title">4.1 Línea de tiempo</h2>
+  <table class="evt">
+    <tr><th>Fecha</th><th>Horas</th><th>Hecho</th></tr>
+    <tr><td class="hora">17-07-2026</td><td>12.142 h</td><td>Windrock. Lado libre en etapa 3. Plazo de cambio: 17 oct a 17 nov.</td></tr>
+    <tr><td class="hora">02-10 · 07:11</td><td>—</td><td>RF02. CPW03 sale por potencia inversa al caer el gas tratado. Vuelve 07:38.</td></tr>
+    <tr><td class="hora">06-10 · 15:17</td><td>13.855 h</td><td>RF05. Shutdown IE650 por MRU y chiller. 3 h 31 min fuera.</td></tr>
+    <tr><td class="hora">08-10 · 12:11</td><td>13.894 h</td><td>RF06. Shutdown IE650 por la MRU, con 684 kW. Vuelve 12:42.</td></tr>
+    <tr><td class="hora">18-10 · 13:07</td><td>—</td><td>RF10. Pérdida del SIN y salida de la MRU. Fuera hasta las 14:05.</td></tr>
+    <tr><td class="hora">19-10 · 00:06</td><td>14.134 h</td><td>RF11. Salida de la MRU. Barraje entre 62,3 y 62,7 Hz. 39 min fuera.</td></tr>
+    <tr><td class="hora">24-10 · 14:43</td><td>14.266 h</td><td>RF17. Reconectador de EEP y salida de la MRU. Vuelve 15:23.</td></tr>
+    <tr><td class="hora">26-10 a 01-11</td><td>—</td><td>Planeación. CPW03 disponible. No hay cambio de rodamiento.</td></tr>
+    <tr><td class="hora">04-11-2026</td><td>—</td><td>Sábana. Siguiente celda de CPW03, código 10, 20 h-h, todavía pendiente. No describe el cambio del rodamiento.</td></tr>
+  </table>
+  <p class="src">Las salidas de octubre son externas al rodamiento. Suman ciclos de parada y rearranque sobre un apoyo que ya estaba en etapa 3. De 12.142 h a 14.266 h hay 2.124 horas.</p>
+  <span class="pn">6</span>
+</div></article>
+
+<article class="slide"><div class="pad">
+  <h2 class="title">5. Evidencia del alojamiento</h2>
+  <figure>
+    <img src="evidencia-alojamiento-rodamiento.jpg" alt="Alojamiento de rodamiento en reparación, interior rayado y viruta de mecanizado">
+    <figcaption>Brida de alojamiento en el banco. Diámetro interior oscuro y rayado. La viruta es de mecanizado. El informe ya registró deterioro del alojamiento en el lado acoplado. La pieza no trae marca del lado, libre o acoplado.</figcaption>
+  </figure>
+  <span class="pn">7</span>
+</div></article>
+
+<article class="slide"><div class="pad">
+  <h2 class="title">6. Cinco porqués</h2>
+  <table class="evt">
+    <tr><th></th><th>Pregunta</th><th>Respuesta con la evidencia</th></tr>
+    <tr><td class="hora">1</td><td>¿Por qué el rodamiento es el tema de esta reunión?</td><td>Porque el 17 de julio quedó en etapa 3 y el plazo de 3 a 4 meses para cambiarlo está abierto desde el 17 de octubre.</td></tr>
+    <tr><td class="hora">2</td><td>¿Por qué etapa 3 y no solo una vibración alta?</td><td>Porque hay 2,04 g rms, la tendencia sube y aparece un delta en 92,8 Hz, frecuencia que el informe atribuye al rodamiento del lado libre.</td></tr>
+    <tr><td class="hora">3</td><td>¿Por qué no se paró el 17 de julio?</td><td>Porque la velocidad global cumplía ISO 8528-9 y el informe declaró que no había acción inmediata.</td></tr>
+    <tr><td class="hora">4</td><td>¿Por qué el riesgo es mayor el 26 de octubre?</td><td>Porque se acumularon 2.124 horas, el plazo ya empezó y el rodamiento no se ha cambiado. El lado acoplado sigue con daño de rodamiento y alojamiento.</td></tr>
+    <tr><td class="hora">5</td><td>¿Por qué sigue en servicio esta semana?</td><td>Porque la planeación del 26 de octubre al 1 de noviembre no tiene la parada. CPW03 está en generación disponible.</td></tr>
+  </table>
+  <div class="box warn">
+    <h3>Límite del análisis</h3>
+    <p>Estos porqués explican la condición declarada y por qué la máquina sigue expuesta. No explican todavía por qué se dañó el rodamiento. Lubricación, alineación, descarga eléctrica o pérdida de ajuste del alojamiento se confirman al abrir.</p>
+  </div>
+  <span class="pn">8</span>
+</div></article>
+
+<article class="slide"><div class="pad">
+  <h2 class="title">7. Causa directa, causa raíz y contribuyentes</h2>
+  <table class="mto">
+    <tr><th>Clasificación</th><th>Descripción</th></tr>
+    <tr><td>Causa directa</td><td>Deterioro del rodamiento del lado libre del generador de CPW03, en etapa 3, con 2,04 g rms y frecuencia de rodamiento en 92,8 Hz.</td></tr>
+    <tr><td>Causa asociada</td><td>Deterioro del rodamiento del lado acoplado y de su alojamiento, en seguimiento, con 0,63 g rms. La fotografía muestra un alojamiento ya en reparación mecánica.</td></tr>
+    <tr><td>Causa raíz física</td><td>No está cerrada. Los documentos no traen el mecanismo que inició el desgaste. Queda para la inspección del rodamiento, del ajuste y del alojamiento.</td></tr>
+    <tr><td>Causa de la exposición actual</td><td>El reemplazo pedido para 3 a 4 meses no está ejecutado ni está en la planeación del 26 de octubre al 1 de noviembre, con la máquina en servicio.</td></tr>
+    <tr><td>Causas contribuyentes</td><td>Medición hecha a 449 kW, por debajo de los 600 kW de seguimiento. 2.124 horas adicionales. Seis salidas de octubre por gas tratado o por la red, con parada y rearranque. Velocidad global todavía tolerable, que no obliga por sí sola a parar.</td></tr>
+    <tr><td>Condición latente</td><td>Un apoyo en etapa 3 puede seguir dentro del límite de velocidad de ISO 8528-9. Si solo se mira el ips, el plazo de cambio se pasa.</td></tr>
+  </table>
+  <span class="pn">9</span>
+</div></article>
+
+<article class="slide"><div class="pad">
+  <h2 class="title">8. Acciones y criterio de cierre</h2>
+  <table class="evt">
+    <tr><th>N.º</th><th>Acción</th><th>Tipo</th><th>Cierre</th></tr>
+    <tr><td class="hora">1</td><td>Parar CPW03 y cambiar el rodamiento del lado libre antes del 17 de noviembre de 2026.</td><td>Correctiva</td><td>Rodamiento nuevo instalado y máquina en servicio.</td></tr>
+    <tr><td class="hora">2</td><td>En la misma parada, inspeccionar el rodamiento y el alojamiento del lado acoplado. Registrar si la pieza de la fotografía es el lado libre o el acoplado.</td><td>Correctiva</td><td>Los dos apoyos identificados y el alojamiento aceptado o reparado.</td></tr>
+    <tr><td class="hora">3</td><td>Al abrir, dejar por escrito referencia, juego, lubricación, pista, elementos rodantes y ajuste del alojamiento, para cerrar la causa física.</td><td>Verificación</td><td>Hallazgo de apertura anexado a este RCA.</td></tr>
+    <tr><td class="hora">4</td><td>Si la máquina carga antes del cambio, repetir vibración con más de 600 kW. No usar otra medición a 449 kW como seguimiento.</td><td>Preventiva</td><td>Un espectro posterior al 17 de julio, con carga mayor a 600 kW.</td></tr>
+    <tr><td class="hora">5</td><td>Meter la parada en la planeación de la semana. Hoy CPW03 figura disponible y el trabajo asignado es CPW02 M1 y válvulas de los Jinan.</td><td>Preventiva</td><td>La sábana muestra la intervención y la fecha.</td></tr>
+  </table>
+  <div class="box ok">
+    <h3>El RCA se cierra cuando</h3>
+    <p>El rodamiento del lado libre está cambiado, el lado acoplado y su alojamiento quedaron inspeccionados, la causa física de la apertura está escrita, y la máquina volvió a servicio sin la frecuencia de rodamiento que marcó la etapa 3.</p>
+  </div>
+  <span class="pn">10</span>
+</div></article>
+
+<article class="slide"><div class="pad">
+  <h2 class="title">9. Conclusiones</h2>
+  <table class="evt">
+    <tr class="sec"><td colspan="2">Lo que queda demostrado</td></tr>
+    <tr><td class="hora">1</td><td>El rodamiento del lado libre de CPW03 está en etapa 3 desde el 17 de julio de 2026.</td></tr>
+    <tr><td class="hora">2</td><td>La evidencia es de aceleración y de frecuencia de rodamiento, no de velocidad global. Por eso ISO 8528-9 puede decir tolerable y el apoyo igual requiere cambio.</td></tr>
+    <tr><td class="hora">3</td><td>El lado acoplado tiene deterioro del rodamiento y del alojamiento. No es el mismo grado, y se inspecciona en la misma parada.</td></tr>
+    <tr><td class="hora">4</td><td>El plazo de 3 a 4 meses está corriendo. Van 2.124 horas desde la medición.</td></tr>
+    <tr><td class="hora">5</td><td>La planeación de esta semana no recoge el cambio.</td></tr>
+    <tr class="sec"><td colspan="2">Lo que no se afirma</td></tr>
+    <tr><td class="hora">6</td><td>No se atribuye el desgaste a lubricación, alineación ni a las salidas de la MRU. Esas salidas ocurrieron después, sobre un rodamiento que ya estaba en etapa 3.</td></tr>
+    <tr><td class="hora">7</td><td>La fotografía no identifica el lado del alojamiento. Confirma que hay una pieza en reparación mecánica.</td></tr>
+  </table>
+  <p class="src">Anexos de este RCA: informe Windrock F040-1 del 17-07-2026, sábana de mantenimientos, planeación 26-10 a 01-11-2026, FO-GE-033 RF02, RF05, RF06, RF10, RF11 y RF17, y la fotografía del alojamiento.</p>
+  <span class="pn">11</span>
+</div></article>
+
+</body>
+</html>

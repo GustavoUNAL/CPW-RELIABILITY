@@ -385,6 +385,14 @@ function FracEq({ num, den, after }: { num: ReactNode; den: ReactNode; after: Re
 }
 
 export function InformeConfiabilidadPdfDeck({ month, monthLabel }: Props) {
+  const requestedLabel = monthLabel;
+  const hasSnap = Boolean(
+    GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey] || COPOWER_MONTHLY_DATA[month as CopowerMonthKey],
+  );
+  if (!hasSnap) {
+    month = "Ago";
+    monthLabel = "Agosto";
+  }
   const model = useMemo(() => {
     const gte = GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey];
     const cpw = COPOWER_MONTHLY_DATA[month as CopowerMonthKey];
@@ -859,6 +867,11 @@ export function InformeConfiabilidadPdfDeck({ month, monthLabel }: Props) {
 
   return (
     <div className="icpdf-deck">
+      {!hasSnap ? (
+        <p className="card">
+          {requestedLabel} no tiene presentación de cierre. Estas láminas son las de agosto, el último mes cargado.
+        </p>
+      ) : null}
       <PdfSlide page={1} cover>
         <div className="icpdf-cover">
           <div className="icpdf-cover-hero">

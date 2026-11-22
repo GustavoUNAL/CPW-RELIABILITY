@@ -1,7 +1,7 @@
 {
   "Ene": {
     "label": "Enero",
-    "sourceFile": "data/Costayaco/GTE/Enero/Data Soporte Cálculo Copower PUTN Enero 2026 (8).xlsx",
+    "sourceFile": "data/Costayaco/GTE/2026-01/Data Soporte Cálculo Copower PUTN Enero 2026 (8).xlsx",
     "summary": {
       "copowerFailures": 6,
       "totalEvents": null,
@@ -461,7 +461,7 @@
   },
   "Feb": {
     "label": "Febrero",
-    "sourceFile": "data/Costayaco/GTE/Febrero/Data Soporte Cálculo Copower PUTN Febrero 2026 (3).xlsx",
+    "sourceFile": "data/Costayaco/GTE/2026-02/Data Soporte Cálculo Copower PUTN Febrero 2026 (3).xlsx",
     "summary": {
       "copowerFailures": 4,
       "totalEvents": null,
@@ -944,7 +944,7 @@
   },
   "Mar": {
     "label": "Marzo",
-    "sourceFile": "data/Costayaco/GTE/Marzo/Data Soporte Cálculo Copower PUTN Marzo 2026 (8).xlsx",
+    "sourceFile": "data/Costayaco/GTE/2026-03/Data Soporte Cálculo Copower PUTN Marzo 2026 (8).xlsx",
     "summary": {
       "copowerFailures": 9,
       "totalEvents": null,
@@ -1661,7 +1661,7 @@
   },
   "Abr": {
     "label": "Abril",
-    "sourceFile": "data/Costayaco/GTE/Abril /Data Soporte Cálculo Copower PUTN Abril 2026.xlsx",
+    "sourceFile": "data/Costayaco/GTE/2026-04/Data Soporte Cálculo Copower PUTN Abril 2026.xlsx",
     "summary": {
       "copowerFailures": 6,
       "totalEvents": null,
@@ -2232,7 +2232,7 @@
   },
   "May": {
     "label": "total general",
-    "sourceFile": "data/Costayaco/GTE/Mayo/Data Soporte Cálculo Copower PUTN Mayo 2026.xlsx",
+    "sourceFile": "data/Costayaco/GTE/2026-05/Data Soporte Cálculo Copower PUTN Mayo 2026.xlsx",
     "summary": {
       "copowerFailures": 7,
       "totalEvents": null,
@@ -2855,7 +2855,7 @@
   },
   "Jun": {
     "label": "Junio",
-    "sourceFile": "data/Costayaco/GTE/Junio/Data Soporte Cálculo Copower PUTN Junio 2026 (1).xlsx",
+    "sourceFile": "data/Costayaco/GTE/2026-06/Data Soporte Cálculo Copower PUTN Junio 2026 (1).xlsx",
     "summary": {
       "copowerFailures": 7,
       "totalEvents": 38,

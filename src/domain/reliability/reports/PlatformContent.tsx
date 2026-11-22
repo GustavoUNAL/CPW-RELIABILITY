@@ -10,6 +10,7 @@ import {
 } from "./granTierraMonthly";
 import { CopowerIndicatorsDashboard } from "./CopowerIndicatorsPanel";
 import { FailureEventsView } from "./FailureEventsView";
+import { EventoPad4Nov12 } from "./EventoPad4Nov12";
 import { FoBitacoraView } from "./FoBitacoraView";
 import { FailureClassificationView } from "./FailureClassificationView";
 import { EventInsightsDashboard } from "./EventInsightsDashboard";
@@ -64,6 +65,8 @@ import { EmptyScreen, ScreenShell } from "../ui/ScreenShell";
 import { InformesResultadosDashboard } from "./InformesResultadosDashboard";
 import { IndicadoresDashboard } from "./IndicadoresDashboard";
 import { FacturacionDashboard } from "./FacturacionDashboard";
+import { HistorialConfiabilidad } from "../history/HistorialConfiabilidad";
+import { CampoFicha } from "../history/CampoFicha";
 
 type Props = {
   page: PageKey;
@@ -83,6 +86,7 @@ type Props = {
   focusCostayacoRcaId?: string | null;
   onFocusCostayacoRcaConsumed?: () => void;
   isAdmin?: boolean;
+  onOpen?: (page: PageKey, leafId: string) => void;
 };
 
 const pct = (v: number | null | undefined, d = 2) =>
@@ -516,6 +520,13 @@ function PlatformBody({
     leafId === "an-criticos" ||
     leafId === "bd-fallas"
   ) {
+    if (leafId === "bd-ev-pad4-1211") {
+      return (
+        <ScreenShell report="copower" headless>
+          <EventoPad4Nov12 />
+        </ScreenShell>
+      );
+    }
     if (leafId === "bd-fo-bitacora") {
       return (
         <ScreenShell report="dual" headless>
@@ -524,13 +535,12 @@ function PlatformBody({
       );
     }
     if (leafId === "bd-ev-dual") {
-      const mode = report === "gran_tierra" ? "gte" : "copower";
       return (
-        <ScreenShell report={report} headless>
+        <ScreenShell report="dual" headless>
           <FailureEventsView
             month={month}
             monthLabel={monthLabel}
-            mode={mode}
+            mode="dual"
             onNavigateToRca={onNavigateToRca}
             rcaCases={rcaCases}
             onCreateRcaFromEvent={onCreateRcaFromEvent}
@@ -974,9 +984,21 @@ function PlatformBody({
     if (leafId === "dash-contrato") {
       return <ContractComplianceDashboard month={month} monthLabel={monthLabel} />;
     }
-    if (leafId === "dash-operacion") return <CopowerResumen month={cpwMonth} />;
+    if (leafId === "dash-operacion") return <OperacionModule section="dashboard" />;
     if (leafId === "dash-operacion-gte") {
-      const gteMonth = (GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey] ? month : "Jul") as GranTierraMonthKey;
+      const gteMonth = GRAN_TIERRA_MONTHLY_DATA[month as GranTierraMonthKey]
+        ? (month as GranTierraMonthKey)
+        : null;
+      if (!gteMonth) {
+        return (
+          <>
+            <p className="card">
+              {monthLabel} no tiene el resumen de operación de Gran Tierra. Esta pantalla es la de agosto, el último cierre cargado.
+            </p>
+            <GteResumen month="Ago" />
+          </>
+        );
+      }
       return <GteResumen month={gteMonth} />;
     }
     if (leafId === "dash-mto") {
@@ -1025,8 +1047,17 @@ export function PlatformContent({
   focusCostayacoRcaId,
   onFocusCostayacoRcaConsumed,
   isAdmin,
+  onOpen,
 }: Props) {
   const ctx = resolveViewContext(page, leafId);
+
+  if (leafId === "dash-historial") {
+    return <HistorialConfiabilidad month={month} onOpen={onOpen} isAdmin={isAdmin} />;
+  }
+
+  if (leafId.startsWith("cfg-campos-pad4")) {
+    return <CampoFicha field="pad4" month={month} monthLabel={monthLabel} onOpen={onOpen} />;
+  }
 
   if (leafId === "admin-usuarios" || leafId === "cfg-usuarios") {
     if (!isAdmin) {

@@ -1,6 +1,6 @@
 /**
  * ETL: Horas concertadas agosto 2026 (01–31) → snapshot COPOWER.
- * Fuente: data/Costayaco/Agosto/Consolidado de Horas concertadas del 01 al 31 de Agosto.xlsx
+ * Fuente: data/Costayaco/concertacion/2026-08/Consolidado de Horas concertadas del 01 al 31 de Agosto.xlsx
  *
  * Uso: node scripts/etl-copower-agosto-concertacion.mjs
  */
@@ -11,7 +11,7 @@ import XLSX from "xlsx";
 const ROOT = path.resolve(import.meta.dirname, "..");
 const XLSX_PATH = path.join(
   ROOT,
-  "data/Costayaco/Agosto/Consolidado de Horas concertadas del 01 al 31 de Agosto.xlsx",
+  "data/Costayaco/concertacion/2026-08/Consolidado de Horas concertadas del 01 al 31 de Agosto.xlsx",
 );
 const MONTHLY = path.join(ROOT, "src/domain/reliability/reports/copowerMonthly.ts");
 
@@ -230,7 +230,7 @@ const consumos = units.map((u) => ({
 const snap = {
   label: "Agosto 2026",
   sourceFile:
-    "data/Costayaco/Agosto/Consolidado de Horas concertadas del 01 al 31 de Agosto.xlsx · diésel Tcal 01–21 (retiro GTE 21/08)",
+    "data/Costayaco/concertacion/2026-08/Consolidado de Horas concertadas del 01 al 31 de Agosto.xlsx · diésel Tcal 01–21 (retiro GTE 21/08)",
   summary: {
     copowerFailures,
     totalEvents: eventLog.length,

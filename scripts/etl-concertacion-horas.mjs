@@ -9,7 +9,7 @@ import XLSX from "xlsx";
 const ROOT = path.resolve(import.meta.dirname, "..");
 const DEFAULT_XLSX = path.join(
   ROOT,
-  "data/Costayaco/concertacion horas/REPORTE DIARIO DE OPERACIONES HASTA 28-07-2026.xlsx",
+  "data/Costayaco/concertacion/2026-07/REPORTE DIARIO DE OPERACIONES HASTA 28-07-2026.xlsx",
 );
 const OUT = path.join(ROOT, "src/domain/reliability/concertacion/data/concertacionPack.json");
 

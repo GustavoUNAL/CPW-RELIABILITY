@@ -29,6 +29,7 @@ const PATH_TO_MODULE = Object.fromEntries(
  */
 export const LEAF_PATH: Record<string, string> = {
   // dashboard
+  "dash-historial": "historial",
   "dash-resumen": "resumen",
   "dash-laminas": "laminas",
   "dash-indicadores": "indicadores",
@@ -50,6 +51,7 @@ export const LEAF_PATH: Record<string, string> = {
   "cfg-campos-vonu-desempeno": "vonu/desempeno",
   "cfg-campos-vonu-contrato": "vonu/contrato",
   "cfg-campos-vonu-activos": "vonu/activos",
+  "cfg-campos-pad4-resumen": "pad4/resumen",
 
   // generacion
   "gen-dashboard": "resumen",
@@ -83,6 +85,7 @@ export const LEAF_PATH: Record<string, string> = {
   "cmp-fuentes": "resumen",
   "proc-clasif": "clasificacion-fallas",
   "bd-fo-bitacora": "fallas/bitacora",
+  "bd-ev-pad4-1211": "fallas/pad4-12-nov",
   "bd-ev-copower": "fallas/copower",
   "bd-ev-gte": "fallas/gte",
   "bd-ev-dual": "fallas/comparativo",
@@ -182,6 +185,26 @@ export type RouteLocation = {
   /** Deep-link RCA (`?id=`). */
   focusId?: string | null;
 };
+
+export const FIELD_PARK_IDS = ["costayaco", "vonu", "pad4"] as const;
+export type FieldParkId = (typeof FIELD_PARK_IDS)[number];
+
+export type ParkRoute = {
+  id: FieldParkId;
+  /** Segmento de la pestaña. Vacío cuando la URL es solo `/parques/:campo`. */
+  section: string | null;
+};
+
+export function parkPath(id: FieldParkId, section = "resumen"): string {
+  return `/parques/${id}/${section}`;
+}
+
+export function parseParkRoute(pathname = window.location.pathname): ParkRoute | null {
+  const clean = cleanPathname(pathname);
+  const match = clean.match(/^\/parques\/(costayaco|vonu|pad4)(?:\/([a-z0-9-]+))?$/);
+  if (!match) return null;
+  return { id: match[1] as FieldParkId, section: match[2] ?? null };
+}
 
 export function cleanPathname(pathname = window.location.pathname): string {
   const clean = pathname.replace(/\/+$/, "") || "/";

@@ -36,6 +36,8 @@ import {
 } from "./InformeConfContinuacion";
 import { InformeLogo } from "./InformeBrandChrome";
 import { InformeCopowerConfiabilidad } from "./InformeCopowerConfiabilidad";
+import { FacturacionDashboard } from "./FacturacionDashboard";
+import { NovemberRecords } from "../history/NovemberRecords";
 import { GRAN_TIERRA_MONTHLY_DATA, type GranTierraMonthKey } from "./granTierraMonthly";
 
 type Props = {
@@ -225,40 +227,48 @@ export function InformesResultadosDashboard({ leafId, month, monthLabel }: Props
   if (leafId.startsWith("inf-cpw-")) {
     return <InformeCopowerConfiabilidad leafId={leafId} month={month} monthLabel={monthLabel} />;
   }
-  if (leafId === "inf-conf-resumen" || leafId.startsWith("inf-conf-")) {
-    if (!(month in GRAN_TIERRA_MONTHLY_DATA)) {
-      return (
-        <div className="dash-module exec-dashboard inf-resultados">
-          <article className="card">
-            <p className="eyebrow">Informes · Confiabilidad</p>
-            <h3>Sin anexo Gran Tierra para {monthLabel}</h3>
-            <p className="empty-state">
-              No hay Data Soporte ni PDF de indicadores GTE en este periodo. Agosto está cargado en
-              Confiabilidad COPOWER y Resultados de Gestión con la concertación del 01 al 23.
-            </p>
-          </article>
-        </div>
+    if (leafId === "inf-conf-resumen" || leafId.startsWith("inf-conf-")) {
+      const gteReady = month in GRAN_TIERRA_MONTHLY_DATA;
+      const gteMonth = (gteReady ? month : "Ago") as GranTierraMonthKey;
+      const gteLabel = gteReady ? monthLabel : "Agosto";
+      const closedNote = gteReady ? null : (
+        <p className="card">
+          {monthLabel} no tiene anexo de Gran Tierra. Esta pantalla muestra agosto, el último cierre cargado.
+        </p>
       );
-    }
-    const gteMonth = month as GranTierraMonthKey;
+      if (!gteReady && leafId === "inf-conf-facturacion") {
+        return <FacturacionDashboard leafId="fac-documento" />;
+      }
+      if (!gteReady && (leafId === "inf-conf-fallas" || leafId === "inf-conf-repetitivos")) {
+        return (
+          <NovemberRecords
+            view={leafId === "inf-conf-fallas" ? "fallas" : "repetitivos"}
+            month={month}
+            monthLabel={monthLabel}
+          />
+        );
+      }
     if (leafId === "inf-conf-conciliacion") {
       return (
         <div className="dash-module exec-dashboard inf-resultados">
-          <DisponibilidadConciliacionSlide month={gteMonth} monthLabel={monthLabel} />
+          {closedNote}
+          <DisponibilidadConciliacionSlide month={gteMonth} monthLabel={gteLabel} />
         </div>
       );
     }
     if (leafId === "inf-conf-confiabilidad") {
       return (
         <div className="dash-module exec-dashboard inf-resultados">
-          <ConfiabilidadConciliacionSlide month={gteMonth} monthLabel={monthLabel} />
+          {closedNote}
+          <ConfiabilidadConciliacionSlide month={gteMonth} monthLabel={gteLabel} />
         </div>
       );
     }
     if (leafId === "inf-conf-maquinas") {
       return (
         <div className="dash-module exec-dashboard inf-resultados">
-          <DesempenoMaquinaBoard month={gteMonth} monthLabel={monthLabel} />
+          {closedNote}
+          <DesempenoMaquinaBoard month={gteMonth} monthLabel={gteLabel} />
         </div>
       );
     }
@@ -279,7 +289,7 @@ export function InformesResultadosDashboard({ leafId, month, monthLabel }: Props
     if (leafId === "inf-conf-mantenimiento" || leafId === "inf-conf-malos") {
       return (
         <div className="dash-module exec-dashboard inf-resultados inf-viewport-page">
-          <InformeConfMantenimientoSection month={gteMonth} monthLabel={monthLabel} slideViewport />
+          <InformeConfMantenimientoSection month={month} monthLabel={monthLabel} slideViewport />
         </div>
       );
     }
@@ -300,34 +310,36 @@ export function InformesResultadosDashboard({ leafId, month, monthLabel }: Props
     if (leafId === "inf-conf-eficiencia") {
       return (
         <div className="dash-module exec-dashboard inf-resultados inf-viewport-page">
-          <InformeConfEficienciaSection month={gteMonth} monthLabel={monthLabel} slideViewport />
+          <InformeConfEficienciaSection month={month} monthLabel={monthLabel} slideViewport />
         </div>
       );
     }
     if (leafId === "inf-conf-conclusiones") {
       return (
         <div className="dash-module exec-dashboard inf-resultados">
-          <ConclusionesConfiabilidadBoard month={gteMonth} monthLabel={monthLabel} />
+          {closedNote}
+          <ConclusionesConfiabilidadBoard month={gteMonth} monthLabel={gteLabel} />
         </div>
       );
     }
     return (
       <div className="dash-module exec-dashboard inf-resultados">
+        {closedNote}
         <header className="exec-header dash-hero inf-report-cover">
           <InformeLogo className="inf-brand-logo inf-brand-logo--cover" />
           <div className="inf-report-cover-copy">
             <p className="eyebrow">Informes · Confiabilidad</p>
             <h2>Reporte de confiabilidad parque de generación Putumayo Norte</h2>
-            <p className="muted">Periodo {monthLabel} · Costayaco / Vonú · Gran Tierra Energy</p>
+            <p className="muted">Periodo {gteLabel} · Costayaco / Vonú · Gran Tierra Energy</p>
           </div>
           <span className="source-badge gte">GTE</span>
         </header>
         <GteResumen month={gteMonth} only={["sistemicos", "horas"]} />
-        <DisponibilidadAnalisisBoard month={gteMonth} monthLabel={monthLabel} />
-        <DisponibilidadHorasBoard month={gteMonth} monthLabel={monthLabel} />
-        <ConfiabilidadAnalisisBoard month={gteMonth} monthLabel={monthLabel} />
-        <DesempenoMaquinaBoard month={gteMonth} monthLabel={monthLabel} />
-        <InformeConfContinuacion month={gteMonth} monthLabel={monthLabel} />
+        <DisponibilidadAnalisisBoard month={gteMonth} monthLabel={gteLabel} />
+        <DisponibilidadHorasBoard month={gteMonth} monthLabel={gteLabel} />
+        <ConfiabilidadAnalisisBoard month={gteMonth} monthLabel={gteLabel} />
+        <DesempenoMaquinaBoard month={gteMonth} monthLabel={gteLabel} />
+        <InformeConfContinuacion month={gteMonth} monthLabel={gteLabel} />
       </div>
     );
   }

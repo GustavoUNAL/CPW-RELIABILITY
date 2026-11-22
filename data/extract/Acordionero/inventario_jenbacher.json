@@ -1,0 +1,969 @@
+{
+  "source": "INVENTARIO REPUESTOS GRAN TIERRA JENBACHER.pdf",
+  "titulo": "STOCK INVENTARIO ACORDEONERO PAD4 - J420",
+  "items": [
+    {
+      "parte": "1207443 CIRCULATION",
+      "desc": "PUMP",
+      "inicial": 1,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 1,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1106892 CIRCULATION",
+      "desc": "PUMP",
+      "inicial": 1,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 1,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "495854",
+      "desc": "TRANSDUCER",
+      "inicial": 1,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 1,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "201775 TEMPERATURE",
+      "desc": "CONTROL",
+      "inicial": 1,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 1,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "607323 TEMPERATURE",
+      "desc": "SENSOR",
+      "inicial": 2,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 2,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "179609 RESISTANCE",
+      "desc": "THERMOMETER",
+      "inicial": 1,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 1,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "415442 PRESSURE",
+      "desc": "TRANSDUCER",
+      "inicial": 3,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 3,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1208828 THROTTLE",
+      "desc": "VALVE(OLD:455676) PLS CONF.",
+      "inicial": 1,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 1,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "631265 OIL",
+      "desc": "FILTER",
+      "inicial": 24,
+      "entrada": 0,
+      "salida": 7,
+      "stock": 17,
+      "ubicacion": "Campo + San Martín"
+    },
+    {
+      "parte": "162817",
+      "desc": "O-RING",
+      "inicial": 30,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 30,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1247730 CYLINDER",
+      "desc": "HEAD-REMUP",
+      "inicial": 25,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 25,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "557647 CYLINDER HEAD",
+      "desc": "GASKET",
+      "inicial": 80,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 80,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "642826 PISTON WHIT",
+      "desc": "RINGS(NEW: 1234248)",
+      "inicial": 10,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 10,
+      "ubicacion": "San Martín"
+    },
+    {
+      "parte": "448556 CYLINDER",
+      "desc": "LINER",
+      "inicial": 5,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 5,
+      "ubicacion": "San Martín"
+    },
+    {
+      "parte": "421782 SCRAPER",
+      "desc": "RING",
+      "inicial": 5,
+      "entrada": 5,
+      "salida": 5,
+      "stock": 5,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "448559 CYLINDER HEAD",
+      "desc": "GASKET",
+      "inicial": 5,
+      "entrada": 20,
+      "salida": 0,
+      "stock": 25,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1245880,1 POWER",
+      "desc": "SUPPLY (OLD: 599772)MPM USADOS",
+      "inicial": 3,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 3,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1245880 POWER",
+      "desc": "SUPPLY (OLD: 599772)MPM",
+      "inicial": 2,
+      "entrada": 1,
+      "salida": 2,
+      "stock": 1,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "572299",
+      "desc": "MODULE",
+      "inicial": 2,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 2,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "572300",
+      "desc": "MODULE",
+      "inicial": 2,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 2,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1140 TARJETA DIANET",
+      "desc": "3",
+      "inicial": 3,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 3,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1139 DISPLAY DIANET",
+      "desc": "3",
+      "inicial": 4,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 4,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "657540 VELAS",
+      "desc": "BUJIAS",
+      "inicial": 2,
+      "entrada": 10,
+      "salida": 2,
+      "stock": 10,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1241175",
+      "desc": "PUENTES (MORIS)",
+      "inicial": 5,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 5,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "652092",
+      "desc": "SAFI #1",
+      "inicial": 10,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 10,
+      "ubicacion": "Campo + San Martín"
+    },
+    {
+      "parte": "1255879-1244136",
+      "desc": "MORIS",
+      "inicial": 6,
+      "entrada": 1,
+      "salida": 1,
+      "stock": 6,
+      "ubicacion": "Campo + San Martín"
+    },
+    {
+      "parte": "1138 JUEGO",
+      "desc": "PLC (T320)",
+      "inicial": 1,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 1,
+      "ubicacion": "San Martín"
+    },
+    {
+      "parte": "1137",
+      "desc": "RESISTENCIA (GROUP RESIST)",
+      "inicial": 1,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 1,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1219950 FLOTANTE MEDIDOR",
+      "desc": "ACEITE",
+      "inicial": 1,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 1,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1136 CARGADOR BATERIA",
+      "desc": "DEIF",
+      "inicial": 1,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 1,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1135 DIANEXT 3",
+      "desc": "COMPLETO",
+      "inicial": 1,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 1,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "641947 TERMOCUPLA",
+      "desc": "CILINDRO",
+      "inicial": 9,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 9,
+      "ubicacion": "Campo + San Martín"
+    },
+    {
+      "parte": "9008292 SENSOR",
+      "desc": "KNOCKING",
+      "inicial": 4,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 4,
+      "ubicacion": "Campo + San Martín"
+    },
+    {
+      "parte": "1101738 DIGITAL",
+      "desc": "INPUT (1101738)",
+      "inicial": 7,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 7,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1101735 ANALOGY",
+      "desc": "INPUT (1101735)",
+      "inicial": 2,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 2,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1101736 TEMPERATURA",
+      "desc": "INPUT (1101736)",
+      "inicial": 2,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 2,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1108978 ANALOGA",
+      "desc": "OUT (1108978)",
+      "inicial": 2,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 2,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "X20BT9100",
+      "desc": "X20BT9100 (TARJETA)",
+      "inicial": 3,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 3,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "487181 IGNITION",
+      "desc": "COIL",
+      "inicial": 14,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 14,
+      "ubicacion": "Campo + San Martín"
+    },
+    {
+      "parte": "1134 TRANSMISOR",
+      "desc": "PULSE",
+      "inicial": 2,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 2,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1133 REDUCTION",
+      "desc": "SENSOR",
+      "inicial": 2,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 2,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1219312 MOTOR",
+      "desc": "ARRANQUE",
+      "inicial": 4,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 4,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1224789 RESISTENCIA DE",
+      "desc": "PRECALENTAMIENTO",
+      "inicial": 1,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 1,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "303531 BOMBA DE",
+      "desc": "PRECALENTAMIENTO",
+      "inicial": 2,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 2,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1207426 VALVULA 3 VIAS",
+      "desc": "HT",
+      "inicial": 1,
+      "entrada": 1,
+      "salida": 0,
+      "stock": 2,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1210363 SERVOMOTOR VALVULA 3",
+      "desc": "VIAS",
+      "inicial": 1,
+      "entrada": 3,
+      "salida": 1,
+      "stock": 3,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1254664",
+      "desc": "BUJIAS",
+      "inicial": 30,
+      "entrada": 4,
+      "salida": 17,
+      "stock": 17,
+      "ubicacion": "Campo + San Martín"
+    },
+    {
+      "parte": "1132 VALVULAS TURBO",
+      "desc": "BY-PASS",
+      "inicial": 4,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 4,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1131 SENSOR RPM",
+      "desc": "PICK-UP",
+      "inicial": 2,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 2,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1129 BOMBA DE AGUA SISTEMA",
+      "desc": "LT (REPARADA)",
+      "inicial": 1,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 1,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1128 DIODOS",
+      "desc": "ALTERNADOR",
+      "inicial": 5,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 5,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1127 BOMBA",
+      "desc": "PREOLING (REPARADA)",
+      "inicial": 1,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 1,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1126 FUENTE DE ALIEMTACION 24",
+      "desc": "VDC",
+      "inicial": 2,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 2,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1125 VALVULAS",
+      "desc": "TRHOTLE",
+      "inicial": 2,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 2,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1124",
+      "desc": "INTERCOOLER",
+      "inicial": 1,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 1,
+      "ubicacion": "Bucaramanga"
+    },
+    {
+      "parte": "1123 FILTRO DE AIRE",
+      "desc": "LOCAL",
+      "inicial": 9,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 9,
+      "ubicacion": "San Martín"
+    },
+    {
+      "parte": "1122 FILTRO COALECENTO",
+      "desc": "LOCAL",
+      "inicial": 3,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 3,
+      "ubicacion": "San Martín"
+    },
+    {
+      "parte": "1121 FILTROS DE",
+      "desc": "GAS",
+      "inicial": 9,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 9,
+      "ubicacion": "San Martín"
+    },
+    {
+      "parte": "1120 TANQUE HIDROFLOT",
+      "desc": "LT",
+      "inicial": 1,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 1,
+      "ubicacion": "San Martín"
+    },
+    {
+      "parte": "1119 TANQUE HIDROFLOT",
+      "desc": "HT",
+      "inicial": 1,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 1,
+      "ubicacion": "San Martín"
+    },
+    {
+      "parte": "1118 BATERIAS 8D",
+      "desc": "NUEVAS",
+      "inicial": 4,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 4,
+      "ubicacion": "San Martín"
+    },
+    {
+      "parte": "1117 BATERTIAS 8D",
+      "desc": "USADAS",
+      "inicial": 4,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 4,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1116 PROAT ISC 3 /",
+      "desc": "WOODWAR",
+      "inicial": 2,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 2,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1115 FUENTE DE ALIEMTACION",
+      "desc": "480V/24V",
+      "inicial": 2,
+      "entrada": 0,
+      "salida": 1,
+      "stock": 1,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1114 MMU",
+      "desc": "USADOS",
+      "inicial": 3,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 3,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1113 BOBINAS",
+      "desc": "USADAS",
+      "inicial": 4,
+      "entrada": 0,
+      "salida": 0,
+      "stock": 4,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1111 FILTRO",
+      "desc": "ANTINIEBLA",
+      "inicial": 4,
+      "entrada": 0,
+      "salida": 3,
+      "stock": 1,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1112 PILZ",
+      "desc": "MUEVOS",
+      "inicial": 4,
+      "entrada": 0,
+      "salida": 2,
+      "stock": 2,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1142 JUNTA ELASTICA",
+      "desc": "BRIDADA",
+      "inicial": 2,
+      "entrada": 8,
+      "salida": 8,
+      "stock": 2,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1143 JUNTA",
+      "desc": "FLEXIBLES",
+      "inicial": 4,
+      "entrada": 0,
+      "salida": 2,
+      "stock": 2,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "290213",
+      "desc": "JUNTA",
+      "inicial": 0,
+      "entrada": 180,
+      "salida": 160,
+      "stock": 20,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1248243-202473",
+      "desc": "JUNTA",
+      "inicial": 0,
+      "entrada": 340,
+      "salida": 240,
+      "stock": 100,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "300805 JUNTA",
+      "desc": "TORICA",
+      "inicial": 0,
+      "entrada": 180,
+      "salida": 160,
+      "stock": 20,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "225040 JUNTA",
+      "desc": "TORICA",
+      "inicial": 0,
+      "entrada": 90,
+      "salida": 80,
+      "stock": 10,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "356298 JUNTA DEL TURBO",
+      "desc": "COMPRESOR",
+      "inicial": 0,
+      "entrada": 12,
+      "salida": 8,
+      "stock": 4,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "1105183 SOPORTE DEL SISTEMA",
+      "desc": "NW36",
+      "inicial": 0,
+      "entrada": 2,
+      "salida": 0,
+      "stock": 2,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "303967",
+      "desc": "COMPENSADOR",
+      "inicial": 0,
+      "entrada": 1,
+      "salida": 0,
+      "stock": 1,
+      "ubicacion": "San Martín"
+    },
+    {
+      "parte": "456732 - 348074 JUNTA",
+      "desc": "TORICA",
+      "inicial": 0,
+      "entrada": 20,
+      "salida": 0,
+      "stock": 20,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "348964 JUNTA",
+      "desc": "TORICA",
+      "inicial": 0,
+      "entrada": 20,
+      "salida": 0,
+      "stock": 20,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "105863 JUNTA",
+      "desc": "TORICA",
+      "inicial": 0,
+      "entrada": 4,
+      "salida": 4,
+      "stock": 0,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "105812 JUNTA",
+      "desc": "TORICA",
+      "inicial": 0,
+      "entrada": 8,
+      "salida": 4,
+      "stock": 4,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "448559 POWERU ZYLINDERKOPFDICHTUNG",
+      "desc": "BR4",
+      "inicial": 0,
+      "entrada": 20,
+      "salida": 0,
+      "stock": 20,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "421782 ANILLO ROSCADOR POWERUP",
+      "desc": "BR4",
+      "inicial": 0,
+      "entrada": 5,
+      "salida": 5,
+      "stock": 0,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "376475-202471 JUNTA",
+      "desc": "TORICA",
+      "inicial": 0,
+      "entrada": 40,
+      "salida": 0,
+      "stock": 40,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "376507 JUNTA",
+      "desc": "TORICA",
+      "inicial": 0,
+      "entrada": 40,
+      "salida": 0,
+      "stock": 40,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "107744",
+      "desc": "JUNTA",
+      "inicial": 0,
+      "entrada": 6,
+      "salida": 0,
+      "stock": 6,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "501834",
+      "desc": "JUNTA",
+      "inicial": 0,
+      "entrada": 10,
+      "salida": 0,
+      "stock": 10,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "100361 TORNILLO CABEZA",
+      "desc": "EXAGONAL",
+      "inicial": 0,
+      "entrada": 48,
+      "salida": 0,
+      "stock": 48,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "101855 NUEZ",
+      "desc": "HEXAGONAL",
+      "inicial": 0,
+      "entrada": 48,
+      "salida": 0,
+      "stock": 48,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "356682 TORNILLO CABEZA",
+      "desc": "EXAGONAL",
+      "inicial": 0,
+      "entrada": 48,
+      "salida": 0,
+      "stock": 48,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "01143195 NUEZ",
+      "desc": "HEXAGONAL",
+      "inicial": 0,
+      "entrada": 48,
+      "salida": 0,
+      "stock": 48,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "100214 TORNILLO",
+      "desc": "CILINDRICO",
+      "inicial": 0,
+      "entrada": 80,
+      "salida": 0,
+      "stock": 80,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "236907 JUNTA",
+      "desc": "TORICA",
+      "inicial": 0,
+      "entrada": 24,
+      "salida": 0,
+      "stock": 24,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "110649-376511 JUNTA",
+      "desc": "TORICA",
+      "inicial": 0,
+      "entrada": 16,
+      "salida": 0,
+      "stock": 16,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "241824 JUNTA",
+      "desc": "TORICA",
+      "inicial": 0,
+      "entrada": 8,
+      "salida": 0,
+      "stock": 8,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "287889 JUNTA",
+      "desc": "TORICA",
+      "inicial": 0,
+      "entrada": 8,
+      "salida": 0,
+      "stock": 8,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "212134 JUNTA",
+      "desc": "TORICA",
+      "inicial": 0,
+      "entrada": 8,
+      "salida": 0,
+      "stock": 8,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "354987 JUNTA",
+      "desc": "TORICA",
+      "inicial": 0,
+      "entrada": 8,
+      "salida": 0,
+      "stock": 8,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "237224-7001959 JUNTA DEL TURBO",
+      "desc": "COMPRESOR",
+      "inicial": 0,
+      "entrada": 1,
+      "salida": 1,
+      "stock": 0,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "437244-183684 AISLAMIENTO CPL. CON ALAMBRE DE",
+      "desc": "UNION",
+      "inicial": 0,
+      "entrada": 1,
+      "salida": 0,
+      "stock": 1,
+      "ubicacion": "San Martín"
+    },
+    {
+      "parte": "453527",
+      "desc": "ABRAZADERA",
+      "inicial": 0,
+      "entrada": 8,
+      "salida": 0,
+      "stock": 8,
+      "ubicacion": "San Martín"
+    },
+    {
+      "parte": "1101885 JUNTA TORICA",
+      "desc": "ISO3601-1-124A-31,4222,62-N",
+      "inicial": 0,
+      "entrada": 2,
+      "salida": 0,
+      "stock": 2,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "9036067-341498",
+      "desc": "BARRA",
+      "inicial": 0,
+      "entrada": 2,
+      "salida": 0,
+      "stock": 2,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "9036068-341498",
+      "desc": "BARRA",
+      "inicial": 0,
+      "entrada": 2,
+      "salida": 0,
+      "stock": 2,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "585704-449408 EXTREMO",
+      "desc": "GIRATORIO",
+      "inicial": 0,
+      "entrada": 2,
+      "salida": 0,
+      "stock": 2,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "585703-449407 EXTREMO",
+      "desc": "GIRATORIO",
+      "inicial": 0,
+      "entrada": 2,
+      "salida": 0,
+      "stock": 2,
+      "ubicacion": "Campo"
+    },
+    {
+      "parte": "101815-1127084 NUEZ",
+      "desc": "HEZAGONAL",
+      "inicial": 0,
+      "entrada": 6,
+      "salida": 0,
+      "stock": 6,
+      "ubicacion": "Campo"
+    }
+  ]
+}

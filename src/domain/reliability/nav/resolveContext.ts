@@ -21,6 +21,9 @@ export const PLATFORM_MONTH_ORDER = [
   "Jun",
   "Jul",
   "Ago",
+  "Sep",
+  "Oct",
+  "Nov",
 ] as const;
 
 const PLATFORM_MONTH_LABELS: Record<(typeof PLATFORM_MONTH_ORDER)[number], string> = {
@@ -32,6 +35,9 @@ const PLATFORM_MONTH_LABELS: Record<(typeof PLATFORM_MONTH_ORDER)[number], strin
   Jun: "Junio",
   Jul: "Julio",
   Ago: "Agosto",
+  Sep: "Septiembre",
+  Oct: "Octubre",
+  Nov: "Noviembre",
 };
 
 export type ViewContext = {
@@ -42,9 +48,11 @@ export type ViewContext = {
   reportShort: string;
   /** Periodo fijo — oculta selector de mes en sidebar. */
   fixedPeriod?: boolean;
+  /** Texto del periodo cuando la vista no depende de un mes. */
+  periodLabel?: string;
 };
 
-const INFORMES_EXTRA_MONTHS = ["Ago"] as const;
+const INFORMES_EXTRA_MONTHS = ["Sep", "Oct", "Nov"] as const;
 const EXTRA_MONTH_LABELS: Record<string, string> = {
   Ago: "Agosto",
   Sep: "Septiembre",
@@ -57,8 +65,13 @@ function withLatestCloseMonths(order: readonly string[], page: PageKey, leafId: 
   if (
     page === "informes" ||
     page === "dashboard" ||
+    page === "campos" ||
+    page === "confiabilidad" ||
     leafId.startsWith("inf-") ||
-    leafId.startsWith("dash-")
+    leafId.startsWith("dash-") ||
+    leafId.startsWith("cfg-campos") ||
+    leafId.startsWith("bd-ev-") ||
+    leafId.startsWith("an-")
   ) {
     return Array.from(new Set([...order, ...INFORMES_EXTRA_MONTHS]));
   }
@@ -77,6 +90,7 @@ const CPW_LEAVES = new Set([
   "op-detalle",
   "bd-ind-copower",
   "bd-ev-copower",
+  "bd-ev-pad4-1211",
   "proc-op",
   "proc-disp",
   "proc-fs",
@@ -219,6 +233,9 @@ export const INTEGRATED_DUAL_LEAVES = new Set([
   "inf-conf-eficiencia",
   "inf-conf-conclusiones",
   "inf-conf-facturacion",
+  "bd-ev-dual",
+  "bd-fallas",
+  "dash-historial",
   "dash-resumen",
   "dash-laminas",
   "dash-indicadores",
@@ -328,6 +345,23 @@ const CONCERTACION_LEAVES = new Set([
 ]);
 
 export function resolveViewContext(page: PageKey, leafId: string): ViewContext {
+  if (leafId === "dash-historial") {
+    return {
+      report: "dual",
+      monthOrder: PLATFORM_MONTH_ORDER,
+      reportLabel: "Cómo va el parque",
+      reportShort: "Inicio",
+    };
+  }
+  if (leafId === "bd-ev-pad4-1211") {
+    return {
+      report: "copower",
+      monthOrder: PLATFORM_MONTH_ORDER,
+      reportLabel: "Pad 4 · parada del 12 de noviembre",
+      reportShort: "Pad 4",
+      fixedPeriod: true,
+    };
+  }
   if (leafId === "bd-fo-bitacora") {
     return {
       report: "dual",
@@ -403,9 +437,15 @@ export function resolveViewContext(page: PageKey, leafId: string): ViewContext {
     return {
       report: "dual",
       monthOrder: withLatestCloseMonths(union, page, leafId),
-      reportLabel: leafId.startsWith("cfg-campos")
-        ? "Campo · Costayaco / Vonú"
-        : "Gran Tierra + COPOWER · vista integrada",
+      reportLabel: leafId.includes("pad4")
+        ? "Campo · Pad 4 Acordionero"
+        : leafId.includes("vonu")
+          ? "Campo · Vonú"
+          : leafId.includes("costayaco")
+            ? "Campo · Costayaco"
+            : leafId.startsWith("cfg-campos")
+              ? "Campos"
+              : "Gran Tierra + COPOWER · vista integrada",
       reportShort: leafId.startsWith("cfg-campos") ? "Campo" : "Dual",
     };
   }
@@ -476,14 +516,15 @@ export function monthOptionLabel(month: string, ctx: ViewContext): string {
 
 export function defaultMonth(ctx: ViewContext): string {
   if (ctx.monthOrder.includes("YTD2026")) return "YTD2026";
-  const preferred = ctx.monthOrder.includes("Ago")
-    ? "Ago"
-    : ctx.monthOrder.includes("Jul")
-      ? "Jul"
-      : ctx.monthOrder.includes("Jun")
-        ? "Jun"
-        : ctx.monthOrder[ctx.monthOrder.length - 1];
-  return preferred ?? "Ago";
+  for (const key of ["Nov", "Oct", "Sep", "Ago", "Jul", "Jun"]) {
+    if (ctx.monthOrder.includes(key)) return key;
+  }
+  return ctx.monthOrder[ctx.monthOrder.length - 1] ?? "Nov";
+}
+
+/** Septiembre y octubre tienen cierre publicado. Noviembre sigue abierto. */
+export function isRecentMonth(month: string): boolean {
+  return month === "Sep" || month === "Oct" || month === "Nov";
 }
 
 export type GenerationSection = "dashboard" | "diaria" | "mensual" | "equipos" | "utilizacion" | "horas";

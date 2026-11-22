@@ -35,7 +35,7 @@ if (!src.includes('Ago: "Agosto"')) {
 }
 src = src.replace(
   "/** Datos por mes desde data/Costayaco/GTE y data/Costayaco/Julio/GTE. May–Jul: KPIs oficiales de informe; Ene–Abr: estimados Excel. */",
-  "/** Datos por mes desde data/Costayaco/GTE, data/Costayaco/Julio/GTE y data/Costayaco/Agosto/Presentación GTE. May–Ago: KPIs oficiales; Ene–Abr: estimados Excel. */",
+  "/** Datos por mes desde data/Costayaco/GTE/2026-01 a 2026-08. May–Ago: KPIs oficiales; Ene–Abr: estimados Excel. */",
 );
 
 // Quitar Ago previo si se reinyecta

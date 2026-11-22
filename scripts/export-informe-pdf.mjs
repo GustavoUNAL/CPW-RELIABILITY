@@ -14,7 +14,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const URL = process.env.INFORME_URL ?? "http://localhost:5175/informes/reporte-completo";
 const OUT =
   process.env.INFORME_PDF_OUT ??
-  path.join(ROOT, "data/Costayaco/Julio/Informe de Confiabilidad - Julio 2026.pdf");
+  path.join(ROOT, "data/Costayaco/informes/2026-07/Informe de Confiabilidad - Julio 2026.pdf");
 const CHROME =
   process.env.CHROME_PATH ??
   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";

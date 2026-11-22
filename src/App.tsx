@@ -1,26 +1,6 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import {
-  CalendarRange,
-  ClipboardCheck,
-  Clock,
-  Database,
-  FileText,
-  Gauge,
-  HeartPulse,
-  LayoutDashboard,
-  Sigma,
-  LogOut,
-  MapPin,
-  Maximize2,
-  Menu,
-  Presentation,
-  Receipt,
-  Shield,
-  UserRound,
-  X,
-  Wrench,
-  Zap,
-} from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { LayoutDashboard, LogOut, Menu, UserRound, X } from "lucide-react";
+import { InformeLogo } from "./domain/reliability/reports/InformeBrandChrome";
 import { PlatformContent } from "./domain/reliability/reports/PlatformContent";
 import type { RcaCaseDetail } from "./domain/reliability/reports/gteJuneRcaCases";
 import { GTE_JUNE_RCA_SEED } from "./domain/reliability/reports/gteJuneRcaCases";
@@ -39,26 +19,21 @@ import {
 } from "./domain/reliability/rca/rcaEventStore";
 import type { RcaEventoFalla } from "./domain/reliability/rca/types";
 import type { PageKey } from "./domain/reliability/types";
-import {
-  PROJECT_NAV_TREE,
-  PROJECT_TITLE,
-  findLeafLabel,
-  firstLeafId,
-  type NavNode,
-} from "./domain/reliability/nav/projectTree";
+import { PROJECT_NAV_TREE, findLeafLabel } from "./domain/reliability/nav/projectTree";
 import {
   defaultMonth,
   monthOptionLabel,
+  PLATFORM_MONTH_ORDER,
   resolveViewContext,
 } from "./domain/reliability/nav/resolveContext";
+import { cleanPathname, parseParkRoute, parsePath, parkPath, pushAppUrl, replaceAppUrl, type FieldParkId } from "./domain/reliability/nav/urlRouting";
+import { HomeBoard, ModuleStrip } from "./domain/reliability/nav/HomeBoard";
+import { PARK_SECTIONS, parkSectionId } from "./domain/reliability/nav/ParkDossier";
+import { ParkDossier } from "./domain/reliability/nav/ParkDossier";
+import { PARK_OPTIONS, WORK_MODULES, moduleForLeaf } from "./domain/reliability/nav/workModules";
 import {
-  buildInformesPath,
-  buildPath,
-  parsePath,
-  pushAppUrl,
-  replaceAppUrl,
-} from "./domain/reliability/nav/urlRouting";
-import {
+  AUTH_ENABLED,
+  LOCAL_PREVIEW_USER,
   LoginScreen,
   ROLE_LABELS,
   canAccessInformes,
@@ -76,28 +51,8 @@ import {
   type SessionUser,
 } from "./domain/reliability/auth";
 
-const MODULE_ICONS: Record<PageKey, ReactNode> = {
-  dashboard: <LayoutDashboard size={16} />,
-  campos: <MapPin size={16} />,
-  generacion: <Zap size={16} />,
-  indicadores: <Sigma size={16} />,
-  operacion: <Database size={16} />,
-  concertacion: <Clock size={16} />,
-  confiabilidad: <Gauge size={16} />,
-  mantenimiento: <Wrench size={16} />,
-  gestion_activos: <HeartPulse size={16} />,
-  gestion_acciones: <ClipboardCheck size={16} />,
-  planeacion: <CalendarRange size={16} />,
-  facturacion: <Receipt size={16} />,
-  informes: <FileText size={16} />,
-  admin: <Shield size={16} />,
-};
-
-const OM_COLOMBIA_URL =
-  "https://copowercomco-my.sharepoint.com/personal/tec_op_copower_com_co/Documents/Forms/All.aspx?RootFolder=%2Fpersonal%2Ftec%5Fop%5Fcopower%5Fcom%5Fco%2FDocuments%2FO%26M%20COLOMBIA&View=%7B181C171F%2DD036%2D4F1F%2DBE86%2D9D8BEC441F3D%7D";
-
 const DEFAULT_MODULE = PROJECT_NAV_TREE[0];
-const DEFAULT_LEAF = "dash-resumen";
+const DEFAULT_LEAF = "dash-historial";
 const MOBILE_MQ = "(max-width: 900px)";
 
 function initialRoute(): { page: PageKey; leaf: string; focusId: string | null } {
@@ -110,13 +65,15 @@ function initialRoute(): { page: PageKey; leaf: string; focusId: string | null }
 
 function App() {
   const boot = useMemo(() => initialRoute(), []);
-  const [session, setSession] = useState<SessionUser | null>(() => loadSession());
+  const [session, setSession] = useState<SessionUser | null>(() =>
+    AUTH_ENABLED ? loadSession() : LOCAL_PREVIEW_USER,
+  );
   const [activePage, setActivePage] = useState<PageKey>(boot.page);
   const [activeLeafId, setActiveLeafId] = useState(boot.leaf);
-  const [openModules, setOpenModules] = useState<Partial<Record<PageKey, boolean>>>({
+  const [, setOpenModules] = useState<Partial<Record<PageKey, boolean>>>({
     [boot.page]: true,
   });
-  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
+  const [, setOpenGroups] = useState<Record<string, boolean>>({
     "conf-eventos": true,
     "conf-bitacoras": true,
     "conf-repetitivos": true,
@@ -130,14 +87,23 @@ function App() {
     "capa-root": true,
   });
   const [theme, setTheme] = useState<"light" | "dark">("light");
-  const [selectedMonth, setSelectedMonth] = useState<string>("Ago");
+  const [selectedMonth, setSelectedMonth] = useState<string>("Nov");
+  const [activeWorkModuleId, setActiveWorkModuleId] = useState<string | null>(
+    () => moduleForLeaf(boot.page, boot.leaf)?.id ?? null,
+  );
+  const [parkRoute, setParkRoute] = useState<FieldParkId | null>(() => parseParkRoute()?.id ?? null);
+  const [parkSection, setParkSection] = useState<string>(() => {
+    const park = parseParkRoute();
+    return park ? parkSectionId(park.id, park.section) : "resumen";
+  });
+  const [atHome, setAtHome] = useState(() => parseParkRoute() == null && parsePath() == null);
   const [navOpen, setNavOpen] = useState(false);
   const [isMobileNav, setIsMobileNav] = useState(false);
   const [analyticsSessionId, setAnalyticsSessionId] = useState(() => getOrCreateAnalyticsSessionId());
   const sessionStartedAtRef = useRef(Date.now());
   const pageStartedAtRef = useRef(Date.now());
   const lastHeartbeatPageAtRef = useRef(Date.now());
-  const viewRef = useRef({ page: boot.page, leaf: boot.leaf, label: "15 láminas" });
+  const viewRef = useRef({ page: boot.page, leaf: boot.leaf, label: "Historial de confiabilidad" });
   const skipUrlPushRef = useRef(false);
 
   useEffect(() => {
@@ -192,9 +158,9 @@ function App() {
   const activeLeafLabel =
     (activeModule ? findLeafLabel(activeModule.children, activeLeafId) : null) ?? activeLeafId;
 
-  // Normaliza la URL inicial (`/` → path semántico) una sola vez al entrar en sesión.
+  // Normaliza la URL inicial (`/` se queda en Inicio) una sola vez al entrar en sesión.
   useEffect(() => {
-    if (!session) return;
+    if (!session || atHome || parseParkRoute()) return;
     const focus = parsePath()?.focusId;
     replaceAppUrl(activePage, activeLeafId, focus);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- solo al autenticar
@@ -202,8 +168,20 @@ function App() {
 
   useEffect(() => {
     const onPop = () => {
+      const park = parseParkRoute();
+      setParkRoute(park?.id ?? null);
+      if (park) {
+        setParkSection(parkSectionId(park.id, park.section));
+        setAtHome(false);
+        setActiveWorkModuleId(park.id);
+        return;
+      }
       const parsed = parsePath();
-      if (!parsed) return;
+      if (!parsed) {
+        setAtHome(true);
+        return;
+      }
+      setAtHome(false);
       skipUrlPushRef.current = true;
       setActivePage(parsed.page);
       setActiveLeafId(parsed.leaf);
@@ -233,13 +211,15 @@ function App() {
       }
       return;
     }
-    if (activePage === "informes" && !canAccessInformes(session.role)) {
+    const reunionLeaf =
+      activeLeafId.startsWith("inf-conf-") || activeLeafId.startsWith("inf-cpw-");
+    if (activePage === "informes" && !canAccessInformes(session.role) && !reunionLeaf) {
       const home = defaultHomeForRole(session.role);
       setActivePage(home.page);
       setActiveLeafId(home.leaf);
       replaceAppUrl(home.page, home.leaf);
     }
-  }, [activePage, session]);
+  }, [activePage, activeLeafId, session]);
 
   useEffect(() => {
     if (!session) return;
@@ -349,6 +329,7 @@ function App() {
   };
 
   const handleLogout = () => {
+    if (!AUTH_ENABLED) return;
     if (session) {
       const now = Date.now();
       void trackLogout(session, analyticsSessionId, {
@@ -364,7 +345,51 @@ function App() {
     setNavOpen(false);
   };
 
+  const goHome = () => {
+    setParkRoute(null);
+    setParkSection("resumen");
+    setAtHome(true);
+    setNavOpen(false);
+    if (window.location.pathname !== "/") {
+      window.history.pushState({ home: true }, "", "/");
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    if (!parkRoute) return;
+    const sectionId = parkSectionId(parkRoute, parkSection);
+    const next = parkPath(parkRoute, sectionId);
+    if (cleanPathname() !== next) {
+      window.history.replaceState({ park: parkRoute, section: sectionId }, "", next);
+    }
+  }, [parkRoute, parkSection]);
+
+  const openPark = (id: FieldParkId, section?: string) => {
+    const sectionId = parkSectionId(id, section);
+    setParkRoute(id);
+    setParkSection(sectionId);
+    setActiveWorkModuleId(id);
+    setAtHome(false);
+    setNavOpen(false);
+    const next = parkPath(id, sectionId);
+    if (cleanPathname() !== next) {
+      window.history.pushState({ park: id, section: sectionId }, "", next);
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const openModuleItem = (moduleId: string, page: PageKey, leaf: string) => {
+    setParkRoute(null);
+    setParkSection("resumen");
+    setActiveWorkModuleId(moduleId);
+    openFromQuick(page, leaf);
+  };
+
   const selectLeaf = (page: PageKey, leafId: string) => {
+    setParkRoute(null);
+    setParkSection("resumen");
+    setAtHome(false);
     const mod = PROJECT_NAV_TREE.find((m) => m.key === page);
     const label = (mod ? findLeafLabel(mod.children, leafId) : null) ?? leafId;
     if (session) {
@@ -394,6 +419,10 @@ function App() {
     skipUrlPushRef.current = false;
     setNavOpen(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const openFromQuick = (page: PageKey, leaf: string) => {
+    selectLeaf(page, leaf);
   };
 
   const updateRcaCases = (next: RcaCaseDetail[] | ((prev: RcaCaseDetail[]) => RcaCaseDetail[])) => {
@@ -470,66 +499,31 @@ function App() {
     navigateToRca(createdId);
   };
 
-  const selectModule = (page: PageKey) => {
-    const mod = PROJECT_NAV_TREE.find((m) => m.key === page);
-    const leaf = mod ? firstLeafId(mod.children) : null;
-    if (leaf) selectLeaf(page, leaf);
-    else {
-      setActivePage(page);
-      setOpenModules((prev) => ({ ...prev, [page]: true }));
-      setNavOpen(false);
-    }
-  };
-
-  const toggleModule = (page: PageKey) => {
-    setOpenModules((prev) => ({ ...prev, [page]: !prev[page] }));
-  };
-
-  const toggleGroup = (id: string) => {
-    setOpenGroups((prev) => ({ ...prev, [id]: !(prev[id] ?? true) }));
-  };
-
-  const renderNavNodes = (page: PageKey, nodes: NavNode[], depth = 0): ReactNode =>
-    nodes.map((node) => {
-      const hasChildren = Boolean(node.children?.length);
-      if (hasChildren) {
-        const open = openGroups[node.id] ?? true;
-        return (
-          <li key={node.id} className={`project-group depth-${depth}`}>
-            <button
-              type="button"
-              className="project-group-btn"
-              aria-expanded={open}
-              onClick={() => toggleGroup(node.id)}
-            >
-              <span className="project-group-chevron">{open ? "▾" : "▸"}</span>
-              <span>{node.label}</span>
-            </button>
-            {open ? <ul className="project-leaves nested">{renderNavNodes(page, node.children!, depth + 1)}</ul> : null}
-          </li>
-        );
-      }
-      const leafActive = activePage === page && activeLeafId === node.id;
-      return (
-        <li key={node.id}>
-          <button
-            type="button"
-            className={leafActive ? "project-leaf active" : "project-leaf"}
-            onClick={() => selectLeaf(page, node.id)}
-          >
-            <span>{node.label}</span>
-          </button>
-        </li>
-      );
-    });
-
-  if (!session) {
+  if (AUTH_ENABLED && !session) {
     return (
       <div className={`app-shell ${theme} login-shell`}>
         <LoginScreen onSuccess={handleLogin} />
       </div>
     );
   }
+
+  if (!session) return null;
+
+  const deskModule =
+    WORK_MODULES.find((mod) => mod.id === activeWorkModuleId) ?? moduleForLeaf(activePage, activeLeafId);
+  const showHome = atHome && !isInformesOnlyRole(session.role);
+  const homeMonthLabel = monthOptionLabel(selectedMonth, {
+    report: "dual",
+    monthOrder: PLATFORM_MONTH_ORDER,
+    reportLabel: "Inicio",
+    reportShort: "Inicio",
+  });
+  const onParkRoute = Boolean(parkRoute);
+  const timelineMonths = (showHome || onParkRoute ? PLATFORM_MONTH_ORDER : viewContext.monthOrder).slice().reverse();
+  const timelineFixed = !showHome && !onParkRoute && Boolean(viewContext.fixedPeriod);
+  const monthContext = showHome || onParkRoute
+    ? { report: "dual" as const, monthOrder: PLATFORM_MONTH_ORDER, reportLabel: "Inicio", reportShort: "Inicio" }
+    : viewContext;
 
   return (
     <div className={`app-shell ${theme}${navOpen ? " nav-open" : ""}`}>
@@ -544,25 +538,26 @@ function App() {
         >
           {navOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
-        <div className="mobile-topbar-copy">
-          <p className="eyebrow">COPOWER</p>
-          <strong>{activeModule?.label ?? "Dashboard"}</strong>
-          <span>{activeLeafLabel}</span>
-        </div>
-        <button
-          type="button"
-          className="laminas-jump-btn mobile-laminas-btn"
-          onClick={() => {
-            setNavOpen(false);
-            if (activePage === "dashboard" && (activeLeafId === "dash-resumen" || activeLeafId === "dash-laminas")) {
-              document.getElementById("lamina-1")?.scrollIntoView({ behavior: "smooth", block: "start" });
-              return;
-            }
-            selectLeaf("dashboard", "dash-resumen");
-          }}
-        >
-          15 láminas
+        <button type="button" className="brand-home" onClick={goHome} title="Inicio">
+          <InformeLogo className="app-logo app-logo--bar" />
         </button>
+        {viewContext.fixedPeriod ? (
+          <p className="mobile-month-fixed">{viewContext.periodLabel ?? monthLabel}</p>
+        ) : (
+          <select
+            className="mobile-month-select"
+            aria-label="Mes"
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(e.target.value)}
+          >
+            {viewContext.monthOrder.map((month) => (
+              <option key={month} value={month}>
+                {monthOptionLabel(month, viewContext)}
+              </option>
+            ))}
+          </select>
+        )}
+        {AUTH_ENABLED ? (
         <button
           type="button"
           className="mobile-logout-btn"
@@ -572,6 +567,7 @@ function App() {
         >
           <LogOut size={18} />
         </button>
+        ) : null}
       </header>
 
       <button
@@ -590,9 +586,8 @@ function App() {
       >
         <div className="sidebar-mobile-head">
           <div className="brand">
-            <p className="eyebrow">COPOWER</p>
-            <h1>Gestión de confiabilidad</h1>
-            <p className="brand-sub">{PROJECT_TITLE}</p>
+            <InformeLogo className="app-logo" />
+            <p className="brand-sub">Confiabilidad del parque</p>
           </div>
           <button
             type="button"
@@ -603,13 +598,119 @@ function App() {
             <X size={18} />
           </button>
         </div>
-        <div className="brand brand-desktop">
-          <p className="eyebrow">COPOWER</p>
-          <h1>Gestión de confiabilidad</h1>
-          <p className="brand-sub">{PROJECT_TITLE}</p>
-        </div>
+        <button type="button" className="brand brand-desktop brand-home" onClick={goHome} title="Inicio">
+          <InformeLogo className="app-logo" />
+          <p className="brand-sub">Confiabilidad del parque</p>
+        </button>
 
-        <div className="session-panel">
+        {!isInformesOnlyRole(session.role) ? (
+        <div className="context-rail">
+          <nav className="side-modules" aria-label="Parques">
+            <p className="eyebrow">Parques</p>
+            {WORK_MODULES.filter((mod) => mod.id === "costayaco" || mod.id === "vonu" || mod.id === "pad4").map((mod) => {
+              const Icon = mod.icon;
+              const id = mod.id as FieldParkId;
+              const active = parkRoute === id;
+              return (
+                <div key={mod.id} className={active ? "side-module active" : "side-module"}>
+                  <button
+                    type="button"
+                    className={active ? "side-module-btn active" : "side-module-btn"}
+                    aria-current={active ? "true" : undefined}
+                    onClick={() => openPark(id)}
+                  >
+                    <Icon size={16} aria-hidden />
+                    <span>
+                      <strong>{mod.label}</strong>
+                      <small>{mod.hint}</small>
+                    </span>
+                  </button>
+                  {active ? (
+                    <ul className="side-module-items">
+                      {PARK_SECTIONS[id].map((section) => (
+                        <li key={section.id}>
+                          <button
+                            type="button"
+                            className={parkSectionId(id, parkSection) === section.id ? "active" : undefined}
+                            aria-current={parkSectionId(id, parkSection) === section.id ? "page" : undefined}
+                            onClick={() => openPark(id, section.id)}
+                          >
+                            {section.label}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
+              );
+            })}
+            <p className="eyebrow">También</p>
+            {WORK_MODULES.filter((mod) => mod.id === "analisis" || mod.id === "reunion").map((mod) => {
+              const Icon = mod.icon;
+              const active = !parkRoute && !showHome && deskModule?.id === mod.id;
+              const first = mod.items[0];
+              if (!first) return null;
+              return (
+                <div key={mod.id} className={active ? "side-module active" : "side-module"}>
+                  <button
+                    type="button"
+                    className={active ? "side-module-btn active" : "side-module-btn"}
+                    aria-current={active ? "true" : undefined}
+                    onClick={() => openModuleItem(mod.id, first.page, first.leaf)}
+                  >
+                    <Icon size={16} aria-hidden />
+                    <span>
+                      <strong>{mod.label}</strong>
+                      <small>{mod.hint}</small>
+                    </span>
+                  </button>
+                  {active ? (
+                    <ul className="side-module-items">
+                      {mod.items.map((item) => (
+                        <li key={item.leaf}>
+                          <button
+                            type="button"
+                            className={activeLeafId === item.leaf ? "active" : undefined}
+                            onClick={() => openModuleItem(mod.id, item.page, item.leaf)}
+                          >
+                            {item.label}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
+              );
+            })}
+          </nav>
+          <div className="timeline">
+            <p className="eyebrow">Mes</p>
+            {timelineFixed ? (
+              <p className="timeline-fixed">{viewContext.periodLabel ?? monthLabel}</p>
+            ) : (
+              <ol className="timeline-list">
+                {timelineMonths.map((month) => {
+                  const active = month === selectedMonth;
+                  return (
+                    <li key={month}>
+                      <button
+                        type="button"
+                        className={active ? "timeline-btn active" : "timeline-btn"}
+                        aria-current={active ? "true" : undefined}
+                        onClick={() => setSelectedMonth(month)}
+                      >
+                        <span className="timeline-mark" aria-hidden />
+                        <span>{monthOptionLabel(month, monthContext)}</span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ol>
+            )}
+          </div>
+        </div>
+        ) : null}
+        <div className="shell-foot">
           <div className="session-user" title={`${session.email} · ${ROLE_LABELS[session.role]}`}>
             <span className="session-user-avatar" aria-hidden>
               <UserRound size={16} />
@@ -618,154 +719,52 @@ function App() {
               <strong className="session-user-name">{session.name}</strong>
               <span className="session-user-role">{ROLE_LABELS[session.role]}</span>
             </span>
-            <button
-              type="button"
-              className="session-logout"
-              onClick={handleLogout}
-              title="Cerrar sesión"
-            >
+            {AUTH_ENABLED ? (
+            <button type="button" className="session-logout" onClick={handleLogout} title="Cerrar sesión">
               <LogOut size={15} />
               <span>Salir</span>
             </button>
+            ) : null}
+          </div>
+          <div className="theme-switch-row shell-theme">
+            <span>Oscuro</span>
+            <label className="theme-switch" htmlFor="theme-toggle">
+              <input
+                id="theme-toggle"
+                type="checkbox"
+                checked={theme === "light"}
+                onChange={(e) => setTheme(e.target.checked ? "light" : "dark")}
+              />
+              <span className="slider" />
+            </label>
+            <span>Claro</span>
           </div>
         </div>
-
-        <div className="sidebar-controls">
-          {viewContext.fixedPeriod ? (
-            <div className="month-picker month-picker-fixed">
-              <label>Periodo</label>
-              <p className="month-fixed-label">{monthOptionLabel(selectedMonth, viewContext)}</p>
-            </div>
-          ) : (
-            <div className="month-picker">
-              <label htmlFor="month-selector">Periodo</label>
-              <select
-                id="month-selector"
-                value={selectedMonth}
-                onChange={(e) => setSelectedMonth(e.target.value)}
-              >
-                {viewContext.monthOrder.map((month) => (
-                  <option key={month} value={month}>
-                    {monthOptionLabel(month, viewContext)}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-          <div className="header-theme-switch">
-            <label>Apariencia</label>
-            <div className="theme-switch-row">
-              <span>Oscuro</span>
-              <label className="theme-switch" htmlFor="theme-toggle">
-                <input
-                  id="theme-toggle"
-                  type="checkbox"
-                  checked={theme === "light"}
-                  onChange={(e) => setTheme(e.target.checked ? "light" : "dark")}
-                />
-                <span className="slider" />
-              </label>
-              <span>Claro</span>
-            </div>
-          </div>
-        </div>
-        <div className="tree-panel project-tree">
-          <p className="eyebrow">Árbol del proyecto</p>
-          <nav className="project-nav" aria-label="Módulos del sistema">
-            {visibleNavTree.map((mod) => {
-              const isActive = activePage === mod.key;
-              const isOpen = openModules[mod.key] ?? isActive;
-              return (
-                <div key={mod.key} className={isActive ? "project-mod active" : "project-mod"}>
-                  <div className="project-mod-row">
-                    <button
-                      type="button"
-                      className="project-mod-toggle"
-                      aria-expanded={isOpen}
-                      onClick={() => toggleModule(mod.key)}
-                      title={isOpen ? "Contraer" : "Expandir"}
-                    >
-                      {isOpen ? "▾" : "▸"}
-                    </button>
-                    <button
-                      type="button"
-                      className={isActive ? "project-mod-btn active" : "project-mod-btn"}
-                      onClick={() => selectModule(mod.key)}
-                      title={mod.description}
-                    >
-                      <span className="project-mod-icon">{MODULE_ICONS[mod.key]}</span>
-                      <span className="project-mod-label">
-                        <strong>{mod.label}</strong>
-                      </span>
-                    </button>
-                    {mod.key === "informes" ? (
-                      <a
-                        className="project-mod-fullscreen"
-                        href={
-                          activePage === "informes"
-                            ? buildInformesPath(activeLeafId)
-                            : buildPath("informes", "inf-indicadores")
-                        }
-                        target="_blank"
-                        rel="noreferrer"
-                        title="Abrir Informes en ventana completa"
-                        aria-label="Abrir Informes en ventana completa"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <Maximize2 size={14} />
-                      </a>
-                    ) : null}
-                  </div>
-                  {isOpen ? (
-                    <ul className="project-leaves">{renderNavNodes(mod.key, mod.children)}</ul>
-                  ) : null}
-                </div>
-              );
-            })}
-          </nav>
-        </div>
-        {!isInformesOnlyRole(session.role) ? (
-          <div className="tree-panel">
-            <p className="eyebrow">Documentación</p>
-            <nav className="menu">
-              <a
-                className="menu-item"
-                href={OM_COLOMBIA_URL}
-                target="_blank"
-                rel="noreferrer"
-                title="Abrir O&M COLOMBIA"
-              >
-                <span>
-                  <FileText size={16} />
-                </span>
-                <span>O&amp;M COLOMBIA</span>
-              </a>
-            </nav>
-          </div>
-        ) : null}
       </aside>
 
-      <main className={viewContext.report === "dual" ? "main main-dual" : "main"}>
-        <div className="main-session-bar" aria-label="Sesión activa">
-          <p className="main-session-greeting">
-            Sesión de <strong>{session.name}</strong>
-            <span className="muted"> · {ROLE_LABELS[session.role]}</span>
-          </p>
-          <button
-            type="button"
-            className="laminas-jump-btn"
-            onClick={() => {
-              if (activePage === "dashboard" && (activeLeafId === "dash-resumen" || activeLeafId === "dash-laminas")) {
-                document.getElementById("lamina-1")?.scrollIntoView({ behavior: "smooth", block: "start" });
-                return;
-              }
-              selectLeaf("dashboard", "dash-resumen");
-            }}
-          >
-            <Presentation size={16} />
-            15 láminas
-          </button>
-        </div>
+      <main className={viewContext.report === "dual" && !showHome ? "main main-dual" : "main"}>
+        {parkRoute ? (
+          <ParkDossier
+            park={parkRoute}
+            month={selectedMonth}
+            monthLabel={homeMonthLabel}
+            activeSection={parkSection}
+            onSection={(sectionId) => openPark(parkRoute, sectionId)}
+            rcaEvents={costayacoRcaEvents}
+            onRcaChange={updateCostayacoRca}
+          />
+        ) : showHome ? (
+          <HomeBoard monthLabel={homeMonthLabel} activePark={parkRoute} onOpenPark={openPark} />
+        ) : (
+        <>
+        {!isInformesOnlyRole(session.role) && deskModule ? (
+          <ModuleStrip
+            mod={deskModule}
+            activeLeaf={activeLeafId}
+            onOpen={openModuleItem}
+            onHome={goHome}
+          />
+        ) : null}
         <PlatformContent
           page={activePage}
           leafId={activeLeafId}
@@ -784,8 +783,37 @@ function App() {
           focusCostayacoRcaId={focusCostayacoRcaId}
           onFocusCostayacoRcaConsumed={() => setFocusCostayacoRcaId(null)}
           isAdmin={session.role === "admin"}
+          onOpen={selectLeaf}
         />
+        </>
+        )}
       </main>
+      {!isInformesOnlyRole(session.role) ? (
+      <nav className="quick-bar" aria-label="Parques">
+        <button
+          type="button"
+          className={showHome ? "quick-bar-btn active" : "quick-bar-btn"}
+          onClick={goHome}
+        >
+          <LayoutDashboard size={18} />
+          <span>Inicio</span>
+        </button>
+        {PARK_OPTIONS.filter((park) => park.id !== "parque").map((park) => (
+          <button
+            key={park.id}
+            type="button"
+            className={parkRoute === park.id ? "quick-bar-btn active" : "quick-bar-btn"}
+            onClick={() => openPark(park.id as FieldParkId)}
+          >
+            <span>{park.label}</span>
+          </button>
+        ))}
+        <button type="button" className={navOpen ? "quick-bar-btn active" : "quick-bar-btn"} onClick={() => setNavOpen(true)}>
+          <Menu size={18} />
+          <span>Mes</span>
+        </button>
+      </nav>
+      ) : null}
     </div>
   );
 }

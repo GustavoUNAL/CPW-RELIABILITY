@@ -25,5 +25,5 @@ export function defaultHomeForRole(role: UserRole): { page: PageKey; leaf: strin
   if (isInformesOnlyRole(role)) {
     return { page: "informes", leaf: "inf-indicadores" };
   }
-  return { page: "dashboard", leaf: "dash-resumen" };
+  return { page: "dashboard", leaf: "dash-historial" };
 }

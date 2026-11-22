@@ -9,7 +9,7 @@ import XLSX from "xlsx";
 const ROOT = path.resolve(import.meta.dirname, "..");
 const SRC = path.join(
   ROOT,
-  "data/Costayaco/Agosto/ejemplo formato/Copia de Ejemplo formato de facturacion.xlsx",
+  "data/Costayaco/facturacion/Copia de Ejemplo formato de facturacion.xlsx",
 );
 const OUT = path.join(ROOT, "src/domain/reliability/reports/facturacionEcuadorData.ts");
 
@@ -194,7 +194,7 @@ const horometers = UNITS_A.concat(UNITS_B).map((u, idx) => {
 });
 
 const pack = {
-  sourceFile: "data/Costayaco/Agosto/ejemplo formato/Copia de Ejemplo formato de facturacion.xlsx",
+  sourceFile: "data/Costayaco/facturacion/Copia de Ejemplo formato de facturacion.xlsx",
   document: {
     nombre: "Facturación Copower Ecuador – GTE",
     tipo: "Soporte de facturación",

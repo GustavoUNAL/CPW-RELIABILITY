@@ -1,0 +1,16 @@
+Reyrolle Protection
+Text File :- 
+Events
+
+09:43:50.500    	1	160	Raised	SpE	--  --  SI=  0  RT=-----  F#=-----	Setting G1 selected
+09:43:50.500    	1	60	Raised	SpE	--  --  SI=  0  RT=-----  F#=-----	Re-Start
+09:43:50.500    	1	160	Raised	SpE	--  --  SI=  0  RT=-----  F#=-----	Power On
+09:44:06.516    	1	183	Raised	SpE	--  --  SI=  0  RT=-----  F#=-----	CB Travelling
+09:44:06.516    	1	183	Raised	SpE	--  --  SI=  0  RT=-----  F#=-----	CB Alarm
+09:44:06.924    	1	60	Raised	SpE	--  --  SI=  0  RT=-----  F#=-----	Local & Remote
+09:44:06.945    	1	160	Raised	SpE	--  --  SI=  0  RT=-----  F#=-----	Binary Input 3
+09:44:06.945    	1	160	Raised	SpE	--  --  SI=  0  RT=-----  F#=-----	Binary Input 2
+09:44:06.945    	1	160	Raised	SpE	--  --  SI=  0  RT=-----  F#=-----	Binary Input 1
+09:44:06.958    	1	200	Raised	SpE	--  --  SI=  0  RT=-----  F#=-----	CB 1
+09:44:06.958    	1	183	Cleared	SpE	--  --  SI=  0  RT=-----  F#=-----	CB Travelling
+09:44:06.958    	1	183	Cleared	SpE	--  --  SI=  0  RT=-----  F#=-----	CB Alarm

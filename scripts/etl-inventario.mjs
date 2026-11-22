@@ -1,7 +1,7 @@
 /**
  * ETL de inventario bodega Costayaco → inventoryMinimumsData.ts
  *
- * Preferencia: data/Costayaco/Agosto «INVENTARIO FINAL BODEGA…».
+ * Preferencia: data/Costayaco/inventarios/2026-08 «INVENTARIO FINAL BODEGA…».
  * El xlsx original pesa cientos de MB por fotos; se lee una copia sin media.
  *
  * STOCK = existencia actual (onHand).
@@ -23,22 +23,20 @@ const PREV_OUT = OUT;
 
 const GENERIC_PN = /^(materiales|material\s*electric[oa]s?|herramienta)s?$/i;
 
-function listDirs(dir) {
-  return fs.readdirSync(dir, { withFileTypes: true }).filter((d) => d.isDirectory());
-}
-
 function findInventoryXlsx() {
   const candidates = [];
-  for (const d of listDirs(DATA)) {
-    const full = path.join(DATA, d.name);
-    const files = fs.readdirSync(full).filter((f) => /INVENTARIO/i.test(f) && f.endsWith(".xlsx"));
-    for (const f of files) {
-      const p = path.join(full, f);
-      const key = d.name.trim().toLowerCase();
-      const rank = key === "agosto" ? 0 : /agosto/i.test(key) ? 1 : /mantenimiento/i.test(key) ? 2 : 9;
-      candidates.push({ rank, p, size: fs.statSync(p).size });
+  const root = path.join(DATA, "inventarios");
+  function walk(dir) {
+    for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
+      const p = path.join(dir, ent.name);
+      if (ent.isDirectory()) walk(p);
+      else if (/INVENTARIO/i.test(ent.name) && ent.name.endsWith(".xlsx") && !ent.name.startsWith("~$")) {
+        const rank = p.includes(`${path.sep}2026-08${path.sep}`) ? 0 : p.includes(`${path.sep}2026-07${path.sep}`) ? 1 : 2;
+        candidates.push({ rank, p, size: fs.statSync(p).size });
+      }
     }
   }
+  walk(root);
   candidates.sort((a, b) => a.rank - b.rank || a.size - b.size);
   if (!candidates.length) {
     console.error("No se encontró un xlsx de INVENTARIO bajo data/");

@@ -1,0 +1,114 @@
+                                  STOCK INVENTARIO ACORDEONERO PAD4 - J420
+PARTE No. JENBACHER                DESCRIPCION               CANTIDAD INICIAL   ENTRADA         SALIDA         STOCK ACTUAL      UBICACIÓN
+              1207443 CIRCULATION PUMP                                      1               0              0               1 CAMPO
+              1106892 CIRCULATION PUMP                                      1               0              0               1 CAMPO
+               495854 TRANSDUCER                                            1               0              0               1 CAMPO
+               201775 TEMPERATURE CONTROL                                   1               0              0               1 CAMPO
+               607323 TEMPERATURE SENSOR                                    2               0              0               2 CAMPO
+               179609 RESISTANCE THERMOMETER                                1               0              0               1 CAMPO
+               415442 PRESSURE TRANSDUCER                                   3               0              0               3 CAMPO
+              1208828 THROTTLE VALVE(OLD:455676) PLS CONF.                  1               0              0               1 CAMPO
+               631265 OIL FILTER                                           24               0              7              17 CAMPO Y SAN MARTIN
+               162817 O-RING                                               30               0              0              30 CAMPO
+              1247730 CYLINDER HEAD-REMUP                                  25               0              0              25 CAMPO
+               557647 CYLINDER HEAD GASKET                                 80               0              0              80 CAMPO
+               642826 PISTON WHIT RINGS(NEW: 1234248)                      10               0              0              10 SAN MARTIN
+               448556 CYLINDER LINER                                        5               0              0               5 SAN MARTIN
+               421782 SCRAPER RING                                          5               5              5               5 CAMPO
+               448559 CYLINDER HEAD GASKET                                  5              20              0              25 CAMPO
+            1245880,1 POWER SUPPLY (OLD: 599772)MPM USADOS                  3               0              0               3 CAMPO
+              1245880 POWER SUPPLY (OLD: 599772)MPM                         2               1              2               1 CAMPO
+               572299 MODULE                                                2               0              0               2 CAMPO
+               572300 MODULE                                                2               0              0               2 CAMPO
+                 1140 TARJETA DIANET 3                                      3               0              0               3 CAMPO
+                 1139 DISPLAY DIANET 3                                      4               0              0               4 CAMPO
+               657540 VELAS BUJIAS                                          2              10              2              10 CAMPO
+              1241175 PUENTES (MORIS)                                       5               0              0               5 CAMPO
+               652092 SAFI #1                                              10               0              0              10 CAMPO Y SAN MARTIN
+     1255879-1244136 MORIS                                                  6               1              1               6 CAMPO Y SAN MARTIN
+                 1138 JUEGO PLC (T320)                                      1               0              0               1 SAN MARTIN
+                 1137 RESISTENCIA (GROUP RESIST)                            1               0              0               1 CAMPO
+              1219950 FLOTANTE MEDIDOR ACEITE                               1               0              0               1 CAMPO
+                 1136 CARGADOR BATERIA DEIF                                 1               0              0               1 CAMPO
+                 1135 DIANEXT 3 COMPLETO                                    1               0              0               1 CAMPO
+               641947 TERMOCUPLA CILINDRO                                   9               0              0               9 CAMPO Y SAN MARTIN
+              9008292 SENSOR KNOCKING                                       4               0              0               4 CAMPO Y SAN MARTIN
+              1101738 DIGITAL INPUT (1101738)                               7               0              0               7 CAMPO
+              1101735 ANALOGY INPUT (1101735)                               2               0              0               2 CAMPO
+              1101736 TEMPERATURA INPUT (1101736)                           2               0              0               2 CAMPO
+              1108978 ANALOGA OUT (1108978)                                 2               0              0               2 CAMPO
+           X20BT9100 X20BT9100 (TARJETA)                                    3               0              0               3 CAMPO
+               487181 IGNITION COIL                                        14               0              0              14 CAMPO Y SAN MARTIN
+                 1134 TRANSMISOR PULSE                                      2               0              0               2 CAMPO
+                 1133 REDUCTION SENSOR                                      2               0              0               2 CAMPO
+              1219312 MOTOR ARRANQUE                                        4               0              0               4 CAMPO
+              1224789 RESISTENCIA DE PRECALENTAMIENTO                       1               0              0               1 CAMPO
+               303531 BOMBA DE PRECALENTAMIENTO                             2               0              0               2 CAMPO
+              1207426 VALVULA 3 VIAS HT                                     1               1              0               2 CAMPO
+              1210363 SERVOMOTOR VALVULA 3 VIAS                             1               3              1               3 CAMPO
+              1254664 BUJIAS                                               30               4             17              17 CAMPO Y SAN MARTIN
+                 1132 VALVULAS TURBO BY-PASS                                4               0              0               4 CAMPO
+                 1131 SENSOR RPM PICK-UP                                    2               0              0               2 CAMPO
+                 1130 RELÈ PILZ USADO                                       8               0              0               8 CAMPO
+                 1129 BOMBA DE AGUA SISTEMA LT (REPARADA)                   1               0              0               1 CAMPO
+                 1128 DIODOS ALTERNADOR                                     5               0              0               5 CAMPO
+                 1127 BOMBA PREOLING (REPARADA)                             1               0              0               1 CAMPO
+                 1126 FUENTE DE ALIEMTACION 24 VDC                          2               0              0               2 CAMPO
+                 1125 VALVULAS TRHOTLE                                      2               0              0               2 CAMPO
+                 1124 INTERCOOLER                                           1               0              0               1 BUCARAMANGA
+                 1123 FILTRO DE AIRE LOCAL                                  9               0              0               9 SAN MARTIN
+                 1122 FILTRO COALECENTO LOCAL                               3               0              0               3 SAN MARTIN
+                 1121 FILTROS DE GAS                                        9               0              0               9 SANMARTIN
+                 1120 TANQUE HIDROFLOT LT                                   1               0              0               1 SAN MARTIN
+                 1119 TANQUE HIDROFLOT HT                                   1               0              0               1 SAN MARTIN
+                 1118 BATERIAS 8D NUEVAS                                    4               0              0               4 SAN MARTIN
+                 1117 BATERTIAS 8D USADAS                                   4               0              0               4 CAMPO
+                 1116 PROAT ISC 3 / WOODWAR                                 2               0              0               2 CAMPO
+                 1115 FUENTE DE ALIEMTACION 480V/24V                        2               0              1               1 CAMPO
+                 1114 MMU USADOS                                            3               0              0               3 CAMPO
+                 1113 BOBINAS USADAS                                        4               0              0               4 CAMPO
+                 1111 FILTRO ANTINIEBLA                                     4               0              3               1 CAMPO
+                 1112 PILZ MUEVOS                                           4               0              2               2 CAMPO
+                 1142 JUNTA ELASTICA BRIDADA                                2               8              8               2 CAMPO
+                 1143 JUNTA FLEXIBLES                                       4               0              2               2 CAMPO
+               290213 JUNTA                                                               180            160              20 CAMPO
+      1248243-202473 JUNTA                                                                340            240             100 CAMPO
+               300805 JUNTA TORICA                                                        180            160              20 CAMPO
+               225040 JUNTA TORICA                                                         90             80              10 CAMPO
+               356298 JUNTA DEL TURBO COMPRESOR                                            12              8               4 CAMPO
+              1105183 SOPORTE DEL SISTEMA NW36                                              2              0               2 CAMPO
+               303967 COMPENSADOR                                                           1              0               1 SAN MARTIN
+      456732 - 348074 JUNTA TORICA                                                         20              0              20 CAMPO
+               348964 JUNTA TORICA                                                         20              0              20 CAMPO
+               105863 JUNTA TORICA                                4   4    0 CAMPO
+               105812 JUNTA TORICA                                8   4    4 CAMPO
+               448559 POWERU ZYLINDERKOPFDICHTUNG BR4            20   0   20 CAMPO
+               421782 ANILLO ROSCADOR POWERUP BR4                 5   5    0 CAMPO
+        376475-202471 JUNTA TORICA                               40   0   40 CAMPO
+               376507 JUNTA TORICA                               40   0   40 CAMPO
+     1255879-1244136 MORIS                                        1   1    0 CAMPO
+               657540 VELAS BUJIAS                               10   2    8 CAMPO
+               107744 JUNTA                                       6   0    6 CAMPO
+               501834 JUNTA                                      10   0   10 CAMPO
+               100361 TORNILLO CABEZA EXAGONAL                   48   0   48 CAMPO
+               101855 NUEZ HEXAGONAL                             48   0   48 CAMPO
+               356682 TORNILLO CABEZA EXAGONAL                   48   0   48 CAMPO
+328973-302307-187671-
+             01143195 NUEZ HEXAGONAL                             48   0   48 CAMPO
+               100214 TORNILLO CILINDRICO                        80   0   80 CAMPO
+               236907 JUNTA TORICA                               24   0   24 CAMPO
+        110649-376511 JUNTA TORICA                               16   0   16 CAMPO
+               241824 JUNTA TORICA                                8   0    8 CAMPO
+               287889 JUNTA TORICA                                8   0    8 CAMPO
+               212134 JUNTA TORICA                                8   0    8 CAMPO
+               354987 JUNTA TORICA                                8   0    8 CAMPO
+      237224-7001959 JUNTA DEL TURBO COMPRESOR                    1   1    0 CAMPO
+        437244-183684 AISLAMIENTO CPL. CON ALAMBRE DE UNION       1   0    1 SAN MARTIN
+               453527 ABRAZADERA                                  8   0    8 SAN MARTIN
+              1101885 JUNTA TORICA ISO3601-1-124A-31,4222,62-N    2   0    2 CAMPO
+      9036067-341498 BARRA                                        2   0    2 CAMPO
+      9036068-341498 BARRA                                        2   0    2 CAMPO
+        585704-449408 EXTREMO GIRATORIO                           2   0    2 CAMPO
+        585703-449407 EXTREMO GIRATORIO                           2   0    2 CAMPO
+      101815-1127084 NUEZ HEZAGONAL                               6   0    6 CAMPO
+

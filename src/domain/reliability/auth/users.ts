@@ -16,6 +16,21 @@ export type SessionUser = {
   role: UserRole;
 };
 
+/**
+ * Interruptor de acceso.
+ * false = entra directo, sin pantalla de login (pruebas locales).
+ * true  = pide usuario y contraseña (activar al desplegar).
+ */
+export const AUTH_ENABLED = false;
+
+/** Sesión usada mientras AUTH_ENABLED es false. Admin para ver toda la plataforma. */
+export const LOCAL_PREVIEW_USER: SessionUser = {
+  id: "usr-gustavo",
+  name: "Gustavo Arteaga",
+  email: "gustavo@copower.com",
+  role: "admin",
+};
+
 export const ROLE_LABELS: Record<UserRole, string> = {
   admin: "Administrador",
   innovacion: "Innovación",
@@ -64,7 +79,20 @@ export const APP_USERS: readonly AppUser[] = [
     role: "generacion",
     passwordHash: "0cea4f3a67fde2f1198053ffad21ced52d79dffc072141b6399955331282b8ca",
   },
+  {
+    id: "usr-admin-demo",
+    name: "Admin COPOWER",
+    email: "admincopower",
+    role: "admin",
+    passwordHash: "c143f10a8b5f4ba8c9d943f7a24e5073cc0a9cedfdb801b581154b1aa2dbc1fd",
+  },
 ];
+
+/** Acceso de prueba. Usuario y clave son la misma palabra. */
+export const DEMO_LOGIN = {
+  user: "admincopower",
+  password: "admincopower",
+} as const;
 
 export function findUserByEmail(email: string): AppUser | undefined {
   const key = email.trim().toLowerCase();

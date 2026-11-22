@@ -1,7 +1,7 @@
 /**
  * ETL agosto 2026: concertación 01–23 → copowerMonthly + concertacionHoursData.
  *
- * Fuente: data/Costayaco/Agosto/Concertación de horas/Consolidado de Horas concertadas del 01 al 23 de Agosto.xlsx
+ * Fuente: data/Costayaco/concertacion/2026-08/Consolidado de Horas concertadas del 01 al 23 de Agosto.xlsx
  * Uso: node scripts/etl-agosto.mjs
  */
 import fs from "node:fs";
@@ -9,20 +9,14 @@ import path from "node:path";
 import XLSX from "xlsx";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
-const AGOSTO_DIR = path.join(ROOT, "data", "Costayaco", "Agosto");
-const concFolder = fs.readdirSync(AGOSTO_DIR).find((d) => /concert/i.test(d));
-if (!concFolder) {
-  console.error("No se encontró carpeta de concertación en data/Costayaco/Agosto");
+const XLSX_PATH = path.join(
+  ROOT,
+  "data/Costayaco/concertacion/2026-08/Consolidado de Horas concertadas del 01 al 23 de Agosto.xlsx",
+);
+if (!fs.existsSync(XLSX_PATH)) {
+  console.error("No se encontró Excel de concertación de agosto 01–23");
   process.exit(1);
 }
-const xlsxName = fs
-  .readdirSync(path.join(AGOSTO_DIR, concFolder))
-  .find((f) => f.endsWith(".xlsx") && !f.startsWith("~$"));
-if (!xlsxName) {
-  console.error("No se encontró Excel de concertación de agosto");
-  process.exit(1);
-}
-const XLSX_PATH = path.join(AGOSTO_DIR, concFolder, xlsxName);
 const REL_SOURCE = path.relative(ROOT, XLSX_PATH).replace(/\\/g, "/");
 const OUT_JSON = path.join(ROOT, "scripts/_extracted_agosto_copower.json");
 const MONTHLY = path.join(ROOT, "src/domain/reliability/reports/copowerMonthly.ts");
@@ -458,7 +452,7 @@ const pack = JSON.parse(concSrc.slice(jsonAssign, jsonEnd + 2));
 pack.sourceFile = `${pack.sourceFile} · ${REL_SOURCE}`;
 pack.extractedAt = new Date().toISOString().slice(0, 10);
 pack.notes =
-  "Horas concertadas GTE. May–Jul desde archivo de julio; agosto 01–23 desde data/Costayaco/Agosto. Ventana parcial (no cierra el mes).";
+  "Horas concertadas GTE. May–Jul desde archivo de julio; agosto 01–23 desde data/Costayaco/concertacion/2026-08. Ventana parcial (no cierra el mes).";
 pack.months.Ago = agoPack;
 const agoGen = {
   month: "Ago",
