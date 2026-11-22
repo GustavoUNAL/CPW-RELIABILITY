@@ -1,15 +1,12 @@
 import { ChevronRight, Factory, MapPin, MapPinned } from "lucide-react";
+import { useMemo } from "react";
 import type { FieldParkId } from "./urlRouting";
 import { PARK_PROFILE } from "./ParkDossier";
 import { NOVEMBER_2026 } from "../history/reliabilityHistory";
+import { fmtHours, quantifiedNovember, reliabilitySnapshot } from "../history/failureMetrics";
+import { novemberDailyField, novemberDailyMeta } from "../history/novemberDailyGte";
 import type { WorkModule } from "./workModules";
 import type { PageKey } from "../types";
-
-const PARKS: { id: FieldParkId; icon: typeof MapPin; figure: string }[] = [
-  { id: "costayaco", icon: MapPin, figure: `${NOVEMBER_2026.costayaco} registros en noviembre` },
-  { id: "vonu", icon: MapPinned, figure: "Sin carpeta de fallas en noviembre" },
-  { id: "pad4", icon: Factory, figure: `${NOVEMBER_2026.pad4} registros · parada ${NOVEMBER_2026.trip}` },
-];
 
 type Props = {
   monthLabel: string;
@@ -17,17 +14,43 @@ type Props = {
   onOpenPark: (park: FieldParkId) => void;
 };
 
+function pctShort(v: number | null | undefined) {
+  if (v == null) return "—";
+  return `${(v * 100).toFixed(1).replace(".", ",")}%`;
+}
+
 export function HomeBoard({ monthLabel, activePark, onOpenPark }: Props) {
+  const meta = novemberDailyMeta();
+  const pulses = useMemo(() => {
+    const cycLive = novemberDailyField("costayaco");
+    const vonuLive = novemberDailyField("vonu");
+    const cycFo = reliabilitySnapshot(quantifiedNovember(["costayaco"]));
+    const pad = reliabilitySnapshot(quantifiedNovember(["pad4"]));
+    return {
+      costayaco: `${pctShort(cycLive.disp)} · ${Math.round(cycLive.mwh)} MWh · ${cycFo.events} FO`,
+      vonu: `${pctShort(vonuLive.disp)} · ${Math.round(vonuLive.mwh)} MWh`,
+      pad4: `${pad.events} FO · ${fmtHours(pad.downtimeHours)} · parada ${NOVEMBER_2026.trip}`,
+    };
+  }, []);
+
+  const parks: { id: FieldParkId; icon: typeof MapPin; figure: string }[] = [
+    { id: "costayaco", icon: MapPin, figure: pulses.costayaco },
+    { id: "vonu", icon: MapPinned, figure: pulses.vonu },
+    { id: "pad4", icon: Factory, figure: pulses.pad4 },
+  ];
+
   return (
     <div className="home-board">
       <header className="home-hero">
-        <p className="eyebrow">{monthLabel}</p>
+        <p className="eyebrow">
+          {monthLabel} · corte {meta.corteDay}
+        </p>
         <h1>Parques</h1>
-        <p>Cada parque abre en su resumen. Cada sección tiene su propia página.</p>
+        <p>Corte con reporte diario GTE. Entre a cada parque para indicadores y gráficas.</p>
       </header>
 
       <div className="home-parks">
-        {PARKS.map((park) => {
+        {parks.map((park) => {
           const profile = PARK_PROFILE[park.id];
           const Icon = park.icon;
           return (
@@ -46,7 +69,6 @@ export function HomeBoard({ monthLabel, activePark, onOpenPark }: Props) {
                 <em>{profile.goal}</em>
                 <span>{park.figure}</span>
               </span>
-              <span className="park-path">{profile.path}</span>
               <ChevronRight size={16} aria-hidden />
             </button>
           );

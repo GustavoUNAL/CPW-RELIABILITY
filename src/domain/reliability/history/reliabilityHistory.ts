@@ -1,4 +1,21 @@
 import type { PageKey } from "../types";
+import { NOVEMBER_FAILURES } from "./novemberFailures";
+
+function novemberDayBars(field: "costayaco" | "pad4") {
+  const counts = new Map<string, number>();
+  for (const row of NOVEMBER_FAILURES) {
+    if (row.field !== field) continue;
+    const day = String(Number(row.day.slice(8, 10)));
+    counts.set(day, (counts.get(day) ?? 0) + 1);
+  }
+  return [...counts.entries()]
+    .sort((a, b) => Number(a[0]) - Number(b[0]))
+    .map(([nombre, valor]) => ({ nombre, valor }));
+}
+
+function novemberFieldCount(field: "costayaco" | "pad4") {
+  return NOVEMBER_FAILURES.filter((row) => row.field === field).length;
+}
 
 /** Cómo entra el mes a la plataforma. */
 export type HistoryCoverage = "modelo" | "presentacion" | "fuente" | "abierto";
@@ -191,13 +208,13 @@ export const PUTN_HISTORY: PutnMonth[] = [
     key: "Nov",
     label: "Noviembre",
     coverage: "abierto",
-    copower: kpi(null, null, null, null),
+    copower: kpi(0.991071, 0.999206, 2069.096, 1),
     gte: null,
     gteExcelAvailability: null,
-    vonuAvailability: null,
-    vonuReliability: null,
-    note: "No hay cierre de disponibilidad. En carpeta hay 7 registros de Costayaco, entre el 1 y el 19. Vonú no tiene carpeta propia. Pad 4 tiene 6, incluida la parada común del 12.",
-    source: "data/Costayaco/fallas/2026-11 y data/Acordionero/fallas/2026-11",
+    vonuAvailability: 1,
+    vonuReliability: 1,
+    note: `Corte al 21 nov con reporte diario GTE (carpeta reporte-diario/2026-11): Costayaco Disp 99,11 % / Conf 99,92 % / 2.069 MWh. Vonú Disp 100 % / Conf 100 % / 291 MWh. FO-GE-033 Costayaco: ${novemberFieldCount("costayaco")} registros. Aún no hay cierre contractual.`,
+    source: "data/Costayaco/operacion/reporte-diario/2026-11",
   },
 ];
 
@@ -231,24 +248,24 @@ export const ACRD_HISTORY: AcrdMonth[] = [
     label: "Noviembre",
     coverage: "abierto",
     kpi: null,
-    note: "No hay cierre de disponibilidad. Hay 6 registros: el 1, el 5, el 10, la parada común del 12 (6 de 6, 9,2 MW), el 19 y el 20.",
+    note: `No hay cierre de disponibilidad. Hay ${novemberFieldCount("pad4")} registros FO: el 1, el 5, el 10, la parada común del 12 (6 de 6, 9,2 MW), el 19 y el 20.`,
     source: "data/Acordionero/fallas/2026-11",
   },
 ];
 
-/** Registros de falla con carpeta en noviembre 2026. No es el cierre de disponibilidad. */
+/** Registros FO-GE-033 de noviembre 2026. No es el cierre de disponibilidad. */
 export const NOVEMBER_2026 = {
-  costayaco: 7,
+  costayaco: novemberFieldCount("costayaco"),
   vonu: 0,
-  pad4: 6,
+  pad4: novemberFieldCount("pad4"),
   trip: "9,2 MW",
   byField: [
-    { nombre: "Costayaco", valor: 7 },
+    { nombre: "Costayaco", valor: novemberFieldCount("costayaco") },
     { nombre: "Vonú", valor: 0 },
-    { nombre: "Pad 4", valor: 6 },
+    { nombre: "Pad 4", valor: novemberFieldCount("pad4") },
   ],
-  costayacoDays: ["1", "2", "6", "9", "15", "16", "19"].map((nombre) => ({ nombre, valor: 1 })),
-  pad4Days: ["1", "5", "10", "12", "19", "20"].map((nombre) => ({ nombre, valor: 1 })),
+  costayacoDays: novemberDayBars("costayaco"),
+  pad4Days: novemberDayBars("pad4"),
 };
 
 export const PLATFORM_GROUPS: PlatformGroup[] = [

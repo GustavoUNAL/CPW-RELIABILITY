@@ -8,6 +8,11 @@ import {
   type GranTierraMonthKey,
 } from "../reports/granTierraMonthly";
 import type { FieldKey } from "./fieldAssets";
+import {
+  novemberDailyField,
+  novemberDailyHasData,
+  novemberDailyMeta,
+} from "../history/novemberDailyGte";
 
 const CAMPO: Record<FieldKey, string> = {
   costayaco: "COSTAYACO",
@@ -58,6 +63,41 @@ function assetForField(fieldKey: FieldKey, asset: string) {
   return fieldKey === "costayaco" ? /costayaco/i.test(asset) : /von/i.test(asset);
 }
 
+function fromNovemberDaily(
+  fieldKey: Extract<FieldKey, "costayaco" | "vonu">,
+  reportLabel: string,
+): FieldOperationalData {
+  const live = novemberDailyField(fieldKey);
+  const meta = novemberDailyMeta();
+  const gasKwh = live.unitsDetail
+    .filter((u) => /GAS/i.test(u.fuel))
+    .reduce((s, u) => s + u.kwh, 0);
+  return {
+    available: true,
+    sourceFile: meta.sourceFile,
+    reportLabel: `${reportLabel} · ${meta.corteLabel}`,
+    disp: live.disp == null ? null : live.disp * 100,
+    conf: live.conf == null ? null : live.conf * 100,
+    generationKwh: live.kwh,
+    gasKwh,
+    dieselKwh: live.kwh - gasKwh,
+    fallas: live.fallas,
+    hoursOp: live.hOp,
+    hoursFs: live.hMtoC + live.hExt,
+    units: live.unitsDetail.map((u) => ({
+      id: u.tag,
+      disp: u.disp == null ? null : u.disp * 100,
+      conf: u.conf == null ? null : u.conf * 100,
+      fallas: u.fallas,
+      mtbf: "—",
+      mttr: null,
+      riesgo: u.fallas > 0 ? "FO" : "OK",
+      energiaKwh: u.kwh,
+      horasOperacion: u.hOp,
+    })),
+  };
+}
+
 export function getFieldOperational(
   report: ReportKey,
   month: string,
@@ -66,6 +106,16 @@ export function getFieldOperational(
   const snap = getSnap(report, month);
   const campo = CAMPO[fieldKey];
   const reportLabel = report === "gran_tierra" ? "Gran Tierra Energy" : "COPOWER";
+
+  // Noviembre abierto: el pack diario GTE (carpeta reporte-diario/2026-11) alimenta GTE.
+  if (
+    !snap &&
+    report === "gran_tierra" &&
+    novemberDailyHasData(month) &&
+    (fieldKey === "costayaco" || fieldKey === "vonu")
+  ) {
+    return fromNovemberDaily(fieldKey, reportLabel);
+  }
 
   if (!snap) {
     return {

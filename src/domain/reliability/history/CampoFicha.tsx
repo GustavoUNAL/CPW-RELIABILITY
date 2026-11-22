@@ -10,6 +10,7 @@ import {
   type HistoryCoverage,
   type HistoryKpi,
 } from "./reliabilityHistory";
+import { novemberDailyField, novemberDailyHasData } from "./novemberDailyGte";
 
 export type IndependentField = "costayaco" | "vonu" | "pad4";
 
@@ -69,19 +70,24 @@ function emptyKpi(): HistoryKpi {
 }
 
 function modelRow(field: "costayaco" | "vonu", key: string, label: string): FieldRow | null {
-  const ops = getFieldOperational("copower", key, field);
+  const cpw = getFieldOperational("copower", key, field);
+  const gte = getFieldOperational("gran_tierra", key, field);
+  const ops = cpw.available ? cpw : gte;
   if (!ops.available || (ops.disp == null && ops.generationKwh == null)) return null;
+  const fromGteDaily = !cpw.available && gte.available && key === "Nov";
   return {
     key,
     label,
-    coverage: "modelo",
+    coverage: fromGteDaily ? "abierto" : "modelo",
     kpi: {
       availability: ratio(ops.disp),
       reliability: ratio(ops.conf),
       generationMwh: ops.generationKwh == null ? null : ops.generationKwh / 1000,
       failures: ops.fallas,
     },
-    note: "Cifra de este campo en el modelo COPOWER.",
+    note: fromGteDaily
+      ? "Corte con reporte diario GTE (carpeta reporte-diario/2026-11). Sin cierre contractual."
+      : "Cifra de este campo en el modelo COPOWER.",
   };
 }
 
@@ -195,23 +201,23 @@ export function CampoFicha({ field, month, monthLabel, onOpen, embedded = false 
               <dd>Sin cierre</dd>
             </div>
           </>
-        ) : november && field === "costayaco" ? (
+        ) : november && novemberDailyHasData(month) && (field === "costayaco" || field === "vonu") ? (
           <>
             <div>
-              <dt>Registros</dt>
-              <dd>{NOVEMBER_2026.costayaco}</dd>
-            </div>
-            <div>
-              <dt>Desde</dt>
-              <dd>1 nov</dd>
-            </div>
-            <div>
-              <dt>Hasta</dt>
-              <dd>19 nov</dd>
-            </div>
-            <div>
               <dt>Disponibilidad</dt>
-              <dd>Sin cierre</dd>
+              <dd>{pct(novemberDailyField(field).disp)}</dd>
+            </div>
+            <div>
+              <dt>Confiabilidad</dt>
+              <dd>{pct(novemberDailyField(field).conf)}</dd>
+            </div>
+            <div>
+              <dt>Generación</dt>
+              <dd>{mwh(novemberDailyField(field).mwh)}</dd>
+            </div>
+            <div>
+              <dt>Fallas</dt>
+              <dd>{novemberDailyField(field).fallas}</dd>
             </div>
           </>
         ) : november ? (

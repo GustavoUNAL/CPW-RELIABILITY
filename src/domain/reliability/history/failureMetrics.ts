@@ -248,3 +248,22 @@ export function fmtHours(hours: number): string {
   if (m === 0) return `${h} h`;
   return `${h} h ${String(m).padStart(2, "0")} min`;
 }
+
+/** Horas compactas para KPIs en móvil (119h04, 44m). */
+export function compactHours(hours: number): string {
+  if (!Number.isFinite(hours) || hours <= 0) return "0";
+  if (hours < 1) return `${Math.round(hours * 60)}m`;
+  const h = Math.floor(hours);
+  const m = Math.round((hours - h) * 60);
+  return m === 0 ? `${h}h` : `${h}h${String(m).padStart(2, "0")}`;
+}
+
+/** Texto corto para listas móviles (causas, títulos FO). */
+export function clipListText(text: string, max = 52): string {
+  const clean = text.replace(/\s+/g, " ").trim();
+  if (clean.length <= max) return clean;
+  const cut = clean.slice(0, max - 1);
+  const atWord = cut.lastIndexOf(" ");
+  const base = atWord > 24 ? cut.slice(0, atWord) : cut;
+  return `${base}…`;
+}

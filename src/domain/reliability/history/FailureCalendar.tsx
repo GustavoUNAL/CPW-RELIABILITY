@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import type { NovemberField } from "./novemberFailures";
 import {
+  clipListText,
+  compactHours as compactHoursLabel,
   failureCalendarDays,
   fmtHours,
   quantifiedNovember,
@@ -162,12 +164,9 @@ export function FailureCalendar({
     <div className="fail-cal">
       <header className="card section-head fail-cal-head">
         <div>
-          <p className="hist-kicker">{monthLabel} · FO-GE-033</p>
-          <h2>{title}</h2>
-          <p className="muted">
-            Pulse un día con falla para abrir el análisis completo a pantalla completa: causa raíz,
-            imputación y horas fuera de línea.
-          </p>
+          <p className="hist-kicker">{monthLabel} · FO</p>
+          <h2>{title.replace("Calendario de fallas · ", "FO · ")}</h2>
+          <p className="muted">Toque un día · causa e imputación.</p>
         </div>
         {allowFieldSwitch && fieldSwitchOptions.length > 1 ? (
           <div className="fail-cal-field-switch" role="tablist" aria-label="Campo">
@@ -184,27 +183,27 @@ export function FailureCalendar({
               </button>
             ))}
           </div>
-        ) : (
+        ) : activeFields.length > 1 ? (
           <p className="fail-cal-field-pill">{activeFields.map(fieldLabel).join(" · ")}</p>
-        )}
+        ) : null}
       </header>
 
       <dl className="hist-stats fail-cal-kpis">
         <div>
-          <dt>Eventos FO</dt>
+          <dt>FO</dt>
           <dd>{snap.events}</dd>
         </div>
         <div>
-          <dt>Horas fuera</dt>
-          <dd>{fmtHours(snap.downtimeHours)}</dd>
+          <dt>Fuera</dt>
+          <dd title={fmtHours(snap.downtimeHours)}>{compactHoursLabel(snap.downtimeHours)}</dd>
         </div>
         <div>
-          <dt>Imputables COPOWER</dt>
-          <dd>{fmtHours(snap.copowerHours)}</dd>
+          <dt>Imput.</dt>
+          <dd title={fmtHours(snap.copowerHours)}>{compactHoursLabel(snap.copowerHours)}</dd>
         </div>
         <div>
-          <dt>Externas</dt>
-          <dd>{fmtHours(snap.externalHours)}</dd>
+          <dt>Ext.</dt>
+          <dd title={fmtHours(snap.externalHours)}>{compactHoursLabel(snap.externalHours)}</dd>
         </div>
       </dl>
 
@@ -219,107 +218,111 @@ export function FailureCalendar({
         </section>
       ) : null}
 
-      <section className="card fail-cal-board">
-        <div className="fail-cal-legend" aria-hidden>
-          <span className="fail-cal-chip fail-cal-chip--ok">Sin falla</span>
-          <span className="fail-cal-chip fail-cal-chip--soft">FO leve</span>
-          <span className="fail-cal-chip fail-cal-chip--warn">FO medio</span>
-          <span className="fail-cal-chip fail-cal-chip--risk">FO alto / COPOWER</span>
-          <span className="fail-cal-legend-sum">
-            {snap.events} FO · {fmtHours(snap.downtimeHours)} fuera
-          </span>
-        </div>
-
-        <div className="fail-cal-weekdays" aria-hidden>
-          {WEEKDAYS.map((d) => (
-            <span key={d}>{d}</span>
-          ))}
-        </div>
-        <div className="fail-cal-grid" role="grid" aria-label={`Calendario ${monthLabel}`}>
-          {cells.map((cell, index) => {
-            if (!cell) return <div key={`b-${index}`} className="fail-cal-day blank" />;
-            const list = byDay.get(cell.iso) ?? [];
-            const hours = list.reduce((sum, e) => sum + e.downtimeHours, 0);
-            const tone = dayTone(hours, list);
-            return (
-              <button
-                key={cell.iso}
-                type="button"
-                className={["fail-cal-day", `fail-cal-day--${tone}`].join(" ")}
-                disabled={!list.length}
-                onClick={() => openDay(cell.iso)}
-              >
-                <strong>{cell.day}</strong>
-                {list.length ? (
-                  <>
-                    <span>{list.length} FO</span>
-                    <em>{fmtHours(hours)}</em>
-                  </>
-                ) : (
-                  <span>OK</span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-
+      <section className="card fail-cal-board fail-cal-board--summary">
+        <p className="fail-cal-board-hint muted">
+          Días con FO · toque para ver causa e imputación
+        </p>
         <ul className="fail-cal-daylist">
           {[...byDay.entries()]
             .sort(([a], [b]) => a.localeCompare(b))
-            .map(([iso, list]) => (
-              <li key={iso}>
-                <button type="button" onClick={() => openDay(iso)}>
-                  <strong>Día {dayNumber(iso)}</strong>
-                  <span>
-                    {`${list.length} ${list.length === 1 ? "evento" : "eventos"} · ${fmtHours(
-                      list.reduce((s, e) => s + e.downtimeHours, 0),
-                    )}`}
-                  </span>
-                </button>
-              </li>
-            ))}
+            .map(([iso, list]) => {
+              const hours = list.reduce((s, e) => s + e.downtimeHours, 0);
+              return (
+                <li key={iso}>
+                  <button type="button" onClick={() => openDay(iso)}>
+                    <strong>D{dayNumber(iso)}</strong>
+                    <span>
+                      {list.length}·{compactHoursLabel(hours)}
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
           {!byDay.size && hasFoData ? (
-            <li className="muted">No hay fallas en el filtro de campo actual.</li>
+            <li className="muted">Sin fallas en el filtro.</li>
           ) : null}
         </ul>
       </section>
 
-      <section className="card fail-cal-analysis">
-        <h3>Indicadores del campo · {monthLabel}</h3>
-        <p>
-          Horas imputables a COPOWER: <strong>{fmtHours(snap.copowerHours)}</strong>. Externas:{" "}
-          <strong>{fmtHours(snap.externalHours)}</strong>. La confiabilidad contractual usa FO imputables: R% ≈
-          (Tcal − FO) / Tcal. Este tablero cuantifica el FO del mes; no inventa el cierre de disponibilidad.
-        </p>
-        <div className="fail-cal-split">
-          <div>
-            <h4>Máquinas con más horas fuera</h4>
-            <ol>
-              {snap.machines.slice(0, 6).map((row) => (
-                <li key={row.unit}>
-                  <strong>{row.unit}</strong>
-                  <span>{fmtHours(row.hours)}</span>
-                </li>
-              ))}
-              {!snap.machines.length ? <li>Sin horas por máquina cuantificadas.</li> : null}
-            </ol>
+      <details className="park-more">
+        <summary>Ver calendario completo</summary>
+        <div className="park-more-body card fail-cal-board">
+          <div className="fail-cal-legend" aria-hidden>
+            <span className="fail-cal-chip fail-cal-chip--ok">Sin falla</span>
+            <span className="fail-cal-chip fail-cal-chip--soft">FO leve</span>
+            <span className="fail-cal-chip fail-cal-chip--warn">FO medio</span>
+            <span className="fail-cal-chip fail-cal-chip--risk">FO alto / COPOWER</span>
+            <span className="fail-cal-legend-sum">
+              {snap.events} FO · {fmtHours(snap.downtimeHours)} fuera
+            </span>
           </div>
-          <div>
-            <h4>Causas raíz por horas</h4>
-            <ol>
-              {snap.causes.slice(0, 5).map((row) => (
-                <li key={row.label}>
-                  <strong>
-                    {row.count}× · {fmtHours(row.hours)}
-                  </strong>
-                  <span>{row.label}</span>
-                </li>
-              ))}
-              {!snap.causes.length ? <li>Sin causas raíz en este filtro.</li> : null}
-            </ol>
+          <div className="fail-cal-weekdays" aria-hidden>
+            {WEEKDAYS.map((d) => (
+              <span key={d}>{d}</span>
+            ))}
+          </div>
+          <div className="fail-cal-grid" role="grid" aria-label={`Calendario ${monthLabel}`}>
+            {cells.map((cell, index) => {
+              if (!cell) return <div key={`b-${index}`} className="fail-cal-day blank" />;
+              const list = byDay.get(cell.iso) ?? [];
+              const hours = list.reduce((sum, e) => sum + e.downtimeHours, 0);
+              const tone = dayTone(hours, list);
+              return (
+                <button
+                  key={cell.iso}
+                  type="button"
+                  className={["fail-cal-day", `fail-cal-day--${tone}`].join(" ")}
+                  disabled={!list.length}
+                  onClick={() => openDay(cell.iso)}
+                >
+                  <strong>{cell.day}</strong>
+                  {list.length ? (
+                    <>
+                      <span>{list.length} FO</span>
+                      <em>{fmtHours(hours)}</em>
+                    </>
+                  ) : (
+                    <span>OK</span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
-      </section>
+      </details>
+
+      <details className="park-more">
+        <summary>Ver ranking y causas</summary>
+        <div className="park-more-body card fail-cal-analysis">
+          <header className="fail-cal-analysis-head">
+            <h3>Ranking FO</h3>
+            <p>
+              Imp <strong>{compactHoursLabel(snap.copowerHours)}</strong> · Ext{" "}
+              <strong>{compactHoursLabel(snap.externalHours)}</strong>
+            </p>
+          </header>
+          <div className="fail-cal-tiles">
+            {snap.machines.slice(0, 6).map((row) => (
+              <article key={row.unit} className="fail-cal-tile">
+                <strong>{row.unit}</strong>
+                <span>{compactHoursLabel(row.hours)}</span>
+              </article>
+            ))}
+            {!snap.machines.length ? <p className="muted">Sin horas por máquina.</p> : null}
+          </div>
+          <div className="fail-cal-cause-grid" style={{ marginTop: "0.65rem" }}>
+            {snap.causes.slice(0, 4).map((row) => (
+              <article key={row.label} className="fail-cal-cause" title={row.label}>
+                <strong>
+                  {row.count}× · {compactHoursLabel(row.hours)}
+                </strong>
+                <span>{clipListText(row.label, 36)}</span>
+              </article>
+            ))}
+            {!snap.causes.length ? <p className="muted">Sin causas.</p> : null}
+          </div>
+        </div>
+      </details>
     </div>
   );
 }
@@ -350,8 +353,12 @@ function FailureFullScreen({
           </p>
         </div>
         <h2>{event.units.length ? event.units.join(" · ") : "Parque"}</h2>
-        <p className="fail-cal-title">{event.title}</p>
-        <p className="muted fail-cal-file">{event.file}</p>
+        <p className="fail-cal-title" title={event.title}>
+          {clipListText(event.title, 96)}
+        </p>
+        <p className="muted fail-cal-file" title={event.file}>
+          {clipListText(event.file, 42)}
+        </p>
       </header>
 
       {dayEvents.length > 1 ? (
@@ -396,9 +403,9 @@ function FailureFullScreen({
         <section className="card fail-cal-screen-block">
           <h3>Resumen para indicadores</h3>
           <h4>Causa inmediata</h4>
-          <p>{event.immediateCause}</p>
+          <p title={event.immediateCause}>{clipListText(event.immediateCause, 140)}</p>
           <h4>Causa raíz</h4>
-          <p>{event.rootCause}</p>
+          <p title={event.rootCause}>{clipListText(event.rootCause, 140)}</p>
           {event.unitHours.length ? (
             <>
               <h4>Tiempo fuera por máquina</h4>

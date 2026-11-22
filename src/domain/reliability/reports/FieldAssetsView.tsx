@@ -55,6 +55,13 @@ const CARD_ICONS: Record<AssetCardKind, LucideIcon> = {
 const pct = (v: number | null) => (v == null || Number.isNaN(v) ? "N/D" : `${v.toFixed(2)}%`);
 const kwh = (v: number | null) =>
   v == null || Number.isNaN(v) ? "N/D" : `${Math.round(v).toLocaleString("es-CO")} kWh`;
+const energyCompact = (v: number | null) => {
+  if (v == null || Number.isNaN(v)) return "N/D";
+  if (Math.abs(v) >= 1000) {
+    return `${(v / 1000).toLocaleString("es-CO", { maximumFractionDigits: 0 })} MWh`;
+  }
+  return kwh(v);
+};
 const hours = (v: number | null) =>
   v == null || Number.isNaN(v) ? "N/D" : `${v.toLocaleString("es-CO", { maximumFractionDigits: 1 })} h`;
 
@@ -535,12 +542,16 @@ function FleetPanel({
 }
 
 function LiveUnitTile({ unit, descriptor }: { unit: MergedUnit; descriptor?: UnitDescriptor }) {
+  const risk = (unit.riesgo || "").toUpperCase();
   const riskClass =
-    unit.riesgo === "RIESGO ALTO"
+    risk.includes("ALTO") || risk === "FO"
       ? "field-live-unit--risk-high"
-      : unit.riesgo === "RIESGO MEDIO"
+      : risk.includes("MEDIO")
         ? "field-live-unit--risk-med"
         : "field-live-unit--risk-low";
+  const badgeTone =
+    risk.includes("ALTO") || risk === "FO" ? "danger" : risk.includes("MEDIO") ? "warn" : "success";
+  const badgeLabel = unit.riesgo.replace(/^RIESGO\s+/i, "") || "OK";
 
   const kwAvg = avgKwFromEnergy(unit.energiaKwh, unit.horasOperacion);
   const kwNom = descriptor?.kwNominal ?? null;
@@ -556,13 +567,7 @@ function LiveUnitTile({ unit, descriptor }: { unit: MergedUnit; descriptor?: Uni
             {descriptor?.variant === "jenbacher" ? " · respaldo diésel" : ""}
           </p>
         </div>
-        <span
-          className={`badge ${
-            unit.riesgo === "RIESGO ALTO" ? "danger" : unit.riesgo === "RIESGO MEDIO" ? "warn" : "success"
-          }`}
-        >
-          {unit.riesgo.replace("RIESGO ", "")}
-        </span>
+        <span className={`badge ${badgeTone}`}>{badgeLabel}</span>
       </header>
 
       <dl className="field-live-tech">
@@ -726,7 +731,7 @@ function FieldPerformanceSection({
   const selectedPrimary: FieldOperationalData =
     source === "copower" ? (cpw.available ? cpw : gte) : source === "gran_tierra" ? (gte.available ? gte : cpw) : autoPrimary;
   const selectedSecondary: FieldOperationalData | null =
-    selectedPrimary.reportLabel === "COPOWER"
+    selectedPrimary.reportLabel.startsWith("COPOWER")
       ? gte.available
         ? gte
         : null
@@ -743,57 +748,67 @@ function FieldPerformanceSection({
         : mergeFieldUnits(gte.units, cpw.units);
   const units = sortUnitsByFleet(unitsRaw, unitDescriptors);
 
+  const primaryIsCpw = selectedPrimary.reportLabel.startsWith("COPOWER");
   const sourceHint =
     source === "auto"
-      ? "Fuente automática (COPOWER prioridad · GTE referencia)"
-      : selectedPrimary.reportLabel === "COPOWER"
+      ? cpw.available
+        ? "Fuente automática (COPOWER prioridad · GTE referencia)"
+        : gte.available
+          ? "Fuente automática · reporte diario GTE (sin COPOWER en el mes)"
+          : "Sin fuente cargada"
+      : primaryIsCpw
         ? "Fuente seleccionada: COPOWER"
         : "Fuente seleccionada: Gran Tierra Energy";
 
-  const critical = units.filter((u) => u.fallas >= 2 || u.riesgo !== "RIESGO BAJO").length;
+  const critical = units.filter((u) => {
+    if (u.fallas >= 2) return true;
+    const r = (u.riesgo || "").toUpperCase();
+    if (!r || r === "OK" || r === "N/A" || r === "RIESGO BAJO" || r === "BAJO") return false;
+    if (r === "FO" || r.includes("ALTO") || r.includes("MEDIO") || r.includes("CRIT")) return true;
+    return false;
+  }).length;
 
   return (
-    <section className="field-op-section">
+    <section className="field-op-section field-op-section--summary">
       <div className="field-section-label">
         <Activity size={15} />
-        <span>Desempeño del periodo</span>
+        <span>Desempeño</span>
         <span className="field-group-count">{monthLabel}</span>
       </div>
-      <SourceSwitch source={source} onSourceChange={onSourceChange} />
 
       <article className="field-op-pane field-op-pane--field">
         <header className="field-op-pane-head">
           <div>
-            <strong>Indicadores del campo · {FIELD_PROFILES[fieldKey].label}</strong>
+            <strong>{FIELD_PROFILES[fieldKey].label}</strong>
             <small>{sourceHint}</small>
           </div>
           {critical > 0 ? (
-            <span className="badge warn">{critical} unidad(es) en seguimiento</span>
+            <span className="badge warn">{critical} en seguimiento</span>
           ) : (
             <span className="badge success">Sin críticos</span>
           )}
         </header>
 
-        <div className="field-op-kpi-grid">
+        <div className="field-op-kpi-grid field-op-kpi-grid--summary">
           <div className="field-op-kpi field-op-kpi--hero">
-            <span>Disponibilidad</span>
+            <span>Disp.</span>
             <strong>{pct(selectedPrimary.disp)}</strong>
             <MeterBar value={selectedPrimary.disp} />
             <small>Meta ≥ {META}%</small>
           </div>
           <div className="field-op-kpi field-op-kpi--hero">
-            <span>Confiabilidad</span>
+            <span>Conf.</span>
             <strong>{pct(selectedPrimary.conf)}</strong>
             <MeterBar value={selectedPrimary.conf} />
             <small>Meta ≥ {META}%</small>
           </div>
           <div className="field-op-kpi">
             <span>Generación</span>
-            <strong>{kwh(selectedPrimary.generationKwh)}</strong>
+            <strong>{energyCompact(selectedPrimary.generationKwh)}</strong>
             <small>
               {selectedPrimary.gasKwh != null
-                ? `Gas ${kwh(selectedPrimary.gasKwh)}${
-                    selectedPrimary.dieselKwh ? ` · Diésel ${kwh(selectedPrimary.dieselKwh)}` : ""
+                ? `Gas ${energyCompact(selectedPrimary.gasKwh)}${
+                    selectedPrimary.dieselKwh ? ` · Diésel ${energyCompact(selectedPrimary.dieselKwh)}` : ""
                   }`
                 : "Energía del periodo"}
             </small>
@@ -802,42 +817,54 @@ function FieldPerformanceSection({
             <span>Fallas</span>
             <strong>{selectedPrimary.fallas}</strong>
             <small>
-              {selectedSecondary && selectedPrimary.fallas !== selectedSecondary.fallas
-                ? `CPW/GTE: ${selectedPrimary.fallas} / ${selectedSecondary.fallas}`
-                : "Unidades del campo"}
+              OP {hours(selectedPrimary.hoursOp)} · FS {hours(selectedPrimary.hoursFs)}
             </small>
           </div>
-          <div className="field-op-kpi">
-            <span>Horas operación</span>
-            <strong>{hours(selectedPrimary.hoursOp)}</strong>
-            <small>Suma equipos del campo</small>
-          </div>
-          <div className="field-op-kpi">
-            <span>Horas FS</span>
-            <strong>{hours(selectedPrimary.hoursFs)}</strong>
-            <small>PF contr + PF cli</small>
-          </div>
         </div>
 
-        <div className="field-live-block-head">
-          <h4>Unidades del campo</h4>
-          <span className="muted">{units.length} equipos · gas primero · luego diésel</span>
-        </div>
-
-        {units.length > 0 ? (
-          <div className="field-live-grid">
-            {units.map((u) => (
-              <LiveUnitTile key={u.id} unit={u} descriptor={unitDescriptors.get(normId(u.id))} />
-            ))}
+        <details className="park-more">
+          <summary>Ver unidades ({units.length})</summary>
+          <div className="park-more-body">
+            {units.length > 0 ? (
+              <div className="field-live-grid">
+                {units.map((u) => (
+                  <LiveUnitTile key={u.id} unit={u} descriptor={unitDescriptors.get(normId(u.id))} />
+                ))}
+              </div>
+            ) : (
+              <p className="field-op-empty">Sin unidades registradas para este campo.</p>
+            )}
           </div>
-        ) : (
-          <p className="field-op-empty">Sin unidades registradas para este campo.</p>
-        )}
+        </details>
 
-        <p className="field-op-sources muted">
-          Fuentes: {selectedPrimary.sourceFile?.split("/").pop() ?? "N/D"}
-          {selectedSecondary?.sourceFile ? ` · ${selectedSecondary.sourceFile.split("/").pop()}` : ""}
-        </p>
+        <details className="park-more">
+          <summary>Fuente y comparación</summary>
+          <div className="park-more-body">
+            <SourceSwitch source={source} onSourceChange={onSourceChange} />
+            <p className="field-op-sources muted">
+              Fuentes: {selectedPrimary.sourceFile?.split("/").pop() ?? "N/D"}
+              {selectedSecondary?.sourceFile ? ` · ${selectedSecondary.sourceFile.split("/").pop()}` : ""}
+            </p>
+            {selectedSecondary ? (
+              <dl className="field-op-compare-mini">
+                <div>
+                  <dt>Disp. 2ª</dt>
+                  <dd>{pct(selectedSecondary.disp)}</dd>
+                </div>
+                <div>
+                  <dt>Conf. 2ª</dt>
+                  <dd>{pct(selectedSecondary.conf)}</dd>
+                </div>
+                <div>
+                  <dt>FO 2ª</dt>
+                  <dd>{selectedSecondary.fallas}</dd>
+                </div>
+              </dl>
+            ) : (
+              <p className="muted">Sin segunda fuente en este mes.</p>
+            )}
+          </div>
+        </details>
       </article>
     </section>
   );
