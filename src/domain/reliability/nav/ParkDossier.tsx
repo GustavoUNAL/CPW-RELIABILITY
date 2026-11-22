@@ -164,7 +164,7 @@ export function ParkDossier({
         <p className="eyebrow">{profile.place}</p>
         <h1>{profile.label}</h1>
         <p>
-          {profile.goal} Mes de {monthLabel}.
+          {profile.goal} Mes de {monthLabel.trim()}.
         </p>
         <p className="park-path">{parkPath(park, section)}</p>
       </header>

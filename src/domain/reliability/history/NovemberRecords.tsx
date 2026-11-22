@@ -47,7 +47,7 @@ export function NovemberRecords({ view, month, monthLabel }: Props) {
               <li key={unit}>
                 <strong>{unit}</strong>
                 <span>
-                  {count} evento{count === 1 ? "" : "s"}
+                  {`${count} ${count === 1 ? "evento" : "eventos"}`}
                 </span>
               </li>
             ))}

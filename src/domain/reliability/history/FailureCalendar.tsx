@@ -271,8 +271,9 @@ export function FailureCalendar({
                 <button type="button" onClick={() => openDay(iso)}>
                   <strong>Día {dayNumber(iso)}</strong>
                   <span>
-                    {list.length} evento{list.length === 1 ? "" : "s"} ·{" "}
-                    {fmtHours(list.reduce((s, e) => s + e.downtimeHours, 0))}
+                    {`${list.length} ${list.length === 1 ? "evento" : "eventos"} · ${fmtHours(
+                      list.reduce((s, e) => s + e.downtimeHours, 0),
+                    )}`}
                   </span>
                 </button>
               </li>
