@@ -55,7 +55,11 @@ export function CostayacoRcaEventsApp({
 
   const [view, setView] = useState<RcaAppView>("lista");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [layout, setLayout] = useState<"table" | "grid">("table");
+  const [layout, setLayout] = useState<"table" | "grid">(() =>
+    typeof window !== "undefined" && window.matchMedia("(max-width: 900px)").matches
+      ? "grid"
+      : "table",
+  );
   const [query, setQuery] = useState("");
   const [estado, setEstado] = useState<"Todos" | RcaEstadoEvento>("Todos");
   const [criticidad, setCriticidad] = useState<"Todos" | RcaCriticidad>("Todos");
@@ -228,63 +232,69 @@ export function CostayacoRcaEventsApp({
                   {filtered.length} de {events.length} evento(s)
                 </h3>
               </div>
-              <div className="mto-plans-filters rca-filters">
-                <select value={estado} onChange={(e) => setEstado(e.target.value as typeof estado)}>
-                  <option value="Todos">Todos los estados</option>
-                  {(Object.keys(ESTADO_LABEL) as RcaEstadoEvento[]).map((k) => (
-                    <option key={k} value={k}>
-                      {ESTADO_LABEL[k]}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  value={criticidad}
-                  onChange={(e) => setCriticidad(e.target.value as typeof criticidad)}
-                >
-                  <option value="Todos">Toda criticidad</option>
-                  <option value="critica">Crítica</option>
-                  <option value="alta">Alta</option>
-                  <option value="media-alta">Media-alta</option>
-                  <option value="media">Media</option>
-                  <option value="baja">Baja</option>
-                  <option value="PENDIENTE">Pendiente</option>
-                </select>
-                <select value={equipo} onChange={(e) => setEquipo(e.target.value)}>
-                  <option value="Todos">Todos los equipos</option>
-                  {equipoOptions.map((eq) => (
-                    <option key={eq} value={eq}>
-                      {eq}
-                    </option>
-                  ))}
-                </select>
-                <select value={calidad} onChange={(e) => setCalidad(e.target.value as typeof calidad)}>
-                  <option value="Todos">Toda calidad</option>
-                  <option value="completo">Completo</option>
-                  <option value="parcial">Parcial</option>
-                  <option value="inferido">Inferido</option>
-                  <option value="vacio">Vacío</option>
-                </select>
-                <select value={sortDir} onChange={(e) => setSortDir(e.target.value as SortDir)}>
-                  <option value="asc">Fecha ↑</option>
-                  <option value="desc">Fecha ↓</option>
-                </select>
+              <div className="rca-filters-bar">
                 <div className="mto-plans-search">
                   <Search size={14} />
                   <input
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Buscar id, título, equipo…"
+                    placeholder="Buscar evento…"
+                    enterKeyHint="search"
                   />
                 </div>
                 <button
                   type="button"
-                  className="btn ghost"
+                  className="btn ghost rca-layout-toggle"
                   onClick={() => setLayout((v) => (v === "table" ? "grid" : "table"))}
                   title="Cambiar vista"
                 >
-                  <LayoutGrid size={14} /> {layout === "table" ? "Grid" : "Tabla"}
+                  <LayoutGrid size={14} /> {layout === "table" ? "Cards" : "Tabla"}
                 </button>
               </div>
+              <details className="park-more rca-filters-more">
+                <summary>Filtros y orden</summary>
+                <div className="park-more-body mto-plans-filters rca-filters">
+                  <select value={estado} onChange={(e) => setEstado(e.target.value as typeof estado)}>
+                    <option value="Todos">Todos los estados</option>
+                    {(Object.keys(ESTADO_LABEL) as RcaEstadoEvento[]).map((k) => (
+                      <option key={k} value={k}>
+                        {ESTADO_LABEL[k]}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    value={criticidad}
+                    onChange={(e) => setCriticidad(e.target.value as typeof criticidad)}
+                  >
+                    <option value="Todos">Toda criticidad</option>
+                    <option value="critica">Crítica</option>
+                    <option value="alta">Alta</option>
+                    <option value="media-alta">Media-alta</option>
+                    <option value="media">Media</option>
+                    <option value="baja">Baja</option>
+                    <option value="PENDIENTE">Pendiente</option>
+                  </select>
+                  <select value={equipo} onChange={(e) => setEquipo(e.target.value)}>
+                    <option value="Todos">Todos los equipos</option>
+                    {equipoOptions.map((eq) => (
+                      <option key={eq} value={eq}>
+                        {eq}
+                      </option>
+                    ))}
+                  </select>
+                  <select value={calidad} onChange={(e) => setCalidad(e.target.value as typeof calidad)}>
+                    <option value="Todos">Toda calidad</option>
+                    <option value="completo">Completo</option>
+                    <option value="parcial">Parcial</option>
+                    <option value="inferido">Inferido</option>
+                    <option value="vacio">Vacío</option>
+                  </select>
+                  <select value={sortDir} onChange={(e) => setSortDir(e.target.value as SortDir)}>
+                    <option value="asc">Fecha ↑</option>
+                    <option value="desc">Fecha ↓</option>
+                  </select>
+                </div>
+              </details>
             </div>
 
             {filtered.length === 0 ? (

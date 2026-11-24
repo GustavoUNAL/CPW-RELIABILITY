@@ -52,6 +52,7 @@ export const WORK_MODULES: WorkModule[] = [
       { label: "Máquinas", page: "campos", leaf: "cfg-campos-costayaco-parque" },
       { label: "Activos", page: "campos", leaf: "cfg-campos-costayaco-activos" },
       { label: "Causas (RCA)", page: "confiabilidad", leaf: "an-rca-gte" },
+      { label: "Mantenimiento nov", page: "campos", leaf: "cfg-campos-costayaco-mantenimiento" },
     ],
   },
   {
@@ -75,6 +76,7 @@ export const WORK_MODULES: WorkModule[] = [
     items: [
       { label: "Resumen", page: "campos", leaf: "cfg-campos-pad4-resumen" },
       { label: "Falla 12 nov", page: "confiabilidad", leaf: "bd-ev-pad4-1211" },
+      { label: "Válvulas nov", page: "campos", leaf: "cfg-campos-pad4-valvulas" },
     ],
   },
   {

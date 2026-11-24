@@ -1,4 +1,4 @@
-import { ChevronRight, Factory, MapPin, MapPinned } from "lucide-react";
+import { Factory, MapPin, MapPinned } from "lucide-react";
 import { useMemo } from "react";
 import type { FieldParkId } from "./urlRouting";
 import { PARK_PROFILE } from "./ParkDossier";
@@ -69,7 +69,6 @@ export function HomeBoard({ monthLabel, activePark, onOpenPark }: Props) {
                 <em>{profile.goal}</em>
                 <span>{park.figure}</span>
               </span>
-              <ChevronRight size={16} aria-hidden />
             </button>
           );
         })}

@@ -1,4 +1,3 @@
-import { ChevronRight } from "lucide-react";
 import { equipoLabel, shortRcaEventId } from "../data";
 import type { RcaEventoFalla } from "../types";
 import { CriticalityBadge } from "./CriticalityBadge";
@@ -31,9 +30,7 @@ export function EventCard({ event, onOpen }: Props) {
         <CriticalityBadge value={event.criticidad} />
       </div>
       <p className="rca-event-card-sys">{event.sistema || "—"}</p>
-      <span className="rca-event-card-go">
-        Abrir ficha <ChevronRight size={14} />
-      </span>
+      <span className="rca-event-card-go">Abrir ficha</span>
     </button>
   );
 }

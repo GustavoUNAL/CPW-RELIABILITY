@@ -1,5 +1,7 @@
 import type { PageKey } from "../types";
 import { NOVEMBER_FAILURES } from "./novemberFailures";
+import { novemberDailyField, novemberDailyMeta } from "./novemberDailyGte";
+import { novemberDailyPad4Field, novemberDailyPad4Meta } from "./novemberDailyPad4";
 
 function novemberDayBars(field: "costayaco" | "pad4") {
   const counts = new Map<string, number>();
@@ -204,18 +206,26 @@ export const PUTN_HISTORY: PutnMonth[] = [
     note: "Cierre 01–31. Costayaco 98,87 % (5 fallas). Vonú 97,04 % y confiabilidad 100 %.",
     source: "Presentación PUTN octubre · data soporte GTE octubre",
   },
-  {
-    key: "Nov",
-    label: "Noviembre",
-    coverage: "abierto",
-    copower: kpi(0.991071, 0.999206, 2069.096, 1),
-    gte: null,
-    gteExcelAvailability: null,
-    vonuAvailability: 1,
-    vonuReliability: 1,
-    note: `Corte al 21 nov con reporte diario GTE (carpeta reporte-diario/2026-11): Costayaco Disp 99,11 % / Conf 99,92 % / 2.069 MWh. Vonú Disp 100 % / Conf 100 % / 291 MWh. FO-GE-033 Costayaco: ${novemberFieldCount("costayaco")} registros. Aún no hay cierre contractual.`,
-    source: "data/Costayaco/operacion/reporte-diario/2026-11",
-  },
+  (() => {
+    const cyc = novemberDailyField("costayaco");
+    const vonu = novemberDailyField("vonu");
+    const meta = novemberDailyMeta();
+    const day = meta.corteDay;
+    const fmt = (v: number | null) =>
+      v == null ? "—" : `${(v * 100).toFixed(2).replace(".", ",")} %`;
+    return {
+      key: "Nov",
+      label: "Noviembre",
+      coverage: "abierto" as const,
+      copower: kpi(cyc.disp ?? 0, cyc.conf ?? 0, cyc.mwh, cyc.fallas),
+      gte: null,
+      gteExcelAvailability: null,
+      vonuAvailability: vonu.disp,
+      vonuReliability: vonu.conf,
+      note: `Corte al ${day} nov con reporte diario GTE (${meta.recordCount} filas): Costayaco Disp ${fmt(cyc.disp)} / Conf ${fmt(cyc.conf)} / ${cyc.mwh.toLocaleString("es-CO", { maximumFractionDigits: 0 })} MWh · ${cyc.obsCount} observaciones. Vonú Disp ${fmt(vonu.disp)} / Conf ${fmt(vonu.conf)} / ${vonu.mwh.toLocaleString("es-CO", { maximumFractionDigits: 0 })} MWh. FO-GE-033 Costayaco: ${novemberFieldCount("costayaco")} registros. Aún no hay cierre contractual.`,
+      source: meta.sourceFile,
+    };
+  })(),
 ];
 
 export const ACRD_HISTORY: AcrdMonth[] = [
@@ -243,14 +253,20 @@ export const ACRD_HISTORY: AcrdMonth[] = [
     note: "N+1 operacional en 100 % y 4.467,2 MWh. Probabilístico 99,80 % de disponibilidad y 99,99 % de confiabilidad. G804 queda en 97,29 % como máquina.",
     source: "Presentación Acordionero Pad 4 · octubre",
   },
-  {
-    key: "Nov",
-    label: "Noviembre",
-    coverage: "abierto",
-    kpi: null,
-    note: `No hay cierre de disponibilidad. Hay ${novemberFieldCount("pad4")} registros FO: el 1, el 5, el 10, la parada común del 12 (6 de 6, 9,2 MW), el 19 y el 20.`,
-    source: "data/Acordionero/fallas/2026-11",
-  },
+  (() => {
+    const live = novemberDailyPad4Field();
+    const meta = novemberDailyPad4Meta();
+    const fmt = (v: number | null) =>
+      v == null ? "—" : `${(v * 100).toFixed(2).replace(".", ",")} %`;
+    return {
+      key: "Nov",
+      label: "Noviembre",
+      coverage: "abierto" as const,
+      kpi: kpi(live.disp ?? 0, live.conf ?? 0, live.mwh, live.fallas),
+      note: `Corte al ${meta.corteDay} nov con reporte diario ACR (${live.days} d · ${live.units} máq.): Disp ${fmt(live.disp)} / Conf ${fmt(live.conf)} / ${live.mwh.toLocaleString("es-CO", { maximumFractionDigits: 0 })} MWh. FO documentados: ${novemberFieldCount("pad4")} (incluye parada del 12 · 9,2 MW). Aún no hay cierre N+1.`,
+      source: meta.sourceFile,
+    };
+  })(),
 ];
 
 /** Registros FO-GE-033 de noviembre 2026. No es el cierre de disponibilidad. */

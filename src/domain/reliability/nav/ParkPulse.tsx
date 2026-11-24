@@ -20,7 +20,13 @@ import {
   novemberDailyField,
   novemberDailyHasData,
   novemberDailyMeta,
+  novemberDailyObsRecent,
 } from "../history/novemberDailyGte";
+import {
+  novemberDailyPad4Field,
+  novemberDailyPad4HasData,
+  novemberDailyPad4Meta,
+} from "../history/novemberDailyPad4";
 
 type Props = {
   park: FieldParkId;
@@ -85,9 +91,15 @@ function lastClosedPad4() {
 
 function availabilitySeries(park: FieldParkId) {
   if (park === "pad4") {
+    const live = novemberDailyPad4Field();
     return ACRD_HISTORY.map((row) => ({
       mes: row.label.slice(0, 3),
-      valor: row.kpi?.availability == null ? null : row.kpi.availability * 100,
+      valor:
+        row.key === "Nov" && live.disp != null
+          ? Number((live.disp * 100).toFixed(2))
+          : row.kpi?.availability == null
+            ? null
+            : row.kpi.availability * 100,
     }));
   }
   const base = PUTN_HISTORY.map((row) => {
@@ -143,10 +155,17 @@ function FoHoursChart({
 export function ParkPulse({ park, month, monthLabel, onOpenFallas }: Props) {
   const profile = PARK_PROFILE[park];
   const goal = GOAL[park];
-  const openMonth = novemberDailyHasData(month) || month === "Nov";
-  const dailyMeta = novemberDailyMeta();
-  const daily =
-    openMonth && (park === "costayaco" || park === "vonu") ? novemberDailyField(park) : null;
+  const openMonth =
+    month === "Nov" ||
+    novemberDailyHasData(month) ||
+    (park === "pad4" && novemberDailyPad4HasData(month));
+  const putnMeta = novemberDailyMeta();
+  const pad4Meta = novemberDailyPad4Meta();
+  const putnField = park === "costayaco" || park === "vonu" ? park : null;
+  const putnDaily = openMonth && putnField ? novemberDailyField(putnField) : null;
+  const pad4Daily = openMonth && park === "pad4" ? novemberDailyPad4Field() : null;
+  const dailyObs = putnField ? novemberDailyObsRecent(putnField, 10) : [];
+  const dailyMeta = park === "pad4" ? pad4Meta : putnMeta;
 
   const foField = FO_FIELD[park];
   const events = useMemo(
@@ -162,19 +181,31 @@ export function ParkPulse({ park, month, monthLabel, onOpenFallas }: Props) {
   const closed =
     park === "pad4" ? lastClosedPad4() : lastClosedPutn(park === "vonu" ? "vonu" : "costayaco");
 
-  const liveDisp = daily?.disp != null ? Number((daily.disp * 100).toFixed(2)) : null;
-  const liveConf = daily?.conf != null ? Number((daily.conf * 100).toFixed(2)) : null;
-  const liveMwh = daily?.mwh ?? null;
-  const foCount = openMonth ? (foField ? snap.events : daily?.fallas ?? null) : null;
+  const liveDisp =
+    putnDaily?.disp != null
+      ? Number((putnDaily.disp * 100).toFixed(2))
+      : pad4Daily?.disp != null
+        ? Number((pad4Daily.disp * 100).toFixed(2))
+        : null;
+  const liveConf =
+    putnDaily?.conf != null
+      ? Number((putnDaily.conf * 100).toFixed(2))
+      : pad4Daily?.conf != null
+        ? Number((pad4Daily.conf * 100).toFixed(2))
+        : null;
+  const liveMwh = putnDaily?.mwh ?? pad4Daily?.mwh ?? null;
+  const foCount = openMonth ? (foField ? snap.events : putnDaily?.fallas ?? pad4Daily?.fallas ?? null) : null;
   const fueraLabel = openMonth ? compactHours(snap.downtimeHours) : "—";
   const extLabel =
     openMonth && foField
       ? compactHours(snap.externalHours)
-      : daily
-        ? compactHours(daily.hExt)
-        : openMonth
-          ? compactHours(snap.externalHours)
-          : "—";
+      : putnDaily
+        ? compactHours(putnDaily.hExt)
+        : pad4Daily
+          ? compactHours(pad4Daily.hCli)
+          : openMonth
+            ? compactHours(snap.externalHours)
+            : "—";
 
   const foDayBars = useMemo(() => {
     return [...byDay.entries()]
@@ -190,13 +221,14 @@ export function ParkPulse({ park, month, monthLabel, onOpenFallas }: Props) {
   }, [byDay]);
 
   const genDayBars = useMemo(() => {
-    if (!daily?.daily.length) return [];
-    return daily.daily.map((row) => ({
+    const rows = putnDaily?.daily ?? pad4Daily?.daily ?? [];
+    if (!rows.length) return [];
+    return rows.map((row) => ({
       nombre: String(Number(row.fecha.slice(8, 10))),
       valor: Number((row.kwh / 1000).toFixed(2)),
       hoursLabel: `${(row.kwh / 1000).toFixed(1)} MWh`,
     }));
-  }, [daily]);
+  }, [putnDaily, pad4Daily]);
 
   const recordDays =
     park === "costayaco"
@@ -216,7 +248,7 @@ export function ParkPulse({ park, month, monthLabel, onOpenFallas }: Props) {
         : "ok";
 
   const chartMode =
-    openMonth && genDayBars.length && (park === "costayaco" || park === "vonu")
+    openMonth && genDayBars.length && (park === "costayaco" || park === "vonu" || park === "pad4")
       ? "gen"
       : openMonth && foDayBars.length
         ? "fo"
@@ -225,10 +257,10 @@ export function ParkPulse({ park, month, monthLabel, onOpenFallas }: Props) {
           : "hist";
 
   const avanceNote =
-    park === "pad4" && openMonth
-      ? `Parada 12: 6/6 · ${NOVEMBER_2026.trip}`
-      : daily
-        ? `${daily.days} d · ${daily.units} máq.`
+    pad4Daily
+      ? `${pad4Daily.days} d · ${pad4Daily.units} máq.`
+      : putnDaily
+        ? `${putnDaily.days} d · ${putnDaily.units} máq.`
         : openMonth
           ? `FO hasta día ${foDayBars.at(-1)?.nombre ?? "—"}`
           : monthLabel;
@@ -238,12 +270,14 @@ export function ParkPulse({ park, month, monthLabel, onOpenFallas }: Props) {
       <header className="park-pulse-head">
         <div>
           <p className="park-pulse-kicker">{corteLabel}</p>
-          <h2>Estado del parque</h2>
+          <h2>Corte del mes</h2>
           <p className="park-pulse-sub">
             {openMonth
-              ? daily
-                ? "Mes abierto · corte GTE"
-                : "Mes abierto · FO"
+              ? putnDaily
+                ? "Disp · Conf · energía · FO"
+                : pad4Daily
+                  ? "ACR · N+1"
+                  : "Mes abierto · FO"
               : "Indicadores del mes"}
           </p>
         </div>
@@ -301,48 +335,48 @@ export function ParkPulse({ park, month, monthLabel, onOpenFallas }: Props) {
         </dl>
       </div>
 
-      <div className="park-pulse-actions">
-        {onOpenFallas && openMonth && (park === "costayaco" || park === "pad4") ? (
-          <button type="button" className="park-more-btn park-more-btn--ghost" onClick={onOpenFallas}>
-            Fallas
-          </button>
-        ) : null}
-      </div>
+      <section className="park-pulse-livechart" aria-label="Lectura rápida del mes">
+        <header>
+          <h3>
+            {chartMode === "gen"
+              ? "Energía del mes"
+              : chartMode === "fo"
+                ? "Fuera de servicio"
+                : chartMode === "records"
+                  ? "Registros FO"
+                  : "Tendencia"}
+          </h3>
+          <span>{openMonth ? corteLabel : monthLabel}</span>
+        </header>
+        {chartMode === "gen" ? (
+          <FoHoursChart days={genDayBars} ariaLabel="MWh por día" valueMode="raw" />
+        ) : chartMode === "fo" ? (
+          <FoHoursChart days={foDayBars} />
+        ) : chartMode === "records" ? (
+          <NovemberChart data={recordDays} />
+        ) : (
+          <IndicatorChart data={series} goal={goal ?? undefined} />
+        )}
+      </section>
 
-      <details className="park-more">
-        <summary>Ver gráficas</summary>
-        <div className="park-more-body park-pulse-board">
-          <section className="park-pulse-card park-pulse-chart">
-            <header>
-              <h3>
-                {chartMode === "gen"
-                  ? "MWh / día"
-                  : chartMode === "fo"
-                    ? "Fuera / día"
-                    : chartMode === "records"
-                      ? "Registros"
-                      : "Histórico"}
-              </h3>
-            </header>
-            {chartMode === "gen" ? (
-              <FoHoursChart days={genDayBars} ariaLabel="MWh por día" valueMode="raw" />
-            ) : chartMode === "fo" ? (
-              <FoHoursChart days={foDayBars} />
-            ) : chartMode === "records" ? (
-              <NovemberChart data={recordDays} />
-            ) : (
-              <IndicatorChart data={series} goal={goal ?? undefined} />
-            )}
-          </section>
-          <section className="park-pulse-card park-pulse-chart">
-            <header>
-              <h3>Tendencia</h3>
-              <span>vs meta</span>
-            </header>
-            <IndicatorChart data={series} goal={goal ?? undefined} />
-          </section>
+      {onOpenFallas && openMonth && (park === "costayaco" || park === "pad4") ? (
+        <div className="park-pulse-actions">
+          <button type="button" className="park-more-btn park-more-btn--ghost" onClick={onOpenFallas}>
+            Ver fallas del mes
+          </button>
         </div>
-      </details>
+      ) : null}
+
+      {chartMode !== "hist" ? (
+        <details className="park-more">
+          <summary>Tendencia vs meta</summary>
+          <div className="park-more-body park-pulse-board">
+            <section className="park-pulse-card park-pulse-chart">
+              <IndicatorChart data={series} goal={goal ?? undefined} />
+            </section>
+          </div>
+        </details>
+      ) : null}
 
       <details className="park-more">
         <summary>Ver más del corte</summary>
@@ -351,26 +385,69 @@ export function ParkPulse({ park, month, monthLabel, onOpenFallas }: Props) {
             <strong>{profile.place}.</strong> {profile.goal}
             {closed ? ` Último cierre ${closed.label}: Disp ${pct(closed.availability)}.` : ""}
           </p>
-          {openMonth && daily ? (
+          {openMonth && putnDaily ? (
             <>
               <p>
-                Fuente GTE {dailyMeta.corte} · OP {daily.hOp} · SB {daily.hSb} · MTO{" "}
-                {daily.hMtoP + daily.hMtoC} · Ext reporte {daily.hExt} h.
+                Fuente GTE {dailyMeta.corte} · {dailyMeta.recordCount} filas · OP {putnDaily.hOp} · SB{" "}
+                {putnDaily.hSb} · MTO {putnDaily.hMtoP + putnDaily.hMtoC} · Ext {putnDaily.hExt} h ·{" "}
+                {putnDaily.obsCount} observaciones.
               </p>
               <div className="park-bitin-block">
-                <h4>Top generación</h4>
-                <ul className="park-bitin-chips">
-                  {daily.unitsDetail.slice(0, 5).map((row) => (
-                    <li key={row.tag}>
-                      <strong>{row.tag}</strong>
-                      <span>
-                        {(row.kwh / 1000).toFixed(1)} MWh
-                        {row.disp == null ? "" : ` · ${(row.disp * 100).toFixed(0)}%`}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+                <h4>Flota · corte GTE</h4>
+                <div className="park-daily-table-wrap">
+                  <table className="park-daily-table">
+                    <thead>
+                      <tr>
+                        <th>TAG</th>
+                        <th>Unidad</th>
+                        <th>MWh</th>
+                        <th>OP</th>
+                        <th>SB</th>
+                        <th>Ext</th>
+                        <th>Disp</th>
+                        <th>FO</th>
+                        <th>Horóm.</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {putnDaily.unitsDetail.map((row) => (
+                        <tr key={row.tag}>
+                          <td>
+                            <strong>{row.tag}</strong>
+                          </td>
+                          <td>{row.unidad}</td>
+                          <td>{(row.kwh / 1000).toFixed(1)}</td>
+                          <td>{row.hOp}</td>
+                          <td>{row.hSb}</td>
+                          <td>{row.hExt}</td>
+                          <td>{row.disp == null ? "—" : `${(row.disp * 100).toFixed(1)}%`}</td>
+                          <td>{row.fallas || "—"}</td>
+                          <td>
+                            {row.horometroFinal == null
+                              ? "—"
+                              : row.horometroFinal.toLocaleString("es-CO")}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
+              {dailyObs.length ? (
+                <div className="park-bitin-block">
+                  <h4>Observaciones recientes</h4>
+                  <ul className="park-daily-obs">
+                    {dailyObs.map((row) => (
+                      <li key={`${row.fecha}-${row.tag}-${row.texto.slice(0, 24)}`}>
+                        <strong>
+                          {Number(row.fecha.slice(8, 10))}/{row.fecha.slice(5, 7)} · {row.tag}
+                        </strong>
+                        <span title={row.texto}>{clipListText(row.texto, 110)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
               {snap.machines.length ? (
                 <div className="park-bitin-block">
                   <h4>FO · más horas</h4>
@@ -400,9 +477,67 @@ export function ParkPulse({ park, month, monthLabel, onOpenFallas }: Props) {
                 </div>
               ) : null}
             </>
+          ) : openMonth && pad4Daily ? (
+            <>
+              <p>
+                Fuente reporte diario ACR {dailyMeta.corte} · OP {pad4Daily.hOp} · SB {pad4Daily.hSb} ·
+                Prog {pad4Daily.hProg} · FS COPOWER {pad4Daily.hFs} · Cliente {pad4Daily.hCli} h · gas{" "}
+                {pad4Daily.gasM3.toLocaleString("es-CO")} m³.
+              </p>
+              <div className="park-bitin-block">
+                <h4>Flota · corte Pad 4</h4>
+                <div className="park-daily-table-wrap">
+                  <table className="park-daily-table">
+                    <thead>
+                      <tr>
+                        <th>TAG</th>
+                        <th>kW nom.</th>
+                        <th>MWh</th>
+                        <th>OP</th>
+                        <th>SB</th>
+                        <th>Prog</th>
+                        <th>FS</th>
+                        <th>Disp</th>
+                        <th>FO</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pad4Daily.unitsDetail.map((row) => (
+                        <tr key={row.tag}>
+                          <td>
+                            <strong>{row.tag}</strong>
+                          </td>
+                          <td>{row.kwNom}</td>
+                          <td>{(row.kwh / 1000).toFixed(1)}</td>
+                          <td>{row.hOp}</td>
+                          <td>{row.hSb}</td>
+                          <td>{row.hProg || "—"}</td>
+                          <td>{row.hFs || "—"}</td>
+                          <td>{row.disp == null ? "—" : `${(row.disp * 100).toFixed(1)}%`}</td>
+                          <td>{row.fallas || "—"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              {snap.machines.length ? (
+                <div className="park-bitin-block">
+                  <h4>FO · más horas</h4>
+                  <ul className="park-bitin-chips">
+                    {snap.machines.slice(0, 5).map((row) => (
+                      <li key={row.unit}>
+                        <strong>{row.unit}</strong>
+                        <span>{compactHours(row.hours)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+            </>
           ) : openMonth ? (
             <>
-              <p>Sin reporte diario GTE. Se muestran FO documentados.</p>
+              <p>Sin reporte diario cargado. Se muestran FO documentados.</p>
               {snap.machines.length ? (
                 <ul className="park-bitin-chips">
                   {snap.machines.slice(0, 5).map((row) => (

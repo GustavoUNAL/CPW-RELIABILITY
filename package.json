@@ -15,6 +15,7 @@
     "etl:concertacion-informes": "node scripts/etl-concertacion.mjs",
     "etl:gte-julio": "node scripts/etl-gte-julio.mjs",
     "etl:nov-diario-gte": "node scripts/etl-november-daily-gte.mjs",
+    "etl:nov-diario-pad4": "node scripts/etl-november-daily-pad4.mjs",
     "etl:copower-julio": "node scripts/etl-copower-julio-concertacion.mjs",
     "etl:agosto": "node scripts/etl-agosto.mjs",
     "etl:facturacion": "node scripts/etl-facturacion-ecuador.mjs",

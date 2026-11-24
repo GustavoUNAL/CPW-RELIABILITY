@@ -10,7 +10,11 @@ import {
   type HistoryCoverage,
   type HistoryKpi,
 } from "./reliabilityHistory";
-import { novemberDailyField, novemberDailyHasData } from "./novemberDailyGte";
+import {
+  novemberDailyField,
+  novemberDailyHasData,
+  novemberDailyMeta,
+} from "./novemberDailyGte";
 
 export type IndependentField = "costayaco" | "vonu" | "pad4";
 
@@ -86,7 +90,7 @@ function modelRow(field: "costayaco" | "vonu", key: string, label: string): Fiel
       failures: ops.fallas,
     },
     note: fromGteDaily
-      ? "Corte con reporte diario GTE (carpeta reporte-diario/2026-11). Sin cierre contractual."
+      ? `Corte ${novemberDailyMeta().corteLabel} · reporte diario GTE. Sin cierre contractual.`
       : "Cifra de este campo en el modelo COPOWER.",
   };
 }

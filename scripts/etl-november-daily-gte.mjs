@@ -2,6 +2,8 @@
  * ETL: Reporte Diario de Operaciones GTE (formato fila/día · máquina)
  * → src/domain/reliability/history/data/novemberDailyGte.json
  *
+ * Extrae todas las columnas del libro (horómetros, consumos, observaciones).
+ *
  * Uso:
  *   node scripts/etl-november-daily-gte.mjs
  *   node scripts/etl-november-daily-gte.mjs [ruta.xlsx]
@@ -34,8 +36,20 @@ function iso(v) {
 }
 
 function num(v) {
+  if (v == null || v === "" || v === "NO APLICA") return null;
   const n = Number(v);
-  return Number.isFinite(n) ? n : 0;
+  return Number.isFinite(n) ? n : null;
+}
+
+function num0(v) {
+  return num(v) ?? 0;
+}
+
+function text(v) {
+  if (v == null || v === "") return null;
+  const s = String(v).trim();
+  if (!s || /^NO APLICA$/i.test(s)) return null;
+  return s;
 }
 
 function fieldSnap(records, campo, corte, dates) {
@@ -48,6 +62,8 @@ function fieldSnap(records, campo, corte, dates) {
   const hTot = rows.reduce((s, r) => s + r.hTot, 0);
   const kwh = rows.reduce((s, r) => s + r.kwh, 0);
   const fallas = rows.reduce((s, r) => s + r.fallas, 0);
+  const consumoPrimario = rows.reduce((s, r) => s + (r.consumoPrimario ?? 0), 0);
+  const obsCount = rows.filter((r) => r.observaciones).length;
 
   const byTag = new Map();
   for (const r of rows) {
@@ -62,8 +78,12 @@ function fieldSnap(records, campo, corte, dates) {
       hTot: 0,
       hExt: 0,
       fallas: 0,
+      consumoPrimario: 0,
+      capInstKw: r.capInstKw,
       capEntKw: r.capEntKw,
       fuel: r.fuel,
+      horometroFinal: null,
+      lastFecha: null,
     };
     cur.kwh += r.kwh;
     cur.hOp += r.hOp;
@@ -73,13 +93,31 @@ function fieldSnap(records, campo, corte, dates) {
     cur.hTot += r.hTot;
     cur.hExt += r.hExt;
     cur.fallas += r.fallas;
+    cur.consumoPrimario += r.consumoPrimario ?? 0;
+    if (!cur.lastFecha || r.fecha >= cur.lastFecha) {
+      cur.lastFecha = r.fecha;
+      cur.horometroFinal = r.horometroFinal;
+    }
     byTag.set(r.tag, cur);
   }
 
   const unitsDetail = [...byTag.values()]
     .map((u) => ({
-      ...u,
+      tag: u.tag,
+      unidad: u.unidad,
       kwh: Number(u.kwh.toFixed(1)),
+      hOp: u.hOp,
+      hSb: u.hSb,
+      hMtoP: u.hMtoP,
+      hMtoC: u.hMtoC,
+      hTot: u.hTot,
+      hExt: u.hExt,
+      fallas: u.fallas,
+      consumoPrimario: Number(u.consumoPrimario.toFixed(1)),
+      capInstKw: u.capInstKw,
+      capEntKw: u.capEntKw,
+      fuel: u.fuel,
+      horometroFinal: u.horometroFinal,
       disp: u.hTot > 0 ? Number(((u.hOp + u.hSb) / u.hTot).toFixed(6)) : null,
       conf: u.hTot > 0 ? Number(((u.hTot - u.hMtoC) / u.hTot).toFixed(6)) : null,
     }))
@@ -94,14 +132,32 @@ function fieldSnap(records, campo, corte, dates) {
       const dOp = dayRows.reduce((s, r) => s + r.hOp, 0);
       const dSb = dayRows.reduce((s, r) => s + r.hSb, 0);
       const dTot = dayRows.reduce((s, r) => s + r.hTot, 0);
+      const dExt = dayRows.reduce((s, r) => s + r.hExt, 0);
+      const dObs = dayRows.filter((r) => r.observaciones).length;
       return {
         fecha,
         kwh: Number(dkwh.toFixed(1)),
         fallas: dFallas,
         hOp: dOp,
+        hSb: dSb,
+        hExt: dExt,
+        obs: dObs,
         disp: dTot > 0 ? Number(((dOp + dSb) / dTot).toFixed(6)) : null,
       };
     });
+
+  const observaciones = rows
+    .filter((r) => r.observaciones)
+    .map((r) => ({
+      fecha: r.fecha,
+      tag: r.tag,
+      unidad: r.unidad,
+      fallas: r.fallas,
+      hExt: r.hExt,
+      hMtoC: r.hMtoC,
+      texto: r.observaciones,
+    }))
+    .sort((a, b) => b.fecha.localeCompare(a.fecha) || a.tag.localeCompare(b.tag));
 
   return {
     campo,
@@ -116,10 +172,13 @@ function fieldSnap(records, campo, corte, dates) {
     kwh: Number(kwh.toFixed(1)),
     mwh: Number((kwh / 1000).toFixed(3)),
     fallas,
+    consumoPrimario: Number(consumoPrimario.toFixed(1)),
+    obsCount,
     disp: hTot > 0 ? Number(((hOp + hSb) / hTot).toFixed(6)) : null,
     conf: hTot > 0 ? Number(((hTot - hMtoC) / hTot).toFixed(6)) : null,
     unitsDetail,
     daily,
+    observaciones,
   };
 }
 
@@ -146,22 +205,31 @@ for (const r of rows.slice(1)) {
   if (!campo) continue;
   records.push({
     fecha,
+    cuenca: text(r[1]),
     campo,
+    campoLabel: String(r[2] || "").trim(),
+    contratista: text(r[3]),
     unidad: String(r[4] || ""),
     tag: String(r[5] || "").replace(/\s+/g, ""),
-    capInstKw: num(r[6]),
-    capEntKw: num(r[7]),
-    kwh: num(r[10]),
-    kwProm: num(r[11]),
-    hOp: num(r[12]),
-    hSb: num(r[13]),
-    hMtoP: num(r[14]),
-    hMtoC: num(r[15]),
-    hTot: num(r[16]),
-    hExt: num(r[17]),
-    fallas: num(r[18]),
+    capInstKw: num0(r[6]),
+    capEntKw: num0(r[7]),
+    horometroInicial: num(r[8]),
+    horometroFinal: num(r[9]),
+    kwh: num0(r[10]),
+    kwProm: num0(r[11]),
+    hOp: num0(r[12]),
+    hSb: num0(r[13]),
+    hMtoP: num0(r[14]),
+    hMtoC: num0(r[15]),
+    hTot: num0(r[16]),
+    hExt: num0(r[17]),
+    fallas: num0(r[18]),
     fuel: String(r[19] || "").toUpperCase(),
-    eff: r[23] == null || r[23] === "" ? null : num(r[23]),
+    fuelSec: text(r[20]),
+    consumoPrimario: num(r[21]),
+    consumoSecundario: num(r[22]),
+    eff: num(r[23]),
+    observaciones: text(r[24]),
   });
 }
 
@@ -174,6 +242,25 @@ const pack = {
   corte,
   corteLabel: `Corte ${Number(corte.slice(8, 10))} nov ${corte.slice(0, 4)}`,
   dateRange: { min: dates[0], max: corte },
+  columns: [
+    "Fecha",
+    "Cuenca",
+    "Campo",
+    "Contratista",
+    "Unidad",
+    "TAG",
+    "Cap. instalada",
+    "Cap. entregada",
+    "Horómetro ini/fin",
+    "kWh",
+    "kW promedio",
+    "Horas OP/SB/MMT/Ext",
+    "Fallas",
+    "Combustible",
+    "Consumo",
+    "Eficiencia",
+    "Observaciones",
+  ],
   fields: {
     costayaco: fieldSnap(records, "costayaco", corte, dates),
     vonu: fieldSnap(records, "vonu", corte, dates),
@@ -187,9 +274,9 @@ const cyc = pack.fields.costayaco;
 const vonu = pack.fields.vonu;
 console.log(`OK → ${path.relative(ROOT, OUT)}`);
 console.log(`fuente ${pack.sourceFile}`);
-console.log(`corte ${corte} · registros ${records.length}`);
+console.log(`corte ${corte} · registros ${records.length} · obs ${records.filter((r) => r.observaciones).length}`);
 console.log(
-  `CYC Disp ${(cyc.disp * 100).toFixed(2)}% · Conf ${(cyc.conf * 100).toFixed(2)}% · ${cyc.mwh} MWh · FO ${cyc.fallas}`,
+  `CYC Disp ${(cyc.disp * 100).toFixed(2)}% · Conf ${(cyc.conf * 100).toFixed(2)}% · ${cyc.mwh} MWh · FO ${cyc.fallas} · gas ${cyc.consumoPrimario}`,
 );
 console.log(
   `VONU Disp ${(vonu.disp * 100).toFixed(2)}% · Conf ${(vonu.conf * 100).toFixed(2)}% · ${vonu.mwh} MWh · FO ${vonu.fallas}`,
